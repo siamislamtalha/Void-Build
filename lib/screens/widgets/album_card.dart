@@ -58,7 +58,7 @@ class _AlbumCardState extends State<AlbumCard> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.black,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(18),
                     border: Border.all(
                       color:
                           Default_Theme.primaryColor1.withValues(alpha: 0.08),
@@ -73,7 +73,7 @@ class _AlbumCardState extends State<AlbumCard> {
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(17),
                     child: Stack(
                       fit: StackFit.expand,
                       children: [

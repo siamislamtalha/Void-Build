@@ -119,6 +119,54 @@ class AppTheme {
       ),
     );
   }
+
+  // ── Liquid Glass Design Tokens & Helpers ─────────────────────────────────────
+  static BoxDecoration liquidGlassDecoration({
+    double borderRadius = 24.0,
+    Color glassColor = const Color(0x33120B16),
+    Color borderColor = const Color(0x3BFFFFFF),
+    double borderWidth = 1.0,
+  }) {
+    return BoxDecoration(
+      color: glassColor,
+      borderRadius: BorderRadius.circular(borderRadius),
+      border: Border.all(
+        color: borderColor,
+        width: borderWidth,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.35),
+          blurRadius: 20,
+          spreadRadius: 0,
+          offset: const Offset(0, 8),
+        ),
+      ],
+    );
+  }
+
+  static BoxDecoration liquidGlassCircleDecoration({
+    Color glassColor = const Color(0x33120B16),
+    Color borderColor = const Color(0x3BFFFFFF),
+    double borderWidth = 1.0,
+  }) {
+    return BoxDecoration(
+      shape: BoxShape.circle,
+      color: glassColor,
+      border: Border.all(
+        color: borderColor,
+        width: borderWidth,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.35),
+          blurRadius: 20,
+          spreadRadius: 0,
+          offset: const Offset(0, 8),
+        ),
+      ],
+    );
+  }
 }
 
 /// Backward-compat alias for [AppTheme].

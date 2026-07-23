@@ -475,8 +475,9 @@ class CustomDiscoverBar extends StatelessWidget {
           ),
           const Spacer(),
           const NotificationIcon(),
-          const SiteIcon(),
+          const SizedBox(width: 8),
           const TimerIcon(),
+          const SizedBox(width: 8),
           const SettingsIcon(),
         ],
       ),
@@ -598,25 +599,3 @@ class SettingsIcon extends StatelessWidget {
   }
 }
 
-class SiteIcon extends StatelessWidget {
-  const SiteIcon({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      padding: const EdgeInsets.all(5),
-      constraints: const BoxConstraints(),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const About()),
-        );
-      },
-      icon: const Icon(
-        MingCute.flower_4_fill,
-        color: Default_Theme.primaryColor1,
-        size: 28.0,
-      ),
-    );
-  }
-}

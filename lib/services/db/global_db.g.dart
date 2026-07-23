@@ -108,7 +108,7 @@ const TrackDBSchema = CollectionSchema(
   getId: _trackDBGetId,
   getLinks: _trackDBGetLinks,
   attach: _trackDBAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _trackDBEstimateSize(
@@ -1862,7 +1862,7 @@ const PlaylistDBSchema = CollectionSchema(
   getId: _playlistDBGetId,
   getLinks: _playlistDBGetLinks,
   attach: _playlistDBAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _playlistDBEstimateSize(
@@ -4036,7 +4036,7 @@ const PlaylistEntryDBSchema = CollectionSchema(
   getId: _playlistEntryDBGetId,
   getLinks: _playlistEntryDBGetLinks,
   attach: _playlistEntryDBAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _playlistEntryDBEstimateSize(
@@ -4918,7 +4918,7 @@ const NotificationsDBSchema = CollectionSchema(
   getId: _notificationsDBGetId,
   getLinks: _notificationsDBGetLinks,
   attach: _notificationsDBAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _notificationsDBEstimateSize(
@@ -6474,7 +6474,7 @@ const LyricsDBSchema = CollectionSchema(
   getId: _lyricsDBGetId,
   getLinks: _lyricsDBGetLinks,
   attach: _lyricsDBAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _lyricsDBEstimateSize(
@@ -8769,7 +8769,7 @@ const SearchHistoryDBSchema = CollectionSchema(
   getId: _searchHistoryDBGetId,
   getLinks: _searchHistoryDBGetLinks,
   attach: _searchHistoryDBAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _searchHistoryDBEstimateSize(
@@ -9542,7 +9542,7 @@ const DownloadDBSchema = CollectionSchema(
   getId: _downloadDBGetId,
   getLinks: _downloadDBGetLinks,
   attach: _downloadDBAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _downloadDBEstimateSize(
@@ -10572,7 +10572,7 @@ const AppSettingsStrDBSchema = CollectionSchema(
   getId: _appSettingsStrDBGetId,
   getLinks: _appSettingsStrDBGetLinks,
   attach: _appSettingsStrDBAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _appSettingsStrDBEstimateSize(
@@ -11751,7 +11751,7 @@ const AppSettingsBoolDBSchema = CollectionSchema(
   getId: _appSettingsBoolDBGetId,
   getLinks: _appSettingsBoolDBGetLinks,
   attach: _appSettingsBoolDBAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _appSettingsBoolDBEstimateSize(
@@ -12475,7 +12475,7 @@ const PlaybackHistoryDBSchema = CollectionSchema(
   getId: _playbackHistoryDBGetId,
   getLinks: _playbackHistoryDBGetLinks,
   attach: _playbackHistoryDBAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _playbackHistoryDBEstimateSize(
@@ -13016,7 +13016,7 @@ const CacheEntryDBSchema = CollectionSchema(
   getId: _cacheEntryDBGetId,
   getLinks: _cacheEntryDBGetLinks,
   attach: _cacheEntryDBAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _cacheEntryDBEstimateSize(
@@ -14359,7 +14359,7 @@ const PluginStorageEntitySchema = CollectionSchema(
   getId: _pluginStorageEntityGetId,
   getLinks: _pluginStorageEntityGetLinks,
   attach: _pluginStorageEntityAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _pluginStorageEntityEstimateSize(

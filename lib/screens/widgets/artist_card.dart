@@ -59,34 +59,50 @@ class _ArtistCardState extends State<ArtistCard> {
               children: [
                 AspectRatio(
                   aspectRatio: 1.0, // Forces a perfect square footprint
-                  child: ClipOval(
-                    child: Stack(
-                      fit:
-                          StackFit.expand, // Forces children to fill the circle
-                      children: [
-                        LoadImageCached(
-                          imageUrl: widget.artist.thumbnail?.url ?? '',
-                          fit: BoxFit
-                              .cover, // Ensures all resolutions scale correctly
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Default_Theme.primaryColor1.withValues(alpha: 0.1),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          color: _isHovering
-                              ? Colors.black.withValues(alpha: 0.5)
-                              : Colors.transparent,
-                          child: Center(
-                            child: AnimatedOpacity(
-                              duration: const Duration(milliseconds: 200),
-                              opacity: _isHovering ? 1.0 : 0.0,
-                              child: const Icon(
-                                MingCute.play_circle_line,
-                                color: Colors.white,
-                                size: 50,
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Stack(
+                        fit:
+                            StackFit.expand, // Forces children to fill the circle
+                        children: [
+                          LoadImageCached(
+                            imageUrl: widget.artist.thumbnail?.url ?? '',
+                            fit: BoxFit
+                                .cover, // Ensures all resolutions scale correctly
+                          ),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            color: _isHovering
+                                ? Colors.black.withValues(alpha: 0.5)
+                                : Colors.transparent,
+                            child: Center(
+                              child: AnimatedOpacity(
+                                duration: const Duration(milliseconds: 200),
+                                opacity: _isHovering ? 1.0 : 0.0,
+                                child: const Icon(
+                                  MingCute.play_circle_line,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

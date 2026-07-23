@@ -346,12 +346,18 @@ class BloomeeMusicPlayer extends BaseAudioHandler
 
   void _initSubscriptions() {
     // Combine engine state signals into a single broadcast.
-    _engineStateSub = Rx.combineLatest4(
+    _engineStateSub = Rx.combineLatest4<
+      EngineState,
+      bool,
+      Duration,
+      double,
+      (EngineState, bool, Duration, double)
+    >(
       engine.stateStream,
       engine.playingStream,
       engine.bufferedStream,
       engine.speedStream,
-      (s, pl, buf, spd) => (s, pl, buf, spd),
+      (EngineState s, bool pl, Duration buf, double spd) => (s, pl, buf, spd),
     ).distinct().listen((r) {
       final (s, pl, buf, spd) = r;
       _broadcastPlaybackState(s, pl, engine.position, buf, spd);

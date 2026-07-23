@@ -167,5 +167,86 @@ jobs:
                 tag: v${{ env.VERSION }}+${{github.run_number}}
                 token: ${{ secrets.GITHUB_TOKEN }}
                 prerelease: true
-                allowUpdates: true 
+                allowUpdates: true
+                omitBodyDuringUpdate: true
+
+    build-android-ubuntu:
+        name: Build Android (Ubuntu)
+        runs-on: ubuntu-latest
+        permissions:
+          contents: write
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+
+            - name: Setup-Java
+              uses: actions/setup-java@v3.12.0
+              with:
+                distribution: 'oracle'
+                java-version: '17'
+
+            - name: Setup Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                flutter-version: '3.35.4'
+                channel: 'stable'
+
+            - name: Install Dependencies
+              run: flutter pub get
+
+            - name: Extract version from pubspec.yaml
+              run: |
+                VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+                echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+            - name: Create keystore file
+              run: |
+                echo "${{ secrets.KEY_STORE }}" | base64 -d > ./android/voidmusic.jks
+
+            - name: Create Keystore properties
+              run: |
+                echo storePassword=\${{ secrets.STORE_PASSWORD }} > ./android/key.properties
+                echo keyPassword=\${{ secrets.KEY_PASSWORD }} >> ./android/key.properties
+                echo keyAlias=\${{ secrets.KEY_ALIAS }} >> ./android/key.properties
+                echo storeFile=voidmusic.jks >> ./android/key.properties
+
+            - name: Build App files
+              run: flutter build apk --release --split-per-abi --build-number ${{github.run_number}}
+
+            - name: Verify Sign
+              run: |
+                $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/apksigner verify build/app/outputs/flutter-apk/app-release.apk
+                $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/apksigner verify build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+                $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/apksigner verify build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+                $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/apksigner verify build/app/outputs/flutter-apk/app-x86_64-release.apk
+
+            - name: Rename APK file
+              run: |
+                mv build/app/outputs/flutter-apk/app-release.apk "VoidMusic_v${VERSION}+${{github.run_number}}_universal_built-on-ubuntu.apk"
+                mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk "VoidMusic_v${VERSION}+${{github.run_number}}_armeabi-v7a_built-on-ubuntu.apk"
+                mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk "VoidMusic_v${VERSION}+${{github.run_number}}_arm64-v8a_built-on-ubuntu.apk"
+                mv build/app/outputs/flutter-apk/app-x86_64-release.apk "VoidMusic_v${VERSION}+${{github.run_number}}_x86_64_built-on-ubuntu.apk"
+
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                name: Release-Android-Ubuntu
+                path: |
+                  build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_universal_built-on-ubuntu.apk
+                  build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_armeabi-v7a_built-on-ubuntu.apk
+                  build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a_built-on-ubuntu.apk
+                  build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_x86_64_built-on-ubuntu.apk
+
+            - name: Publish Android Ubuntu to Release
+              uses: ncipollo/release-action@v1
+              with:
+                artifacts: |
+                  build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_universal_built-on-ubuntu.apk
+                  build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_armeabi-v7a_built-on-ubuntu.apk
+                  build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a_built-on-ubuntu.apk
+                  build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_x86_64_built-on-ubuntu.apk
+                tag: v${{ env.VERSION }}+${{github.run_number}}
+                token: ${{ secrets.GITHUB_TOKEN }}
+                prerelease: true
+                allowUpdates: true
                 omitBodyDuringUpdate: true
