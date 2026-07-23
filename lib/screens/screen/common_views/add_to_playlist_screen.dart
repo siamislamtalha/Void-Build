@@ -1,18 +1,18 @@
-import 'package:Bloomee/blocs/library/cubit/library_items_cubit.dart';
-import 'package:Bloomee/core/constants/setting_keys.dart';
-import 'package:Bloomee/core/models/media_playlist_model.dart';
-import 'package:Bloomee/screens/widgets/animated_list_item.dart';
-import 'package:Bloomee/screens/widgets/sign_board_widget.dart';
+import 'package:voidmusic/blocs/library/cubit/library_items_cubit.dart';
+import 'package:voidmusic/core/constants/setting_keys.dart';
+import 'package:voidmusic/core/models/media_playlist_model.dart';
+import 'package:voidmusic/screens/widgets/animated_list_item.dart';
+import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:Bloomee/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/core/constants/sentinel_values.dart';
-import 'package:Bloomee/screens/widgets/create_playlist_bottomsheet.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
-import 'package:Bloomee/utils/load_image.dart';
+import 'package:voidmusic/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/core/constants/sentinel_values.dart';
+import 'package:voidmusic/screens/widgets/create_playlist_bottomsheet.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
+import 'package:voidmusic/l10n/app_localizations.dart';
+import 'package:voidmusic/utils/load_image.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 class AddToPlaylistScreen extends StatefulWidget {

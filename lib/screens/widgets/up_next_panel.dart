@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 import 'dart:ui';
-import 'package:Bloomee/blocs/media_player/bloomee_player_cubit.dart';
-import 'package:Bloomee/core/adapters/track_adapter.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
+import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/core/adapters/track_adapter.dart';
+import 'package:voidmusic/l10n/app_localizations.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

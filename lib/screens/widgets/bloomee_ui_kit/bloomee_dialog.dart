@@ -1,6 +1,6 @@
 import 'dart:ui';
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/utils/load_image.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
+import 'package:voidmusic/utils/load_image.dart';
 import 'package:flutter/material.dart';
 
 /// Bloomee-branded dialog surface.

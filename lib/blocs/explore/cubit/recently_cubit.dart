@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/services/db/dao/history_dao.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/services/db/dao/history_dao.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'recently_state.dart';

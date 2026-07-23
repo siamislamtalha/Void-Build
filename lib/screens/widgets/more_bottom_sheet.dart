@@ -7,18 +7,18 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:Bloomee/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
-import 'package:Bloomee/blocs/downloader/cubit/downloader_cubit.dart';
-import 'package:Bloomee/blocs/library/cubit/library_items_cubit.dart';
-import 'package:Bloomee/blocs/media_player/bloomee_player_cubit.dart';
-import 'package:Bloomee/core/constants/route_paths.dart';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
-import 'package:Bloomee/screens/widgets/snackbar.dart';
-import 'package:Bloomee/screens/widgets/smart_replace_dialog.dart';
-import 'package:Bloomee/screens/widgets/song_tile.dart';
-import 'package:Bloomee/services/song_metadata_refresh_service.dart';
+import 'package:voidmusic/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
+import 'package:voidmusic/blocs/downloader/cubit/downloader_cubit.dart';
+import 'package:voidmusic/blocs/library/cubit/library_items_cubit.dart';
+import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/core/constants/route_paths.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
+import 'package:voidmusic/l10n/app_localizations.dart';
+import 'package:voidmusic/screens/widgets/snackbar.dart';
+import 'package:voidmusic/screens/widgets/smart_replace_dialog.dart';
+import 'package:voidmusic/screens/widgets/song_tile.dart';
+import 'package:voidmusic/services/song_metadata_refresh_service.dart';
 
 void showMoreBottomSheet(
   BuildContext context,

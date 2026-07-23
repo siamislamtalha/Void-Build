@@ -1,13 +1,13 @@
-import 'package:Bloomee/blocs/media_player/bloomee_player_cubit.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/screens/screen/library_views/cubit/current_playlist_cubit.dart';
-import 'package:Bloomee/screens/widgets/bloomee_ui_kit/bloomee_dialog.dart';
-import 'package:Bloomee/screens/widgets/snackbar.dart';
-import 'package:Bloomee/services/meta_resolver/smart_track_replacement_service.dart';
-import 'package:Bloomee/src/rust/api/plugin/models.dart';
+import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
+import 'package:voidmusic/screens/screen/library_views/cubit/current_playlist_cubit.dart';
+import 'package:voidmusic/screens/widgets/bloomee_ui_kit/bloomee_dialog.dart';
+import 'package:voidmusic/screens/widgets/snackbar.dart';
+import 'package:voidmusic/services/meta_resolver/smart_track_replacement_service.dart';
+import 'package:voidmusic/src/rust/api/plugin/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
+import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 Future<void> showSmartReplaceDialog(BuildContext context, Track track) {

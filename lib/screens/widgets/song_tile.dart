@@ -4,16 +4,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
+import 'package:voidmusic/l10n/app_localizations.dart';
 
-import 'package:Bloomee/screens/screen/common_views/song_info_screen.dart';
-import 'package:Bloomee/screens/widgets/snackbar.dart';
-import 'package:Bloomee/blocs/downloader/cubit/downloader_cubit.dart';
-import 'package:Bloomee/blocs/media_player/bloomee_player_cubit.dart';
-import 'package:Bloomee/core/models/exported.dart' hide MediaItem;
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/screens/widgets/media_metadata_links.dart';
-import 'package:Bloomee/utils/load_image.dart';
+import 'package:voidmusic/screens/screen/common_views/song_info_screen.dart';
+import 'package:voidmusic/screens/widgets/snackbar.dart';
+import 'package:voidmusic/blocs/downloader/cubit/downloader_cubit.dart';
+import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/core/models/exported.dart' hide MediaItem;
+import 'package:voidmusic/core/theme/app_theme.dart';
+import 'package:voidmusic/screens/widgets/media_metadata_links.dart';
+import 'package:voidmusic/utils/load_image.dart';
 
 class SongCardWidget extends StatelessWidget {
   final Track song;

@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:Bloomee/core/constants/setting_keys.dart';
-import 'package:Bloomee/core/di/service_locator.dart';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/src/rust/api/plugin/commands.dart';
-import 'package:Bloomee/src/rust/api/plugin/plugin_info.dart';
-import 'package:Bloomee/src/rust/api/plugin/types.dart';
-import 'package:Bloomee/utils/url_checker.dart';
+import 'package:voidmusic/core/constants/setting_keys.dart';
+import 'package:voidmusic/core/di/service_locator.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/services/db/dao/settings_dao.dart';
+import 'package:voidmusic/services/db/db_provider.dart';
+import 'package:voidmusic/src/rust/api/plugin/commands.dart';
+import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
+import 'package:voidmusic/src/rust/api/plugin/types.dart';
+import 'package:voidmusic/utils/url_checker.dart';
 
 enum SharedUrlResolveStatus {
   success,

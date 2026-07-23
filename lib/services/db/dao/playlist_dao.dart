@@ -1,10 +1,10 @@
 import 'dart:developer';
 
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/core/models/media_playlist_model.dart';
-import 'package:Bloomee/services/db/dao/track_dao.dart';
-import 'package:Bloomee/services/db/global_db.dart';
-import 'package:Bloomee/services/db/mappers/media_item_mapper.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/core/models/media_playlist_model.dart';
+import 'package:voidmusic/services/db/dao/track_dao.dart';
+import 'package:voidmusic/services/db/global_db.dart';
+import 'package:voidmusic/services/db/mappers/media_item_mapper.dart';
 import 'package:isar_community/isar.dart';
 
 /// DAO for playlist CRUD and position-based track ordering.

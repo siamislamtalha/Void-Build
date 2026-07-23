@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:Bloomee/src/rust/api/bridge.dart' as bridge;
-import 'package:Bloomee/src/rust/api/downloader.dart';
-import 'package:Bloomee/src/rust/api/downloader/types.dart';
-import 'package:Bloomee/src/rust/api/plugin/plugin.dart';
+import 'package:voidmusic/src/rust/api/bridge.dart' as bridge;
+import 'package:voidmusic/src/rust/api/downloader.dart';
+import 'package:voidmusic/src/rust/api/downloader/types.dart';
+import 'package:voidmusic/src/rust/api/plugin/plugin.dart';
 
 class RustDownloadService {
   DownloadManager? _manager;

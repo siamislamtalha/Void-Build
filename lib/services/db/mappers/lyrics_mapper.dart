@@ -1,5 +1,5 @@
-import 'package:Bloomee/core/models/lyrics_models.dart';
-import 'package:Bloomee/services/db/global_db.dart';
+import 'package:voidmusic/core/models/lyrics_models.dart';
+import 'package:voidmusic/services/db/global_db.dart';
 
 /// Maps between [LyricsDB] (Isar entity) and [Lyrics] (domain).
 

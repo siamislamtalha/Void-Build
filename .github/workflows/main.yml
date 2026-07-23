@@ -56,7 +56,7 @@ jobs:
                   echo storeFile=voidmusic.jks >> ./android/key.properties
 
             - name: Clean Android build
-              run: cd android && ./gradlew clean
+              run: cd android; ./gradlew clean
 
             - name: Build App files
               run: flutter build apk --release --split-per-abi --build-number ${{github.run_number}}

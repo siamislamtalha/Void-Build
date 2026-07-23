@@ -1,10 +1,10 @@
 import 'dart:developer';
 import 'dart:math' as math;
 
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/services/meta_resolver/cross_plugin_resolver.dart';
-import 'package:Bloomee/services/plugin/plugin_service.dart';
-import 'package:Bloomee/src/rust/api/plugin/commands.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/services/meta_resolver/cross_plugin_resolver.dart';
+import 'package:voidmusic/services/plugin/plugin_service.dart';
+import 'package:voidmusic/src/rust/api/plugin/commands.dart';
 
 class ChartResolveResult {
   final Track resolvedTrack;

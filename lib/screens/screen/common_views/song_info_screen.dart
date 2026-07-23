@@ -1,20 +1,20 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:ui';
 
-import 'package:Bloomee/core/constants/route_paths.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
-import 'package:Bloomee/screens/widgets/snackbar.dart';
+import 'package:voidmusic/core/constants/route_paths.dart';
+import 'package:voidmusic/l10n/app_localizations.dart';
+import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/screens/widgets/media_metadata_links.dart';
-import 'package:Bloomee/services/song_metadata_refresh_service.dart';
-import 'package:Bloomee/utils/load_image.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
+import 'package:voidmusic/screens/widgets/media_metadata_links.dart';
+import 'package:voidmusic/services/song_metadata_refresh_service.dart';
+import 'package:voidmusic/utils/load_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:Bloomee/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SongInfoScreen extends StatefulWidget {

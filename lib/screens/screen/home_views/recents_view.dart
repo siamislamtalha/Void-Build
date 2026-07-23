@@ -1,14 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:Bloomee/blocs/history/cubit/history_cubit.dart';
-import 'package:Bloomee/blocs/media_player/bloomee_player_cubit.dart';
-import 'package:Bloomee/core/models/media_playlist_model.dart';
-import 'package:Bloomee/screens/screen/home_views/setting_views/storage_setting.dart';
-import 'package:Bloomee/screens/widgets/more_bottom_sheet.dart';
-import 'package:Bloomee/screens/widgets/song_tile.dart';
+import 'package:voidmusic/blocs/history/cubit/history_cubit.dart';
+import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/core/models/media_playlist_model.dart';
+import 'package:voidmusic/screens/screen/home_views/setting_views/storage_setting.dart';
+import 'package:voidmusic/screens/widgets/more_bottom_sheet.dart';
+import 'package:voidmusic/screens/widgets/song_tile.dart';
 import 'package:flutter/material.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
+import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 class HistoryView extends StatelessWidget {

@@ -1,12 +1,12 @@
 import 'dart:developer';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/plugins/utils/media_id.dart';
-import 'package:Bloomee/core/constants/setting_keys.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
-import 'package:Bloomee/services/player/player_engine.dart';
-import 'package:Bloomee/services/plugin/plugin_service.dart';
-import 'package:Bloomee/src/rust/api/plugin/commands.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/plugins/utils/media_id.dart';
+import 'package:voidmusic/core/constants/setting_keys.dart';
+import 'package:voidmusic/services/db/db_provider.dart';
+import 'package:voidmusic/services/db/dao/settings_dao.dart';
+import 'package:voidmusic/services/player/player_engine.dart';
+import 'package:voidmusic/services/plugin/plugin_service.dart';
+import 'package:voidmusic/src/rust/api/plugin/commands.dart';
 import 'package:rxdart/rxdart.dart';
 
 class RelatedSongsManager {

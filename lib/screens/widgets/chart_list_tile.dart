@@ -1,10 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/screens/screen/chart/chart_view.dart';
-import 'package:Bloomee/utils/load_image.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/screens/screen/chart/chart_view.dart';
+import 'package:voidmusic/utils/load_image.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 /// A rich list tile for chart items with rank, trend indicator, artwork,

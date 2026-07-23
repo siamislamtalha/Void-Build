@@ -7,17 +7,17 @@
 /// before [runApp] so that registered services are available at widget-tree build time.
 library service_locator;
 
-import 'package:Bloomee/services/cache/plugin_cache_repository.dart';
-import 'package:Bloomee/services/cache/plugin_cache_store.dart';
-import 'package:Bloomee/services/cache/plugin_cache_writer.dart';
-import 'package:Bloomee/services/db/dao/cache_dao.dart';
-import 'package:Bloomee/services/db/dao/plugin_storage_dao.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/services/plugin/plugin_event_bus.dart';
-import 'package:Bloomee/services/plugin/plugin_service.dart';
-import 'package:Bloomee/services/plugin/plugin_storage_service.dart';
-import 'package:Bloomee/plugins/services/plugin_repository_service.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
+import 'package:voidmusic/services/cache/plugin_cache_repository.dart';
+import 'package:voidmusic/services/cache/plugin_cache_store.dart';
+import 'package:voidmusic/services/cache/plugin_cache_writer.dart';
+import 'package:voidmusic/services/db/dao/cache_dao.dart';
+import 'package:voidmusic/services/db/dao/plugin_storage_dao.dart';
+import 'package:voidmusic/services/db/db_provider.dart';
+import 'package:voidmusic/services/plugin/plugin_event_bus.dart';
+import 'package:voidmusic/services/plugin/plugin_service.dart';
+import 'package:voidmusic/services/plugin/plugin_storage_service.dart';
+import 'package:voidmusic/plugins/services/plugin_repository_service.dart';
+import 'package:voidmusic/services/db/dao/settings_dao.dart';
 
 /// Service locator — static singleton registry.
 ///

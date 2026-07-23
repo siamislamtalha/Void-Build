@@ -1,18 +1,18 @@
 import 'dart:developer';
 
-import 'package:Bloomee/core/events/global_event_bus.dart';
-import 'package:Bloomee/core/constants/setting_keys.dart';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/plugins/errors/plugin_exceptions.dart';
-import 'package:Bloomee/plugins/utils/media_id.dart';
-import 'package:Bloomee/services/db/dao/download_dao.dart';
-import 'package:Bloomee/services/db/dao/playlist_dao.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
-import 'package:Bloomee/services/db/dao/track_dao.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/services/plugin/plugin_service.dart';
-import 'package:Bloomee/services/player/stream_quality_selector.dart';
-import 'package:Bloomee/src/rust/api/plugin/commands.dart';
+import 'package:voidmusic/core/events/global_event_bus.dart';
+import 'package:voidmusic/core/constants/setting_keys.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/plugins/errors/plugin_exceptions.dart';
+import 'package:voidmusic/plugins/utils/media_id.dart';
+import 'package:voidmusic/services/db/dao/download_dao.dart';
+import 'package:voidmusic/services/db/dao/playlist_dao.dart';
+import 'package:voidmusic/services/db/dao/settings_dao.dart';
+import 'package:voidmusic/services/db/dao/track_dao.dart';
+import 'package:voidmusic/services/db/db_provider.dart';
+import 'package:voidmusic/services/plugin/plugin_service.dart';
+import 'package:voidmusic/services/player/stream_quality_selector.dart';
+import 'package:voidmusic/src/rust/api/plugin/commands.dart';
 
 class ResolvedMediaSource {
   final Uri uri;

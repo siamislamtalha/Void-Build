@@ -1,8 +1,8 @@
 import 'dart:developer';
 
-import 'package:Bloomee/services/db/global_db.dart';
-import 'package:Bloomee/services/db/mappers/media_item_mapper.dart';
-import 'package:Bloomee/src/rust/api/plugin/models.dart';
+import 'package:voidmusic/services/db/global_db.dart';
+import 'package:voidmusic/services/db/mappers/media_item_mapper.dart';
+import 'package:voidmusic/src/rust/api/plugin/models.dart';
 import 'package:isar_community/isar.dart';
 
 /// DAO for track persistence — accepts domain [Track] models.

@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:Bloomee/core/constants/setting_keys.dart';
-import 'package:Bloomee/core/constants/cache_keys.dart';
-import 'package:Bloomee/repository/bloomee/settings_repository.dart';
-import 'package:Bloomee/services/player/stream_quality_selector.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/utils/country_info.dart';
+import 'package:voidmusic/core/constants/setting_keys.dart';
+import 'package:voidmusic/core/constants/cache_keys.dart';
+import 'package:voidmusic/repository/bloomee/settings_repository.dart';
+import 'package:voidmusic/services/player/stream_quality_selector.dart';
+import 'package:voidmusic/services/db/db_provider.dart';
+import 'package:voidmusic/utils/country_info.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';

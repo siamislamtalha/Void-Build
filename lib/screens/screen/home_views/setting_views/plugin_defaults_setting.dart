@@ -1,12 +1,12 @@
-import 'package:Bloomee/blocs/settings_cubit/cubit/settings_cubit.dart';
-import 'package:Bloomee/plugins/blocs/plugin/plugin_bloc.dart';
-import 'package:Bloomee/plugins/blocs/plugin/plugin_state.dart';
-import 'package:Bloomee/src/rust/api/plugin/plugin_info.dart';
-import 'package:Bloomee/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
+import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
+import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
+import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
+import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
+import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
+import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 class PluginDefaultsSettings extends StatelessWidget {

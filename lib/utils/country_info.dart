@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:Bloomee/core/constants/setting_keys.dart';
+import 'package:voidmusic/core/constants/setting_keys.dart';
 import 'package:country_codes/country_codes.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
+import 'package:voidmusic/services/db/dao/settings_dao.dart';
+import 'package:voidmusic/services/db/db_provider.dart';
 import 'package:http/http.dart' as http;
 
 class CountryInfoService {

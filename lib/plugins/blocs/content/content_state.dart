@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/src/rust/api/plugin/commands.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/src/rust/api/plugin/commands.dart';
 
 /// State for [ContentBloc].
 ///

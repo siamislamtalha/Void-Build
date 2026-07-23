@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:Bloomee/services/db/dao/plugin_storage_dao.dart';
-import 'package:Bloomee/services/plugin/plugin_event_bus.dart';
-import 'package:Bloomee/src/rust/api/plugin/events.dart';
-import 'package:Bloomee/src/rust/api/plugin/plugin.dart';
-import 'package:Bloomee/src/rust/api/bridge.dart' as bridge;
+import 'package:voidmusic/services/db/dao/plugin_storage_dao.dart';
+import 'package:voidmusic/services/plugin/plugin_event_bus.dart';
+import 'package:voidmusic/src/rust/api/plugin/events.dart';
+import 'package:voidmusic/src/rust/api/plugin/plugin.dart';
+import 'package:voidmusic/src/rust/api/bridge.dart' as bridge;
 
 /// Handles plugin storage persistence.
 ///

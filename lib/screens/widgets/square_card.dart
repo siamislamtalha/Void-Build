@@ -1,5 +1,5 @@
-import 'package:Bloomee/core/theme/app_theme.dart';
-import 'package:Bloomee/utils/load_image.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
+import 'package:voidmusic/utils/load_image.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 

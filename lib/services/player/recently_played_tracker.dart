@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/services/player/player_engine.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/services/db/dao/history_dao.dart';
-import 'package:Bloomee/services/db/dao/track_dao.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/services/player/player_engine.dart';
+import 'package:voidmusic/services/db/db_provider.dart';
+import 'package:voidmusic/services/db/dao/history_dao.dart';
+import 'package:voidmusic/services/db/dao/track_dao.dart';
 
 /// Tracks continuous playback of the current track and pushes it to
 /// the playback history DB only when the item has been played continuously

@@ -1,15 +1,15 @@
 import 'dart:developer';
 
-import 'package:Bloomee/blocs/lastdotfm/lastdotfm_cubit.dart';
-import 'package:Bloomee/blocs/settings_cubit/cubit/settings_cubit.dart';
-import 'package:Bloomee/repository/LastFM/lastfmapi.dart';
-import 'package:Bloomee/core/constants/cache_keys.dart';
-import 'package:Bloomee/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
-import 'package:Bloomee/screens/widgets/snackbar.dart';
+import 'package:voidmusic/blocs/lastdotfm/lastdotfm_cubit.dart';
+import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
+import 'package:voidmusic/repository/LastFM/lastfmapi.dart';
+import 'package:voidmusic/core/constants/cache_keys.dart';
+import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
+import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
-import 'package:Bloomee/core/theme/app_theme.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:Bloomee/l10n/app_localizations.dart';
+import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 class LastDotFM extends StatefulWidget {

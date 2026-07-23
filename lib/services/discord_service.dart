@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
-import 'package:Bloomee/core/models/exported.dart';
-import 'package:Bloomee/core/constants/sentinel_values.dart';
+import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/core/constants/sentinel_values.dart';
 import 'package:dart_discord_rpc/dart_discord_rpc.dart';
 
 class DiscordService {

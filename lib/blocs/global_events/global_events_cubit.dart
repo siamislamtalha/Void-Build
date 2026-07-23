@@ -1,8 +1,8 @@
 import 'dart:developer';
 
-import 'package:Bloomee/core/constants/setting_keys.dart';
-import 'package:Bloomee/services/bloomee_updater_tools.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
+import 'package:voidmusic/core/constants/setting_keys.dart';
+import 'package:voidmusic/services/bloomee_updater_tools.dart';
+import 'package:voidmusic/services/db/dao/settings_dao.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 

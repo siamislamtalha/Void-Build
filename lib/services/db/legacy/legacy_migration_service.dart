@@ -4,17 +4,17 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:Bloomee/core/models/exported.dart' as models;
-import 'package:Bloomee/services/db/dao/download_dao.dart';
-import 'package:Bloomee/services/db/dao/library_dao.dart';
-import 'package:Bloomee/services/db/dao/playlist_dao.dart';
-import 'package:Bloomee/services/db/dao/settings_dao.dart';
-import 'package:Bloomee/services/db/dao/track_dao.dart';
-import 'package:Bloomee/services/db/db_provider.dart';
-import 'package:Bloomee/services/db/global_db.dart';
-import 'package:Bloomee/services/db/legacy/legacy_db_opener.dart'
+import 'package:voidmusic/core/models/exported.dart' as models;
+import 'package:voidmusic/services/db/dao/download_dao.dart';
+import 'package:voidmusic/services/db/dao/library_dao.dart';
+import 'package:voidmusic/services/db/dao/playlist_dao.dart';
+import 'package:voidmusic/services/db/dao/settings_dao.dart';
+import 'package:voidmusic/services/db/dao/track_dao.dart';
+import 'package:voidmusic/services/db/db_provider.dart';
+import 'package:voidmusic/services/db/global_db.dart';
+import 'package:voidmusic/services/db/legacy/legacy_db_opener.dart'
     as legacy_opener;
-import 'package:Bloomee/services/db/legacy/legacy_global_db.dart' as legacy;
+import 'package:voidmusic/services/db/legacy/legacy_global_db.dart' as legacy;
 import 'package:isar_community/isar.dart';
 import 'package:path/path.dart' as p;
 
