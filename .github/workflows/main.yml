@@ -44,29 +44,8 @@ jobs:
                   $ver = $vLine.Matches[0].Groups[1].Value.Split('+')[0]
                   echo "VERSION=$ver" >> $env:GITHUB_ENV
 
-            - name: Create keystore file
-              run: |
-                  $b64 = "${{ secrets.KEY_STORE }}"
-                  $filename = "./android/voidmusic.jks"
-                  $bytes =[Convert]::FromBase64String($b64)
-                  [IO.File]::WriteAllBytes($filename, $bytes)
-            
-            - name: Create Keystore properties
-              run: |
-                  echo storePassword=\${{ secrets.STORE_PASSWORD }} > ./android/key.properties
-                  echo keyPassword=\${{ secrets.KEY_PASSWORD }} >> ./android/key.properties
-                  echo keyAlias=\${{ secrets.KEY_ALIAS }} >> ./android/key.properties
-                  echo storeFile=voidmusic.jks >> ./android/key.properties
-
-
             - name: Build App files
               run: flutter build apk --release --target-platform android-arm64 --build-number ${{github.run_number}}
-
-            - name: Verify Sign
-              run: |
-                  $buildToolsDir = Get-ChildItem "$env:ANDROID_HOME\build-tools" | Where-Object { $_.PSIsContainer } | Sort-Object Name -Descending | Select-Object -First 1
-                  Write-Host "Using build tools version: $($buildToolsDir.Name)"
-                  & "$($buildToolsDir.FullName)\apksigner.bat" verify build/app/outputs/flutter-apk/app-release.apk
 
             - name: Rename APK file
               shell: powershell
@@ -187,23 +166,8 @@ jobs:
                 VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
                 echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-            - name: Create keystore file
-              run: |
-                echo "${{ secrets.KEY_STORE }}" | base64 -d > ./android/voidmusic.jks
-
-            - name: Create Keystore properties
-              run: |
-                echo storePassword=\${{ secrets.STORE_PASSWORD }} > ./android/key.properties
-                echo keyPassword=\${{ secrets.KEY_PASSWORD }} >> ./android/key.properties
-                echo keyAlias=\${{ secrets.KEY_ALIAS }} >> ./android/key.properties
-                echo storeFile=voidmusic.jks >> ./android/key.properties
-
             - name: Build App files
               run: flutter build apk --release --target-platform android-arm64 --build-number ${{github.run_number}}
-
-            - name: Verify Sign
-              run: |
-                $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/apksigner verify build/app/outputs/flutter-apk/app-release.apk
 
             - name: Rename APK file
               run: |
