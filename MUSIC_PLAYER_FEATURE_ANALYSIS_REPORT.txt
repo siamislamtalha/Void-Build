@@ -1,0 +1,829 @@
+================================================================================
+                    MUSIC PLAYER APP FEATURE ANALYSIS REPORT
+================================================================================
+
+Generated: July 22, 2026
+Analysis Scope: Main Project (NEW VOID) vs Reference Apps (BlackHole, BloomeeTunes, Musify, Kreate, Metrolist)
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+
+1. EXECUTIVE SUMMARY
+2. ARCHITECTURE COMPARISON
+3. FEATURE MATRIX
+4. DETAILED FEATURE ANALYSIS BY CATEGORY
+5. CODE PATTERNS AND BEST PRACTICES
+6. MISSING FEATURES PRIORITIZATION
+7. IMPLEMENTATION RECOMMENDATIONS
+8. APP-SPECIFIC INSIGHTS
+
+================================================================================
+1. EXECUTIVE SUMMARY
+================================================================================
+
+This comprehensive analysis compares the main NEW VOID music player project against five reference applications: BlackHole, BloomeeTunes, Musify, Kreate, and Metrolist. The analysis reveals significant feature gaps, particularly in social integrations, advanced audio features, and user customization options.
+
+KEY FINDINGS:
+- Main project has solid foundation with plugin architecture, Bloc state management, and basic playback features
+- Missing 25+ major features present in reference apps
+- Kreate offers the most extensive customization (100+ player settings)
+- Metrolist excels in social features (Listen Together, Discord, Cast)
+- BloomeeTunes has strong desktop support and keyboard shortcuts
+- Musify provides excellent listening statistics and proxy support
+
+================================================================================
+2. ARCHITECTURE COMPARISON
+================================================================================
+
+MAIN PROJECT (NEW VOID):
+- Framework: Flutter
+- State Management: Bloc
+- Database: Hive
+- Audio: just_audio, audio_service
+- Architecture: Plugin-based content resolution
+- UI: Custom screens with SliverAppBar, TabController
+
+BLACKHOLE:
+- Framework: Flutter
+- State Management: ValueNotifier, Provider
+- Database: Hive
+- Audio: just_audio, audio_service
+- YouTube Integration: youtube_explode_dart
+- Features: Download management, Equalizer, Last.fm
+
+BLOOMEETUNES:
+- Framework: Flutter
+- State Management: Bloc, Cubit
+- Database: SQLite (custom implementation)
+- Audio: just_audio_media_kit
+- Platform Support: Android, Windows, Linux, MacOS
+- Features: Discord RPC, Last.fm, Keyboard shortcuts, Responsive breakpoints
+
+MUSIFY:
+- Framework: Flutter
+- State Management: ValueNotifier
+- Database: Hive
+- Audio: just_audio, audio_service
+- Router: go_router
+- Features: Listening stats, Proxy manager, Time machine, Radio stations
+
+KREATE:
+- Framework: Kotlin (Jetpack Compose)
+- State Management: Koin DI, StateFlow
+- Database: Room
+- Audio: ExoPlayer (Media3)
+- Platform: Android
+- Features: 100+ customization options, YouTube account sync, Advanced lyrics
+
+METROLIST:
+- Framework: Kotlin (Jetpack Compose)
+- State Management: Hilt DI, StateFlow
+- Database: Room
+- Audio: ExoPlayer (Media3)
+- Platform: Android
+- Features: Listen Together, Google Cast, Discord, AI lyrics translation
+
+================================================================================
+3. FEATURE MATRIX
+================================================================================
+
+FEATURE                          | MAIN | BLACKHOLE | BLOOMEE | MUSIFY | KREATE | METRO
+--------------------------------|------|-----------|---------|--------|--------|-------
+CORE PLAYBACK
+- Audio Playback                 | YES  | YES       | YES     | YES    | YES    | YES
+- Play/Pause/Seek               | YES  | YES       | YES     | YES    | YES    | YES
+- Next/Previous                 | YES  | YES       | YES     | YES    | YES    | YES
+- Loop/Shuffle                  | YES  | YES       | YES     | YES    | YES    | YES
+- Queue Management              | YES  | YES       | YES     | YES    | YES    | YES
+- Volume Control                | YES  | YES       | YES     | YES    | YES    | YES
+
+AUDIO FEATURES
+- Equalizer                      | YES  | YES       | YES     | YES    | YES    | YES
+- Audio Effects (Reverb, Bass)  | NO   | NO        | NO      | NO     | YES    | NO
+- Volume Normalization          | NO   | NO        | NO      | NO     | YES    | NO
+- Skip Silence                   | NO   | NO        | NO      | NO     | YES    | NO
+- High Refresh Rate             | NO   | NO        | YES     | YES    | YES    | YES
+
+SOCIAL INTEGRATIONS
+- Discord Rich Presence          | NO   | NO        | YES     | NO     | YES    | YES
+- Last.fm Scrobbling             | NO   | YES       | YES     | NO     | NO     | YES
+- Listen Together (Real-time)    | NO   | NO        | NO      | NO     | NO     | YES
+- Google Cast                    | NO   | NO        | NO      | NO     | NO     | YES
+
+LYRICS
+- Basic Lyrics                   | YES  | YES       | YES     | YES    | YES    | YES
+- Synchronized Lyrics           | NO   | NO        | NO      | NO     | YES    | YES
+- AI Translation                 | NO   | NO        | NO      | NO     | NO     | YES
+- Romanization                   | NO   | NO        | NO      | NO     | YES    | YES
+
+CUSTOMIZATION
+- Theme Colors                   | YES  | YES       | YES     | YES    | YES    | YES
+- Dynamic Color (Material You)   | NO   | NO        | NO      | YES    | NO     | YES
+- Player Customization          | LIMITED | LIMITED | LIMITED | LIMITED | EXTENSIVE | MODERATE
+- Mini Player Options           | NO   | YES       | YES     | YES    | YES    | YES
+- Swipe Actions                  | NO   | NO        | NO      | NO     | YES    | YES
+
+DATA & STORAGE
+- Download Management            | YES  | YES       | YES     | YES    | YES    | YES
+- Cache Management               | NO   | YES       | YES     | YES    | YES    | YES
+- Import/Export                 | NO   | NO        | YES     | YES    | YES    | YES
+- Backup/Restore                 | NO   | NO        | NO      | YES    | YES    | YES
+- Database Export                | NO   | NO        | NO      | NO     | YES    | YES
+
+ADVANCED FEATURES
+- YouTube Account Sync           | NO   | NO        | NO      | NO     | YES    | NO
+- Proxy Support                  | NO   | NO        | NO      | YES    | NO     | NO
+- Listening Statistics           | NO   | NO        | NO      | YES    | YES    | NO
+- Radio Stations                 | NO   | NO        | NO      | YES    | YES    | NO
+- Time Machine                   | NO   | NO        | NO      | YES    | NO     | NO
+- Sleep Timer                    | NO   | NO        | NO      | NO     | YES    | YES
+- Keyboard Shortcuts              | NO   | NO        | YES     | NO     | NO     | NO
+
+UI/UX
+- Responsive Design              | LIMITED | LIMITED | EXTENSIVE | LIMITED | YES    | YES
+- Desktop Support                | NO   | NO        | YES     | NO     | NO     | NO
+- Android Auto                   | NO   | NO        | NO      | NO     | NO     | YES
+- Screenshot Protection          | NO   | NO        | NO      | NO     | NO     | YES
+
+UPDATE & MAINTENANCE
+- Auto Update Checks             | NO   | NO        | NO      | YES    | YES    | YES
+- Crash Reporting                | NO   | NO        | NO      | YES    | YES    | NO
+
+================================================================================
+4. DETAILED FEATURE ANALYSIS BY CATEGORY
+================================================================================
+
+4.1 SOCIAL INTEGRATIONS
+================================================================================
+
+DISCORD RICH PRESENCE
+- BloomeeTunes: Full Discord RPC integration on desktop platforms (Windows/Linux/MacOS)
+  - Shows currently playing song with album art
+  - Updates play/pause state
+  - Artist URL and thumbnail support
+  - File: lib/services/discord_service.dart
+
+- Kreate: Discord Rich Presence with detailed listening activity
+  - Artist thumbnails, album info
+  - Time tracking for accurate presence
+  - File: composeApp/src/androidMain/kotlin/app/kreate/android/service/PlayerEventUpdateDiscord.kt
+
+- Metrolist: Discord presence integrated with Listen Together
+  - Shows room participation status
+  - File: app/src/main/kotlin/com/metrolist/music/ui/screens/settings/integrations/DiscordSettings.kt
+
+LAST.FM SCROBBLING
+- BlackHole: Basic Last.fm integration
+- BloomeeTunes: Comprehensive Last.fm implementation
+  - Authentication flow
+  - Session management
+  - Scrobbling with play time tracking (50% threshold)
+  - Failed scrobble caching
+  - Recommended tracks fetching
+  - File: lib/blocs/lastdotfm/lastdotfm_cubit.dart
+
+- Metrolist: Last.fm integration with settings UI
+  - File: app/src/main/kotlin/com/metrolist/music/ui/screens/settings/integrations/LastFMSettings.kt
+
+LISTEN TOGETHER (REAL-TIME COLLABORATIVE LISTENING)
+- Metrolist: Full WebSocket-based sync implementation
+  - Room codes for sharing
+  - Host/guest roles
+  - Playback sync (play/pause/seek/track change)
+  - Queue synchronization
+  - Volume sync (optional)
+  - Buffer synchronization protocol
+  - Reconnection handling
+  - User management (kick, block, join requests)
+  - File: app/src/main/kotlin/com/metrolist/music/listentogether/ListenTogetherManager.kt (1944 lines)
+  - Features: Debounce threshold (1000ms), position tolerance (2000ms), buffer wait protocol
+
+GOOGLE CAST
+- Metrolist: Full Google Cast integration
+  - CastPlayer integration with ExoPlayer
+  - Session availability detection
+  - Cast state management
+  - Device picker UI
+  - File: app/src/main/kotlin/com/metrolist/music/cast/CastManager.kt
+  - Multiple build variants (GMS, FOSS, Izzy)
+
+4.2 AUDIO FEATURES
+================================================================================
+
+EQUALIZER
+- All apps have equalizer support
+- BlackHole: Custom equalizer widget with band sliders
+  - File: lib/CustomWidgets/equalizer.dart
+  - Hive-based persistence
+  - Audio handler integration
+
+AUDIO EFFECTS (KREATE-SPECIFIC)
+- Audio reverb presets
+- Bass boost
+- Volume normalization
+- Skip silence
+- Shake to skip
+- These are controlled through extensive preference system
+
+HIGH REFRESH RATE SUPPORT
+- BloomeeTunes: High refresh rate mode for Android
+- Musify: High refresh rate support
+- Kreate: High refresh rate support
+- Metrolist: Density scaling for different screen sizes
+
+4.3 LYRICS FEATURES
+================================================================================
+
+SYNCHRONIZED LYRICS
+- Kreate: Advanced lyrics system
+  - Multiple alignment options
+  - Background blur/transparency
+  - Romanization support
+  - Multiple providers
+
+- Metrolist: Lyrics provider registry
+  - Multiple sources
+  - AI translation integration
+  - Romanization settings
+  - File: app/src/main/kotlin/com/metrolist/music/ui/screens/settings/RomanizationSettings.kt
+
+AI LYRICS TRANSLATION
+- Metrolist: AI-powered lyrics translation
+  - File: app/src/main/kotlin/com/metrolist/music/ui/screens/settings/AiSettings.kt
+
+4.4 CUSTOMIZATION
+================================================================================
+
+PLAYER CUSTOMIZATION (KREATE - MOST EXTENSIVE)
+100+ customization options including:
+
+Player Types:
+- Essential, Modern, Classic, etc.
+
+Thumbnail Animations:
+- Vinyl rotation
+- Carousel
+- Static
+- Multiple animation styles
+
+Visualizer:
+- Audio visualizer support
+
+Swipe Actions:
+- Queue swipe actions
+- Playlist swipe actions
+- Album swipe actions
+
+Mini Player:
+- Multiple positions (bottom, top, etc.)
+- Multiple types
+
+Timeline:
+- FakeAudioBar
+- Waveform
+- Progress bar styles
+
+Background:
+- Blur strength
+- Color options
+- Image options
+
+Stats for Nerds:
+- Technical information display
+
+File: composeApp/src/androidMain/kotlin/app/kreate/android/Preferences.kt (687 lines)
+- Extensive enum-based preference system
+- Lazy initialization
+- Observable state
+
+DYNAMIC COLOR (MATERIAL YOU)
+- Musify: DynamicColorBuilder integration
+  - System color extraction
+  - Material You theming
+  - File: lib/screens/settings_page.dart
+
+- Metrolist: Theme color extraction from album art
+  - Caching system
+  - Multiple color schemes
+
+4.5 DATA & STORAGE
+================================================================================
+
+IMPORT/EXPORT
+- BloomeeTunes: Comprehensive import/export service
+  - JSON format for playlists and media items
+  - M3U/M3U8 playlist export
+  - Validation and error handling
+  - Metadata preservation
+  - File: lib/services/import_export_service.dart (358 lines)
+  - Features: Playlist export with metadata, media item export, JSON validation, M3U conversion
+
+- Musify: Playlist sharing via deep links
+  - Custom URL scheme (musify://playlist/custom/...)
+  - File: lib/services/playlist_sharing.dart
+
+- Kreate: Database export with crashlog copying
+  - Full database backup
+  - Settings export
+
+- Metrolist: Database export/import
+  - Full backup/restore functionality
+
+DOWNLOAD MANAGEMENT
+- BlackHole: Advanced download system
+  - Progress tracking
+  - Cancellation support
+  - Multi-download support
+  - File: lib/Services/download.dart (591 lines)
+  - Features: Permission handling, file naming options, folder creation, metadata tagging (audiotagger/metadata_god), lyrics download, quality selection
+
+- All apps have basic download support
+
+CACHE MANAGEMENT
+- Musify: Cache clearing functionality
+- Kreate: ExoPlayer cache location options
+  - Cache size management
+  - Multiple cache locations
+
+4.6 ADVANCED FEATURES
+================================================================================
+
+YOUTUBE ACCOUNT INTEGRATION (KREATE)
+- YouTube login
+- Playlist sync
+- Artist sync
+- Album sync
+- Encrypted credentials storage
+- Custom YouTube client implementation
+- Player config parsing and caching
+
+PROXY SUPPORT (MUSIFY)
+- Comprehensive proxy manager
+- Multiple proxy sources (spys.me, proxyscrape.com, geonode, openproxylist)
+- Automatic proxy validation
+- Country-specific proxy selection
+- TTL-based proxy blocking
+- Resource pooling
+- File: lib/services/proxy_manager.dart (798 lines)
+- Features: 4 proxy sources, validation with timeout, country filtering, SSL support, automatic refresh (60 min), cleanup (120 min)
+
+LISTENING STATISTICS (SPOTIFY WRAPPED-STYLE)
+- Musify: Comprehensive listening stats service
+  - Monthly/yearly tracking
+  - Top songs, artists, albums
+  - Play counts
+  - Qualified playback tracking (must listen for minimum duration)
+  - Session management
+  - File: lib/services/listening_stats_service.dart (500 lines)
+  - Features: Session tracking, play count increment, listening time tracking, qualified listen detection (50% or 30s), stats flushing
+
+- Kreate: Statistics tracking with multiple categories
+  - Detailed breakdown by artist, album, genre
+
+RADIO STATIONS
+- Musify: Radio stations with genre support
+  - Liked stations prioritized
+  - Genre filtering
+  - File: lib/screens/radio_stations_page.dart
+
+TIME MACHINE
+- Musify: Historical listening feature
+  - View what you listened to in the past
+  - File: lib/screens/time_machine_page.dart
+
+SLEEP TIMER
+- Kreate: Sleep timer with player action button
+- Metrolist: Sleep timer dialog
+  - File: app/src/main/kotlin/com/metrolist/music/ui/component/SettingsSleepTimerDialog.kt
+
+KEYBOARD SHORTCUTS (BLOOMEETUNES)
+- Space: Play/Pause
+- Arrow keys: Seek/Skip
+- R: Repeat toggle
+- L: Like toggle
+- Alt+Arrow: 5 second seek
+- Arrow Up/Down: Volume control
+- Desktop-specific feature
+
+4.7 UI/UX
+================================================================================
+
+RESPONSIVE DESIGN
+- BloomeeTunes: Responsive framework with breakpoints
+  - Mobile, tablet, desktop, 4K breakpoints
+  - Adaptive layouts
+  - File: lib/main.dart (ResponsiveBreakpoints)
+
+- Kreate: Density scaling
+- Metrolist: Density scaling for different screen sizes
+
+DESKTOP SUPPORT
+- BloomeeTunes: Full desktop support (Windows, Linux, MacOS)
+  - Discord RPC integration
+  - Keyboard shortcuts
+  - Responsive design
+
+ANDROID AUTO
+- Metrolist: Android Auto integration
+  - File: app/src/main/kotlin/com/metrolist/music/ui/screens/settings/AndroidAutoSettings.kt
+  - Conditional display based on Android Auto installation
+
+SCREENSHOT PROTECTION
+- Metrolist: Screenshot disable option
+  - Privacy feature
+
+4.8 UPDATE & MAINTENANCE
+================================================================================
+
+AUTO UPDATE CHECKS
+- Musify: Update checking with notifications
+  - File: lib/services/update_manager.dart
+  - GitHub-based version checking
+
+- Kreate: GitHub-based updater
+  - Download dialogs
+  - Version comparison
+
+- Metrolist: Update checking with download links
+  - File: app/src/main/kotlin/com/metrolist/music/ui/screens/settings/UpdaterSettings.kt
+  - Release notes display
+  - Badge notification for updates
+
+CRASH REPORTING
+- Musify: Logger service with log copying
+  - File: lib/services/logger_service.dart
+  - Error tracking
+
+- Kreate: Crashlog copying in database export
+
+================================================================================
+5. CODE PATTERNS AND BEST PRACTICES
+================================================================================
+
+5.1 STATE MANAGEMENT PATTERNS
+================================================================================
+
+BLOOMEEETUNES (BLOCCUBIT PATTERN):
+- Separate Cubit and State files for each feature
+- Example: lib/blocs/lastdotfm/lastdotfm_cubit.dart + lastdotfm_state.dart
+- Clear separation of business logic and UI state
+- Event-driven state updates
+
+KREATE (PREFERENCE PATTERN):
+- Centralized preference system with enums
+- Lazy initialization for performance
+- Observable state using StateFlow
+- Type-safe preference access
+- File: composeApp/src/androidMain/kotlin/app/kreate/android/Preferences.kt
+
+METROLIST (VIEWMODEL PATTERN):
+- ViewModels for each settings screen
+- Hilt dependency injection
+- StateFlow for reactive updates
+- Clear separation of UI and business logic
+
+5.2 AUDIO HANDLING PATTERNS
+================================================================================
+
+BLACKHOLE:
+- YouTube Explode Dart for YouTube audio
+- Custom stream URL caching in Hive
+- Quality selection (High/Low)
+- File: lib/Services/youtube_services.dart (637 lines)
+- Pattern: Singleton service with caching
+
+MUSIFY:
+- Proxy manager for YouTube access
+- Multiple client fallback
+- Automatic proxy rotation
+- Pattern: Singleton with resource pooling
+
+KREATE/METROLIST:
+- ExoPlayer (Media3) for audio playback
+- CastPlayer integration (Metrolist)
+- Pattern: Service-based architecture with DI
+
+5.3 DOWNLOAD PATTERNS
+================================================================================
+
+BLACKHOLE:
+- Progress tracking with ValueNotifier
+- Permission handling cascade
+- File naming options (Title-Artist, Artist-Title, Title only)
+- Metadata tagging (audiotagger for Android, metadata_god for others)
+- Pattern: ChangeNotifier with progress callbacks
+
+5.4 DATABASE PATTERNS
+================================================================================
+
+HIVE-BASED (BLACKHOLE, MUSIFY, MAIN PROJECT):
+- Simple NoSQL database
+- Box-based organization
+- Type adapters for custom objects
+- Pattern: Box-based storage with lazy loading
+
+SQLITE-BASED (BLOOMEETUNES):
+- Custom database implementation
+- SQL queries with ORM-like helpers
+- Migration support
+- Pattern: Service layer with query builders
+
+ROOM-BASED (KREATE, METROLIST):
+- Type-safe SQL with compile-time verification
+- DAO pattern for data access
+- Migration support
+- Pattern: Repository pattern with DAOs
+
+5.5 SERVICE ARCHITECTURE PATTERNS
+================================================================================
+
+BLOOMEETUNES:
+- Service-based architecture
+- Import/Export service
+- Discord service
+- Last.fm service
+- Pattern: Singleton services with clear responsibilities
+
+MUSIFY:
+- Service-based architecture
+- Proxy manager
+- Listening stats service
+- Playlist manager
+- Pattern: Singleton services with state management
+
+KREATE:
+- DI-based architecture (Koin)
+- Module-based organization
+- Pattern: Dependency injection with modules
+
+METROLIST:
+- DI-based architecture (Hilt)
+- Manager pattern (ListenTogetherManager, CastManager)
+- Pattern: Manager classes with lifecycle management
+
+5.6 UI PATTERNS
+================================================================================
+
+FLUTTER APPS:
+- Sliver-based scrolling
+- TabController for navigation
+- Custom widgets for reusability
+- Pattern: Composition over inheritance
+
+KOTLIN APPS (KREATE, METROLIST):
+- Jetpack Compose
+- Composable functions
+- State hoisting
+- Pattern: Unidirectional data flow
+
+================================================================================
+6. MISSING FEATURES PRIORITIZATION
+================================================================================
+
+HIGH PRIORITY (Core User Experience):
+1. Discord Rich Presence - Social presence is highly requested
+2. Last.fm Scrobbling - Music tracking integration
+3. Dynamic Color (Material You) - Modern Android theming
+4. Listening Statistics - Engagement feature (Spotify Wrapped-style)
+5. Import/Export - Data portability
+
+MEDIUM PRIORITY (Enhanced Features):
+6. Keyboard Shortcuts - Desktop UX improvement
+7. Sleep Timer - Common user request
+8. Cache Management - Storage optimization
+9. Backup/Restore - Data safety
+10. Radio Stations - Content variety
+11. Proxy Support - Accessibility in restricted regions
+12. Advanced Lyrics - Enhanced lyrics experience
+
+LOW PRIORITY (Nice-to-have):
+13. Google Cast - Hardware integration
+14. Listen Together - Social feature (complex implementation)
+15. YouTube Account Sync - Personalization
+16. Time Machine - Historical listening
+17. Audio Effects (Reverb, Bass) - Audio enhancement
+18. Screenshot Protection - Privacy
+19. Android Auto - Car integration
+20. AI Lyrics Translation - Advanced lyrics
+
+================================================================================
+7. IMPLEMENTATION RECOMMENDATIONS
+================================================================================
+
+7.1 PHASE 1: QUICK WINS (1-2 weeks each)
+================================================================================
+
+DYNAMIC COLOR (MATERIAL YOU):
+- Use DynamicColorBuilder from Flutter
+- Extract colors from system wallpaper
+- Apply to Material 3 theme
+- Estimated effort: 3-5 days
+
+LAST.FM SCROBBLING:
+- Reference: BloomeeTunes lib/blocs/lastdotfm/lastdotfm_cubit.dart
+- Implement authentication flow
+- Track play time (50% threshold)
+- Cache failed scrobbles
+- Estimated effort: 5-7 days
+
+KEYBOARD SHORTCUTS:
+- Reference: BloomeeTunes main.dart keyboard handlers
+- Implement FocusScope and RawKeyboardListener
+- Map keys to player actions
+- Desktop-only feature
+- Estimated effort: 2-3 days
+
+SLEEP TIMER:
+- Reference: Metrolist SettingsSleepTimerDialog.kt
+- Simple countdown timer
+- Stop playback on completion
+- Estimated effort: 2-3 days
+
+7.2 PHASE 2: MEDIUM COMPLEXITY (2-4 weeks each)
+================================================================================
+
+DISCORD RICH PRESENCE:
+- Reference: BloomeeTunes lib/services/discord_service.dart
+- Use discord_rpc package for Flutter
+- Desktop-only (Windows/Linux/MacOS)
+- Update presence on playback changes
+- Estimated effort: 1-2 weeks
+
+LISTENING STATISTICS:
+- Reference: Musify lib/services/listening_stats_service.dart
+- Track play counts and listening time
+- Implement qualified listen detection
+- Create statistics UI
+- Estimated effort: 2-3 weeks
+
+IMPORT/EXPORT:
+- Reference: BloomeeTunes lib/services/import_export_service.dart
+- JSON format for playlists
+- M3U export support
+- Validation and error handling
+- Estimated effort: 1-2 weeks
+
+CACHE MANAGEMENT:
+- Clear audio cache
+- Clear image cache
+- Show cache size
+- Estimated effort: 3-5 days
+
+7.3 PHASE 3: ADVANCED FEATURES (4-8 weeks each)
+================================================================================
+
+PROXY SUPPORT:
+- Reference: Musify lib/services/proxy_manager.dart
+- Multiple proxy sources
+- Automatic validation
+- Country filtering
+- Estimated effort: 3-4 weeks
+
+GOOGLE CAST:
+- Reference: Metrolist CastManager.kt
+- Requires Google Play Services
+- GMS build variant
+- Estimated effort: 4-6 weeks
+
+LISTEN TOGETHER:
+- Reference: Metrolist ListenTogetherManager.kt
+- WebSocket server/client
+- Complex sync logic
+- Estimated effort: 6-8 weeks
+
+YOUTUBE ACCOUNT SYNC:
+- Reference: Kreate YouTube integration
+- OAuth flow
+- Encrypted credential storage
+- Estimated effort: 4-6 weeks
+
+================================================================================
+8. APP-SPECIFIC INSIGHTS
+================================================================================
+
+8.1 BLACKHOLE INSIGHTS
+================================================================================
+Strengths:
+- Clean YouTube integration with youtube_explode_dart
+- Robust download system with metadata tagging
+- Good permission handling cascade
+- Stream URL caching in Hive
+
+Key Files:
+- lib/Services/youtube_services.dart (637 lines) - YouTube API wrapper
+- lib/Services/download.dart (591 lines) - Download management
+- lib/CustomWidgets/equalizer.dart (188 lines) - Equalizer UI
+
+Learnings:
+- Singleton pattern for services
+- Hive caching for performance
+- Progressive permission requests
+
+8.2 BLOOMEETUNES INSIGHTS
+================================================================================
+Strengths:
+- Comprehensive desktop support
+- Keyboard shortcuts for power users
+- Import/Export functionality
+- Discord RPC integration
+- Responsive design with breakpoints
+
+Key Files:
+- lib/services/discord_service.dart (62 lines) - Discord RPC
+- lib/blocs/lastdotfm/lastdotfm_cubit.dart (300 lines) - Last.fm
+- lib/services/import_export_service.dart (358 lines) - Import/Export
+- lib/main.dart (403 lines) - Keyboard shortcuts, responsive setup
+
+Learnings:
+- Bloc pattern for state management
+- Desktop-specific features (keyboard, Discord)
+- JSON-based import/export format
+- Responsive breakpoint system
+
+8.3 MUSIFY INSIGHTS
+================================================================================
+Strengths:
+- Advanced proxy manager for restricted regions
+- Comprehensive listening statistics
+- Time machine feature
+- Radio stations
+- Dynamic color theming
+- Update management
+
+Key Files:
+- lib/services/proxy_manager.dart (798 lines) - Proxy management
+- lib/services/listening_stats_service.dart (500 lines) - Statistics
+- lib/screens/settings_page.dart (877 lines) - Settings UI
+- lib/screens/radio_stations_page.dart (100 lines) - Radio stations
+
+Learnings:
+- Resource pooling for HTTP clients
+- TTL-based cache invalidation
+- Session-based statistics tracking
+- Multiple proxy source aggregation
+
+8.4 KREATE INSIGHTS
+================================================================================
+Strengths:
+- Most extensive customization (100+ options)
+- YouTube account integration
+- Advanced lyrics system
+- Audio effects (reverb, bass, etc.)
+- Sleep timer
+- Database export
+
+Key Files:
+- composeApp/src/androidMain/kotlin/app/kreate/android/Preferences.kt (687 lines) - Preferences
+- composeApp/src/androidMain/kotlin/app/kreate/android/service/PlayerEventUpdateDiscord.kt (141 lines) - Discord
+- composeApp/src/androidMain/kotlin/it/fast4x/rimusic/ui/screens/settings/SettingsScreen.kt (201 lines) - Settings
+
+Learnings:
+- Enum-based preference system
+- Lazy initialization
+- Observable state with StateFlow
+- Modular settings screens
+
+8.5 METROLIST INSIGHTS
+================================================================================
+Strengths:
+- Listen Together (real-time collaborative listening)
+- Google Cast integration
+- Discord presence
+- AI lyrics translation
+- Android Auto support
+- Screenshot protection
+
+Key Files:
+- app/src/main/kotlin/com/metrolist/music/listentogether/ListenTogetherManager.kt (1944 lines) - Listen Together
+- app/src/main/kotlin/com/metrolist/music/cast/CastManager.kt (168 lines) - Cast
+- app/src/main/kotlin/com/metrolist/music/ui/screens/settings/SettingsScreen.kt (292 lines) - Settings
+
+Learnings:
+- WebSocket-based real-time sync
+- Debounce and tolerance for smooth sync
+- Buffer synchronization protocol
+- Manager pattern with lifecycle
+- Multiple build variants (GMS, FOSS)
+
+================================================================================
+CONCLUSION
+================================================================================
+
+The NEW VOID music player has a solid foundation with plugin architecture and basic playback features. However, there are significant opportunities for enhancement by implementing features from the reference apps.
+
+RECOMMENDED IMPLEMENTATION ORDER:
+1. Dynamic Color (Material You) - Quick win, modern Android standard
+2. Last.fm Scrobbling - Popular feature, moderate complexity
+3. Discord Rich Presence - Social presence, desktop-focused
+4. Listening Statistics - Engagement feature, moderate complexity
+5. Import/Export - Data portability, moderate complexity
+6. Keyboard Shortcuts - Desktop UX, quick win
+7. Sleep Timer - Common request, quick win
+8. Cache Management - Storage optimization, quick win
+
+The reference apps, particularly Kreate for customization and Metrolist for social features, provide excellent code patterns and architectural examples that can be adapted for the NEW VOID project.
+
+================================================================================
+END OF REPORT
+================================================================================
