@@ -1,5 +1,5 @@
-name: Bloomee
-description: An Open source Free Music Player.
+name: voidmusic
+description: Void Music - An Close source Free Music Player.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -75,7 +75,7 @@ dependencies:
   media_kit_libs_audio: ^1.0.7 
   audio_service_mpris: ^0.2.0
   audio_service_win: ^0.0.2
-  rust_lib_Bloomee:
+  rust_lib_VoidMusic:
     path: rust_builder
   flutter_rust_bridge: 2.12.0
   freezed_annotation: ^3.1.0

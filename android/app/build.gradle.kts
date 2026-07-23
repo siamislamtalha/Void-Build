@@ -12,7 +12,7 @@ val keystorePropertiesFile = rootProject.file("key.properties")
 
 
 android {
-    namespace = "ls.bloomee.musicplayer"
+    namespace = "dts.voidmusic.silentcode.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "ls.bloomee.musicplayer"
+        applicationId = "dts.voidmusic.silentcode.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -55,7 +55,7 @@ android {
             val keystoreProperties = Properties()
             keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 
-            val keystorePath = keystoreProperties["bloomee.jks"] as String?
+            val keystorePath = keystoreProperties["voidmusic.jks"] as String?
             val keyAliasValue = keystoreProperties["keyAlias"] as String?
 
             println("   Keystore file path: $keystorePath")
@@ -70,7 +70,7 @@ android {
             create("release") {
                 keyAlias = keystoreProperties["keyAlias"] as String?
                 keyPassword = keystoreProperties["keyPassword"] as String?
-                storeFile = rootProject.file("bloomee.jks")
+                storeFile = rootProject.file("voidmusic.jks")
                 storePassword = keystoreProperties["storePassword"] as String?
                 println("   ✅ Release signing config created successfully")
             }
