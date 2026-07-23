@@ -30,6 +30,9 @@ jobs:
                 flutter-version: '3.35.4'
                 channel: 'stable'
 
+            - name: Install Inno Setup
+              run: choco install innosetup -y
+
             - name: Install Dependencies
               run: flutter pub get
 
@@ -56,7 +59,7 @@ jobs:
                   echo storeFile=voidmusic.jks >> ./android/key.properties
 
             - name: Clean Android build
-              run: cd android; ./gradlew clean
+              run: cd android; ./gradlew.bat clean
 
             - name: Build App files
               run: flutter build apk --release --split-per-abi --build-number ${{github.run_number}}
@@ -80,15 +83,15 @@ jobs:
 
             - name: Build Windows App
               run: flutter build windows --release --build-number ${{github.run_number}}
-            
+
             - name: Create build-number.txt file
               run: echo ${{github.run_number}} > build-number.txt
 
-            - name: Rename file
-              run: Rename-Item -Path "build/windows/x64/runner/Release/voidmusic.exe" -NewName "VoidMusic.exe"
-           
-            - name: ZIP build
-              run: Compress-Archive -Path build/windows/x64/runner/Release/* -Destination  build/windows/x64/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.zip
+            - name: Create Inno Setup installer
+              shell: powershell
+              run: |
+                  $env:VERSION = "${{ env.VERSION }}"
+                  & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DVERSION=$env:VERSION windows/installer.iss
             
             - name: Upload Artifacts
               uses: actions/upload-artifact@v4
@@ -96,7 +99,7 @@ jobs:
                 name: Release-Windows-Android
                 path: |
                   build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_universal.apk
-                  build/windows/x64/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.zip
+                  build/windows/x64/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.exe
                   build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_armeabi-v7a.apk
                   build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
                   build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_x86_64.apk
@@ -107,7 +110,7 @@ jobs:
               with:
                 artifacts: |
                   build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_universal.apk
-                  build/windows/x64/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.zip
+                  build/windows/x64/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.exe
                   build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_armeabi-v7a.apk
                   build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
                   build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_x86_64.apk
