@@ -59,8 +59,9 @@ jobs:
                   echo storeFile=voidmusic.jks >> ./android/key.properties
 
             - name: Clean Android build
-              shell: powershell
-              run: ./android/gradlew.bat clean
+              shell: cmd
+              working-directory: android
+              run: gradlew.bat clean
 
             - name: Build App files
               run: flutter build apk --release --split-per-abi --build-number ${{github.run_number}}
