@@ -107,20 +107,13 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
             child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: Default_Theme.themeColor.withValues(alpha: 0.96),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.05),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.30),
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
+              decoration: AppTheme.liquidGlassDecoration(
+                borderRadius: 24,
+                glassColor: const Color(0xF50A040C),
+                borderColor: const Color(0x3BFFFFFF),
+                borderWidth: 1,
               ),
               child: Column(
                 // FIX: Ensure it only takes needed height so top taps can dismiss

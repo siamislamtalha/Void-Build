@@ -95,16 +95,11 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),
           child: Container(
-            decoration: BoxDecoration(
-              color: Default_Theme.themeColor,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  blurRadius: 30,
-                  offset: const Offset(0, 15),
-                ),
-              ],
+            decoration: AppTheme.liquidGlassDecoration(
+              borderRadius: 24,
+              glassColor: const Color(0xF50A040C),
+              borderColor: const Color(0x3BFFFFFF),
+              borderWidth: 1,
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(24),

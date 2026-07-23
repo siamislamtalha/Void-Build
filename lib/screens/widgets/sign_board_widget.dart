@@ -13,18 +13,24 @@ class SignBoardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Wrap(
-        children: [
-          Column(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          decoration: AppTheme.liquidGlassDecoration(
+            borderRadius: 20,
+            glassColor: const Color(0x1A120B16),
+            borderColor: const Color(0x2DFFFFFF),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  icon,
-                  color: Default_Theme.primaryColor2.withValues(alpha: 0.7),
-                  size: 40,
-                ),
+              Icon(
+                icon,
+                color: Default_Theme.primaryColor2.withValues(alpha: 0.7),
+                size: 48,
               ),
+              const SizedBox(height: 12),
               Text(
                 message,
                 textAlign: TextAlign.center,
@@ -33,8 +39,8 @@ class SignBoardWidget extends StatelessWidget {
                     fontSize: 14)),
               ),
             ],
-          )
-        ],
+          ),
+        ),
       ),
     );
   }

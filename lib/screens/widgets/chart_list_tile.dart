@@ -78,7 +78,7 @@ class ChartListTile extends StatelessWidget {
                   width: isMobile ? 54 : 64,
                   decoration: BoxDecoration(
                     color: const Color(0xFF111111),
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.08),
                       width: 1,

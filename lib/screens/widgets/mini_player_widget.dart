@@ -168,49 +168,50 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
       child: Transform.translate(
         offset: Offset(_dragOffset, 0),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: SizedBox(
-              height: _cardHeight,
-              child: Stack(
-                children: [
-                  _BlurredBackground(imageUrl: thumbUrl),
-                  _GlassOverlay(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      children: [
-                        _Artwork(
-                          imageUrl: thumbUrl,
-                          fallbackUrl: song.thumbnail.url,
-                          size: _artworkSize,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _TrackInfo(
-                            song: song,
-                            waveController: _waveController,
-                            isPlaying: widget.state.isPlaying,
+            borderRadius: BorderRadius.circular(34),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+              child: SizedBox(
+                height: _cardHeight,
+                child: Stack(
+                  children: [
+                    _BlurredBackground(imageUrl: thumbUrl),
+                    _GlassOverlay(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Row(
+                        children: [
+                          _Artwork(
+                            imageUrl: thumbUrl,
+                            fallbackUrl: song.thumbnail.url,
+                            size: _artworkSize,
                           ),
-                        ),
-                        if (isDesktop)
-                          _ControlButton(
-                            icon: FontAwesome.backward_step_solid,
-                            size: 20,
-                            onPressed: () {
-                              HapticFeedback.lightImpact();
-                              context
-                                  .read<BloomeePlayerCubit>()
-                                  .bloomeePlayer
-                                  .skipToPrevious();
-                            },
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _TrackInfo(
+                              song: song,
+                              waveController: _waveController,
+                              isPlaying: widget.state.isPlaying,
+                            ),
                           ),
-                        _PlayPauseButton(state: widget.state),
-                        if (isDesktop)
+                          if (isDesktop)
+                            _ControlButton(
+                              icon: FontAwesome.backward_step_solid,
+                              size: 20,
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                context
+                                    .read<BloomeePlayerCubit>()
+                                    .bloomeePlayer
+                                    .skipToPrevious();
+                              },
+                            ),
+                          _PlayPauseButton(state: widget.state),
                           _ControlButton(
                             icon: FontAwesome.forward_step_solid,
-                            size: 20,
+                            size: 18,
                             onPressed: () {
                               HapticFeedback.lightImpact();
                               context
@@ -219,35 +220,21 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                                   .skipToNext();
                             },
                           ),
-                        _ControlButton(
-                          icon: FontAwesome.plus_solid,
-                          size: 18,
-                          onPressed: () {
-                            HapticFeedback.lightImpact();
-                            context.read<AddToPlaylistCubit>().setTrack(song);
-                            context.pushNamed(RoutePaths.addToPlaylistScreen);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (!widget.state.isCompleted) const _GlowingProgressBar(),
-                  Positioned(
-                    top: 0,
-                    left: 24,
-                    right: 24,
-                    child: Container(
-                      height: 0.5,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [
-                          Colors.white.withValues(alpha: 0),
-                          Colors.white.withValues(alpha: 0.15),
-                          Colors.white.withValues(alpha: 0),
-                        ]),
+                          _ControlButton(
+                            icon: FontAwesome.plus_solid,
+                            size: 16,
+                            onPressed: () {
+                              HapticFeedback.lightImpact();
+                              context.read<AddToPlaylistCubit>().setTrack(song);
+                              context.pushNamed(RoutePaths.addToPlaylistScreen);
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+                    if (!widget.state.isCompleted) const _GlowingProgressBar(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -268,8 +255,8 @@ class _BlurredBackground extends StatelessWidget {
         scale: 1.6,
         child: ImageFiltered(
           imageFilter: ImageFilter.blur(
-            sigmaX: 40,
-            sigmaY: 40,
+            sigmaX: 35,
+            sigmaY: 35,
             tileMode: TileMode.clamp,
           ),
           child: LoadImageCached(imageUrl: imageUrl, fit: BoxFit.cover),
@@ -285,19 +272,19 @@ class _GlassOverlay extends StatelessWidget {
     return Positioned.fill(
       child: DecoratedBox(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.black.withValues(alpha: 0.45),
-              Colors.black.withValues(alpha: 0.60),
-            ],
-          ),
+          color: Colors.black.withValues(alpha: 0.38),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.06),
-            width: 0.5,
+            color: Colors.white.withValues(alpha: 0.24),
+            width: 1.2,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(34),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.4),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
       ),
     );

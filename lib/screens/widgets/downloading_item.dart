@@ -43,7 +43,7 @@ class DownloadingCardWidget extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(14),
           child: SizedBox(
             width: 55,
             height: 55,
@@ -57,7 +57,7 @@ class DownloadingCardWidget extends StatelessWidget {
           width: 55,
           height: 55,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(14),
             color: Colors.black.withValues(alpha: 0.6),
           ),
         ),

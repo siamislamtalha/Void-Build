@@ -66,12 +66,16 @@ class SongCardWidget extends StatelessWidget {
           curve: Curves.easeOutCubic,
           height: 66,
           margin: const EdgeInsets.symmetric(vertical: 2),
-          decoration: BoxDecoration(
-            color: isPlaying
-                ? Default_Theme.accentColor2.withValues(alpha: 0.08)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
-          ),
+          decoration: isPlaying
+              ? AppTheme.liquidGlassDecoration(
+                  borderRadius: 14,
+                  glassColor: Default_Theme.accentColor2.withValues(alpha: 0.12),
+                  borderColor: Default_Theme.accentColor2.withValues(alpha: 0.3),
+                )
+              : BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(14),
+                ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(

@@ -397,9 +397,10 @@ class _SongInfoCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Default_Theme.primaryColor1.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(12),
+      decoration: AppTheme.liquidGlassDecoration(
+        borderRadius: 16,
+        glassColor: const Color(0x1A120B16),
+        borderColor: const Color(0x2DFFFFFF),
       ),
       child: Row(
         children: [
@@ -470,9 +471,10 @@ class _SearchBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       child: Container(
-        decoration: BoxDecoration(
-          color: Default_Theme.primaryColor1.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(10),
+        decoration: AppTheme.liquidGlassDecoration(
+          borderRadius: 14,
+          glassColor: const Color(0x1A120B16),
+          borderColor: const Color(0x2DFFFFFF),
         ),
         child: TextField(
           controller: controller,

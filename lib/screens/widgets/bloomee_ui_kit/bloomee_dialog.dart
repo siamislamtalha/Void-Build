@@ -96,22 +96,16 @@ class BloomeeDialogSurface extends StatelessWidget {
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
           child: Container(
             constraints: BoxConstraints(maxWidth: maxW),
-            decoration: BoxDecoration(
-              color: _kDialogBg.withValues(alpha: 0.92),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _kDialogBorder, width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  blurRadius: 32,
-                  offset: const Offset(0, 8),
-                ),
-              ],
+            decoration: AppTheme.liquidGlassDecoration(
+              borderRadius: 24,
+              glassColor: const Color(0xF50A040C),
+              borderColor: const Color(0x3BFFFFFF),
+              borderWidth: 1,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,

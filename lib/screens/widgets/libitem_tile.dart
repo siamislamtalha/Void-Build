@@ -42,48 +42,54 @@ class LibItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
-      child: InkWell(
-        splashColor: Default_Theme.primaryColor2.withValues(alpha: 0.1),
-        hoverColor: Colors.white.withValues(alpha: 0.05),
-        highlightColor: Default_Theme.primaryColor2.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(10),
-        onTap: onTap ?? () {},
-        onSecondaryTap: onSecondaryTap ?? () {},
-        onLongPress: onLongPress ?? () {},
-        child: SizedBox(
-          height: 80,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              type == LibItemTypes.userPlaylist
-                  ? StreamBuilder<String>(
-                      stream: context
-                          .watch<BloomeePlayerCubit>()
-                          .bloomeePlayer
-                          .queueTitle,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData && snapshot.data == title) {
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 8),
-                            child: Icon(
-                              FontAwesome.chart_simple_solid,
-                              color: Default_Theme.primaryColor2
-                                  .withValues(alpha: 1),
-                              size: 15,
-                            ),
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      })
-                  : const SizedBox.shrink(),
-              Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                child: SizedBox.square(
-                  dimension: 70,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
+      child: StreamBuilder<String>(
+        stream: context
+            .watch<BloomeePlayerCubit>()
+            .bloomeePlayer
+            .queueTitle,
+        builder: (context, snapshot) {
+          final isPlaying = snapshot.hasData && snapshot.data == title;
+          return InkWell(
+            splashColor: Default_Theme.primaryColor2.withValues(alpha: 0.1),
+            hoverColor: Colors.white.withValues(alpha: 0.05),
+            highlightColor: Default_Theme.primaryColor2.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16),
+            onTap: onTap ?? () {},
+            onSecondaryTap: onSecondaryTap ?? () {},
+            onLongPress: onLongPress ?? () {},
+            child: Container(
+              height: 80,
+              decoration: isPlaying
+                  ? AppTheme.liquidGlassDecoration(
+                      borderRadius: 16,
+                      glassColor: Default_Theme.accentColor2.withValues(alpha: 0.12),
+                      borderColor: Default_Theme.accentColor2.withValues(alpha: 0.3),
+                    )
+                  : null,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  type == LibItemTypes.userPlaylist
+                      ? isPlaying
+                          ? Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Icon(
+                                FontAwesome.chart_simple_solid,
+                                color: Default_Theme.primaryColor2
+                                    .withValues(alpha: 1),
+                                size: 15,
+                              ),
+                            )
+                          : const SizedBox.shrink()
+                      : const SizedBox.shrink(),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: SizedBox.square(
+                      dimension: 70,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
                     child: switch (type) {
                       LibItemTypes.userPlaylist => LoadImageCached(
                           imageUrl: coverArt, fallbackUrl: coverArt.toString()),

@@ -237,13 +237,11 @@ class _PanelContent extends StatelessWidget {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
             child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.85),
-                borderRadius: _UpNextStyles.panelBorderRadius,
-                border: Border(
-                    top: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        width: 0.5)),
+              decoration: AppTheme.liquidGlassDecoration(
+                borderRadius: 25,
+                glassColor: const Color(0xD50A040C),
+                borderColor: const Color(0x3BFFFFFF),
+                borderWidth: 0.5,
               ),
               child: Column(
                 children: [

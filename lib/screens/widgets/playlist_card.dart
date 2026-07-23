@@ -75,37 +75,53 @@ class _PlaylistCardState extends State<PlaylistCard> {
       tag: _heroTag,
       child: AspectRatio(
         aspectRatio: 1,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Container(
-                color: Default_Theme.primaryColor2.withValues(alpha: 0.04),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: Default_Theme.primaryColor1.withValues(alpha: 0.08),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
-              LoadImageCached(
-                imageUrl: widget.playlist.thumbnail.url,
-                fallbackUrl: widget.playlist.thumbnail.url,
-                fit: BoxFit.fitWidth,
-              ),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                color: _isHovering
-                    ? Colors.black.withValues(alpha: 0.45)
-                    : Colors.transparent,
-                child: Center(
-                  child: AnimatedOpacity(
-                    opacity: _isHovering ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: const Icon(
-                      MingCute.play_circle_line,
-                      color: Colors.white,
-                      size: 42,
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(17),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Container(
+                  color: Default_Theme.primaryColor2.withValues(alpha: 0.04),
+                ),
+                LoadImageCached(
+                  imageUrl: widget.playlist.thumbnail.url,
+                  fallbackUrl: widget.playlist.thumbnail.url,
+                  fit: BoxFit.fitWidth,
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  color: _isHovering
+                      ? Colors.black.withValues(alpha: 0.45)
+                      : Colors.transparent,
+                  child: Center(
+                    child: AnimatedOpacity(
+                      opacity: _isHovering ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: const Icon(
+                        MingCute.play_circle_line,
+                        color: Colors.white,
+                        size: 42,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

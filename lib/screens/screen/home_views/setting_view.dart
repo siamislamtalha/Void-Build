@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:voidmusic/screens/screen/home_views/setting_views/about.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/appui_setting.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/local_music_setting.dart';
@@ -148,15 +147,16 @@ class SettingsView extends StatelessWidget {
                 ],
               ),
 
-              // ── Group 4: Info ──
+              // ── Group 4: Info & About Dev ──
               _SettingsSection(
                 children: [
                   _SettingsTile(
                     title: AppLocalizations.of(context)!.settingsAbout,
                     subtitle:
                         AppLocalizations.of(context)!.settingsAboutSubtitle,
-                    icon: MingCute.github_fill,
+                    icon: MingCute.flower_4_fill,
                     iconColor: Default_Theme.accentColor2,
+                    isHighlightIcon: true,
                     onTap: () => _navigate(context, const About()),
                   ),
                 ],
@@ -189,13 +189,13 @@ class _SettingsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
-      decoration: BoxDecoration(
-        // Solid, subtle surface color with NO border. Looks much cleaner.
-        color: Default_Theme.primaryColor1.withValues(alpha: 0.02),
-        borderRadius: BorderRadius.circular(20),
+      decoration: AppTheme.liquidGlassDecoration(
+        borderRadius: 24,
+        glassColor: const Color(0x1A120B16),
+        borderColor: const Color(0x2DFFFFFF),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         child: Material(
           color: Colors
               .transparent, // Required to let the InkWell splash render correctly inside

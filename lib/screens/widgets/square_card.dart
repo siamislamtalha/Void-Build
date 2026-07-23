@@ -67,7 +67,7 @@ class _SquareImgCardState extends State<SquareImgCard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(18),
                     child: Stack(children: [
                       SizedBox(
                         height: 150,
@@ -88,7 +88,7 @@ class _SquareImgCardState extends State<SquareImgCard> {
                               color: Default_Theme.accentColor2
                                   .withValues(alpha: 0.95),
                               borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(15),
+                                bottomLeft: Radius.circular(18),
                               ),
                             ),
                             child: widget.isList

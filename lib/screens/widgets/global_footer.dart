@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/screens/widgets/player_overlay_wrapper.dart';
 import 'package:voidmusic/screens/widgets/mini_player_widget.dart';
@@ -7,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
@@ -22,38 +22,24 @@ class GlobalFooter extends StatelessWidget {
 
     return PlayerOverlayWrapper(
       child: BackButtonListener(
-        // FIX H-04: Back button priority order:
-        // ① Navigator routes (FullscreenLyricsView, PlayerSettings, TimerView, etc.)
-        // ② UpNext panel collapse
-        // ③ Player overlay hide
-        // ④ GoRouter shell navigation
-        // ⑤ System exit
-        //
-        // Previously the handler short-circuited at step ③ whenever the player
-        // was visible, swallowing Navigator pops and causing sub-screens to
-        // appear orphaned over a hidden/collapsed player.
         onBackButtonPressed: () async {
           final overlayC = context.read<PlayerOverlayCubit>();
           final router = GoRouter.of(context);
 
-          // ① Navigator MUST have first priority — always.
           if (router.canPop()) {
             router.pop();
             return true;
           }
 
-          // ② Collapse UpNext panel if expanded (player must be visible).
           if (overlayC.state && overlayC.collapseUpNextPanel()) {
             return true;
           }
 
-          // ③ Hide the player overlay.
           if (overlayC.state) {
             overlayC.hidePlayer();
             return true;
           }
 
-          // ④ Let PopScope handle tab/exit navigation below.
           return false;
         },
         child: PopScope(
@@ -89,7 +75,7 @@ class GlobalFooter extends StatelessWidget {
                     Container(
                       color: Colors.transparent,
                       margin: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 10),
+                          vertical: 4, horizontal: 8),
                       child: HorizontalNavBar(navigationShell: navigationShell),
                     ),
                 ],
@@ -101,34 +87,27 @@ class GlobalFooter extends StatelessWidget {
     );
   }
 
-  /// Handles PopScope back presses using the same priority order as
-  /// BackButtonListener above.
   Future<void> _handleHardwareBackPress(BuildContext context) async {
     final overlayC = context.read<PlayerOverlayCubit>();
     final router = GoRouter.of(context);
 
-    // ① Navigator routes first
     if (router.canPop()) {
       router.pop();
       return;
     }
 
-    // ② Collapse UpNext panel
     if (overlayC.state && overlayC.collapseUpNextPanel()) return;
 
-    // ③ Hide player
     if (overlayC.state) {
       overlayC.hidePlayer();
       return;
     }
 
-    // ④ Navigate to home tab
     if (navigationShell.currentIndex != 0) {
       navigationShell.goBranch(0);
       return;
     }
 
-    // ⑤ Exit app
     if (context.mounted) {
       await SystemNavigator.pop();
     }
@@ -249,26 +228,161 @@ class HorizontalNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final currentIndex = navigationShell.currentIndex;
 
-    return GNav(
-      gap: 7.0,
-      tabBackgroundColor: Default_Theme.accentColor2.withValues(alpha: 0.22),
-      color: Default_Theme.primaryColor2,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      activeColor: Default_Theme.accentColor2,
-      textStyle: Default_Theme.secondoryTextStyleMedium.merge(
-          const TextStyle(color: Default_Theme.accentColor2, fontSize: 18)),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      backgroundColor: Default_Theme.themeColor.withValues(alpha: 0.3),
-      tabs: [
-        GButton(icon: MingCute.home_4_fill, text: l10n.navHome),
-        GButton(icon: MingCute.book_5_fill, text: l10n.navLibrary),
-        GButton(icon: MingCute.search_2_fill, text: l10n.navSearch),
-        GButton(icon: MingCute.music_2_fill, text: l10n.navLocal),
-        GButton(icon: MingCute.folder_download_fill, text: l10n.navOffline),
-      ],
-      selectedIndex: navigationShell.currentIndex,
-      onTabChange: navigationShell.goBranch,
+    final navItems = [
+      _NavItemData(branchIndex: 0, icon: MingCute.home_4_fill, label: l10n.navHome),
+      _NavItemData(branchIndex: 1, icon: MingCute.book_5_fill, label: l10n.navLibrary),
+      _NavItemData(branchIndex: 3, icon: MingCute.music_2_fill, label: l10n.navLocal),
+      _NavItemData(branchIndex: 4, icon: MingCute.folder_download_fill, label: l10n.navOffline),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 6, right: 6, top: 4, bottom: 6),
+      child: Row(
+        children: [
+          // Left Liquid Glass Floating Capsule Bar
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(34),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.38),
+                    borderRadius: BorderRadius.circular(34),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.24),
+                      width: 1.2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.4),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: navItems.map((item) {
+                      final isSelected = currentIndex == item.branchIndex;
+                      return GestureDetector(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          navigationShell.goBranch(item.branchIndex);
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isSelected ? 12 : 8,
+                            vertical: 6,
+                          ),
+                          decoration: isSelected
+                              ? BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.18),
+                                  borderRadius: BorderRadius.circular(22),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.25),
+                                    width: 0.8,
+                                  ),
+                                )
+                              : const BoxDecoration(),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                item.icon,
+                                size: 22,
+                                color: isSelected
+                                    ? Default_Theme.accentColor2
+                                    : Colors.white.withValues(alpha: 0.65),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                item.label,
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color: isSelected
+                                      ? Default_Theme.accentColor2
+                                      : Colors.white.withValues(alpha: 0.65),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Right Circular Liquid Glass Search Button
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              navigationShell.goBranch(2);
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: currentIndex == 2
+                        ? Colors.white.withValues(alpha: 0.25)
+                        : Colors.black.withValues(alpha: 0.38),
+                    border: Border.all(
+                      color: currentIndex == 2
+                          ? Colors.white.withValues(alpha: 0.45)
+                          : Colors.white.withValues(alpha: 0.24),
+                      width: 1.2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.4),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Icon(
+                      MingCute.search_2_fill,
+                      size: 24,
+                      color: currentIndex == 2
+                          ? Default_Theme.accentColor2
+                          : Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
+}
+
+class _NavItemData {
+  final int branchIndex;
+  final IconData icon;
+  final String label;
+
+  const _NavItemData({
+    required this.branchIndex,
+    required this.icon,
+    required this.label,
+  });
 }

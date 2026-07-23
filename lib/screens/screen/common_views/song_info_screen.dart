@@ -551,14 +551,12 @@ class _GlassCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
         child: Container(
-          decoration: BoxDecoration(
-            color: Default_Theme.accentColor2.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.05),
-            ),
+          decoration: AppTheme.liquidGlassDecoration(
+            borderRadius: 24,
+            glassColor: const Color(0x1A120B16),
+            borderColor: const Color(0x2DFFFFFF),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
