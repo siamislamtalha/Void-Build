@@ -60,9 +60,7 @@ jobs:
 
             - name: Clean Android build
               shell: powershell
-              run: |
-                  cd android
-                  .\gradlew.bat clean
+              run: ./android/gradlew.bat clean
 
             - name: Build App files
               run: flutter build apk --release --split-per-abi --build-number ${{github.run_number}}
