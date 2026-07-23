@@ -1,10 +1,10 @@
-import 'package:voidmusic/core/models/lyrics_models.dart';
+﻿import 'package:voidmusic/core/models/lyrics_models.dart';
 import 'package:voidmusic/services/db/global_db.dart';
 import 'package:voidmusic/services/db/mappers/lyrics_mapper.dart';
 import 'package:isar_community/isar.dart';
 
 /// DAO for cached lyrics. Uses [lyricsToLyricsDB] and [lyricsDBToLyrics]
-/// from [lyrics_mapper.dart] � no inline mapping.
+/// from [lyrics_mapper.dart] — no inline mapping.
 class LyricsDAO {
   final Future<Isar> _db;
 
