@@ -59,6 +59,7 @@ jobs:
                   echo storeFile=voidmusic.jks >> ./android/key.properties
 
             - name: Clean Android build
+              shell: powershell
               run: |
                   cd android
                   .\gradlew.bat clean
