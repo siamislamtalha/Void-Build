@@ -90,83 +90,85 @@ class LibItemCard extends StatelessWidget {
                       dimension: 70,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(14),
-                    child: switch (type) {
-                      LibItemTypes.userPlaylist => LoadImageCached(
-                          imageUrl: coverArt, fallbackUrl: coverArt.toString()),
-                      LibItemTypes.onlPlaylist => LoadImageCached(
-                          imageUrl: coverArt, fallbackUrl: coverArt.toString()),
-                      LibItemTypes.artist => ClipOval(
-                          child: LoadImageCached(
-                              imageUrl: coverArt,
-                              fallbackUrl: coverArt.toString()),
-                        ),
-                      LibItemTypes.album => LoadImageCached(
-                          imageUrl: coverArt, fallbackUrl: coverArt.toString()),
-                    },
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: Default_Theme.secondoryTextStyle.merge(
-                          const TextStyle(
-                              fontSize: 16.5,
-                              fontWeight: FontWeight.w700,
-                              color: Default_Theme.primaryColor1)),
+                        child: switch (type) {
+                          LibItemTypes.userPlaylist => LoadImageCached(
+                              imageUrl: coverArt, fallbackUrl: coverArt.toString()),
+                          LibItemTypes.onlPlaylist => LoadImageCached(
+                              imageUrl: coverArt, fallbackUrl: coverArt.toString()),
+                          LibItemTypes.artist => ClipOval(
+                              child: LoadImageCached(
+                                  imageUrl: coverArt,
+                                  fallbackUrl: coverArt.toString()),
+                            ),
+                          LibItemTypes.album => LoadImageCached(
+                              imageUrl: coverArt, fallbackUrl: coverArt.toString()),
+                        },
+                      ),
                     ),
-                    Row(
+                  ),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (isPinned) ...[
-                          Icon(
-                            MingCute.pin_2_fill,
-                            size: 12,
-                            color: Default_Theme.accentColor2
-                                .withValues(alpha: 0.85),
-                          ),
-                          const SizedBox(width: 4),
-                        ],
-                        Expanded(
-                          child: Text(
-                            subtitle,
-                            maxLines: 1,
-                            style: Default_Theme.secondoryTextStyle.merge(
-                                const TextStyle(
-                                    fontSize: 14,
-                                    overflow: TextOverflow.fade,
-                                    fontWeight: FontWeight.w500,
-                                    color: Default_Theme.primaryColor1)),
-                          ),
+                        Text(
+                          title,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: Default_Theme.secondoryTextStyle.merge(
+                              const TextStyle(
+                                  fontSize: 16.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: Default_Theme.primaryColor1)),
+                        ),
+                        Row(
+                          children: [
+                            if (isPinned) ...[
+                              Icon(
+                                MingCute.pin_2_fill,
+                                size: 12,
+                                color: Default_Theme.accentColor2
+                                    .withValues(alpha: 0.85),
+                              ),
+                              const SizedBox(width: 4),
+                            ],
+                            Expanded(
+                              child: Text(
+                                subtitle,
+                                maxLines: 1,
+                                style: Default_Theme.secondoryTextStyle.merge(
+                                    const TextStyle(
+                                        fontSize: 14,
+                                        overflow: TextOverflow.fade,
+                                        fontWeight: FontWeight.w500,
+                                        color: Default_Theme.primaryColor1)),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              if (showMenuButton)
-                Padding(
-                  padding: const EdgeInsets.only(right: 2),
-                  child: IconButton(
-                    onPressed: onMenuTap,
-                    splashRadius: 20,
-                    icon: Icon(
-                      Icons.more_vert_rounded,
-                      size: 20,
-                      color:
-                          Default_Theme.primaryColor1.withValues(alpha: 0.72),
-                    ),
                   ),
-                ),
-            ],
-          ),
-        ),
+                  if (showMenuButton)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 2),
+                      child: IconButton(
+                        onPressed: onMenuTap,
+                        splashRadius: 20,
+                        icon: Icon(
+                          Icons.more_vert_rounded,
+                          size: 20,
+                          color:
+                              Default_Theme.primaryColor1.withValues(alpha: 0.72),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
