@@ -7,10 +7,7 @@ OutputBaseFilename=VoidMusic_v{#VERSION}
 Compression=lzma
 SolidCompression=yes
 OutputDir=..\build\windows\x64
-SetupIconFile=..\assets\icons\BloomeeLogoFG.png
 UninstallDisplayIcon={app}\voidmusic.exe
-WizardImageFile=..\assets\icons\BloomeeLogoFG.png
-WizardSmallImageFile=..\assets\icons\BloomeeLogoFG.png
 
 [Files]
 Source: "..\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
