@@ -8,11 +8,11 @@ import 'package:voidmusic/core/models/exported.dart';
 
 /// A null/empty [Track] sentinel used as a default value
 /// where a non-nullable Track is required but no track is loaded.
-final Track trackNull = Track(
+const Track trackNull = Track(
   id: 'Null',
   title: 'Null',
-  artists: const [],
-  thumbnail: const Artwork(url: '', layout: ImageLayout.square),
+  artists: [],
+  thumbnail: Artwork(url: '', layout: ImageLayout.square),
   isExplicit: false,
 );
 

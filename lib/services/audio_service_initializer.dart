@@ -28,7 +28,7 @@ Future<void> setupAudioSession() async {
         AVAudioSessionRouteSharingPolicy.defaultPolicy,
     avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
     // Android
-    androidAudioAttributes: AndroidAudioAttributes(
+    androidAudioAttributes: const AndroidAudioAttributes(
       contentType: AndroidAudioContentType.music,
       usage: AndroidAudioUsage.media,
     ),
@@ -80,7 +80,7 @@ class PlayerInitializer {
       builder: () => BloomeeMusicPlayer(),
       config: const AudioServiceConfig(
         androidNotificationChannelId: 'com.BloomeePlayer.notification.status',
-        androidNotificationChannelName: 'BloomeTunes',
+        androidNotificationChannelName: 'Void Music',
         androidNotificationIcon: 'mipmap/ic_launcher',
         androidResumeOnClick: true,
         androidShowNotificationBadge: true,

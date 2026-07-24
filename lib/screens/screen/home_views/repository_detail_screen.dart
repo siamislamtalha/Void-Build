@@ -272,14 +272,14 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
     final remoteManifestVer =
         _parseManifestVersion(remotePlugin.manifestVersion);
     final remoteManifestCompatible = remoteManifestVer != null &&
-        remoteManifestVer == CURRENT_MANIFEST_VERSION;
+        remoteManifestVer == currentManifestVersion;
 
     final hasInstalled = installedPlugin != null;
     final canUpdate =
         hasInstalled && remoteManifestCompatible && remoteVer > localVer;
     final canInstall = !hasInstalled && remoteManifestCompatible;
     final installedManifestMismatch = hasInstalled &&
-        installedPlugin.manifest.manifestVersion != CURRENT_MANIFEST_VERSION;
+        installedPlugin.manifest.manifestVersion != currentManifestVersion;
 
     final phase = _phaseByPlugin[remotePlugin.id] ?? _RemoteInstallPhase.idle;
 
@@ -320,7 +320,7 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
                         const SizedBox(width: 6),
                         Tooltip(
                             message: l10n.pluginRepositoryOutdatedManifest,
-                            child: Icon(Icons.warning_amber_rounded,
+                            child: const Icon(Icons.warning_amber_rounded,
                                 color: Colors.orange, size: 16)),
                       ]
                     ],

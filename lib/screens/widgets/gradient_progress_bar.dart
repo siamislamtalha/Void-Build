@@ -568,7 +568,7 @@ class _GradientProgressBarPainter extends CustomPainter {
     final double trackBottom = centerY + trackHeight / 2;
 
     // Track spans the full width for visual alignment with other UI elements
-    final double trackStartX = 0;
+    const double trackStartX = 0;
     final double trackEndX = size.width;
     final double trackWidth = trackEndX - trackStartX;
 

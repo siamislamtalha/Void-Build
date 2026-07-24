@@ -48,7 +48,7 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
         contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
         title: Text(
           l10n.pluginRepositoryAddTitle,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w600,

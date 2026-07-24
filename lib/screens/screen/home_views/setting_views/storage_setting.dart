@@ -324,6 +324,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
 
     // 3) Show options dialog: which parts to restore (defaults all true)
     final options = await showDialog<_RestoreOptions?>(
+      // ignore: use_build_context_synchronously
       context: context,
       builder: (ctx) {
         // initial values (all true)
@@ -432,6 +433,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
 
     // If user cancelled options dialog
     if (options == null) return;
+    if (!context.mounted) return;
 
     // 4) Show final confirmation with warning (user must confirm)
     final confirmed = await showDialog<bool>(
@@ -476,6 +478,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
       // user cancelled final confirmation
       return;
     }
+    if (!context.mounted) return;
 
     // 5) Show non-dismissible progress dialog and capture its context
     BuildContext? progressDialogContext;
@@ -484,8 +487,8 @@ Future<void> _onRestoreTap(BuildContext context) async {
       barrierDismissible: false,
       builder: (ctx) {
         progressDialogContext = ctx; // capture
-        return WillPopScope(
-          onWillPop: () async => false,
+        return PopScope(
+          canPop: false,
           child: AlertDialog(
             backgroundColor: const Color.fromARGB(255, 24, 24, 24),
             content: Column(
@@ -528,7 +531,9 @@ Future<void> _onRestoreTap(BuildContext context) async {
       // Always attempt to close the progress dialog using captured context
       if (progressDialogContext != null) {
         try {
+          // ignore: use_build_context_synchronously
           if (Navigator.of(progressDialogContext!).canPop()) {
+            // ignore: use_build_context_synchronously
             Navigator.of(progressDialogContext!).pop();
           }
         } catch (e) {
@@ -537,7 +542,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
       } else {
         // Fallback: try to pop root navigator (best-effort)
         try {
-          if (Navigator.of(context, rootNavigator: true).canPop()) {
+          if (context.mounted && Navigator.of(context, rootNavigator: true).canPop()) {
             Navigator.of(context, rootNavigator: true).pop();
           }
         } catch (_) {}
@@ -545,6 +550,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
       // allow UI a short moment to settle
       await Future.delayed(const Duration(milliseconds: 150));
     }
+    if (!context.mounted) return;
 
     // 7) Show final result dialog and recommend restart
     final success = restoreResult["success"] == true;
@@ -564,6 +570,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
       }
     }
 
+    if (!context.mounted) return;
     await _showResultDialog(context, success: success, errors: errors);
   } catch (e, st) {
     log("Unexpected error in restore flow: $e\n$st", name: "StorageSetting");

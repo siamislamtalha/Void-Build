@@ -14,7 +14,7 @@ class RecentlyCubit extends Cubit<RecentlyCubitState> {
   final HistoryDAO _historyDao;
   StreamSubscription<void>? _watcher;
 
-  RecentlyCubit(this._historyDao) : super(RecentlyCubitInitial()) {
+  RecentlyCubit(this._historyDao) : super(const RecentlyCubitInitial()) {
     _initialize();
   }
 

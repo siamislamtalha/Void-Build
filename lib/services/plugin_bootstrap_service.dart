@@ -541,7 +541,7 @@ class PluginBootstrapService {
 
   static bool _isRemoteManifestCompatible(RemotePluginModel plugin) {
     final value = _parseManifestVersion(plugin.manifestVersion);
-    return value != null && value == CURRENT_MANIFEST_VERSION;
+    return value != null && value == currentManifestVersion;
   }
 
   static int? _parseManifestVersion(String value) {

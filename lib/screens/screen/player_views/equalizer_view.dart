@@ -374,7 +374,7 @@ class _EqualizerViewState extends State<EqualizerView>
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(Icons.info_outline_rounded,
+                                  const Icon(Icons.info_outline_rounded,
                                       color: accent, size: 16),
                                   const SizedBox(width: 8),
                                   Expanded(

@@ -11,10 +11,10 @@ class VolumeDragController extends StatefulWidget {
   const VolumeDragController({super.key, required this.child});
 
   @override
-  _VolumeDragControllerState createState() => _VolumeDragControllerState();
+  VolumeDragControllerState createState() => VolumeDragControllerState();
 }
 
-class _VolumeDragControllerState extends State<VolumeDragController> {
+class VolumeDragControllerState extends State<VolumeDragController> {
   double _volume = 0.5; // Initial volume
   bool _showVolumeController = false;
   Timer? _timer;

@@ -295,7 +295,7 @@ class DBProvider {
         'media_items': mediaRows,
       };
 
-      final encoder = const JsonEncoder.withIndent('  ');
+      const encoder = JsonEncoder.withIndent('  ');
       final file = File(backupFilePath);
       await file.writeAsString(encoder.convert(backupPayload), flush: true);
 

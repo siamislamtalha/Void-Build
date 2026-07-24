@@ -58,7 +58,7 @@ LegacyDbLocation? findLegacyDbLocation({
   final dbFallbackCandidates = <LegacyDbLocation>[];
   final seenPaths = <String>{};
 
-  bool _isMigratedArtifact(String filePath) {
+  bool isMigratedArtifact(String filePath) {
     final lower = filePath.toLowerCase();
     // Skip already-migrated files, temp files, lock files, and staging directories
     return lower.endsWith('.migrated') ||
@@ -120,7 +120,7 @@ LegacyDbLocation? findLegacyDbLocation({
   ) {
     final filePath = p.join(dir, filename);
     if (!seenPaths.add(filePath)) return;
-    if (_isMigratedArtifact(filePath)) return;
+    if (isMigratedArtifact(filePath)) return;
     if (File(filePath).existsSync()) {
       target.add(LegacyDbLocation(directory: dir, filePath: filePath));
     }

@@ -100,7 +100,9 @@ class _ArtistViewState extends State<ArtistView> {
 
     if (nextPageToken == null ||
         status == DetailStatus.loading ||
-        status == DetailStatus.loadingMore) return;
+        status == DetailStatus.loadingMore) {
+      return;
+    }
 
     _contentBloc.add(LoadMoreArtistAlbums(
       pluginId: widget.pluginId,

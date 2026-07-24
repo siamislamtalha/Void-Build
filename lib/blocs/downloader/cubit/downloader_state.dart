@@ -3,7 +3,7 @@
 part of 'downloader_cubit.dart';
 
 /// A wrapper class to link a DownloadTask to its live status.
-class DownloadProgress with EquatableMixin {
+class DownloadProgress with Equatable {
   final DownloadTask task;
   final DownloadStatus status;
 

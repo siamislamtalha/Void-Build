@@ -41,11 +41,11 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       scaffoldBackgroundColor: themeColor,
-      dialogBackgroundColor: themeColor,
+      dialogTheme: const DialogThemeData(backgroundColor: themeColor),
       primaryColorDark: accentColor2,
       fontFamily: 'Gilroy',
       primarySwatch: MaterialColor(
-        accentColor2.value,
+        accentColor2.toARGB32(),
         {
           50: accentColor2.withValues(alpha: 0.1),
           100: accentColor2.withValues(alpha: 0.2),
@@ -123,7 +123,7 @@ class AppTheme {
   // ── Liquid Glass Design Tokens & Helpers ─────────────────────────────────────
   static BoxDecoration liquidGlassDecoration({
     double borderRadius = 24.0,
-    Color glassColor = const Color(0x33120B16),
+    Color glassColor = const Color(0x14FFFFFF),
     Color borderColor = const Color(0x3BFFFFFF),
     double borderWidth = 1.0,
   }) {
@@ -136,7 +136,7 @@ class AppTheme {
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.35),
+          color: Colors.black.withValues(alpha: 0.25),
           blurRadius: 20,
           spreadRadius: 0,
           offset: const Offset(0, 8),
@@ -146,7 +146,7 @@ class AppTheme {
   }
 
   static BoxDecoration liquidGlassCircleDecoration({
-    Color glassColor = const Color(0x33120B16),
+    Color glassColor = const Color(0x14FFFFFF),
     Color borderColor = const Color(0x3BFFFFFF),
     double borderWidth = 1.0,
   }) {
@@ -159,7 +159,7 @@ class AppTheme {
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.35),
+          color: Colors.black.withValues(alpha: 0.25),
           blurRadius: 20,
           spreadRadius: 0,
           offset: const Offset(0, 8),

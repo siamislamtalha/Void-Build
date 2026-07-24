@@ -75,8 +75,9 @@ class PluginCacheRepository with WidgetsBindingObserver {
     } catch (e) {
       log('L2 read failed for $key: $e', name: 'PluginCacheRepository');
     }
-    if (entry == null || entry.value.isEmpty)
+    if (entry == null || entry.value.isEmpty) {
       return (value: null, isStale: true);
+    }
 
     final T decoded = await decode(entry.value);
 

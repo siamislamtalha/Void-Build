@@ -21,7 +21,7 @@ class HorizontalCardView extends StatefulWidget {
   final bool canLoadMore;
   final bool isLoadingMore;
 
-  HorizontalCardView({
+  const HorizontalCardView({
     super.key,
     required this.section,
     required this.pluginId,

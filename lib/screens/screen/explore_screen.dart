@@ -14,7 +14,6 @@ import 'package:voidmusic/plugins/blocs/content/content_state.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
 import 'package:voidmusic/screens/screen/home_views/recents_view.dart';
-import 'package:voidmusic/screens/screen/home_views/setting_views/about.dart';
 import 'package:voidmusic/screens/widgets/more_bottom_sheet.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';

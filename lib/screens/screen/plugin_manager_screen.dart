@@ -80,8 +80,9 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
               curr.successMessage != null),
       listener: (context, state) {
         if (state.error != null) SnackbarService.showMessage(state.error!);
-        if (state.successMessage != null)
+        if (state.successMessage != null) {
           SnackbarService.showMessage(state.successMessage!);
+        }
       },
       builder: (context, state) {
         if (!state.isInitialized) {
@@ -493,7 +494,7 @@ class _PluginCard extends StatelessWidget {
                           ),
                         ),
                         if (manifest.manifestVersion !=
-                            CURRENT_MANIFEST_VERSION) ...[
+                            currentManifestVersion) ...[
                           const SizedBox(width: 6),
                           Tooltip(
                             message: l10n.pluginManagerOutdatedManifest,
@@ -1111,7 +1112,9 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
 
   @override
   void dispose() {
-    for (final c in _controllers.values) c.dispose();
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 

@@ -105,7 +105,9 @@ class _AlbumViewState extends State<AlbumView> {
 
     if (nextPageToken == null ||
         status == DetailStatus.loading ||
-        status == DetailStatus.loadingMore) return;
+        status == DetailStatus.loadingMore) {
+      return;
+    }
 
     if (_scrollController.position.maxScrollExtent - _scrollController.offset <=
         320) {

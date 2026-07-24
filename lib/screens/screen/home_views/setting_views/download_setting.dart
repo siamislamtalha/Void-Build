@@ -117,6 +117,7 @@ class _DownloadSettingsState extends State<DownloadSettings> {
                                 .getDirectoryPath()
                                 .then((value) {
                               if (value != null) {
+                                if (!context.mounted) return;
                                 context
                                     .read<SettingsCubit>()
                                     .setDownPath(value);

@@ -146,8 +146,9 @@ class _SearchScreenState extends State<SearchScreen> {
   void _performSearch(
       {required String query, required ContentSearchFilter filter}) {
     final normalizedQuery = _normalizeSearchQuery(query);
-    if (normalizedQuery.isEmpty || _activePluginIdNotifier.value == null)
+    if (normalizedQuery.isEmpty || _activePluginIdNotifier.value == null) {
       return;
+    }
 
     context
         .read<SearchSuggestionBloc>()
@@ -631,8 +632,9 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                                             activePluginNotifier,
                                         onTap: () {
                                           final id = plugin.manifest.id;
-                                          if (activePluginNotifier.value == id)
+                                          if (activePluginNotifier.value == id) {
                                             return;
+                                          }
                                           activePluginNotifier.value = id;
                                           contentBloc.add(
                                               SetActiveContentPlugin(
@@ -641,7 +643,9 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                                               .read<SettingsCubit>()
                                               .setSearchPluginId(id);
                                           if (textEditingController.text
-                                              .isNotEmpty) onPluginChanged();
+                                              .isNotEmpty) {
+                                            onPluginChanged();
+                                          }
                                         },
                                       ),
                                     ))
@@ -1378,11 +1382,13 @@ class _NebulaBackground extends StatelessWidget {
 
   List<Color> _getReactiveGradientColors(ContentState state) {
     if (state.searchStatus != SearchStatus.loaded &&
-        state.searchStatus != SearchStatus.loadingMore)
+        state.searchStatus != SearchStatus.loadingMore) {
       return [Colors.transparent, Colors.transparent];
+    }
     final items = state.searchResults?.items;
-    if (items == null || items.isEmpty)
+    if (items == null || items.isEmpty) {
       return [Colors.transparent, Colors.transparent];
+    }
 
     String seedString = "";
     final firstItem = items.first;

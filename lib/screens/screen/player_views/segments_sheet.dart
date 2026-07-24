@@ -149,7 +149,7 @@ class _SegmentsSheetBodyState extends State<_SegmentsSheetBody> {
               padding: const EdgeInsets.all(16),
               child: Text(
                 l10n.segmentsSheetTitle,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Default_Theme.primaryColor1,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

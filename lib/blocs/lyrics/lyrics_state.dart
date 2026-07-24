@@ -33,11 +33,11 @@ final class LyricsInitial extends LyricsState {
                 id: "id",
                 lyricsPlain: "",
                 provider: LyricsProvider.none),
-            Track(
+            const Track(
                 id: 'Null',
                 title: 'Null',
-                artists: const [],
-                thumbnail: const Artwork(url: '', layout: ImageLayout.square),
+                artists: [],
+                thumbnail: Artwork(url: '', layout: ImageLayout.square),
                 isExplicit: false));
 }
 

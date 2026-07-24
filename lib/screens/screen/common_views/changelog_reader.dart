@@ -241,6 +241,7 @@ class ChangelogScreen extends StatelessWidget {
             icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white70),
             onPressed: () async {
               await Navigator.of(context).maybePop();
+              if (!context.mounted) return;
               Navigator.of(context).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => const About(),
                 transitionsBuilder: (_, animation, secondaryAnimation, child) {
@@ -409,10 +410,10 @@ class VersionCard extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _VersionCardState createState() => _VersionCardState();
+  VersionCardState createState() => VersionCardState();
 }
 
-class _VersionCardState extends State<VersionCard> {
+class VersionCardState extends State<VersionCard> {
   bool _isExpanded = false;
 
   @override
@@ -501,7 +502,7 @@ class _VersionCardState extends State<VersionCard> {
         : const SizedBox.shrink();
 
     // New badges: CURRENT and UPDATE (if applicable)
-    Widget _badge(String text, Color bg, Color textColor) => Container(
+    Widget badge(String text, Color bg, Color textColor) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         margin: const EdgeInsets.only(left: 6),
         decoration: BoxDecoration(
@@ -517,10 +518,10 @@ class _VersionCardState extends State<VersionCard> {
                 letterSpacing: 0.3)));
 
     final currentBadge = showCurrentBadge
-        ? _badge('CURRENT', Colors.blueAccent.shade700, Colors.white)
+        ? badge('CURRENT', Colors.blueAccent.shade700, Colors.white)
         : const SizedBox.shrink();
     final updateBadge = showUpdateBadge
-        ? _badge('UPDATE', Colors.deepOrangeAccent.shade200, Colors.white)
+        ? badge('UPDATE', Colors.deepOrangeAccent.shade200, Colors.white)
         : const SizedBox.shrink();
 
     return Container(

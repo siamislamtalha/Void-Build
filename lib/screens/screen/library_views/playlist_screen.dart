@@ -99,6 +99,7 @@ class _PlaylistViewState extends State<PlaylistView> {
     final fullPlaylist =
         await context.read<CurrentPlaylistCubit>().ensureAllTracksLoaded();
     if (!mounted || fullPlaylist.tracks.isEmpty) return;
+    if (!context.mounted) return;
 
     context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
           Playlist(tracks: fullPlaylist.tracks, title: fullPlaylist.title),
@@ -718,6 +719,7 @@ class _PlaylistViewState extends State<PlaylistView> {
             .tracks;
     if (items.isEmpty) return;
 
+    if (!context.mounted) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -750,13 +752,17 @@ class _PlaylistViewState extends State<PlaylistView> {
     );
 
     if (confirmed == true && mounted) {
+      // ignore: use_build_context_synchronously
       await _showAddToDownloadProgress(context, items, l10n);
-      SnackbarService.showMessage(l10n.snackbarSongsAddedToQueue(items.length));
+      if (mounted) {
+        SnackbarService.showMessage(l10n.snackbarSongsAddedToQueue(items.length));
+      }
     }
   }
 
   Future<void> _showAddToDownloadProgress(
       BuildContext context, List<Track> items, AppLocalizations l10n) async {
+    // ignore: use_build_context_synchronously
     await showDialog(
       context: context,
       barrierDismissible: false,
@@ -769,6 +775,7 @@ class _PlaylistViewState extends State<PlaylistView> {
           for (final song in items) {
             setStateRef(() => currentTitle = song.title);
             try {
+              // ignore: use_build_context_synchronously
               context
                   .read<DownloaderCubit>()
                   .downloadSong(song, showSnackbar: false);

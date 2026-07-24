@@ -806,7 +806,9 @@ class BloomeeMusicPlayer extends BaseAudioHandler
     if (fromPlaylist.isClosed ||
         isOffline.isClosed ||
         loopMode.isClosed ||
-        isResolving.isClosed) return false;
+        isResolving.isClosed) {
+      return false;
+    }
     try {
       final _ = engine.state;
       return true;
@@ -826,12 +828,18 @@ class BloomeeMusicPlayer extends BaseAudioHandler
       _savedPositionForRevive = engine.position;
     } catch (_) {}
 
-    if (fromPlaylist.isClosed)
+    if (fromPlaylist.isClosed) {
       fromPlaylist = BehaviorSubject<bool>.seeded(false);
-    if (isOffline.isClosed) isOffline = BehaviorSubject<bool>.seeded(false);
-    if (loopMode.isClosed)
+    }
+    if (isOffline.isClosed) {
+      isOffline = BehaviorSubject<bool>.seeded(false);
+    }
+    if (loopMode.isClosed) {
       loopMode = BehaviorSubject<LoopMode>.seeded(LoopMode.off);
-    if (isResolving.isClosed) isResolving = BehaviorSubject<bool>.seeded(false);
+    }
+    if (isResolving.isClosed) {
+      isResolving = BehaviorSubject<bool>.seeded(false);
+    }
 
     _shouldResumeAfterInterruption = false;
 
@@ -883,11 +891,11 @@ class BloomeeMusicPlayer extends BaseAudioHandler
   // ─── Queue Operations ─────────────────────────────────────────────────────
 
   @override
-  Future<void> playMediaItem(MediaItem mi,
+  Future<void> playMediaItem(MediaItem mediaItem,
       {bool doPlay = true, Duration? initialPosition}) async {
     _errorHandler.resetCircuitBreaker();
     _shouldResumeAfterInterruption = false;
-    await _enqueuePlayTrack(mediaItemToTrack(mi),
+    await _enqueuePlayTrack(mediaItemToTrack(mediaItem),
         doPlay: doPlay, initialPosition: initialPosition);
   }
 
@@ -1003,16 +1011,16 @@ class BloomeeMusicPlayer extends BaseAudioHandler
   }
 
   @override
-  Future<void> addQueueItem(MediaItem mi) async =>
-      _queueManager.addTrack(mediaItemToTrack(mi));
+  Future<void> addQueueItem(MediaItem mediaItem) async =>
+      _queueManager.addTrack(mediaItemToTrack(mediaItem));
 
   Future<void> addQueueTrack(Track track) async =>
       _queueManager.addTrack(track);
 
   @override
-  Future<void> addQueueItems(List<MediaItem> items,
+  Future<void> addQueueItems(List<MediaItem> mediaItems,
           {String queueName = 'Queue', bool atLast = false}) async =>
-      _queueManager.addTracks(items.map(mediaItemToTrack).toList(),
+      _queueManager.addTracks(mediaItems.map(mediaItemToTrack).toList(),
           atLast: atLast);
 
   Future<void> addQueueTracks(List<Track> tracks,
@@ -1035,8 +1043,8 @@ class BloomeeMusicPlayer extends BaseAudioHandler
       _queueManager.addPlayNext(track);
 
   @override
-  Future<void> insertQueueItem(int index, MediaItem mi) async =>
-      _queueManager.insertTrack(index, mediaItemToTrack(mi));
+  Future<void> insertQueueItem(int index, MediaItem mediaItem) async =>
+      _queueManager.insertTrack(index, mediaItemToTrack(mediaItem));
 
   @override
   Future<void> removeQueueItemAt(int index) async =>
@@ -1051,9 +1059,9 @@ class BloomeeMusicPlayer extends BaseAudioHandler
   }
 
   @override
-  Future<void> updateQueue(List<MediaItem> newQueue,
+  Future<void> updateQueue(List<MediaItem> queue,
       {bool doPlay = false}) async {
-    _queueManager.updateQueue(newQueue.map(mediaItemToTrack).toList());
+    _queueManager.updateQueue(queue.map(mediaItemToTrack).toList());
     if (doPlay) {
       final t = _queueManager.currentTrack;
       if (t != null) await _enqueuePlayTrack(t, doPlay: true);

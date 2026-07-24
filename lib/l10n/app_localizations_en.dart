@@ -1143,7 +1143,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateCheckTitle => 'Check for Updates';
 
   @override
-  String get updateUpToDate => 'Bloomee🌸 is up-to-date!!!';
+  String get updateUpToDate => 'Void Music is up-to-date!!!';
 
   @override
   String get updateViewPreRelease => 'View Latest Pre-Release';
@@ -1155,7 +1155,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateNewVersionAvailable =>
-      'New Version of Bloomee🌸 is now available!!';
+      'New Version of Void Music is now available!!';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1472,13 +1472,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      'Enjoying Bloomee? A small tip keeps it blooming. 🌸';
+      'Enjoying Void Music? A small tip keeps it blooming.';
 
   @override
   String get aboutTipButton => 'I\'ll help';
 
   @override
-  String get aboutTipDesc => 'I want Bloomee to keep improving.';
+  String get aboutTipDesc => 'I want Void Music to keep improving.';
 
   @override
   String get aboutGitHub => 'GitHub';
@@ -1974,7 +1974,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'New Version of Bloomee🌸 is now available!\n\nVersion: $ver+$build';
+    return 'New Version of Void Music is now available!\n\nVersion: $ver+$build';
   }
 
   @override

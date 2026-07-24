@@ -15,10 +15,10 @@ class ToggleButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ToggleButtonState createState() => _ToggleButtonState();
+  ToggleButtonState createState() => ToggleButtonState();
 }
 
-class _ToggleButtonState extends State<ToggleButton>
+class ToggleButtonState extends State<ToggleButton>
     with SingleTickerProviderStateMixin {
   late bool _isActive;
   late AnimationController _animationController;

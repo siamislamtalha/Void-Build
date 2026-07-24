@@ -51,6 +51,7 @@ class GlobalFooter extends StatelessWidget {
           child: Scaffold(
             backgroundColor: Default_Theme.themeColor,
             drawerScrimColor: Default_Theme.themeColor,
+            extendBody: true,
             body: isMobile
                 ? _AnimatedPageView(navigationShell: navigationShell)
                 : Row(
@@ -249,20 +250,11 @@ class HorizontalNavBar extends StatelessWidget {
                 filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.38),
-                    borderRadius: BorderRadius.circular(34),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.24),
-                      width: 1.2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.4),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+                  decoration: AppTheme.liquidGlassDecoration(
+                    borderRadius: 34,
+                    glassColor: Colors.white.withValues(alpha: 0.08),
+                    borderColor: Colors.white.withValues(alpha: 0.18),
+                    borderWidth: 1.2,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -340,17 +332,17 @@ class HorizontalNavBar extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: currentIndex == 2
-                        ? Colors.white.withValues(alpha: 0.25)
-                        : Colors.black.withValues(alpha: 0.38),
+                        ? Colors.white.withValues(alpha: 0.22)
+                        : Colors.white.withValues(alpha: 0.08),
                     border: Border.all(
                       color: currentIndex == 2
                           ? Colors.white.withValues(alpha: 0.45)
-                          : Colors.white.withValues(alpha: 0.24),
+                          : Colors.white.withValues(alpha: 0.18),
                       width: 1.2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.4),
+                        color: Colors.black.withValues(alpha: 0.25),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),

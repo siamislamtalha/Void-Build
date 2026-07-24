@@ -116,6 +116,7 @@ class _LastDotFMState extends State<LastDotFM> {
                       if (value && LastFmAPI.initialized == false) {
                         SnackbarService.showMessage(l10n.lastfmAuthFirst);
                         Future.delayed(const Duration(milliseconds: 500), () {
+                          if (!context.mounted) return;
                           context
                               .read<SettingsCubit>()
                               .setLastFMScrobble(false);

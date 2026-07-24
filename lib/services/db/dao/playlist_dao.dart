@@ -669,7 +669,7 @@ class PlaylistDAO {
   /// Load a fully hydrated [Playlist] domain model from the database.
   Future<Playlist> loadPlaylist(String name) async {
     final playlistDB = await getPlaylistByName(name);
-    if (playlistDB == null) return Playlist(tracks: [], title: name);
+    if (playlistDB == null) return const Playlist(tracks: [], title: '');
     final tracks = await getPlaylistTracks(playlistDB.id);
     final domainPlaylist = playlistDBToPlaylist(playlistDB);
     return domainPlaylist.copyWith(

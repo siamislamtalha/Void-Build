@@ -65,7 +65,6 @@ Future<T?> showBloomeeDialog<T>({
 
 // ── Surface Colors ──────────────────────────────────────────────────────────
 
-const _kDialogBg = Color(0xFF12101A);
 const _kDialogSurface = Color(0xFF1A1626);
 const _kDialogBorder = Color(0xFF2A2438);
 

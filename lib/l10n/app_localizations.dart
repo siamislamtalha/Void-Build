@@ -2103,7 +2103,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateUpToDate.
   ///
   /// In en, this message translates to:
-  /// **'Bloomee🌸 is up-to-date!!!'**
+  /// **'Void Music is up-to-date!!!'**
   String get updateUpToDate;
 
   /// No description provided for @updateViewPreRelease.
@@ -2121,7 +2121,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateNewVersionAvailable.
   ///
   /// In en, this message translates to:
-  /// **'New Version of Bloomee🌸 is now available!!'**
+  /// **'New Version of Void Music is now available!!'**
   String get updateNewVersionAvailable;
 
   /// No description provided for @updateVersion.
@@ -2679,7 +2679,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTipQuote.
   ///
   /// In en, this message translates to:
-  /// **'Enjoying Bloomee? A small tip keeps it blooming. 🌸'**
+  /// **'Enjoying Void Music? A small tip keeps it blooming.'**
   String get aboutTipQuote;
 
   /// No description provided for @aboutTipButton.

@@ -165,7 +165,7 @@ class _ImportMediaFromPlatformsViewState
             ),
             child: Text(
               AppLocalizations.of(context)!.buttonCancel,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Default_Theme.primaryColor2,
                 fontWeight: FontWeight.w600,
               ),
@@ -337,7 +337,7 @@ class _ImportMediaFromPlatformsViewState
             onPressed: () => Navigator.of(dialogCtx).pop(),
             child: Text(
               AppLocalizations.of(context)!.buttonCancel,
-              style: TextStyle(color: Default_Theme.primaryColor2),
+              style: const TextStyle(color: Default_Theme.primaryColor2),
             ),
           ),
           ValueListenableBuilder<TextEditingValue>(

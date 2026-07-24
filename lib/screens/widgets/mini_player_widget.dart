@@ -177,7 +177,6 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                 height: _cardHeight,
                 child: Stack(
                   children: [
-                    _BlurredBackground(imageUrl: thumbUrl),
                     _GlassOverlay(),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -244,47 +243,16 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
   }
 }
 
-class _BlurredBackground extends StatelessWidget {
-  final String imageUrl;
-  const _BlurredBackground({required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: Transform.scale(
-        scale: 1.6,
-        child: ImageFiltered(
-          imageFilter: ImageFilter.blur(
-            sigmaX: 35,
-            sigmaY: 35,
-            tileMode: TileMode.clamp,
-          ),
-          child: LoadImageCached(imageUrl: imageUrl, fit: BoxFit.cover),
-        ),
-      ),
-    );
-  }
-}
-
 class _GlassOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.38),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.24),
-            width: 1.2,
-          ),
-          borderRadius: BorderRadius.circular(34),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
+        decoration: AppTheme.liquidGlassDecoration(
+          borderRadius: 34,
+          glassColor: Colors.white.withValues(alpha: 0.08),
+          borderColor: Colors.white.withValues(alpha: 0.18),
+          borderWidth: 1.2,
         ),
       ),
     );
