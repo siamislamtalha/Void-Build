@@ -567,6 +567,7 @@
   "importSongsTitle": "Import Songs",
   "importNoPluginsLoaded": "No content-importer plugins loaded.\nInstall an importer plugin to import playlists from external services.",
   "importVoidMusicFiles": "Import Void Music Files",
+  "importBloomeeFiles": "Import Bloomee Files",
     "importM3UFiles": "Import M3U Playlist",
     "importM3UNameDialogTitle": "Playlist Name",
     "importM3UNameHint": "Enter a name for this playlist",

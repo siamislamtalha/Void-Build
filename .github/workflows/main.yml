@@ -66,27 +66,44 @@ jobs:
               run: |
                   $env:VERSION = "${{ env.VERSION }}"
                   & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DVERSION=$env:VERSION windows/installer.iss
-            
+
+            - name: Copy files to root for upload
+              shell: powershell
+              run: |
+                  Copy-Item "build/app/outputs/flutter-apk/VoidMusic_v$env:VERSION+${{github.run_number}}_arm64-v8a.apk" -Destination "VoidMusic_v$env:VERSION+${{github.run_number}}_arm64-v8a.apk"
+                  Copy-Item "build/windows/x64/runner/Release/void_music.exe" -Destination "VoidMusic_v$env:VERSION+${{github.run_number}}.exe"
+                  # Find and copy the Inno Setup installer output
+                  $installerPath = Get-ChildItem -Path "build/windows/x64" -Filter "VoidMusic_v$env:VERSION.exe" -Recurse | Select-Object -First 1 -ExpandProperty FullName
+                  if ($installerPath) {
+                      Copy-Item $installerPath -Destination "VoidMusic_Installer_v$env:VERSION+${{github.run_number}}.exe"
+                  }
+                  Copy-Item "build-number.txt" -Destination "build-number.txt"
+
             - name: Upload Artifacts
               uses: actions/upload-artifact@v4
               with:
                 name: Release-Windows-Android
                 path: |
-                  build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
-                  build/windows/x64/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.exe
+                  VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
+                  VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.exe
+                  VoidMusic_Installer_v${{ env.VERSION }}+${{github.run_number}}.exe
                   build-number.txt
+                if-no-files-found: warn
+                overwrite: true
 
             - name: Create Release
               uses: ncipollo/release-action@v1
               with:
                 artifacts: |
-                  build/app/outputs/flutter-apk/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
-                  build/windows/x64/VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.exe
+                  VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
+                  VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.exe
+                  VoidMusic_Installer_v${{ env.VERSION }}+${{github.run_number}}.exe
                   build-number.txt
                 tag: v${{ env.VERSION }}+${{github.run_number}}
                 token: ${{ secrets.GITHUB_TOKEN }}
                 prerelease: true
-                allowUpdates: true 
+                allowUpdates: true
+                omitBodyDuringUpdate: true 
 
 
     build-linux:
@@ -122,7 +139,8 @@ jobs:
 
             - name: Compress Linux Build
               run: |
-                tar -czf VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.tar.gz -C build/linux/x64/release/bundle .
+                cd build/linux/x64/release/bundle
+                tar -czf ../../../VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.tar.gz .
 
             - name: Upload Artifact
               uses: actions/upload-artifact@v4

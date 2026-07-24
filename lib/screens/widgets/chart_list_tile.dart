@@ -165,17 +165,16 @@ class ChartListTile extends StatelessWidget {
   }
 
   Color _rankColor(int rank) {
-    if (rank <= 3) return const Color(0xFFCD9A7B); // Bronze/gold
-    if (rank <= 10) return const Color(0xFFB3B9C5); // Silver
-    return const Color(0xFF555555);
+    if (rank <= 3) return Colors.white;
+    return Colors.white70;
   }
 
   Widget _buildTrendTag(Trend trend, int? change) {
     switch (trend) {
       case Trend.newEntry:
-        return _buildRotatedBadge('NEW', Default_Theme.accentColor1light);
+        return _buildRotatedBadge('NEW', Colors.white);
       case Trend.reEntry:
-        return _buildRotatedBadge('RE', Default_Theme.accentColor1light);
+        return _buildRotatedBadge('RE', Colors.white);
       case Trend.same:
         return const Center(
           child: Text('—',
@@ -185,9 +184,9 @@ class ChartListTile extends StatelessWidget {
                   fontWeight: FontWeight.w300)),
         );
       case Trend.up:
-        return _buildArrow('↑', change, Default_Theme.successColor);
+        return _buildArrow('↑', change, Colors.white);
       case Trend.down:
-        return _buildArrow('↓', change, Default_Theme.accentColor2);
+        return _buildArrow('↓', change, Colors.white60);
       case Trend.unknown:
         return const SizedBox();
     }

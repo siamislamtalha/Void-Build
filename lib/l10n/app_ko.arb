@@ -566,7 +566,8 @@
 
   "importSongsTitle": "곡 가져오기",
   "importNoPluginsLoaded": "가져오기 플러그인이 없습니다. 외부 플레이리스트를 가져오려면 플러그인을 설치하세요.",
-  "importBloomeeFiles": "Void Music 파일 가져오기",
+  "importVoidMusicFiles": "Void Music 파일 가져오기",
+  "importBloomeeFiles": "Bloomee 파일 가져오기",
   "importM3UFiles": "M3U 플레이리스트 가져오기",
   "importM3UNameDialogTitle": "플레이리스트 이름",
   "importM3UNameHint": "이름을 입력하세요",

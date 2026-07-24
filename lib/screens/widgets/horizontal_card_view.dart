@@ -111,7 +111,7 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Default_Theme.accentColor2,
+                color: Default_Theme.primaryColor1,
               ).merge(Default_Theme.secondoryTextStyle),
             ),
           ),

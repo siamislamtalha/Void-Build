@@ -452,7 +452,7 @@ class _ResolverPriorityListState extends State<_ResolverPriorityList> {
             );
           },
           itemCount: _items.length,
-          onReorder: (oldIndex, newIndex) {
+          onReorderItem: (oldIndex, newIndex) {
             setState(() {
               final item = _items.removeAt(oldIndex);
               _items.insert(newIndex, item);
