@@ -4278,6 +4278,7 @@ const _: fn() = || {
         let _: crate::api::plugin::models::Track = EnqueueDownloadRequest.track;
         let _: String = EnqueueDownloadRequest.download_dir;
         let _: String = EnqueueDownloadRequest.preferred_quality;
+        let _: String = EnqueueDownloadRequest.download_plugin_id;
     }
     match None::<crate::api::plugin::commands::LyricsProviderCommand>.unwrap() {
         crate::api::plugin::commands::LyricsProviderCommand::GetLyrics { metadata } => {
@@ -4931,10 +4932,12 @@ impl SseDecode for crate::api::downloader::types::EnqueueDownloadRequest {
         let mut var_track = <crate::api::plugin::models::Track>::sse_decode(deserializer);
         let mut var_downloadDir = <String>::sse_decode(deserializer);
         let mut var_preferredQuality = <String>::sse_decode(deserializer);
+        let mut var_downloadPluginId = <String>::sse_decode(deserializer);
         return crate::api::downloader::types::EnqueueDownloadRequest {
             track: var_track,
             download_dir: var_downloadDir,
             preferred_quality: var_preferredQuality,
+            download_plugin_id: var_downloadPluginId,
         };
     }
 }
@@ -9061,6 +9064,7 @@ impl SseEncode for crate::api::downloader::types::EnqueueDownloadRequest {
         <crate::api::plugin::models::Track>::sse_encode(self.track, serializer);
         <String>::sse_encode(self.download_dir, serializer);
         <String>::sse_encode(self.preferred_quality, serializer);
+        <String>::sse_encode(self.download_plugin_id, serializer);
     }
 }
 

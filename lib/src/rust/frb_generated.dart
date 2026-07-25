@@ -3189,12 +3189,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   EnqueueDownloadRequest dco_decode_enqueue_download_request(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return EnqueueDownloadRequest(
       track: dco_decode_track(arr[0]),
       downloadDir: dco_decode_String(arr[1]),
       preferredQuality: dco_decode_String(arr[2]),
+      downloadPluginId: dco_decode_String(arr[3]),
     );
   }
 
@@ -4910,10 +4911,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_track = sse_decode_track(deserializer);
     var var_downloadDir = sse_decode_String(deserializer);
     var var_preferredQuality = sse_decode_String(deserializer);
+    var var_downloadPluginId = sse_decode_String(deserializer);
     return EnqueueDownloadRequest(
         track: var_track,
         downloadDir: var_downloadDir,
-        preferredQuality: var_preferredQuality);
+        preferredQuality: var_preferredQuality,
+        downloadPluginId: var_downloadPluginId);
   }
 
   @protected
@@ -6771,6 +6774,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_track(self.track, serializer);
     sse_encode_String(self.downloadDir, serializer);
     sse_encode_String(self.preferredQuality, serializer);
+    sse_encode_String(self.downloadPluginId, serializer);
   }
 
   @protected
