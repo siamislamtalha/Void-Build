@@ -1382,7 +1382,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get aboutCreativeHighlights => '업데이트 및 주요 소식';
 
   @override
-  String get aboutTipQuote => 'Void Music가 마음에 드시나요? 소중한 후원이 더 멋진 발전을 만듭니다.';
+  String get aboutTipQuote => 'Void Music가 마음에 드시나요? 소중한 후원이 더 멋진 발전을 만듭니다. 🌸';
 
   @override
   String get aboutTipButton => '후원하기';
@@ -1532,7 +1532,10 @@ class AppLocalizationsKo extends AppLocalizations {
       '가져오기 플러그인이 없습니다. 외부 플레이리스트를 가져오려면 플러그인을 설치하세요.';
 
   @override
-  String get importBloomeeFiles => 'Void Music 파일 가져오기';
+  String get importVoidMusicFiles => 'Void Music 파일 가져오기';
+
+  @override
+  String get importBloomeeFiles => 'Bloomee 파일 가져오기';
 
   @override
   String get importM3UFiles => 'M3U 플레이리스트 가져오기';
@@ -1875,7 +1878,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Void Music 설정 중';
+  String get pluginBootstrapTitle => 'Bloomee 설정 중';
 
   @override
   String pluginBootstrapProgress(int percent) {

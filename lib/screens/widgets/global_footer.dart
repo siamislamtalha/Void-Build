@@ -52,35 +52,47 @@ class GlobalFooter extends StatelessWidget {
             backgroundColor: Default_Theme.themeColor,
             drawerScrimColor: Default_Theme.themeColor,
             extendBody: true,
-            body: isMobile
-                ? _AnimatedPageView(navigationShell: navigationShell)
-                : Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4),
-                        child: VerticalNavBar(navigationShell: navigationShell),
+            body: Stack(
+              children: [
+                Positioned.fill(
+                  child: isMobile
+                      ? _AnimatedPageView(navigationShell: navigationShell)
+                      : Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4),
+                              child: VerticalNavBar(navigationShell: navigationShell),
+                            ),
+                            Expanded(
+                              child:
+                                  _AnimatedPageView(navigationShell: navigationShell),
+                            ),
+                          ],
+                        ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const MiniPlayerWidget(),
+                          if (isMobile) ...[
+                            const SizedBox(height: 6),
+                            HorizontalNavBar(navigationShell: navigationShell),
+                          ],
+                        ],
                       ),
-                      Expanded(
-                        child:
-                            _AnimatedPageView(navigationShell: navigationShell),
-                      ),
-                    ],
-                  ),
-            bottomNavigationBar: SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const MiniPlayerWidget(),
-                  if (isMobile)
-                    Container(
-                      color: Colors.transparent,
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 4, horizontal: 8),
-                      child: HorizontalNavBar(navigationShell: navigationShell),
                     ),
-                ],
-              ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -214,7 +226,7 @@ class VerticalNavBar extends StatelessWidget {
       groupAlignment: 0.0,
       unselectedIconTheme:
           const IconThemeData(color: Default_Theme.primaryColor2),
-      indicatorColor: Default_Theme.accentColor2,
+      indicatorColor: Colors.white.withValues(alpha: 0.2),
       indicatorShape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(15)),
       ),
@@ -231,130 +243,90 @@ class HorizontalNavBar extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final currentIndex = navigationShell.currentIndex;
 
-    final navItems = [
+    final capsuleItems = [
       _NavItemData(branchIndex: 0, icon: MingCute.home_4_fill, label: l10n.navHome),
       _NavItemData(branchIndex: 1, icon: MingCute.book_5_fill, label: l10n.navLibrary),
       _NavItemData(branchIndex: 3, icon: MingCute.music_2_fill, label: l10n.navLocal),
       _NavItemData(branchIndex: 4, icon: MingCute.folder_download_fill, label: l10n.navOffline),
     ];
 
+    final isSearchSelected = currentIndex == 2;
+
     return Padding(
-      padding: const EdgeInsets.only(left: 6, right: 6, top: 4, bottom: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Left Liquid Glass Floating Capsule Bar
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(34),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                  decoration: AppTheme.liquidGlassDecoration(
-                    borderRadius: 34,
-                    glassColor: Colors.white.withValues(alpha: 0.08),
-                    borderColor: Colors.white.withValues(alpha: 0.18),
-                    borderWidth: 1.2,
+          // ── Main Glass Capsule (Home, Library, Local, Offline) ──
+          ClipRRect(
+            borderRadius: BorderRadius.circular(36),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                decoration: BoxDecoration(
+                  // Pure glass — no opaque black background
+                  color: Colors.white.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(36),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    width: 0.8,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: navItems.map((item) {
-                      final isSelected = currentIndex == item.branchIndex;
-                      return GestureDetector(
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          navigationShell.goBranch(item.branchIndex);
-                        },
-                        behavior: HitTestBehavior.opaque,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isSelected ? 12 : 8,
-                            vertical: 6,
-                          ),
-                          decoration: isSelected
-                              ? BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.18),
-                                  borderRadius: BorderRadius.circular(22),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.25),
-                                    width: 0.8,
-                                  ),
-                                )
-                              : const BoxDecoration(),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                item.icon,
-                                size: 22,
-                                color: isSelected
-                                    ? Default_Theme.accentColor2
-                                    : Colors.white.withValues(alpha: 0.65),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                item.label,
-                                style: TextStyle(
-                                  fontSize: 10.5,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
-                                  color: isSelected
-                                      ? Default_Theme.accentColor2
-                                      : Colors.white.withValues(alpha: 0.65),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: capsuleItems.map((item) {
+                    final isSelected = currentIndex == item.branchIndex;
+                    return _NavItemButton(
+                      item: item,
+                      isSelected: isSelected,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        navigationShell.goBranch(item.branchIndex);
+                      },
+                    );
+                  }).toList(),
                 ),
               ),
             ),
           ),
           const SizedBox(width: 10),
-          // Right Circular Liquid Glass Search Button
+
+          // ── Right Glass Search Circle Button (Branch 2) ──
           GestureDetector(
             onTap: () {
               HapticFeedback.selectionClick();
               navigationShell.goBranch(2);
             },
+            behavior: HitTestBehavior.opaque,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(30),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                child: Container(
-                  width: 56,
-                  height: 56,
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 54,
+                  height: 54,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: currentIndex == 2
-                        ? Colors.white.withValues(alpha: 0.22)
+                    // Pure glass — no opaque black background
+                    color: isSearchSelected
+                        ? Colors.white.withValues(alpha: 0.18)
                         : Colors.white.withValues(alpha: 0.08),
                     border: Border.all(
-                      color: currentIndex == 2
-                          ? Colors.white.withValues(alpha: 0.45)
+                      color: isSearchSelected
+                          ? Colors.white.withValues(alpha: 0.30)
                           : Colors.white.withValues(alpha: 0.18),
-                      width: 1.2,
+                      width: 0.8,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.25),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
                   ),
                   child: Center(
                     child: Icon(
-                      MingCute.search_2_fill,
+                      MingCute.search_2_line,
                       size: 24,
-                      color: currentIndex == 2
-                          ? Default_Theme.accentColor2
-                          : Colors.white.withValues(alpha: 0.9),
+                      color: isSearchSelected
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.70),
                     ),
                   ),
                 ),
@@ -362,6 +334,75 @@ class HorizontalNavBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Individual nav item with its own circular glass background (matching the reference image)
+class _NavItemButton extends StatelessWidget {
+  final _NavItemData item;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _NavItemButton({
+    required this.item,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Active item accent color (pinkish-red like reference)
+    const activeColor = Color(0xFFFF4D6A);
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isSelected
+                ? Colors.white.withValues(alpha: 0.14)
+                : Colors.white.withValues(alpha: 0.06),
+            border: Border.all(
+              color: isSelected
+                  ? Colors.white.withValues(alpha: 0.25)
+                  : Colors.white.withValues(alpha: 0.10),
+              width: 0.8,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                item.icon,
+                size: 22,
+                color: isSelected
+                    ? activeColor
+                    : Colors.white.withValues(alpha: 0.55),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                item.label,
+                style: TextStyle(
+                  fontSize: 9,
+                  fontFamily: 'Gilroy',
+                  fontWeight: FontWeight.w700,
+                  color: isSelected
+                      ? activeColor
+                      : Colors.white.withValues(alpha: 0.55),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

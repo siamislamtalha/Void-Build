@@ -21,6 +21,7 @@ import 'package:path/path.dart' as p;
 const _pluginJisSaavn = 'content-resolver.bloomfactory.jisaavn';
 const _pluginYtMusic = 'content-resolver.bloomfactory.ytmusic';
 const _pluginYtVideo = 'content-resolver.bloomfactory.ytvideo';
+const _pluginMultiSource = 'content-resolver.bloomfactory.multisource';
 const _migrationStateFileName = 'legacy_migration_state.json';
 const _likedPlaylistName = 'Liked';
 const _skipPlaylistNames = {
@@ -778,6 +779,8 @@ String _sourceDisplayName(String? pluginId) {
       return 'YouTube Music';
     case _pluginYtVideo:
       return 'YouTube';
+    case _pluginMultiSource:
+      return 'Multi-Source';
     default:
       return 'Unknown source';
   }

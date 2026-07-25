@@ -944,7 +944,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get storageAutoLyricsSubtitle => '再生時に歌詞を自動的にデバイスへ保存します。';
 
   @override
-  String get storageResetApp => 'アプリをリセット';
+  String get storageResetApp => 'Void Musicをリセット';
 
   @override
   String get storageResetAppSubtitle => 'すべてのデータを削除し、初期状態に戻します。';
@@ -954,7 +954,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get storageResetConfirmMessage =>
-      '本当にリセットしますか？この操作は取り消しできず、すべてのデータが消去されます。';
+      '本当にVoid Musicをリセットしてもよろしいですか？すべてのデータが削除され、元に戻すことはできません。';
 
   @override
   String get storageResetButton => 'リセット';
@@ -967,7 +967,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get storageLocationAndroid =>
-      'バックアップは以下に保存されます:\n\n1. ダウンロードフォルダー\n2. Android/data/ls.voidmusic.musicplayer/data\n\nここからファイルをコピーしてください。';
+      'バックアップは以下に保存されます:\n\n1. ダウンロードフォルダー\n2. Android/data/ls.bloomee.musicplayer/data\n\nここからファイルをコピーしてください。';
 
   @override
   String get storageLocationOther => 'バックアップはダウンロードフォルダーに保存されます。';
@@ -1064,7 +1064,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get updateCheckTitle => '更新の確認';
 
   @override
-  String get updateUpToDate => 'Void Music は最新の状態です！';
+  String get updateUpToDate => 'Void Musicは最新です！';
 
   @override
   String get updateViewPreRelease => '最新のプレリリースを表示';
@@ -1380,7 +1380,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aboutCreativeHighlights => 'アップデートとクリエイティブな活動';
 
   @override
-  String get aboutTipQuote => 'Void Music を気に入っていただけましたか？応援が活動の励みになります。';
+  String get aboutTipQuote => 'Void Musicは気に入りましたか？応援が励みになります。 �';
 
   @override
   String get aboutTipButton => '応援する';
@@ -1530,7 +1530,10 @@ class AppLocalizationsJa extends AppLocalizations {
       'インポータープラグインがありません。外部サービスから取り込むにはインストールしてください。';
 
   @override
-  String get importBloomeeFiles => 'Void Music ファイルをインポート';
+  String get importVoidMusicFiles => 'Void Music ファイルをインポート';
+
+  @override
+  String get importBloomeeFiles => 'Bloomee ファイルをインポート';
 
   @override
   String get importM3UFiles => 'M3U プレイリストをインポート';
@@ -1854,7 +1857,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Void Music の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
+    return 'Bloomee🌸 の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
   }
 
   @override
@@ -1873,7 +1876,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Void Music をセットアップ中';
+  String get pluginBootstrapTitle => 'Bloomee をセットアップ中';
 
   @override
   String pluginBootstrapProgress(int percent) {

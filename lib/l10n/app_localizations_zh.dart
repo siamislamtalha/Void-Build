@@ -951,7 +951,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get storageResetConfirmTitle => '确认重置';
 
   @override
-  String get storageResetConfirmMessage => '确定要重置 Void Music 吗？这将删除您的所有数据且无法撤销。';
+  String get storageResetConfirmMessage =>
+      '确定要重置 Void Music 吗？这将删除您的所有数据且无法撤销。';
 
   @override
   String get storageResetButton => '重置';
@@ -1525,7 +1526,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importNoPluginsLoaded => '未加载内容导入插件。\n请安装导入插件以从外部服务导入歌单。';
 
   @override
-  String get importBloomeeFiles => '导入 Void Music 文件';
+  String get importVoidMusicFiles => '导入 Void Music 文件';
+
+  @override
+  String get importBloomeeFiles => '导入 Bloomee 文件';
 
   @override
   String get importM3UFiles => '导入 M3U 歌单';

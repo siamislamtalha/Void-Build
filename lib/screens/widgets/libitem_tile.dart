@@ -62,8 +62,8 @@ class LibItemCard extends StatelessWidget {
               decoration: isPlaying
                   ? AppTheme.liquidGlassDecoration(
                       borderRadius: 16,
-                      glassColor: Default_Theme.accentColor2.withValues(alpha: 0.12),
-                      borderColor: Default_Theme.accentColor2.withValues(alpha: 0.3),
+                      glassColor: Colors.white.withValues(alpha: 0.08),
+                      borderColor: Colors.white.withValues(alpha: 0.2),
                     )
                   : null,
               child: Row(

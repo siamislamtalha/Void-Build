@@ -84,10 +84,9 @@ class _SquareImgCardState extends State<SquareImgCard> {
                           right: 0,
                           child: Container(
                             padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              color: Default_Theme.accentColor2
-                                  .withValues(alpha: 0.95),
-                              borderRadius: const BorderRadius.only(
+                            decoration: const BoxDecoration(
+                              color: Color(0xCC161618),
+                              borderRadius: BorderRadius.only(
                                 bottomLeft: Radius.circular(18),
                               ),
                             ),

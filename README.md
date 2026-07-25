@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="./assets/docs/bloomeetunes_new_banner.png" alt="BloomeeTunes Banner" width="100%">
+<img src="./assets/docs/bloomeetunes_new_banner.png" alt="Void Music Banner" width="100%">
 
-# 🌸 Bloomee 
+# 🌸 Void Music 
 
 **A unified local and plugin-first streaming music player built with Flutter & Rust.**
 
@@ -13,9 +13,9 @@
 </p>
 
 
-<a href="https://trendshift.io/repositories/11533" target="_blank"><img src="https://trendshift.io/api/badge/repositories/11533" alt="Bloomee on Trendshift" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/11533" target="_blank"><img src="https://trendshift.io/api/badge/repositories/11533" alt="Void Music on Trendshift" width="250" height="55"/></a>
 
- **Bloomee** is an experimental, open-source music player designed to give you absolute freedom over your audio. Seamlessly mix your **local device music** with an infinite universe of streams powered by a secure, **Rust-backed plugin system**. No ads, no interruptions—just your tunes, your way. 🌼🎵
+ **Void Music** is an experimental, open-source music player designed to give you absolute freedom over your audio. Seamlessly mix your **local device music** with an infinite universe of streams powered by a secure, **Rust-backed plugin system**. No ads, no interruptions—just your tunes, your way. 🎵
 
 </div>
 
@@ -33,12 +33,12 @@
 
 ---
 > ⚠️ **SECURITY WARNING: BEWARE OF FAKE WEBSITES!** ⚠️    
-> Due to the app's popularity, several unofficial websites claim to be the "official" Bloomee site. The ONLY official websites maintained by me are:
+> Due to the app's popularity, several unofficial websites claim to be the "official" Void Music site. The ONLY official websites maintained by me are:
 > 
 > - https://bloomeex.org
 > - https://siamislamtalha.github.io/Void-Music/
 >
-> These two URLs are the only official and safe sites for Bloomee. Do not trust other websites claiming to be official — unofficial sites may distribute modified APKs or malware. I am **not responsible** for any damage, privacy loss, or issues caused by downloading the app from third-party sources.
+> These two URLs are the only official and safe sites for Void Music. Do not trust other websites claiming to be official — unofficial sites may distribute modified APKs or malware. I am **not responsible** for any damage, privacy loss, or issues caused by downloading the app from third-party sources.
 ---
 
 ## 🚀 Features & Roadmap
@@ -82,11 +82,11 @@
   </a>
   &nbsp;
   <a href="https://sourceforge.net/projects/bloomee/files/latest/download">
-    <img alt="Download BloomeeTunes" src="https://a.fsdn.com/con/app/sf-download-button" height="40">
+    <img alt="Download Void Music" src="https://a.fsdn.com/con/app/sf-download-button" height="40">
   </a>
 </p>
 <p align="center">
-  <a href="https://apt.izzysoft.de/fdroid/index/apk/ls.bloomee.musicplayer">
+  <a href="https://apt.izzysoft.de/fdroid/index/apk/ls.voidmusic.musicplayer">
     <img alt="izzyondroid" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroidButtonGreyBorder.svg" height="45"/>
   </a>
 </p>
@@ -95,7 +95,7 @@
 
 ## 💖 Support the Development
 
-Bloomee is a passion project. I spend countless hours building, refining, and fixing bugs to give everyone a premium, ad-free music experience. If you love the app and want to see it grow, consider supporting my work! 
+Void Music is a passion project. I spend countless hours building, refining, and fixing bugs to give everyone a premium, ad-free music experience. If you love the app and want to see it grow, consider supporting my work! 
 
 Every contribution, big or small, keeps the music playing. ☕🎶
 
@@ -111,16 +111,16 @@ Every contribution, big or small, keeps the music playing. ☕🎶
 
 ---
 
-## 🤝 Contribute to Bloomee
+## 🤝 Contribute to Void Music
 
 **Every note counts!** Whether you're a seasoned developer or a beginner (I am relatively new to Flutter myself!), your pull requests, bug reports, and feature suggestions are highly appreciated. 
 
-Contributing to Bloomee is a great way to learn **Flutter, clean architecture, and BLoC patterns** in a real-world codebase.
+Contributing to Void Music is a great way to learn **Flutter, clean architecture, and BLoC patterns** in a real-world codebase.
 
 1. **Discuss:** Open an Issue first to discuss your idea.
 2. **Fork & Clone:** Fork the `main` branch.
 3. **Branch & Build:** Create your feature branch.
-4. **Pull Request:** Submit a PR and let your code join the Bloomee symphony!
+4. **Pull Request:** Submit a PR and let your code join the Void Music symphony!
 
 *Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.*
 

@@ -1478,13 +1478,14 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      'Void Music पसंद आ रहा है? आपका छोटा-सा सहयोग इसे और बेहतर बनाने में मदद करेगा।';
+      'Void Music पसंद आ रहा है? आपका छोटा-सा सहयोग इसे और बेहतर बनाने में मदद करेगा। �';
 
   @override
   String get aboutTipButton => 'मैं सहायता करना चाहता/चाहती हूँ';
 
   @override
-  String get aboutTipDesc => 'Void Music को और बेहतर बनाने में अपना योगदान दें।';
+  String get aboutTipDesc =>
+      'Void Music को और बेहतर बनाने में अपना योगदान दें।';
 
   @override
   String get aboutGitHub => 'GitHub';
@@ -1632,7 +1633,10 @@ class AppLocalizationsHi extends AppLocalizations {
       'कोई इम्पोर्टर प्लगइन मौजूद नहीं है।\nबाहरी जगहों से प्लेलिस्ट लाने के लिए पहले कोई इम्पोर्टर प्लगइन इंस्टॉल करें।';
 
   @override
-  String get importBloomeeFiles => 'Void Music फ़ाइलें इम्पोर्ट करें';
+  String get importVoidMusicFiles => 'Void Music फ़ाइलें इम्पोर्ट करें';
+
+  @override
+  String get importBloomeeFiles => 'Bloomee फ़ाइलें इम्पोर्ट करें';
 
   @override
   String get importM3UFiles => 'M3U प्लेलिस्ट इम्पोर्ट करें';
@@ -1652,7 +1656,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get importNoteMessage =>
-      'आप केवल Void Music द्वारा बनाई गई फ़ाइलें ही इम्पोर्ट कर सकते हैं।\nयदि आपकी फ़ाइल किसी और जगह की है, तो वह काम नहीं करेगी। क्या आप फिर भी आगे बढ़ना चाहते हैं?';
+      'आप केवल Bloomee द्वारा बनाई गई फ़ाइलें ही इम्पोर्ट कर सकते हैं।\nयदि आपकी फ़ाइल किसी और जगह की है, तो वह काम नहीं करेगी। क्या आप फिर भी आगे बढ़ना चाहते हैं?';
 
   @override
   String get importTitle => 'इम्पोर्ट करें';
@@ -1987,7 +1991,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Void Music का नया वर्शन आ गया है!\n\nवर्शन: $ver+$build';
+    return 'Bloomee🌸 का नया वर्शन आ गया है!\n\nवर्शन: $ver+$build';
   }
 
   @override
@@ -2006,7 +2010,7 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Void Music को तैयार किया जा रहा है';
+  String get pluginBootstrapTitle => 'Bloomee को तैयार किया जा रहा है';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -2021,7 +2025,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      'कुछ प्लगइन्स इंस्टॉल नहीं हो सके। आप फिर भी Void Music का उपयोग कर सकते हैं — ऐप दोबारा खुलने पर इन्हें इंस्टॉल करने की कोशिश की जाएगी।';
+      'कुछ प्लगइन्स इंस्टॉल नहीं हो सके। आप फिर भी Bloomee का उपयोग कर सकते हैं — ऐप दोबारा खुलने पर इन्हें इंस्टॉल करने की कोशिश की जाएगी।';
 
   @override
   String get pluginBootstrapContinue => 'फिर भी आगे बढ़ें';

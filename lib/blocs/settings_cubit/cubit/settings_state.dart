@@ -34,6 +34,7 @@ class SettingsState extends Equatable {
   final List<String> resolverPriority; // content resolver priority order
   final List<String> lyricsPriority; // lyrics provider plugin priority order
   final String suggestionPluginId; // search suggestion provider plugin
+  final String downloadPluginId; // content resolver plugin for downloads
 
   const SettingsState({
     required this.settingsReady,
@@ -64,6 +65,7 @@ class SettingsState extends Equatable {
     required this.resolverPriority,
     required this.lyricsPriority,
     required this.suggestionPluginId,
+    required this.downloadPluginId,
   });
 
   SettingsState copyWith({
@@ -95,6 +97,7 @@ class SettingsState extends Equatable {
     List<String>? resolverPriority,
     List<String>? lyricsPriority,
     String? suggestionPluginId,
+    String? downloadPluginId,
   }) {
     return SettingsState(
       settingsReady: settingsReady ?? this.settingsReady,
@@ -132,6 +135,7 @@ class SettingsState extends Equatable {
           ? List<String>.from(lyricsPriority)
           : List<String>.from(this.lyricsPriority),
       suggestionPluginId: suggestionPluginId ?? this.suggestionPluginId,
+      downloadPluginId: downloadPluginId ?? this.downloadPluginId,
     );
   }
 
@@ -165,6 +169,7 @@ class SettingsState extends Equatable {
         resolverPriority,
         lyricsPriority,
         suggestionPluginId,
+        downloadPluginId,
       ];
 }
 
@@ -199,5 +204,6 @@ class SettingsInitial extends SettingsState {
           resolverPriority: const [],
           lyricsPriority: const [],
           suggestionPluginId: '',
+          downloadPluginId: '',
         );
 }

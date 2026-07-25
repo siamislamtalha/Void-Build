@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get onboardingTitle => 'Welcome to Bloomee';
+  String get onboardingTitle => 'Welcome to Void Music';
 
   @override
   String get onboardingSubtitle => 'Let\'s set up your language and region.';
@@ -1010,7 +1010,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Save lyrics automatically when a song plays.';
 
   @override
-  String get storageResetApp => 'Reset Bloomee App';
+  String get storageResetApp => 'Reset Void Music App';
 
   @override
   String get storageResetAppSubtitle =>
@@ -1021,7 +1021,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storageResetConfirmMessage =>
-      'Are you sure you want to reset Bloomee? This will delete all your data and cannot be undone.';
+      'Are you sure you want to reset Void Music? This will delete all your data and cannot be undone.';
 
   @override
   String get storageResetButton => 'Reset';
@@ -1034,7 +1034,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storageLocationAndroid =>
-      'Backups are stored in:\n\n1. Downloads directory\n2. Android/data/ls.bloomee.musicplayer/data\n\nCopy the file from either location.';
+      'Backups are stored in:\n\n1. Downloads directory\n2. Android/data/ls.voidmusic.musicplayer/data\n\nCopy the file from either location.';
 
   @override
   String get storageLocationOther =>
@@ -1130,7 +1130,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateCheckSubtitle =>
-      'See if a newer version of Bloomee is available.';
+      'See if a newer version of Void Music is available.';
 
   @override
   String get updateAutoNotify => 'Auto Update Notify';
@@ -1472,7 +1472,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      'Enjoying Void Music? A small tip keeps it blooming.';
+      'Enjoying Void Music? A small tip keeps the music flowing. �';
 
   @override
   String get aboutTipButton => 'I\'ll help';
@@ -1539,13 +1539,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Metadata refresh is unavailable for this source';
 
   @override
-  String get songInfoSearchTitle => 'Search for this song in Bloomee';
+  String get songInfoSearchTitle => 'Search for this song in Void Music';
 
   @override
-  String get songInfoSearchArtist => 'Search for this artist in Bloomee';
+  String get songInfoSearchArtist => 'Search for this artist in Void Music';
 
   @override
-  String get songInfoSearchAlbum => 'Search for this album in Bloomee';
+  String get songInfoSearchAlbum => 'Search for this album in Void Music';
 
   @override
   String get eqTitle => 'Equalizer';
@@ -1625,6 +1625,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'No content-importer plugins loaded.\nInstall an importer plugin to import playlists from external services.';
 
   @override
+  String get importVoidMusicFiles => 'Import Void Music Files';
+
+  @override
   String get importBloomeeFiles => 'Import Bloomee Files';
 
   @override
@@ -1644,7 +1647,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importNoteMessage =>
-      'You can only import files created by Bloomee.\nIf your file is from another source, it will not work. Continue anyway?';
+      'You can only import files created by Void Music.\nIf your file is from another source, it will not work. Continue anyway?';
 
   @override
   String get importTitle => 'Import';
@@ -1974,7 +1977,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'New Version of Void Music is now available!\n\nVersion: $ver+$build';
+    return 'New Version of Bloomee🌸 is now available!\n\nVersion: $ver+$build';
   }
 
   @override

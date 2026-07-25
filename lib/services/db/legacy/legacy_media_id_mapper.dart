@@ -3,6 +3,7 @@ library legacy_media_id_mapper;
 const pluginJisSaavnId = 'content-resolver.bloomfactory.jisaavn';
 const pluginYtMusicId = 'content-resolver.bloomfactory.ytmusic';
 const pluginYtVideoId = 'content-resolver.bloomfactory.ytvideo';
+const pluginMultiSourceId = 'content-resolver.bloomfactory.multisource';
 
 bool isPluginScopedMediaId(String value) =>
     value.trim().startsWith('content-resolver.');
@@ -33,6 +34,10 @@ String? buildPluginScopedMediaId({
   final normalizedSource = source.trim().toLowerCase();
   if (normalizedSource == 'saavn') {
     return '$pluginJisSaavnId::$cleanedId';
+  }
+
+  if (normalizedSource == 'multisource' || normalizedSource == 'multi-source') {
+    return '$pluginMultiSourceId::$cleanedId';
   }
 
   if (normalizedSource.contains('youtube') ||

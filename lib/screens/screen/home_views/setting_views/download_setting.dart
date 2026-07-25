@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/services/player/stream_quality_selector.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
+import 'package:voidmusic/screens/widgets/plugin_selector.dart';
+import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
+import 'package:voidmusic/src/rust/api/plugin/types.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
@@ -98,6 +101,65 @@ class _DownloadSettingsState extends State<DownloadSettings> {
                     selected: state.downQuality,
                     onSelected: (v) =>
                         context.read<SettingsCubit>().setDownQuality(v),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+              SettingSectionHeader(label: 'Download Plugin'),
+              SettingCard(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              MingCute.extension_line,
+                              color: Default_Theme.primaryColor1,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Download Method',
+                                    style: TextStyle(
+                                      color: Default_Theme.primaryColor1,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ).merge(Default_Theme.secondoryTextStyleMedium),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Select plugin for downloading songs',
+                                    style: TextStyle(
+                                      color: Default_Theme.primaryColor1.withValues(alpha: 0.6),
+                                      fontSize: 12,
+                                    ).merge(Default_Theme.secondoryTextStyle),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        PluginSelectorBar(
+                          pluginType: PluginType.contentResolver,
+                          activePluginId: state.downloadPluginId.isEmpty ? null : state.downloadPluginId,
+                          showAllOption: true,
+                          onAllSelected: () {
+                            context.read<SettingsCubit>().setDownloadPluginId('');
+                          },
+                          onPluginSelected: (plugin) {
+                            context.read<SettingsCubit>().setDownloadPluginId(plugin.manifest.id);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

@@ -44,6 +44,10 @@ class SettingKeys {
   static const String downloadPlaylist = "_DOWNLOADS";
   static const String downQuality = "downloadQuality";
 
+  /// ID of the content resolver plugin to use for downloads.
+  /// Empty string or null = use app default (Rust download manager).
+  static const String downloadPluginId = "downloadPluginId";
+
   // ── Backup ──────────────────────────────────────────────────────────────────
   static const String backupPath = "backupPath";
   static const String autoBackup = "autoBackup";

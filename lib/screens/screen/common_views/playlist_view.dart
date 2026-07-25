@@ -556,27 +556,27 @@ class _PremiumPlayButton extends StatelessWidget {
       child: InkWell(
         onTap: isEmpty ? null : onTap,
         borderRadius: BorderRadius.circular(30),
-        splashColor: Default_Theme.accentColor2.withValues(alpha: 0.2),
+        splashColor: Colors.white.withValues(alpha: 0.2),
         child: Container(
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 28),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
-            color: Default_Theme.accentColor2.withValues(alpha: 0.1),
-            border: Border.all(color: Default_Theme.accentColor2, width: 1.5),
+            color: Colors.white.withValues(alpha: 0.1),
+            border: Border.all(color: Colors.white, width: 1.5),
           ),
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(MingCute.play_fill,
-                  size: 20, color: Default_Theme.accentColor2),
+                  size: 20, color: Colors.white),
               SizedBox(width: 8),
               Text('Play',
                   style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: Default_Theme.accentColor2)),
+                      color: Colors.white)),
             ],
           ),
         ),
@@ -613,20 +613,16 @@ class _PremiumCircularButton extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isActive
-                  ? Default_Theme.accentColor2.withValues(alpha: 0.15)
-                  : Default_Theme.primaryColor1.withValues(alpha: 0.05),
+                  ? Colors.white.withValues(alpha: 0.2)
+                  : Colors.white.withValues(alpha: 0.05),
               border: Border.all(
-                color: isActive
-                    ? Default_Theme.accentColor2.withValues(alpha: 0.5)
-                    : Default_Theme.primaryColor1.withValues(alpha: 0.15),
+                color: Colors.white.withValues(alpha: 0.3),
                 width: 1.5,
               ),
             ),
             child: Center(
               child: Icon(icon,
-                  color: isActive
-                      ? Default_Theme.accentColor2
-                      : Default_Theme.primaryColor1,
+                  color: Colors.white,
                   size: 20),
             ),
           ),

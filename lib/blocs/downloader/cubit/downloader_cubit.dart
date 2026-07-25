@@ -435,11 +435,16 @@ class DownloaderCubit extends Cubit<DownloaderState> {
         SettingKeys.downQuality,
         defaultValue: 'Medium',
       );
+      final downloadPluginId = await _settingsDao.getSettingStr(
+        SettingKeys.downloadPluginId,
+        defaultValue: '',
+      );
       await _downloadService.enqueue(
         request: EnqueueDownloadRequest(
           track: song,
           downloadDir: directory.path,
           preferredQuality: storedQuality ?? 'Medium',
+          downloadPluginId: downloadPluginId ?? '',
         ),
       );
 

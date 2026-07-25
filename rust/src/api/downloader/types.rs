@@ -69,6 +69,8 @@ pub struct EnqueueDownloadRequest {
     pub track: Track,
     pub download_dir: String,
     pub preferred_quality: String,
+    #[frb(default = "")]
+    pub download_plugin_id: String,
 }
 
 // ── Internal domain types (FRB-ignored) ──────────────────────────────────────
@@ -81,6 +83,7 @@ pub struct PersistedDownloadTask {
     pub track: Track,
     pub download_dir: String,
     pub preferred_quality: String,
+    pub download_plugin_id: String,
     pub file_name: String,
     pub target_path: String,
     pub temp_path: String,

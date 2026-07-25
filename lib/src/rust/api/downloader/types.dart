@@ -119,16 +119,18 @@ class EnqueueDownloadRequest {
   final Track track;
   final String downloadDir;
   final String preferredQuality;
+  final String downloadPluginId;
 
   const EnqueueDownloadRequest({
     required this.track,
     required this.downloadDir,
     required this.preferredQuality,
+    this.downloadPluginId = '',
   });
 
   @override
   int get hashCode =>
-      track.hashCode ^ downloadDir.hashCode ^ preferredQuality.hashCode;
+      track.hashCode ^ downloadDir.hashCode ^ preferredQuality.hashCode ^ downloadPluginId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -137,5 +139,6 @@ class EnqueueDownloadRequest {
           runtimeType == other.runtimeType &&
           track == other.track &&
           downloadDir == other.downloadDir &&
-          preferredQuality == other.preferredQuality;
+          preferredQuality == other.preferredQuality &&
+          downloadPluginId == other.downloadPluginId;
 }

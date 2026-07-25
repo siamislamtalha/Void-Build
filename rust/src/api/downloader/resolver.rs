@@ -77,13 +77,37 @@ pub async fn resolve_stream(
     }
 
     // 2. Need a fresh stream – read the fields we need under a short lock.
-    let (track, preference) = {
+    let (track, preference, download_plugin_id) = {
         let guard = task.lock().map_err(|_| "Task mutex poisoned".to_string())?;
-        (guard.persisted.track.clone(), guard.persisted.preferred_quality.clone())
+        (
+            guard.persisted.track.clone(),
+            guard.persisted.preferred_quality.clone(),
+            guard.persisted.download_plugin_id.clone(),
+        )
     };
 
     // 3. Fetch from plugin manager (this is async and may take time).
-    let stream = if let Some((plugin_id, local_id)) = split_media_id(&track.id) {
+    let stream = if !download_plugin_id.is_empty() {
+        // Use the user-selected download plugin
+        let response = plugin_manager
+            .handle_plugin_request(
+                &download_plugin_id,
+                PluginRequest::ContentResolver(ContentResolverCommand::GetStreams {
+                    id: track.id.clone(),
+                }),
+            )
+            .await
+            .map_err(|e| e.to_string())?;
+
+        let streams = match response {
+            PluginResponse::Streams(s) => s,
+            _ => return Err("Unexpected plugin response for GetStreams".to_string()),
+        };
+
+        select_best_stream(&streams, &preference)
+            .ok_or_else(|| format!("No usable streams returned for '{}'", track.title))?
+    } else if let Some((plugin_id, local_id)) = split_media_id(&track.id) {
+        // Fall back to extracting plugin ID from track ID (original behavior)
         let response = plugin_manager
             .handle_plugin_request(
                 &plugin_id,

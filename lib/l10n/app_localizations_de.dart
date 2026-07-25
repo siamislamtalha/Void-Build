@@ -1045,7 +1045,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get storageLocationAndroid =>
-      'Sicherungen befinden sich in:\n\n1. Downloads-Verzeichnis\n2. Android/data/ls.voidmusic.musicplayer/data\n\nKopiere die Datei von einem dieser Orte.';
+      'Sicherungen befinden sich in:\n\n1. Downloads-Verzeichnis\n2. Android/data/ls.bloomee.musicplayer/data\n\nKopiere die Datei von einem dieser Orte.';
 
   @override
   String get storageLocationOther =>
@@ -1481,7 +1481,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      'Gefällt dir Void Music? Eine kleine Unterstützung lässt die App weiter blühen.';
+      'Gefällt dir Void Music? Eine kleine Unterstützung lässt die Musik weiter fließen. �';
 
   @override
   String get aboutTipButton => 'Ich möchte helfen';
@@ -1638,7 +1638,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine Importer-Plugins geladen.\nInstalliere ein Plugin, um Playlists externer Dienste zu importieren.';
 
   @override
-  String get importBloomeeFiles => 'Void Music-Dateien importieren';
+  String get importVoidMusicFiles => 'Void Music-Dateien importieren';
+
+  @override
+  String get importBloomeeFiles => 'Bloomee-Dateien importieren';
 
   @override
   String get importM3UFiles => 'M3U-Playlist importieren';
@@ -1990,7 +1993,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Neue Version von Void Music verfügbar!\n\nVersion: $ver+$build';
+    return 'Neue Version von Bloomee🌸 verfügbar!\n\nVersion: $ver+$build';
   }
 
   @override
@@ -2009,7 +2012,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Void Music wird eingerichtet';
+  String get pluginBootstrapTitle => 'Bloomee wird eingerichtet';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -2024,7 +2027,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      'Einige Plugins konnten nicht installiert werden. Du kannst Void Music dennoch nutzen – Plugins werden beim nächsten Start erneut versucht.';
+      'Einige Plugins konnten nicht installiert werden. Du kannst Bloomee dennoch nutzen – Plugins werden beim nächsten Start erneut versucht.';
 
   @override
   String get pluginBootstrapContinue => 'Trotzdem fortfahren';

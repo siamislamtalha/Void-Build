@@ -145,3 +145,16 @@ app.*.symbols
 
 # APK reference folder
 /apk referance/
+
+# Android SDK
+/android-sdk/
+
+# Large files
+*.zip
+commandlinetools-*.zip
+
+# Analysis output
+analyze_*.txt
+
+# Screenshots
+/screenshot/

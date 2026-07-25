@@ -67,10 +67,13 @@ class SongCardWidget extends StatelessWidget {
           height: 66,
           margin: const EdgeInsets.symmetric(vertical: 2),
           decoration: isPlaying
-              ? AppTheme.liquidGlassDecoration(
-                  borderRadius: 14,
-                  glassColor: Default_Theme.accentColor2.withValues(alpha: 0.12),
-                  borderColor: Default_Theme.accentColor2.withValues(alpha: 0.3),
+              ? BoxDecoration(
+                  color: const Color(0xFF161618),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    width: 1,
+                  ),
                 )
               : BoxDecoration(
                   color: Colors.transparent,
@@ -108,7 +111,7 @@ class SongCardWidget extends StatelessWidget {
                                 ? const Icon(
                                     MingCute.right_fill,
                                     key: ValueKey('playing_icon'),
-                                    color: Default_Theme.accentColor2,
+                                    color: Colors.white,
                                     size: 18,
                                   )
                                 : Text(
@@ -150,15 +153,11 @@ class SongCardWidget extends StatelessWidget {
                           AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeOutCubic,
-                            style: TextStyle(
-                              color: isPlaying
-                                  ? Default_Theme.accentColor2
-                                  : Colors.white.withValues(alpha: 0.75),
+                            style: const TextStyle(
+                              color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               letterSpacing: -0.2,
-                              fontFamily:
-                                  Default_Theme.secondoryTextStyle.fontFamily,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

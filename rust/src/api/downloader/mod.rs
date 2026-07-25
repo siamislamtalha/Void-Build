@@ -237,6 +237,7 @@ impl DownloadManager {
             track: request.track,
             download_dir: request.download_dir,
             preferred_quality: normalize_quality(&request.preferred_quality).to_string(),
+            download_plugin_id: request.download_plugin_id,
             file_name: String::new(),
             target_path: String::new(),
             temp_path,

@@ -1039,7 +1039,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get storageLocationAndroid =>
-      'Las copias se guardan en:\n\n1. Directorio de Descargas\n2. Android/data/ls.voidmusic.musicplayer/data\n\nCopia el archivo desde cualquiera de esas rutas.';
+      'Las copias se guardan en:\n\n1. Directorio de Descargas\n2. Android/data/ls.bloomee.musicplayer/data\n\nCopia el archivo desde cualquiera de esas rutas.';
 
   @override
   String get storageLocationOther =>
@@ -1149,7 +1149,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get updateCheckTitle => 'Búsqueda de actualizaciones';
 
   @override
-  String get updateUpToDate => '¡Void Music está al día!';
+  String get updateUpToDate => '¡Void Music está actualizado!!!';
 
   @override
   String get updateViewPreRelease => 'Ver última Pre-Release';
@@ -1161,7 +1161,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get updateNewVersionAvailable =>
-      '¡Hay una nueva versión de Void Music disponible!';
+      '¡Nueva versión de Void Music disponible!!';
 
   @override
   String updateVersion(String ver, String build) {
@@ -1477,7 +1477,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get aboutTipQuote =>
-      '¿Te gusta Void Music? Tu apoyo ayuda a que siga creciendo.';
+      '¿Te gusta Void Music? Tu apoyo ayuda a que siga creciendo. �';
 
   @override
   String get aboutTipButton => 'Quiero ayudar';
@@ -1629,7 +1629,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'No hay plugins importadores cargados.\nInstala uno para importar desde servicios externos.';
 
   @override
-  String get importBloomeeFiles => 'Importar archivos Void Music';
+  String get importVoidMusicFiles => 'Importar archivos Void Music';
+
+  @override
+  String get importBloomeeFiles => 'Importar archivos Bloomee';
 
   @override
   String get importM3UFiles => 'Importar lista M3U';
@@ -1982,7 +1985,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return '¡Nueva versión de Void Music disponible!\n\nVersión: $ver+$build';
+    return '¡Nueva versión de Bloomee🌸 disponible!\n\nVersión: $ver+$build';
   }
 
   @override
@@ -2001,7 +2004,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Configurando Void Music';
+  String get pluginBootstrapTitle => 'Configurando Bloomee';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -2016,7 +2019,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      'No se instalaron algunos plugins. Puedes usar Void Music, se reintentará en el próximo inicio.';
+      'No se instalaron algunos plugins. Puedes usar Bloomee, se reintentará en el próximo inicio.';
 
   @override
   String get pluginBootstrapContinue => 'Continuar de todos modos';

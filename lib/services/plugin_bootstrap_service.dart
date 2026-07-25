@@ -319,9 +319,14 @@ class PluginBootstrapService {
       final currentHome =
           await settingsDao.getSettingStr(SettingKeys.homePluginId);
       if (currentHome == null || currentHome.isEmpty) {
+        // Prefer multi-source plugin for home if available
         final homePlugin = available.firstWhere(
-          (p) => p.pluginType == PluginType.contentResolver,
-          orElse: () => throw StateError('none'),
+          (p) => p.pluginType == PluginType.contentResolver &&
+                  p.manifest.id == 'content-resolver.bloomfactory.multisource',
+          orElse: () => available.firstWhere(
+            (p) => p.pluginType == PluginType.contentResolver,
+            orElse: () => throw StateError('none'),
+          ),
         );
         await settingsDao.putSettingStr(
             SettingKeys.homePluginId, homePlugin.manifest.id);
@@ -332,9 +337,14 @@ class PluginBootstrapService {
       final currentSearch =
           await settingsDao.getSettingStr(SettingKeys.searchPluginId);
       if (currentSearch == null || currentSearch.isEmpty) {
+        // Prefer multi-source plugin for search if available
         final searchPlugin = available.firstWhere(
-          (p) => p.pluginType == PluginType.contentResolver,
-          orElse: () => throw StateError('none'),
+          (p) => p.pluginType == PluginType.contentResolver &&
+                  p.manifest.id == 'content-resolver.bloomfactory.multisource',
+          orElse: () => available.firstWhere(
+            (p) => p.pluginType == PluginType.contentResolver,
+            orElse: () => throw StateError('none'),
+          ),
         );
         await settingsDao.putSettingStr(
             SettingKeys.searchPluginId, searchPlugin.manifest.id);

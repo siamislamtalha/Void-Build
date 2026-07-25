@@ -169,6 +169,12 @@ class SettingsCubit extends Cubit<SettingsState> {
             defaultValue: ''),
         SettingKeys.suggestionPluginId,
       ),
+      // [27] downloadPluginId
+      _readSetting(
+        () => _settingsRepo.getSettingStr(SettingKeys.downloadPluginId,
+            defaultValue: ''),
+        SettingKeys.downloadPluginId,
+      ),
     ]);
 
     // Normalize stream quality labels.
@@ -280,6 +286,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       resolverPriority: resolverPriority,
       lyricsPriority: lyricsPriority,
       suggestionPluginId: (results[26] as String?) ?? '',
+      downloadPluginId: (results[27] as String?) ?? '',
     ));
   }
 
@@ -487,6 +494,11 @@ class SettingsCubit extends Cubit<SettingsState> {
   void setSuggestionPluginId(String id) {
     _settingsRepo.putSettingStr(SettingKeys.suggestionPluginId, id);
     emit(state.copyWith(suggestionPluginId: id));
+  }
+
+  void setDownloadPluginId(String id) {
+    _settingsRepo.putSettingStr(SettingKeys.downloadPluginId, id);
+    emit(state.copyWith(downloadPluginId: id));
   }
 
   Future<void> resetDownPath() async {

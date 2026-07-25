@@ -111,7 +111,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Bloomee'**
+  /// **'Welcome to Void Music'**
   String get onboardingTitle;
 
   /// No description provided for @onboardingSubtitle.
@@ -1869,7 +1869,7 @@ abstract class AppLocalizations {
   /// No description provided for @storageResetApp.
   ///
   /// In en, this message translates to:
-  /// **'Reset Bloomee App'**
+  /// **'Reset Void Music App'**
   String get storageResetApp;
 
   /// No description provided for @storageResetAppSubtitle.
@@ -1887,7 +1887,7 @@ abstract class AppLocalizations {
   /// No description provided for @storageResetConfirmMessage.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to reset Bloomee? This will delete all your data and cannot be undone.'**
+  /// **'Are you sure you want to reset Void Music? This will delete all your data and cannot be undone.'**
   String get storageResetConfirmMessage;
 
   /// No description provided for @storageResetButton.
@@ -1911,7 +1911,7 @@ abstract class AppLocalizations {
   /// No description provided for @storageLocationAndroid.
   ///
   /// In en, this message translates to:
-  /// **'Backups are stored in:\n\n1. Downloads directory\n2. Android/data/ls.bloomee.musicplayer/data\n\nCopy the file from either location.'**
+  /// **'Backups are stored in:\n\n1. Downloads directory\n2. Android/data/ls.voidmusic.musicplayer/data\n\nCopy the file from either location.'**
   String get storageLocationAndroid;
 
   /// No description provided for @storageLocationOther.
@@ -2079,7 +2079,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateCheckSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'See if a newer version of Bloomee is available.'**
+  /// **'See if a newer version of Void Music is available.'**
   String get updateCheckSubtitle;
 
   /// No description provided for @updateAutoNotify.
@@ -2679,7 +2679,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTipQuote.
   ///
   /// In en, this message translates to:
-  /// **'Enjoying Void Music? A small tip keeps it blooming.'**
+  /// **'Enjoying Void Music? A small tip keeps the music flowing. �'**
   String get aboutTipQuote;
 
   /// No description provided for @aboutTipButton.
@@ -2691,7 +2691,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTipDesc.
   ///
   /// In en, this message translates to:
-  /// **'I want Bloomee to keep improving.'**
+  /// **'I want Void Music to keep improving.'**
   String get aboutTipDesc;
 
   /// No description provided for @aboutGitHub.
@@ -2811,19 +2811,19 @@ abstract class AppLocalizations {
   /// No description provided for @songInfoSearchTitle.
   ///
   /// In en, this message translates to:
-  /// **'Search for this song in Bloomee'**
+  /// **'Search for this song in Void Music'**
   String get songInfoSearchTitle;
 
   /// No description provided for @songInfoSearchArtist.
   ///
   /// In en, this message translates to:
-  /// **'Search for this artist in Bloomee'**
+  /// **'Search for this artist in Void Music'**
   String get songInfoSearchArtist;
 
   /// No description provided for @songInfoSearchAlbum.
   ///
   /// In en, this message translates to:
-  /// **'Search for this album in Bloomee'**
+  /// **'Search for this album in Void Music'**
   String get songInfoSearchAlbum;
 
   /// No description provided for @eqTitle.
@@ -2970,6 +2970,12 @@ abstract class AppLocalizations {
   /// **'No content-importer plugins loaded.\nInstall an importer plugin to import playlists from external services.'**
   String get importNoPluginsLoaded;
 
+  /// No description provided for @importVoidMusicFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Void Music Files'**
+  String get importVoidMusicFiles;
+
   /// No description provided for @importBloomeeFiles.
   ///
   /// In en, this message translates to:
@@ -3009,7 +3015,7 @@ abstract class AppLocalizations {
   /// No description provided for @importNoteMessage.
   ///
   /// In en, this message translates to:
-  /// **'You can only import files created by Bloomee.\nIf your file is from another source, it will not work. Continue anyway?'**
+  /// **'You can only import files created by Void Music.\nIf your file is from another source, it will not work. Continue anyway?'**
   String get importNoteMessage;
 
   /// No description provided for @importTitle.

@@ -507,29 +507,16 @@ class _AestheticFilterChipsSliver extends StatelessWidget {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     curve: Curves.easeOut,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? Default_Theme.accentColor2
-                          : Default_Theme.primaryColor2.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                          color: isSelected
-                              ? Default_Theme.accentColor2
-                              : Colors.white.withValues(alpha: 0.05)),
-                    ),
+                    decoration: isSelected
+                        ? AppTheme.activePillDecoration
+                        : AppTheme.inactivePillDecoration,
                     child: Text(
                       displayName,
-                      style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                        color: isSelected
-                            ? Default_Theme.primaryColor2
-                            : Default_Theme.primaryColor1
-                                .withValues(alpha: 0.8),
-                        fontSize: 13,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                      ),
+                      style: isSelected
+                          ? AppTheme.activePillTextStyle
+                          : AppTheme.inactivePillTextStyle,
                     ),
                   ),
                 );
@@ -692,14 +679,14 @@ class _PluginChip extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5.5),
             decoration: BoxDecoration(
               color: isSelected
-                  ? Default_Theme.accentColor2.withValues(alpha: 0.15)
-                  : Colors.transparent,
+                  ? Colors.white.withValues(alpha: 0.12)
+                  : const Color(0xFF1C1C1E),
               borderRadius: BorderRadius.circular(50),
               border: Border.all(
                 color: isSelected
-                    ? Default_Theme.accentColor2
-                    : Default_Theme.primaryColor1.withValues(alpha: 0.15),
-                width: 1.5,
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.12),
+                width: 1.2,
               ),
             ),
             child: AnimatedSize(
@@ -710,22 +697,18 @@ class _PluginChip extends StatelessWidget {
                 children: [
                   if (isSelected) ...[
                     const Icon(MingCute.check_line,
-                        size: 13, color: Default_Theme.accentColor2),
-                    const SizedBox(width: 4),
+                        size: 14, color: Colors.white),
+                    const SizedBox(width: 5),
                   ],
                   Text(
                     plugin.name,
-                    style: Default_Theme.secondoryTextStyleMedium.merge(
-                      TextStyle(
-                        color: isSelected
-                            ? Default_Theme.accentColor2
-                            : Default_Theme.primaryColor1
-                                .withValues(alpha: 0.8),
-                        fontSize: 12.5,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                        letterSpacing: 0.3,
-                      ),
+                    style: TextStyle(
+                      fontFamily: 'Gilroy',
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                      letterSpacing: 0.2,
                     ),
                   ),
                 ],

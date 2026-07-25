@@ -708,21 +708,14 @@ class _ActionButton extends StatelessWidget {
       child: InkWell(
         onTap: isEnabled ? onTap : null,
         borderRadius: BorderRadius.circular(18),
-        splashColor: (isPrimary
-                ? Default_Theme.accentColor2
-                : Default_Theme.accentColor1)
-            .withValues(alpha: 0.2),
+        splashColor: Colors.white.withValues(alpha: 0.1),
         highlightColor: Colors.transparent,
         child: Ink(
           decoration: BoxDecoration(
-            color: isPrimary
-                ? Default_Theme.accentColor2.withValues(alpha: 0.15)
-                : Default_Theme.primaryColor2.withValues(alpha: 0.05),
+            color: Colors.white.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: isPrimary
-                  ? Default_Theme.accentColor2.withValues(alpha: 0.3)
-                  : Default_Theme.primaryColor2.withValues(alpha: 0.1),
+              color: Colors.white.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -736,23 +729,19 @@ class _ActionButton extends StatelessWidget {
               mainAxisSize: isWide ? MainAxisSize.max : MainAxisSize.min,
               children: [
                 if (isLoading)
-                  SizedBox(
+                  const SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: isPrimary
-                          ? Default_Theme.accentColor2
-                          : Default_Theme.primaryColor2.withValues(alpha: 0.9),
+                      color: Colors.white,
                     ),
                   )
                 else
                   Icon(
                     icon,
                     size: 20,
-                    color: isPrimary
-                        ? Default_Theme.accentColor2
-                        : Default_Theme.primaryColor2.withValues(alpha: 0.9),
+                    color: Colors.white,
                   ),
                 const SizedBox(width: 12),
                 Flexible(
@@ -761,13 +750,10 @@ class _ActionButton extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Default_Theme.secondoryTextStyleMedium.merge(
-                      TextStyle(
-                        color: isPrimary
-                            ? Default_Theme.accentColor2
-                            : Default_Theme.primaryColor2,
+                      const TextStyle(
+                        color: Colors.white,
                         fontSize: 15,
-                        fontWeight:
-                            isPrimary ? FontWeight.w700 : FontWeight.w600,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),

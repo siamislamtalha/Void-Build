@@ -356,15 +356,15 @@ class _CreatePlaylistTile extends StatelessWidget {
                   height: 50,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: Default_Theme.accentColor2.withValues(alpha: 0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     border: Border.all(
-                      color: Default_Theme.accentColor2.withValues(alpha: 0.25),
+                      color: Colors.white.withValues(alpha: 0.25),
                       width: 1.5,
                     ),
                   ),
                   child: const Icon(
                     Icons.add_rounded,
-                    color: Default_Theme.accentColor2,
+                    color: Colors.white,
                     size: 26,
                   ),
                 ),
@@ -373,7 +373,7 @@ class _CreatePlaylistTile extends StatelessWidget {
                   AppLocalizations.of(context)!.playlistCreateNew,
                   style: Default_Theme.secondoryTextStyleMedium.merge(
                     const TextStyle(
-                      color: Default_Theme.accentColor2,
+                      color: Colors.white,
                       fontSize: 15,
                     ),
                   ),
