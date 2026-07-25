@@ -44,9 +44,9 @@ class SettingKeys {
   static const String downloadPlaylist = "_DOWNLOADS";
   static const String downQuality = "downloadQuality";
 
-  /// ID of the content resolver plugin to use for downloads.
-  /// Empty string or null = use app default (Rust download manager).
-  static const String downloadPluginId = "downloadPluginId";
+  /// JSON-encoded list of content resolver plugin IDs in priority order
+  /// for downloads. Empty list = use app default (Rust download manager).
+  static const String downloadPluginIds = "downloadPluginIds";
 
   // ── Backup ──────────────────────────────────────────────────────────────────
   static const String backupPath = "backupPath";
@@ -88,13 +88,13 @@ class SettingKeys {
   /// JSON-encoded list of plugin IDs that should auto-load on app startup.
   static const String autoLoadPluginIds = "autoLoadPluginIds";
 
-  /// ID of the content resolver plugin used for home page sections.
-  /// Empty string or null = use the first available content resolver.
-  static const String homePluginId = "homePluginId";
+  /// JSON-encoded list of content resolver plugin IDs in priority order
+  /// for home page sections. Empty list = use the first available content resolver.
+  static const String homePluginIds = "homePluginIds";
 
-  /// ID of the content resolver plugin last used for search.
-  /// Empty string = use the first available content resolver.
-  static const String searchPluginId = "searchPluginId";
+  /// JSON-encoded list of content resolver plugin IDs in priority order
+  /// for search. Empty list = use the first available content resolver.
+  static const String searchPluginIds = "searchPluginIds";
 
   /// JSON-encoded list of content resolver plugin IDs in priority order
   /// for the cross-plugin metadata resolver.
@@ -103,9 +103,9 @@ class SettingKeys {
   /// JSON-encoded list of lyrics provider plugin IDs in priority order.
   static const String lyricsPriority = "lyricsPriority";
 
-  /// ID of the search suggestion provider plugin.
-  /// Empty string = no plugin-based suggestions.
-  static const String suggestionPluginId = "suggestionPluginId";
+  /// JSON-encoded list of search suggestion provider plugin IDs in priority order.
+  /// Empty list = no plugin-based suggestions.
+  static const String suggestionPluginIds = "suggestionPluginIds";
 
   /// ISO 8601 UTC timestamp of the last repository sync cycle.
   static const String pluginRepositoryLastSync = "pluginRepositoryLastSync";

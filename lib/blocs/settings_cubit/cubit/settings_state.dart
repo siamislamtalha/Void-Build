@@ -29,12 +29,12 @@ class SettingsState extends Equatable {
   /// See [EqSourceValues] for valid values.
   final String eqSource;
 
-  final String homePluginId; // content resolver plugin for home sections
-  final String searchPluginId; // persisted search plugin selection
+  final List<String> homePluginIds; // content resolver plugins for home sections (priority order)
+  final List<String> searchPluginIds; // search plugins (priority order)
   final List<String> resolverPriority; // content resolver priority order
   final List<String> lyricsPriority; // lyrics provider plugin priority order
-  final String suggestionPluginId; // search suggestion provider plugin
-  final String downloadPluginId; // content resolver plugin for downloads
+  final List<String> suggestionPluginIds; // search suggestion provider plugins (priority order)
+  final List<String> downloadPluginIds; // content resolver plugins for downloads (priority order)
 
   const SettingsState({
     required this.settingsReady,
@@ -60,12 +60,12 @@ class SettingsState extends Equatable {
     required this.eqBandGains,
     required this.eqPreset,
     required this.eqSource,
-    required this.homePluginId,
-    required this.searchPluginId,
+    required this.homePluginIds,
+    required this.searchPluginIds,
     required this.resolverPriority,
     required this.lyricsPriority,
-    required this.suggestionPluginId,
-    required this.downloadPluginId,
+    required this.suggestionPluginIds,
+    required this.downloadPluginIds,
   });
 
   SettingsState copyWith({
@@ -92,12 +92,12 @@ class SettingsState extends Equatable {
     List<double>? eqBandGains,
     String? eqPreset,
     String? eqSource,
-    String? homePluginId,
-    String? searchPluginId,
+    List<String>? homePluginIds,
+    List<String>? searchPluginIds,
     List<String>? resolverPriority,
     List<String>? lyricsPriority,
-    String? suggestionPluginId,
-    String? downloadPluginId,
+    List<String>? suggestionPluginIds,
+    List<String>? downloadPluginIds,
   }) {
     return SettingsState(
       settingsReady: settingsReady ?? this.settingsReady,
@@ -126,16 +126,24 @@ class SettingsState extends Equatable {
           : List<double>.from(this.eqBandGains),
       eqPreset: eqPreset ?? this.eqPreset,
       eqSource: eqSource ?? this.eqSource,
-      homePluginId: homePluginId ?? this.homePluginId,
-      searchPluginId: searchPluginId ?? this.searchPluginId,
+      homePluginIds: homePluginIds != null
+          ? List<String>.from(homePluginIds)
+          : List<String>.from(this.homePluginIds),
+      searchPluginIds: searchPluginIds != null
+          ? List<String>.from(searchPluginIds)
+          : List<String>.from(this.searchPluginIds),
       resolverPriority: resolverPriority != null
           ? List<String>.from(resolverPriority)
           : List<String>.from(this.resolverPriority),
       lyricsPriority: lyricsPriority != null
           ? List<String>.from(lyricsPriority)
           : List<String>.from(this.lyricsPriority),
-      suggestionPluginId: suggestionPluginId ?? this.suggestionPluginId,
-      downloadPluginId: downloadPluginId ?? this.downloadPluginId,
+      suggestionPluginIds: suggestionPluginIds != null
+          ? List<String>.from(suggestionPluginIds)
+          : List<String>.from(this.suggestionPluginIds),
+      downloadPluginIds: downloadPluginIds != null
+          ? List<String>.from(downloadPluginIds)
+          : List<String>.from(this.downloadPluginIds),
     );
   }
 
@@ -164,12 +172,12 @@ class SettingsState extends Equatable {
         eqBandGains,
         eqPreset,
         eqSource,
-        homePluginId,
-        searchPluginId,
+        homePluginIds,
+        searchPluginIds,
         resolverPriority,
         lyricsPriority,
-        suggestionPluginId,
-        downloadPluginId,
+        suggestionPluginIds,
+        downloadPluginIds,
       ];
 }
 
@@ -199,11 +207,11 @@ class SettingsInitial extends SettingsState {
           eqBandGains: List<double>.filled(10, 0.0),
           eqPreset: 'Flat',
           eqSource: EqSourceValues.builtin,
-          homePluginId: '',
-          searchPluginId: '',
+          homePluginIds: const [],
+          searchPluginIds: const [],
           resolverPriority: const [],
           lyricsPriority: const [],
-          suggestionPluginId: '',
-          downloadPluginId: '',
+          suggestionPluginIds: const [],
+          downloadPluginIds: const [],
         );
 }

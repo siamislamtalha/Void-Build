@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -435,16 +436,24 @@ class DownloaderCubit extends Cubit<DownloaderState> {
         SettingKeys.downQuality,
         defaultValue: 'Medium',
       );
-      final downloadPluginId = await _settingsDao.getSettingStr(
-        SettingKeys.downloadPluginId,
-        defaultValue: '',
+      final downloadPluginIdsJson = await _settingsDao.getSettingStr(
+        SettingKeys.downloadPluginIds,
+        defaultValue: '[]',
       );
+      List<String> downloadPluginIds = const [];
+      try {
+        if (downloadPluginIdsJson != null && downloadPluginIdsJson.isNotEmpty) {
+          downloadPluginIds = (jsonDecode(downloadPluginIdsJson) as List).cast<String>();
+        }
+      } catch (_) {}
+      
+      final downloadPluginId = downloadPluginIds.isNotEmpty ? downloadPluginIds.first : '';
       await _downloadService.enqueue(
         request: EnqueueDownloadRequest(
           track: song,
           downloadDir: directory.path,
           preferredQuality: storedQuality ?? 'Medium',
-          downloadPluginId: downloadPluginId ?? '',
+          downloadPluginId: downloadPluginId,
         ),
       );
 

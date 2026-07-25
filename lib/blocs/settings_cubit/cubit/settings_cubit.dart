@@ -139,17 +139,17 @@ class SettingsCubit extends Cubit<SettingsState> {
             defaultValue: EqSourceValues.builtin),
         SettingKeys.eqSource,
       ),
-      // [22] homePluginId
+      // [22] homePluginIds
       _readSetting(
-        () => _settingsRepo.getSettingStr(SettingKeys.homePluginId,
-            defaultValue: ''),
-        SettingKeys.homePluginId,
+        () => _settingsRepo.getSettingStr(SettingKeys.homePluginIds,
+            defaultValue: '[]'),
+        SettingKeys.homePluginIds,
       ),
-      // [23] searchPluginId
+      // [23] searchPluginIds
       _readSetting(
-        () => _settingsRepo.getSettingStr(SettingKeys.searchPluginId,
-            defaultValue: ''),
-        SettingKeys.searchPluginId,
+        () => _settingsRepo.getSettingStr(SettingKeys.searchPluginIds,
+            defaultValue: '[]'),
+        SettingKeys.searchPluginIds,
       ),
       // [24] resolverPriority
       _readSetting(
@@ -163,17 +163,17 @@ class SettingsCubit extends Cubit<SettingsState> {
             defaultValue: '[]'),
         SettingKeys.lyricsPriority,
       ),
-      // [26] suggestionPluginId
+      // [26] suggestionPluginIds
       _readSetting(
-        () => _settingsRepo.getSettingStr(SettingKeys.suggestionPluginId,
-            defaultValue: ''),
-        SettingKeys.suggestionPluginId,
+        () => _settingsRepo.getSettingStr(SettingKeys.suggestionPluginIds,
+            defaultValue: '[]'),
+        SettingKeys.suggestionPluginIds,
       ),
-      // [27] downloadPluginId
+      // [27] downloadPluginIds
       _readSetting(
-        () => _settingsRepo.getSettingStr(SettingKeys.downloadPluginId,
-            defaultValue: ''),
-        SettingKeys.downloadPluginId,
+        () => _settingsRepo.getSettingStr(SettingKeys.downloadPluginIds,
+            defaultValue: '[]'),
+        SettingKeys.downloadPluginIds,
       ),
     ]);
 
@@ -239,6 +239,38 @@ class SettingsCubit extends Cubit<SettingsState> {
       }
     } catch (_) {}
 
+    List<String> homePluginIds = const [];
+    try {
+      final hj = results[22] as String?;
+      if (hj != null && hj.isNotEmpty) {
+        homePluginIds = (jsonDecode(hj) as List).cast<String>();
+      }
+    } catch (_) {}
+
+    List<String> searchPluginIds = const [];
+    try {
+      final sj = results[23] as String?;
+      if (sj != null && sj.isNotEmpty) {
+        searchPluginIds = (jsonDecode(sj) as List).cast<String>();
+      }
+    } catch (_) {}
+
+    List<String> suggestionPluginIds = const [];
+    try {
+      final sugj = results[26] as String?;
+      if (sugj != null && sugj.isNotEmpty) {
+        suggestionPluginIds = (jsonDecode(sugj) as List).cast<String>();
+      }
+    } catch (_) {}
+
+    List<String> downloadPluginIds = const [];
+    try {
+      final dj = results[27] as String?;
+      if (dj != null && dj.isNotEmpty) {
+        downloadPluginIds = (jsonDecode(dj) as List).cast<String>();
+      }
+    } catch (_) {}
+
     // Normalize country code.
     final rawCountry = results[14] as String?;
     final normalizedCountry =
@@ -281,12 +313,12 @@ class SettingsCubit extends Cubit<SettingsState> {
       eqBandGains: eqGains,
       eqPreset: (results[20] as String?) ?? 'Flat',
       eqSource: eqSource,
-      homePluginId: (results[22] as String?) ?? '',
-      searchPluginId: (results[23] as String?) ?? '',
+      homePluginIds: homePluginIds,
+      searchPluginIds: searchPluginIds,
       resolverPriority: resolverPriority,
       lyricsPriority: lyricsPriority,
-      suggestionPluginId: (results[26] as String?) ?? '',
-      downloadPluginId: (results[27] as String?) ?? '',
+      suggestionPluginIds: suggestionPluginIds,
+      downloadPluginIds: downloadPluginIds,
     ));
   }
 
@@ -471,14 +503,14 @@ class SettingsCubit extends Cubit<SettingsState> {
     emit(state.copyWith(eqSource: normalized));
   }
 
-  void setHomePluginId(String id) {
-    _settingsRepo.putSettingStr(SettingKeys.homePluginId, id);
-    emit(state.copyWith(homePluginId: id));
+  void setHomePluginIds(List<String> ids) {
+    _settingsRepo.putSettingStr(SettingKeys.homePluginIds, jsonEncode(ids));
+    emit(state.copyWith(homePluginIds: ids));
   }
 
-  void setSearchPluginId(String id) {
-    _settingsRepo.putSettingStr(SettingKeys.searchPluginId, id);
-    emit(state.copyWith(searchPluginId: id));
+  void setSearchPluginIds(List<String> ids) {
+    _settingsRepo.putSettingStr(SettingKeys.searchPluginIds, jsonEncode(ids));
+    emit(state.copyWith(searchPluginIds: ids));
   }
 
   void setResolverPriority(List<String> p) {
@@ -491,14 +523,14 @@ class SettingsCubit extends Cubit<SettingsState> {
     emit(state.copyWith(lyricsPriority: p));
   }
 
-  void setSuggestionPluginId(String id) {
-    _settingsRepo.putSettingStr(SettingKeys.suggestionPluginId, id);
-    emit(state.copyWith(suggestionPluginId: id));
+  void setSuggestionPluginIds(List<String> ids) {
+    _settingsRepo.putSettingStr(SettingKeys.suggestionPluginIds, jsonEncode(ids));
+    emit(state.copyWith(suggestionPluginIds: ids));
   }
 
-  void setDownloadPluginId(String id) {
-    _settingsRepo.putSettingStr(SettingKeys.downloadPluginId, id);
-    emit(state.copyWith(downloadPluginId: id));
+  void setDownloadPluginIds(List<String> ids) {
+    _settingsRepo.putSettingStr(SettingKeys.downloadPluginIds, jsonEncode(ids));
+    emit(state.copyWith(downloadPluginIds: ids));
   }
 
   Future<void> resetDownPath() async {

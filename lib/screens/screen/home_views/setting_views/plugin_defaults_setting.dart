@@ -8,6 +8,7 @@ import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class PluginDefaultsSettings extends StatelessWidget {
   const PluginDefaultsSettings({super.key});
@@ -85,10 +86,6 @@ class PluginDefaultsSettings extends StatelessWidget {
     SettingsState state,
     List<PluginInfo> resolvers,
   ) {
-    final hasStoredSelection = state.homePluginId.isNotEmpty &&
-        resolvers.any((plugin) => plugin.manifest.id == state.homePluginId);
-    final selectedPluginId = hasStoredSelection ? state.homePluginId : '';
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -120,37 +117,13 @@ class PluginDefaultsSettings extends StatelessWidget {
             ],
           )
         else
-          SettingCard(
-            children: [
-              SettingRadioTile<String>(
-                title: l10n.settingsAutomatic,
-                subtitle: l10n.pluginDefaultsAutomaticSubtitle,
-                value: '',
-                groupValue: selectedPluginId,
-                onChanged: (_) {
-                  context.read<SettingsCubit>().setHomePluginId('');
-                },
-              ),
-              ...resolvers.map((plugin) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SettingDivider(),
-                    SettingRadioTile<String>(
-                      title: plugin.name,
-                      subtitle: plugin.manifest.id,
-                      value: plugin.manifest.id,
-                      groupValue: selectedPluginId,
-                      onChanged: (_) {
-                        context
-                            .read<SettingsCubit>()
-                            .setHomePluginId(plugin.manifest.id);
-                      },
-                    ),
-                  ],
-                );
-              }),
-            ],
+          _MultiPluginSelector(
+            plugins: resolvers,
+            selectedIds: state.homePluginIds,
+            title: l10n.pluginDefaultsDiscoverHeader,
+            onSelectionChanged: (ids) {
+              context.read<SettingsCubit>().setHomePluginIds(ids);
+            },
           ),
       ],
     );
@@ -319,8 +292,6 @@ class PluginDefaultsSettings extends StatelessWidget {
     SettingsState state,
     List<PluginInfo> suggestionProviders,
   ) {
-    final selectedId = state.suggestionPluginId;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -352,37 +323,13 @@ class PluginDefaultsSettings extends StatelessWidget {
             ],
           )
         else
-          SettingCard(
-            children: [
-              SettingRadioTile<String>(
-                title: l10n.pluginDefaultsSuggestionsHistoryOnlyTitle,
-                subtitle: l10n.pluginDefaultsSuggestionsHistoryOnlySubtitle,
-                value: '',
-                groupValue: selectedId,
-                onChanged: (_) {
-                  context.read<SettingsCubit>().setSuggestionPluginId('');
-                },
-              ),
-              ...suggestionProviders.map((plugin) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SettingDivider(),
-                    SettingRadioTile<String>(
-                      title: plugin.name,
-                      subtitle: plugin.manifest.id,
-                      value: plugin.manifest.id,
-                      groupValue: selectedId,
-                      onChanged: (_) {
-                        context
-                            .read<SettingsCubit>()
-                            .setSuggestionPluginId(plugin.manifest.id);
-                      },
-                    ),
-                  ],
-                );
-              }),
-            ],
+          _MultiPluginSelector(
+            plugins: suggestionProviders,
+            selectedIds: state.suggestionPluginIds,
+            title: l10n.pluginDefaultsSuggestionsHeader,
+            onSelectionChanged: (ids) {
+              context.read<SettingsCubit>().setSuggestionPluginIds(ids);
+            },
           ),
       ],
     );
@@ -452,7 +399,7 @@ class _ResolverPriorityListState extends State<_ResolverPriorityList> {
             );
           },
           itemCount: _items.length,
-          onReorder: (oldIndex, newIndex) {
+          onReorderItem: (oldIndex, newIndex) {
             setState(() {
               final item = _items.removeAt(oldIndex);
               _items.insert(newIndex, item);
@@ -489,6 +436,41 @@ class _PriorityTile extends StatelessWidget {
     required this.pluginId,
   });
 
+  static Widget _getPluginIcon(String pluginId) {
+    String svgPath;
+    Color? color;
+    
+    if (pluginId.contains('ytmusic') || pluginId.contains('youtube_music')) {
+      svgPath = 'assets/icons/svg/Youtube Music.svg';
+      color = null;
+    } else if (pluginId.contains('ytvideo') || pluginId.contains('youtube')) {
+      svgPath = 'assets/icons/svg/youtube.svg';
+      color = null;
+    } else if (pluginId.contains('spotify')) {
+      svgPath = 'assets/icons/svg/spotify.svg';
+      color = null;
+    } else if (pluginId.contains('jiosaavn') || pluginId.contains('jio')) {
+      svgPath = 'assets/icons/svg/jiosaavn.svg';
+      color = null;
+    } else if (pluginId.contains('multi') || pluginId.contains('bloomfactory')) {
+      svgPath = 'assets/icons/svg/multi-source.svg';
+      color = Default_Theme.primaryColor1;
+    } else {
+      return const SizedBox.shrink();
+    }
+    
+    return SizedBox(
+      width: 16,
+      height: 16,
+      child: color != null
+          ? ColorFiltered(
+              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+              child: SvgPicture.asset(svgPath),
+            )
+          : SvgPicture.asset(svgPath),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -513,6 +495,8 @@ class _PriorityTile extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
+          _getPluginIcon(pluginId),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -544,6 +528,170 @@ class _PriorityTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _MultiPluginSelector extends StatefulWidget {
+  final List<PluginInfo> plugins;
+  final List<String> selectedIds;
+  final String title;
+  final ValueChanged<List<String>> onSelectionChanged;
+
+  const _MultiPluginSelector({
+    required this.plugins,
+    required this.selectedIds,
+    required this.title,
+    required this.onSelectionChanged,
+  });
+
+  @override
+  State<_MultiPluginSelector> createState() => _MultiPluginSelectorState();
+}
+
+class _MultiPluginSelectorState extends State<_MultiPluginSelector> {
+  late List<String> _selectedIds;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIds = List.from(widget.selectedIds);
+  }
+
+  @override
+  void didUpdateWidget(covariant _MultiPluginSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedIds != oldWidget.selectedIds) {
+      _selectedIds = List.from(widget.selectedIds);
+    }
+  }
+
+  void _togglePlugin(String pluginId) {
+    setState(() {
+      if (_selectedIds.contains(pluginId)) {
+        _selectedIds.remove(pluginId);
+      } else {
+        _selectedIds.add(pluginId);
+      }
+    });
+    widget.onSelectionChanged(List.from(_selectedIds));
+  }
+
+  Widget _getPluginIcon(String pluginId) {
+    String svgPath;
+    Color? color;
+    
+    if (pluginId.contains('ytmusic') || pluginId.contains('youtube_music')) {
+      svgPath = 'assets/icons/svg/Youtube Music.svg';
+      color = null; // Already colored
+    } else if (pluginId.contains('ytvideo') || pluginId.contains('youtube')) {
+      svgPath = 'assets/icons/svg/youtube.svg';
+      color = null; // Already colored
+    } else if (pluginId.contains('spotify')) {
+      svgPath = 'assets/icons/svg/spotify.svg';
+      color = null; // Already colored
+    } else if (pluginId.contains('jiosaavn') || pluginId.contains('jio')) {
+      svgPath = 'assets/icons/svg/jiosaavn.svg';
+      color = null; // Already colored
+    } else if (pluginId.contains('multi') || pluginId.contains('bloomfactory')) {
+      svgPath = 'assets/icons/svg/multi-source.svg';
+      color = Default_Theme.primaryColor1; // Color the black SVG
+    } else {
+      return const SizedBox.shrink(); // No icon for unknown plugins
+    }
+    
+    return SizedBox(
+      width: 16,
+      height: 16,
+      child: color != null
+          ? ColorFiltered(
+              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+              child: SvgPicture.asset(svgPath),
+            )
+          : SvgPicture.asset(svgPath),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final nameMap = {
+      for (final p in widget.plugins) p.manifest.id: p.name,
+    };
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            'Select multiple plugins (drag to reorder priority)',
+            style: TextStyle(
+              color: Default_Theme.primaryColor2.withValues(alpha: 0.5),
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ).merge(Default_Theme.secondoryTextStyle),
+          ),
+        ),
+        _ResolverPriorityList(
+          ordered: _selectedIds,
+          nameMap: nameMap,
+          onReorder: (newOrder) {
+            setState(() {
+              _selectedIds = newOrder;
+            });
+            widget.onSelectionChanged(List.from(_selectedIds));
+          },
+        ),
+        const SizedBox(height: 12),
+        SettingCard(
+          children: [
+            ...widget.plugins.map((plugin) {
+              final isSelected = _selectedIds.contains(plugin.manifest.id);
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.plugins.indexOf(plugin) > 0)
+                    const SettingDivider(),
+                  CheckboxListTile(
+                    title: Row(
+                      children: [
+                        _getPluginIcon(plugin.manifest.id),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            plugin.name,
+                            style: const TextStyle(
+                              color: Default_Theme.primaryColor1,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ).merge(Default_Theme.secondoryTextStyleMedium),
+                          ),
+                        ),
+                      ],
+                    ),
+                    subtitle: Text(
+                      plugin.manifest.id,
+                      style: TextStyle(
+                        color: Default_Theme.primaryColor2.withValues(alpha: 0.45),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w400,
+                      ).merge(Default_Theme.secondoryTextStyle),
+                    ),
+                    value: isSelected,
+                    onChanged: (_) => _togglePlugin(plugin.manifest.id),
+                    activeColor: Default_Theme.accentColor2,
+                    checkColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ],
+        ),
+      ],
     );
   }
 }

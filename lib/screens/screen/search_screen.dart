@@ -76,11 +76,18 @@ class _SearchScreenState extends State<SearchScreen> {
     final pluginState = context.read<PluginBloc>().state;
     final resolvers = pluginState.loadedContentResolvers;
     if (resolvers.isNotEmpty) {
-      final persistedId = context.read<SettingsCubit>().state.searchPluginId;
-      final hasPersistedPlugin = persistedId.isNotEmpty &&
-          resolvers.any((p) => p.manifest.id == persistedId);
-      final activeId =
-          hasPersistedPlugin ? persistedId : resolvers.first.manifest.id;
+      final persistedIds = context.read<SettingsCubit>().state.searchPluginIds;
+      String activeId;
+      if (persistedIds.isNotEmpty) {
+        final hasPersistedPlugin = persistedIds.any((id) =>
+            resolvers.any((p) => p.manifest.id == id));
+        activeId = hasPersistedPlugin
+            ? persistedIds.firstWhere((id) =>
+                resolvers.any((p) => p.manifest.id == id))
+            : resolvers.first.manifest.id;
+      } else {
+        activeId = resolvers.first.manifest.id;
+      }
 
       _activePluginIdNotifier.value = activeId;
       _contentBloc.add(SetActiveContentPlugin(pluginId: activeId));
@@ -203,11 +210,18 @@ class _SearchScreenState extends State<SearchScreen> {
           _activePluginIdNotifier.value == null,
       listener: (context, pluginState) {
         final resolvers = pluginState.loadedContentResolvers;
-        final persistedId = context.read<SettingsCubit>().state.searchPluginId;
-        final hasPersistedPlugin = persistedId.isNotEmpty &&
-            resolvers.any((p) => p.manifest.id == persistedId);
-        final activeId =
-            hasPersistedPlugin ? persistedId : resolvers.first.manifest.id;
+        final persistedIds = context.read<SettingsCubit>().state.searchPluginIds;
+        String activeId;
+        if (persistedIds.isNotEmpty) {
+          final hasPersistedPlugin = persistedIds.any((id) =>
+              resolvers.any((p) => p.manifest.id == id));
+          activeId = hasPersistedPlugin
+              ? persistedIds.firstWhere((id) =>
+                  resolvers.any((p) => p.manifest.id == id))
+              : resolvers.first.manifest.id;
+        } else {
+          activeId = resolvers.first.manifest.id;
+        }
 
         _activePluginIdNotifier.value = activeId;
         _contentBloc.add(SetActiveContentPlugin(pluginId: activeId));
@@ -626,9 +640,14 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                                           contentBloc.add(
                                               SetActiveContentPlugin(
                                                   pluginId: id));
+                                          final currentIds = context
+                                              .read<SettingsCubit>()
+                                              .state
+                                              .searchPluginIds;
+                                          final newIds = [id, ...currentIds.where((e) => e != id)];
                                           context
                                               .read<SettingsCubit>()
-                                              .setSearchPluginId(id);
+                                              .setSearchPluginIds(newIds);
                                           if (textEditingController.text
                                               .isNotEmpty) {
                                             onPluginChanged();

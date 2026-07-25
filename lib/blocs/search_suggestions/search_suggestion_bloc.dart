@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:voidmusic/services/db/dao/search_history_dao.dart';
 import 'package:voidmusic/services/db/dao/settings_dao.dart';
@@ -97,11 +98,22 @@ class SearchSuggestionBloc
   /// Returns a tuple of (query strings, entity suggestions) from the plugin.
   Future<(List<String>, List<plugin_models.EntitySuggestion>)>
       _getPluginSuggestions(String query) async {
-    final pluginId =
-        await _settingsDao.getSettingStr(SettingKeys.suggestionPluginId);
-    if (pluginId == null || pluginId.isEmpty) {
+    final pluginIdsJson =
+        await _settingsDao.getSettingStr(SettingKeys.suggestionPluginIds);
+    if (pluginIdsJson == null || pluginIdsJson.isEmpty || pluginIdsJson == '[]') {
       return (<String>[], <plugin_models.EntitySuggestion>[]);
     }
+    
+    List<String> pluginIds = const [];
+    try {
+      pluginIds = (jsonDecode(pluginIdsJson) as List).cast<String>();
+    } catch (_) {}
+    
+    if (pluginIds.isEmpty) {
+      return (<String>[], <plugin_models.EntitySuggestion>[]);
+    }
+    
+    final pluginId = pluginIds.first;
 
     try {
       final PluginRequest request;

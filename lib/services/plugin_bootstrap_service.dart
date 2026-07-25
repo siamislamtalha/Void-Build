@@ -304,21 +304,21 @@ class PluginBootstrapService {
       final available = await _safeGetAvailable(pluginService);
 
       final currentSuggestion =
-          await settingsDao.getSettingStr(SettingKeys.suggestionPluginId);
+          await settingsDao.getSettingStr(SettingKeys.suggestionPluginIds);
       if (currentSuggestion == null || currentSuggestion.isEmpty) {
         final suggestionPlugin = available.firstWhere(
           (p) => p.pluginType == PluginType.searchSuggestionProvider,
           orElse: () => throw StateError('none'),
         );
         await settingsDao.putSettingStr(
-            SettingKeys.suggestionPluginId, suggestionPlugin.manifest.id);
+            SettingKeys.suggestionPluginIds, jsonEncode([suggestionPlugin.manifest.id]));
         log('Auto-selected suggestion plugin: ${suggestionPlugin.manifest.id}',
             name: 'PluginBootstrap');
       }
 
       final currentHome =
-          await settingsDao.getSettingStr(SettingKeys.homePluginId);
-      if (currentHome == null || currentHome.isEmpty) {
+          await settingsDao.getSettingStr(SettingKeys.homePluginIds);
+      if (currentHome == null || currentHome.isEmpty || currentHome == '[]') {
         // Prefer multi-source plugin for home if available
         final homePlugin = available.firstWhere(
           (p) => p.pluginType == PluginType.contentResolver &&
@@ -329,14 +329,14 @@ class PluginBootstrapService {
           ),
         );
         await settingsDao.putSettingStr(
-            SettingKeys.homePluginId, homePlugin.manifest.id);
+            SettingKeys.homePluginIds, jsonEncode([homePlugin.manifest.id]));
         log('Auto-selected home plugin: ${homePlugin.manifest.id}',
             name: 'PluginBootstrap');
       }
 
       final currentSearch =
-          await settingsDao.getSettingStr(SettingKeys.searchPluginId);
-      if (currentSearch == null || currentSearch.isEmpty) {
+          await settingsDao.getSettingStr(SettingKeys.searchPluginIds);
+      if (currentSearch == null || currentSearch.isEmpty || currentSearch == '[]') {
         // Prefer multi-source plugin for search if available
         final searchPlugin = available.firstWhere(
           (p) => p.pluginType == PluginType.contentResolver &&
@@ -347,7 +347,7 @@ class PluginBootstrapService {
           ),
         );
         await settingsDao.putSettingStr(
-            SettingKeys.searchPluginId, searchPlugin.manifest.id);
+            SettingKeys.searchPluginIds, jsonEncode([searchPlugin.manifest.id]));
         log('Auto-selected search plugin: ${searchPlugin.manifest.id}',
             name: 'PluginBootstrap');
       }

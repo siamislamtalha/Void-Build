@@ -66,6 +66,7 @@ dependencies:
   dart_discord_rpc: ^0.0.2
   mime: ^2.0.0
   photo_manager: ^3.9.0
+  flutter_svg: ^2.0.10
 
 
   # audio service dependencies
@@ -128,6 +129,7 @@ flutter:
     - assets/icons/bloomee_new_logo_c.png
     - assets/icons/lazy_loading.png
     - assets/icons/BloomeeLogoFG.png
+    - assets/icons/svg/
     
   fonts:
     - family: Unageo

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:flutter/foundation.dart';
 import 'package:voidmusic/blocs/explore/cubit/explore_cubits.dart';
 import 'package:voidmusic/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:voidmusic/blocs/lastdotfm/lastdotfm_cubit.dart';
@@ -57,15 +58,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final contentResolvers = pluginState.loadedContentResolvers;
     if (contentResolvers.isEmpty) return;
 
-    final preferredId = settingsState.homePluginId;
-    // If the user's preferred plugin is installed but not yet loaded, wait for it.
+    final preferredIds = settingsState.homePluginIds;
+    // If the user's preferred plugins are installed but not yet loaded, wait for them.
     // This prevents flashing the wrong plugin's home page on startup.
-    if (preferredId.isNotEmpty) {
+    if (preferredIds.isNotEmpty) {
+      final firstPreferred = preferredIds.first;
       final isAlreadyLoaded =
-          contentResolvers.any((p) => p.manifest.id == preferredId);
+          contentResolvers.any((p) => p.manifest.id == firstPreferred);
       if (!isAlreadyLoaded) {
         final isInstalled = pluginState.availablePlugins
-            .any((p) => p.manifest.id == preferredId);
+            .any((p) => p.manifest.id == firstPreferred);
         if (isInstalled) return; // Preferred plugin is loading — wait for it
       }
     }
@@ -82,10 +84,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 
   String _effectiveHomePluginId(List<dynamic> loadedResolvers) {
-    final preferredId = context.read<SettingsCubit>().state.homePluginId;
-    final hasPreferred = preferredId.isNotEmpty &&
-        loadedResolvers.any((plugin) => plugin.manifest.id == preferredId);
-    return hasPreferred ? preferredId : loadedResolvers.first.manifest.id;
+    final preferredIds = context.read<SettingsCubit>().state.homePluginIds;
+    if (preferredIds.isNotEmpty) {
+      for (final preferredId in preferredIds) {
+        final hasPreferred = loadedResolvers.any((plugin) => plugin.manifest.id == preferredId);
+        if (hasPreferred) return preferredId;
+      }
+    }
+    return loadedResolvers.first.manifest.id;
   }
 
   @override
@@ -128,7 +134,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         listeners: [
           BlocListener<SettingsCubit, SettingsState>(
             listenWhen: (previous, current) =>
-                previous.homePluginId != current.homePluginId ||
+                !listEquals(previous.homePluginIds, current.homePluginIds) ||
                 (!previous.settingsReady && current.settingsReady),
             listener: (context, state) {
               _homeContentBloc.add(const ClearHomeSections());
