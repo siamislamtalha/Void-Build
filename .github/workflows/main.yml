@@ -13,7 +13,7 @@ jobs:
     # JOB 1: WINDOWS
     build-windows:
         name: Build Windows
-        runs-on: windows-latest
+        runs-on: windows-2022
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
@@ -53,6 +53,8 @@ jobs:
                   flutter pub get
                   flutter build windows --release --build-number ${{github.run_number}}
               shell: powershell
+              env:
+                  CMAKE_GENERATOR: Visual Studio 17 2022
 
             - name: Create build-number.txt file
               shell: powershell
