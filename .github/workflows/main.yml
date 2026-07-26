@@ -8,23 +8,15 @@ on:
 
 permissions:
   contents: write
-    
+
 jobs:
-    # JOB 1: WINDOWS & ANDROID
-    build-windows-android:
-        name: Build Windows & Android
+    # JOB 1: WINDOWS
+    build-windows:
+        name: Build Windows
         runs-on: windows-latest
-        env:
-          CMAKE_GENERATOR: Visual Studio 17 2022
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
-
-            - name: Setup-Java
-              uses: actions/setup-java@v4
-              with:
-                distribution: 'oracle'
-                java-version: '17'
 
             - name: Setup Flutter
               uses: subosito/flutter-action@v2
@@ -54,25 +46,6 @@ jobs:
                   $ver = $vLine.Matches[0].Groups[1].Value.Split('+')[0]
                   echo "VERSION=$ver" >> $env:GITHUB_ENV
 
-            - name: Build Android APK
-              run: flutter build apk --release --target-platform android-arm64 --build-number ${{github.run_number}}
-
-            - name: Rename APK file
-              shell: powershell
-              run: |
-                  Rename-Item -Path "build/app/outputs/flutter-apk/app-release.apk" -NewName "VoidMusic_v$env:VERSION+${{github.run_number}}_arm64-v8a.apk"
-
-            - name: Clean Windows build directory
-              run: |
-                  if (Test-Path "build/windows") { Remove-Item -Recurse -Force "build/windows" }
-                  if (Test-Path "build\.flutter-plugins") { Remove-Item -Force "build\.flutter-plugins" }
-                  if (Test-Path "build\.flutter-plugins-dependencies") { Remove-Item -Force "build\.flutter-plugins-dependencies" }
-                  if (Test-Path "windows\CMakeCache.txt") { Remove-Item -Force "windows\CMakeCache.txt" }
-                  if (Test-Path "windows\CMakeFiles") { Remove-Item -Recurse -Force "windows\CMakeFiles" }
-                  if (Test-Path "windows\runner\CMakeCache.txt") { Remove-Item -Force "windows\runner\CMakeCache.txt" }
-                  if (Test-Path "windows\runner\CMakeFiles") { Remove-Item -Recurse -Force "windows\runner\CMakeFiles" }
-              shell: powershell
-
             - name: Build Windows App
               run: |
                   flutter clean
@@ -95,22 +68,6 @@ jobs:
             - name: Copy files to root for upload
               shell: powershell
               run: |
-                  # Copy APK - try multiple possible locations
-                  $apkSrc = "build/app/outputs/flutter-apk/VoidMusic_v$env:VERSION+${{github.run_number}}_arm64-v8a.apk"
-                  if (Test-Path $apkSrc) {
-                      Copy-Item $apkSrc -Destination "VoidMusic_v$env:VERSION+${{github.run_number}}_arm64-v8a.apk"
-                      Write-Host "APK copied successfully from: $apkSrc"
-                  } else {
-                      Write-Warning "APK not found at: $apkSrc, searching for any APK..."
-                      $anyApk = Get-ChildItem -Path "build/app/outputs/flutter-apk" -Filter "*.apk" -ErrorAction SilentlyContinue | Select-Object -First 1
-                      if ($anyApk) {
-                          Copy-Item $anyApk.FullName -Destination "VoidMusic_v$env:VERSION+${{github.run_number}}_arm64-v8a.apk"
-                          Write-Host "APK copied from: $($anyApk.FullName)"
-                      } else {
-                          Write-Error "No APK found anywhere in build/app/outputs/flutter-apk"
-                      }
-                  }
-
                   # Find Windows executable - comprehensive search
                   Write-Host "=== Searching for Windows EXE ==="
                   
@@ -154,9 +111,8 @@ jobs:
             - name: Upload Artifacts
               uses: actions/upload-artifact@v4
               with:
-                name: Release-Windows-Android
+                name: Release-Windows
                 path: |
-                  VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
                   VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.exe
                   VoidMusic_Installer_v${{ env.VERSION }}+${{github.run_number}}.exe
                   build-number.txt
@@ -167,7 +123,6 @@ jobs:
               uses: ncipollo/release-action@v1
               with:
                 artifacts: |
-                  VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
                   VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.exe
                   VoidMusic_Installer_v${{ env.VERSION }}+${{github.run_number}}.exe
                   build-number.txt
@@ -175,9 +130,66 @@ jobs:
                 token: ${{ secrets.GITHUB_TOKEN }}
                 prerelease: true
                 allowUpdates: true
-                omitBodyDuringUpdate: true 
+                omitBodyDuringUpdate: true
 
+    # JOB 2: ANDROID
+    build-android:
+        name: Build Android
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
 
+            - name: Setup-Java
+              uses: actions/setup-java@v4
+              with:
+                distribution: 'oracle'
+                java-version: '17'
+
+            - name: Setup Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                flutter-version: '3.35.4'
+                channel: 'stable'
+
+            - name: Install Dependencies
+              run: flutter pub get
+
+            - name: Extract version from pubspec.yaml
+              run: |
+                  VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+                  echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+            - name: Build Android APK
+              run: flutter build apk --release --target-platform android-arm64 --build-number ${{github.run_number}}
+
+            - name: Rename APK file
+              run: |
+                  mv build/app/outputs/flutter-apk/app-release.apk VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
+
+            - name: Copy APK to root for upload
+              run: |
+                  cp VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
+
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                name: Release-Android
+                path: VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
+                if-no-files-found: error
+                overwrite: true
+
+            - name: Create Release
+              uses: ncipollo/release-action@v1
+              with:
+                artifacts: VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
+                tag: v${{ env.VERSION }}+${{github.run_number}}
+                token: ${{ secrets.GITHUB_TOKEN }}
+                prerelease: true
+                allowUpdates: true
+                omitBodyDuringUpdate: true
+
+    # JOB 3: LINUX
     build-linux:
         name: Build Linux
         runs-on: ubuntu-latest
