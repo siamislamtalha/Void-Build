@@ -24,8 +24,9 @@ jobs:
                 flutter-version: '3.35.4'
                 channel: 'stable'
 
-            - name: Install Visual Studio Build Tools
-              run: choco install visualstudio2022buildtools -y --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+            - name: Verify Visual Studio installation
+              run: |
+                & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath
 
             - name: Install Inno Setup
               run: choco install innosetup -y
