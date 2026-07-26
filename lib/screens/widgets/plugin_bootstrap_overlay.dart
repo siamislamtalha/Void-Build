@@ -38,6 +38,7 @@ class _PluginBootstrapOverlayState extends State<PluginBootstrapOverlay>
 
   final ValueNotifier<_Phase> _phase = ValueNotifier(_Phase.running);
   final ValueNotifier<int> _progress = ValueNotifier(0);
+  final ValueNotifier<List<String>> _errors = ValueNotifier([]);
   int _runToken = 0;
 
   late final AnimationController _pulseCtrl;
@@ -73,6 +74,7 @@ class _PluginBootstrapOverlayState extends State<PluginBootstrapOverlay>
     _fadeCtrl.dispose();
     _phase.dispose();
     _progress.dispose();
+    _errors.dispose();
     super.dispose();
   }
 
@@ -110,6 +112,7 @@ class _PluginBootstrapOverlayState extends State<PluginBootstrapOverlay>
       _phase.value = _Phase.noInternet;
     } else {
       _phase.value = _Phase.failed;
+      _errors.value = result.errors;
     }
   }
 
@@ -147,6 +150,7 @@ class _PluginBootstrapOverlayState extends State<PluginBootstrapOverlay>
                         : phase == _Phase.failed
                             ? _ErrorBody(
                                 onRetry: _run,
+                                errors: _errors.value,
                               )
                             : _SpinnerBody(
                                 pulse: _pulse,
@@ -267,9 +271,11 @@ class _SpinnerBody extends StatelessWidget {
 class _ErrorBody extends StatelessWidget {
   const _ErrorBody({
     required this.onRetry,
+    required this.errors,
   });
 
   final VoidCallback onRetry;
+  final List<String> errors;
 
   @override
   Widget build(BuildContext context) {
@@ -290,7 +296,7 @@ class _ErrorBody extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(
-              Icons.wifi_off_rounded,
+              Icons.error_outline_rounded,
               color: _PluginBootstrapOverlayState._errorAccent,
               size: 48,
             ),
@@ -314,6 +320,36 @@ class _ErrorBody extends StatelessWidget {
                 height: 1.55,
               ),
             ),
+            if (errors.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Container(
+                constraints: const BoxConstraints(maxHeight: 150),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: errors
+                        .map((error) => Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Text(
+                                '• $error',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.7),
+                                  fontSize: 11,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 28),
             SizedBox(
               width: double.infinity,

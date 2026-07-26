@@ -153,7 +153,28 @@ class PluginBootstrapService {
       } catch (e) {
         log('Could not load repository at ${entry.url}: $e',
             name: 'PluginBootstrap');
-        errors.add('Failed to load plugin repository: $e');
+        final errorStr = e.toString();
+        String errorType;
+        String reason;
+
+        if (errorStr.contains('HTTP')) {
+          errorType = 'Failed to fetch';
+          reason = 'HTTP error';
+        } else if (errorStr.contains('SocketException')) {
+          errorType = 'Failed to fetch';
+          reason = 'Network connection failed';
+        } else if (errorStr.contains('TimeoutException')) {
+          errorType = 'Failed to fetch';
+          reason = 'Request timed out';
+        } else if (errorStr.contains('FormatException') || errorStr.contains('json')) {
+          errorType = 'Failed to parse';
+          reason = 'Invalid JSON format';
+        } else {
+          errorType = 'Failed to load';
+          reason = 'Unknown error';
+        }
+
+        errors.add('$errorType plugin repository from ${entry.url} because $reason: $e');
       }
     }
 
@@ -190,6 +211,8 @@ class PluginBootstrapService {
 
         bool installed = false;
         bool skippedByCountry = false;
+        String? errorType;
+        String? reason;
         String? lastError;
 
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
@@ -213,13 +236,31 @@ class PluginBootstrapService {
               installed = true;
               installedIds.add(plugin.id);
             } else {
-              lastError =
-                  'Install returned status: ${result.status.name}${result.error != null ? ' — ${result.error}' : ''}';
+              errorType = 'Failed to install';
+              reason = 'Installation returned status ${result.status.name}';
+              lastError = result.error != null ? ' — ${result.error}' : '';
             }
           } on PluginCountryRestrictedException {
             skippedByCountry = true;
             break;
           } catch (e) {
+            final errorStr = e.toString();
+            if (errorStr.contains('HTTP')) {
+              errorType = 'Failed to download';
+              reason = 'HTTP error';
+            } else if (errorStr.contains('SocketException')) {
+              errorType = 'Failed to download';
+              reason = 'Network connection failed';
+            } else if (errorStr.contains('TimeoutException')) {
+              errorType = 'Failed to download';
+              reason = 'Request timed out';
+            } else if (errorStr.contains('FileSystemException')) {
+              errorType = 'Failed to install';
+              reason = 'File system error';
+            } else {
+              errorType = 'Failed to install';
+              reason = 'Unknown error';
+            }
             lastError = e.toString();
           }
 
@@ -230,7 +271,7 @@ class PluginBootstrapService {
         }
 
         if (!installed && !skippedByCountry) {
-          errors.add('Could not install "${plugin.name}": $lastError');
+          errors.add('$errorType "${plugin.name}" because $reason$lastError');
         }
 
         processedPlugins++;
