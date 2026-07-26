@@ -140,6 +140,16 @@ jobs:
             - name: Checkout Repository
               uses: actions/checkout@v4
 
+            - name: Create key.properties from GitHub secrets
+              run: |
+                echo "keyAlias=${{ secrets.KEY_ALIAS }}" > android/key.properties
+                echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+                echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/key.properties
+
+            - name: Decode keystore from GitHub secrets
+              run: |
+                echo "${{ secrets.KEY_STORE }}" | base64 --decode > android/voidmusic.jks
+
             - name: Setup-Java
               uses: actions/setup-java@v4
               with:
@@ -163,13 +173,9 @@ jobs:
             - name: Build Android APK
               run: flutter build apk --release --target-platform android-arm64 --build-number ${{github.run_number}}
 
-            - name: Rename APK file
+            - name: Rename and move APK file
               run: |
                   mv build/app/outputs/flutter-apk/app-release.apk VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
-
-            - name: Copy APK to root for upload
-              run: |
-                  cp VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
 
             - name: Upload Artifacts
               uses: actions/upload-artifact@v4
