@@ -130,6 +130,7 @@ flutter:
     - assets/icons/lazy_loading.png
     - assets/icons/BloomeeLogoFG.png
     - assets/icons/svg/
+    - svg/
     
   fonts:
     - family: Unageo

@@ -462,30 +462,82 @@ class CustomDiscoverBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverAppBar(
+    return SliverPersistentHeader(
       floating: true,
-      surfaceTintColor: Default_Theme.themeColor,
-      backgroundColor: Default_Theme.themeColor,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            AppLocalizations.of(context)!.exploreDiscover,
-            style: Default_Theme.primaryTextStyle.merge(
-              const TextStyle(
-                fontSize: 34,
-                color: Default_Theme.primaryColor1,
+      delegate: _DiscoverBarDelegate(),
+    );
+  }
+}
+
+class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
+  static const double _minH = 0;
+  static const double _maxH = 96;
+
+  @override
+  double get minExtent => _minH;
+
+  @override
+  double get maxExtent => _maxH;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
+      false;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Solid background so the bar itself is opaque
+        Container(color: Default_Theme.themeColor),
+        // The actual app bar content
+        SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.exploreDiscover,
+                  style: Default_Theme.primaryTextStyle.merge(
+                    const TextStyle(
+                      fontSize: 34,
+                      color: Default_Theme.primaryColor1,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                const NotificationIcon(),
+                const SizedBox(width: 8),
+                const TimerIcon(),
+                const SizedBox(width: 8),
+                const SettingsIcon(),
+              ],
+            ),
+          ),
+        ),
+        // Gradient fade at the bottom — blends the header into the content
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Container(
+            height: 28,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Default_Theme.themeColor.withOpacity(0.0),
+                  Default_Theme.themeColor,
+                ],
               ),
             ),
           ),
-          const Spacer(),
-          const NotificationIcon(),
-          const SizedBox(width: 8),
-          const TimerIcon(),
-          const SizedBox(width: 8),
-          const SettingsIcon(),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

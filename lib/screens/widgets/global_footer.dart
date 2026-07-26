@@ -55,20 +55,10 @@ class GlobalFooter extends StatelessWidget {
             body: Stack(
               children: [
                 Positioned.fill(
-                  child: isMobile
-                      ? _AnimatedPageView(navigationShell: navigationShell)
-                      : Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 4),
-                              child: VerticalNavBar(navigationShell: navigationShell),
-                            ),
-                            Expanded(
-                              child:
-                                  _AnimatedPageView(navigationShell: navigationShell),
-                            ),
-                          ],
-                        ),
+                  child: _FooterAwareBody(
+                    isMobile: isMobile,
+                    navigationShell: navigationShell,
+                  ),
                 ),
                 Positioned(
                   left: 0,
@@ -124,6 +114,61 @@ class GlobalFooter extends StatelessWidget {
     if (context.mounted) {
       await SystemNavigator.pop();
     }
+  }
+}
+
+// Heights of the floating overlay elements (in logical pixels).
+// Mini player card height + vertical padding = 64 + 4 + 4 = 72.
+// SizedBox gap between mini player and nav bar = 6.
+// Nav bar item circle height + vertical padding = 56 + 5 + 5 = 66.
+// Outer bottom padding on the Column = 6.
+// Mobile total = 72 + 6 + 66 + 6 = 150.
+// Desktop (no nav bar) = 72 + 6 = 78.
+const double _kMiniPlayerFooterHeight = 78.0;
+const double _kNavBarFooterHeight = 72.0; // gap(6) + navBar(66)
+
+/// Wraps the navigation shell with a [MediaQuery] that adds extra bottom
+/// padding equal to the height of the floating footer (mini player + nav bar).
+/// This ensures every inner screen's [SafeArea] and scroll views naturally
+/// clear the overlay without needing per-screen workarounds.
+class _FooterAwareBody extends StatelessWidget {
+  const _FooterAwareBody({
+    required this.isMobile,
+    required this.navigationShell,
+  });
+
+  final bool isMobile;
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    // Total footer height above the system bottom inset.
+    final footerExtra = _kMiniPlayerFooterHeight +
+        (isMobile ? _kNavBarFooterHeight : 0.0);
+    // Override bottom padding so SafeArea / scroll views clear the footer.
+    final updatedMq = mq.copyWith(
+      padding: mq.padding.copyWith(
+        bottom: mq.padding.bottom + footerExtra,
+      ),
+    );
+
+    return MediaQuery(
+      data: updatedMq,
+      child: isMobile
+          ? _AnimatedPageView(navigationShell: navigationShell)
+          : Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: VerticalNavBar(navigationShell: navigationShell),
+                ),
+                Expanded(
+                  child: _AnimatedPageView(navigationShell: navigationShell),
+                ),
+              ],
+            ),
+    );
   }
 }
 
@@ -255,37 +300,53 @@ class HorizontalNavBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // ── Main Glass Capsule (Home, Library, Local, Offline) ──
-          ClipRRect(
-            borderRadius: BorderRadius.circular(36),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-                decoration: BoxDecoration(
-                  // Pure glass — no opaque black background
-                  color: Colors.white.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(36),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    width: 0.8,
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(36),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                  decoration: BoxDecoration(
+                    // Liquid glass — layered translucency
+                    color: Colors.white.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(36),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.22),
+                      width: 1.0,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withValues(alpha: 0.06),
+                        blurRadius: 1,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 1),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.30),
+                        blurRadius: 20,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: capsuleItems.map((item) {
-                    final isSelected = currentIndex == item.branchIndex;
-                    return _NavItemButton(
-                      item: item,
-                      isSelected: isSelected,
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        navigationShell.goBranch(item.branchIndex);
-                      },
-                    );
-                  }).toList(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: capsuleItems.map((item) {
+                      final isSelected = currentIndex == item.branchIndex;
+                      return _NavItemButton(
+                        item: item,
+                        isSelected: isSelected,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          navigationShell.goBranch(item.branchIndex);
+                        },
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
             ),
@@ -302,23 +363,39 @@ class HorizontalNavBar extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  width: 54,
-                  height: 54,
+                  width: 56,
+                  height: 56,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    // Pure glass — no opaque black background
+                    // Only show glass circle when selected
                     color: isSearchSelected
                         ? Colors.white.withValues(alpha: 0.18)
-                        : Colors.white.withValues(alpha: 0.08),
-                    border: Border.all(
-                      color: isSearchSelected
-                          ? Colors.white.withValues(alpha: 0.30)
-                          : Colors.white.withValues(alpha: 0.18),
-                      width: 0.8,
-                    ),
+                        : Colors.transparent,
+                    border: isSearchSelected
+                        ? Border.all(
+                            color: Colors.white.withValues(alpha: 0.35),
+                            width: 1.0,
+                          )
+                        : null,
+                    boxShadow: isSearchSelected
+                        ? [
+                            BoxShadow(
+                              color: Colors.white.withValues(alpha: 0.06),
+                              blurRadius: 1,
+                              spreadRadius: 0,
+                              offset: const Offset(0, 1),
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.30),
+                              blurRadius: 20,
+                              spreadRadius: 0,
+                              offset: const Offset(0, 8),
+                            ),
+                          ]
+                        : null,
                   ),
                   child: Center(
                     child: Icon(
@@ -326,7 +403,7 @@ class HorizontalNavBar extends StatelessWidget {
                       size: 24,
                       color: isSearchSelected
                           ? Colors.white
-                          : Colors.white.withValues(alpha: 0.70),
+                          : Colors.white.withValues(alpha: 0.55),
                     ),
                   ),
                 ),
@@ -353,8 +430,9 @@ class _NavItemButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Active item accent color (pinkish-red like reference)
-    const activeColor = Color(0xFFFF4D6A);
+    // Active color matches app's white monochromatic theme
+    const activeColor = Colors.white;
+    const inactiveColor = Color(0x8CFFFFFF);
 
     return GestureDetector(
       onTap: onTap,
@@ -368,15 +446,16 @@ class _NavItemButton extends StatelessWidget {
           height: 56,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
+            // Only show background + border on selected item
             color: isSelected
-                ? Colors.white.withValues(alpha: 0.14)
-                : Colors.white.withValues(alpha: 0.06),
-            border: Border.all(
-              color: isSelected
-                  ? Colors.white.withValues(alpha: 0.25)
-                  : Colors.white.withValues(alpha: 0.10),
-              width: 0.8,
-            ),
+                ? Colors.white.withValues(alpha: 0.15)
+                : Colors.transparent,
+            border: isSelected
+                ? Border.all(
+                    color: Colors.white.withValues(alpha: 0.30),
+                    width: 1.0,
+                  )
+                : null,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -384,9 +463,7 @@ class _NavItemButton extends StatelessWidget {
               Icon(
                 item.icon,
                 size: 22,
-                color: isSelected
-                    ? activeColor
-                    : Colors.white.withValues(alpha: 0.55),
+                color: isSelected ? activeColor : inactiveColor,
               ),
               const SizedBox(height: 2),
               Text(
@@ -395,9 +472,7 @@ class _NavItemButton extends StatelessWidget {
                   fontSize: 9,
                   fontFamily: 'Gilroy',
                   fontWeight: FontWeight.w700,
-                  color: isSelected
-                      ? activeColor
-                      : Colors.white.withValues(alpha: 0.55),
+                  color: isSelected ? activeColor : inactiveColor,
                 ),
               ),
             ],

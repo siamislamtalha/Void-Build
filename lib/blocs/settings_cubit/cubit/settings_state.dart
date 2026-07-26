@@ -36,6 +36,9 @@ class SettingsState extends Equatable {
   final List<String> suggestionPluginIds; // search suggestion provider plugins (priority order)
   final List<String> downloadPluginIds; // content resolver plugins for downloads (priority order)
 
+  /// Theme preference: 'system' | 'light' | 'dark'.
+  final String themeMode;
+
   const SettingsState({
     required this.settingsReady,
     required this.autoUpdateNotify,
@@ -66,6 +69,7 @@ class SettingsState extends Equatable {
     required this.lyricsPriority,
     required this.suggestionPluginIds,
     required this.downloadPluginIds,
+    this.themeMode = 'system',
   });
 
   SettingsState copyWith({
@@ -98,6 +102,7 @@ class SettingsState extends Equatable {
     List<String>? lyricsPriority,
     List<String>? suggestionPluginIds,
     List<String>? downloadPluginIds,
+    String? themeMode,
   }) {
     return SettingsState(
       settingsReady: settingsReady ?? this.settingsReady,
@@ -144,6 +149,7 @@ class SettingsState extends Equatable {
       downloadPluginIds: downloadPluginIds != null
           ? List<String>.from(downloadPluginIds)
           : List<String>.from(this.downloadPluginIds),
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 
@@ -178,6 +184,7 @@ class SettingsState extends Equatable {
         lyricsPriority,
         suggestionPluginIds,
         downloadPluginIds,
+        themeMode,
       ];
 }
 

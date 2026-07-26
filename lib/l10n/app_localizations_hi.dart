@@ -1636,7 +1636,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get importVoidMusicFiles => 'Void Music फ़ाइलें इम्पोर्ट करें';
 
   @override
-  String get importBloomeeFiles => 'Bloomee फ़ाइलें इम्पोर्ट करें';
+  String get importBloomeeFiles => 'Void Music फ़ाइलें इम्पोर्ट करें';
 
   @override
   String get importM3UFiles => 'M3U प्लेलिस्ट इम्पोर्ट करें';

@@ -1535,7 +1535,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get importVoidMusicFiles => 'Void Music 파일 가져오기';
 
   @override
-  String get importBloomeeFiles => 'Bloomee 파일 가져오기';
+  String get importBloomeeFiles => 'Void Music 파일 가져오기';
 
   @override
   String get importM3UFiles => 'M3U 플레이리스트 가져오기';

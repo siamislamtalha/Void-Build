@@ -13,6 +13,7 @@ import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
 import 'package:voidmusic/core/models/exported.dart' hide MediaItem;
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/screens/widgets/media_metadata_links.dart';
+import 'package:voidmusic/screens/widgets/source_badge.dart';
 import 'package:voidmusic/utils/load_image.dart';
 
 class SongCardWidget extends StatelessWidget {
@@ -177,16 +178,28 @@ class SongCardWidget extends StatelessWidget {
                               ),
                             )
                           else
-                            TrackMetadataLinks(
-                              track: song,
-                              style: TextStyle(
-                                color: Default_Theme.primaryColor2
-                                    .withValues(alpha: 0.65),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: TrackMetadataLinks(
+                                    track: song,
+                                    style: TextStyle(
+                                      color: Default_Theme.primaryColor2
+                                          .withValues(alpha: 0.65),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                SourceBadge(
+                                  mediaId: song.id,
+                                  size: 13,
+                                ),
+                              ],
                             ),
                         ],
                       ),

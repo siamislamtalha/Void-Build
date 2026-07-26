@@ -15,6 +15,7 @@ analyzer:
     - 'apk referance/**'
     - 'ghpage/**'
     - 'build/**'
+    - 'diff/**'
 
 linter:
   # The lint rules applied to this project can be customized in the

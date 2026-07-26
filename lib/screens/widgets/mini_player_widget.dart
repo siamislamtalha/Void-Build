@@ -168,17 +168,31 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
           child: ClipRRect(
             borderRadius: BorderRadius.circular(34),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
               child: Container(
                 height: _cardHeight,
                 decoration: BoxDecoration(
-                  // Pure glass — no opaque black
-                  color: Colors.white.withValues(alpha: 0.08),
+                  // Liquid glass — layered translucency
+                  color: Colors.white.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(34),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    width: 0.8,
+                    color: Colors.white.withValues(alpha: 0.22),
+                    width: 1.0,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.06),
+                      blurRadius: 1,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 1),
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.30),
+                      blurRadius: 20,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
                 child: Stack(
                   children: [
@@ -240,16 +254,24 @@ class _ControlsCapsule extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.10),
+            color: Colors.white.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.20),
-              width: 0.8,
+              color: Colors.white.withValues(alpha: 0.22),
+              width: 1.0,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.20),
+                blurRadius: 12,
+                spreadRadius: 0,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

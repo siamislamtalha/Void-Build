@@ -207,8 +207,8 @@ class _LegacyMigrationOverlayState extends State<LegacyMigrationOverlay>
       valueListenable: _phase,
       builder: (context, phase, _) {
         final title = switch (phase) {
-          _Phase.running => 'Upgrading Bloomee',
-          _Phase.success => 'Welcome to Bloomee 3.0',
+          _Phase.running => 'Upgrading Void Music',
+          _Phase.success => 'Welcome to Void Music',
           _Phase.failed => 'Migration Aborted',
         };
 
@@ -406,7 +406,7 @@ class _LegacyMigrationOverlayState extends State<LegacyMigrationOverlay>
           elevation: 0,
         ),
         child: Text(
-          isErr ? 'Retry Migration' : 'Enter Bloomee',
+          isErr ? 'Retry Migration' : 'Enter Void Music',
           style: const TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 0.3),
         ),

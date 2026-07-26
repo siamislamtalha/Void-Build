@@ -10,6 +10,10 @@ class SettingKeys {
   static const String autoUpdateNotify = "auto_update_notify";
   static const String autoSlideCharts = "auto_slide_charts";
 
+  // ── Theme ────────────────────────────────────────────────────────────────────
+  /// Stored as: 'system' | 'light' | 'dark'. Defaults to 'system'.
+  static const String themeMode = "themeMode";
+
   // ── Playback ────────────────────────────────────────────────────────────────
   static const String strmQuality = "streamQuality";
   static const String autoPlay = "autoPlaySimilarItems";

@@ -1529,7 +1529,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importVoidMusicFiles => '导入 Void Music 文件';
 
   @override
-  String get importBloomeeFiles => '导入 Bloomee 文件';
+  String get importBloomeeFiles => '导入 Void Music 文件';
 
   @override
   String get importM3UFiles => '导入 M3U 歌单';

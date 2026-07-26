@@ -158,7 +158,7 @@
 </script>
 
 <svelte:head>
-	<title>Bloomee</title>
+	<title>Void Music</title>
 </svelte:head>
 
 <Background />
@@ -169,11 +169,11 @@
 
 	<div class="content-wrapper" bind:this={contentWrapper}>
 		<section id="section-0" class="content-section {active === 0 ? 'active' : ''}" aria-hidden={active !== 0}>
-			<h1 class="home-title">BloomeeTunes</h1>
+			<h1 class="home-title">Void Music</h1>
 			<p class="home-subtitle">Multi-source and open music app for free.</p>
-			<div class="support-message" role="region" aria-label="Support Bloomee">
-<span class="lead">Keep bloomee alive!</span>
-<span class="msg">Your support today fuels every <span class="highlight">future update</span>, keeps Bloomee <span class="highlight">ad-free</span>, and ensures the tunes <span class="highlight">never stop</span>. ✨</span>
+			<div class="support-message" role="region" aria-label="Support Void Music">
+<span class="lead">Keep Void Music alive!</span>
+<span class="msg">Your support today fuels every <span class="highlight">future update</span>, keeps Void Music <span class="highlight">ad-free</span>, and ensures the tunes <span class="highlight">never stop</span>. ✨</span>
 </div>
 
 

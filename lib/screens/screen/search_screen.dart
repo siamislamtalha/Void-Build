@@ -28,6 +28,7 @@ import 'package:voidmusic/screens/widgets/song_tile.dart';
 import 'package:voidmusic/src/rust/api/plugin/commands.dart';
 import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
 import 'package:voidmusic/src/rust/api/plugin/models.dart' as plugin_models;
+import 'package:voidmusic/screens/widgets/source_badge.dart';
 
 class SearchScreen extends StatefulWidget {
   final String searchQuery;
@@ -719,6 +720,11 @@ class _PluginChip extends StatelessWidget {
                         size: 14, color: Colors.white),
                     const SizedBox(width: 5),
                   ],
+                  SourceBadgeByPluginId(
+                    pluginId: plugin.manifest.id,
+                    size: 14,
+                  ),
+                  const SizedBox(width: 6),
                   Text(
                     plugin.name,
                     style: TextStyle(

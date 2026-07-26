@@ -567,7 +567,7 @@
   "importSongsTitle": "गाने इम्पोर्ट करें",
   "importNoPluginsLoaded": "कोई इम्पोर्टर प्लगइन मौजूद नहीं है।\nबाहरी जगहों से प्लेलिस्ट लाने के लिए पहले कोई इम्पोर्टर प्लगइन इंस्टॉल करें।",
   "importVoidMusicFiles": "Void Music फ़ाइलें इम्पोर्ट करें",
-  "importBloomeeFiles": "Bloomee फ़ाइलें इम्पोर्ट करें",
+  "importBloomeeFiles": "Void Music फ़ाइलें इम्पोर्ट करें",
   "importM3UFiles": "M3U प्लेलिस्ट इम्पोर्ट करें",
   "importM3UNameDialogTitle": "प्लेलिस्ट का नाम",
   "importM3UNameHint": "इस प्लेलिस्ट का कोई नाम रखें",

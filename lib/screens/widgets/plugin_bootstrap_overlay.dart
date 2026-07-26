@@ -226,7 +226,7 @@ class _SpinnerBody extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           Text(
-            l10n?.pluginBootstrapTitle ?? 'Setting up Bloomee',
+            l10n?.pluginBootstrapTitle ?? 'Setting up Void Music',
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
@@ -429,7 +429,7 @@ class _NoInternetBody extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Bloomee needs an internet connection once to detect your country and set up the plugin engine.',
+              'Void Music needs an internet connection once to detect your country and set up the plugin engine.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.62),

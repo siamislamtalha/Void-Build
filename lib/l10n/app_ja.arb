@@ -567,7 +567,7 @@
   "importSongsTitle": "曲をインポート",
   "importNoPluginsLoaded": "インポータープラグインがありません。外部サービスから取り込むにはインストールしてください。",
   "importVoidMusicFiles": "Void Music ファイルをインポート",
-  "importBloomeeFiles": "Bloomee ファイルをインポート",
+  "importBloomeeFiles": "Void Music ファイルをインポート",
   "importM3UFiles": "M3U プレイリストをインポート",
   "importM3UNameDialogTitle": "プレイリスト名",
   "importM3UNameHint": "名前を入力してください",

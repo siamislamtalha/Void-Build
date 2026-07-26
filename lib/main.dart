@@ -471,6 +471,19 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                     ? null
                     : Locale(settingsState.languageCode);
 
+                // Resolve ThemeMode from persisted preference.
+                final ThemeMode resolvedThemeMode;
+                switch (settingsState.themeMode) {
+                  case 'light':
+                    resolvedThemeMode = ThemeMode.light;
+                    break;
+                  case 'dark':
+                    resolvedThemeMode = ThemeMode.dark;
+                    break;
+                  default:
+                    resolvedThemeMode = ThemeMode.system;
+                }
+
                 return KeyboardShortcutsHandler(
                   child: ShortcutIndicatorOverlay(
                     child: MaterialApp.router(
@@ -495,7 +508,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                       ),
                       scaffoldMessengerKey: SnackbarService.messengerKey,
                       routerConfig: GlobalRoutes.globalRouter,
-                      theme: Default_Theme().defaultThemeData,
+                      theme: Default_Theme().lightThemeData,
+                      darkTheme: Default_Theme().defaultThemeData,
+                      themeMode: resolvedThemeMode,
                       scrollBehavior: CustomScrollBehavior(),
                       debugShowCheckedModeBanner: false,
                     ),

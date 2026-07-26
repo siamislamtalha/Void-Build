@@ -1632,7 +1632,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get importVoidMusicFiles => 'Importar archivos Void Music';
 
   @override
-  String get importBloomeeFiles => 'Importar archivos Bloomee';
+  String get importBloomeeFiles => 'Importar archivos de Void Music';
 
   @override
   String get importM3UFiles => 'Importar lista M3U';

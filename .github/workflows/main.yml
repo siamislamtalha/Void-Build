@@ -12,121 +12,193 @@ permissions:
 jobs:
     # JOB 1: WINDOWS
     build-windows:
-        name: Build Windows
-        runs-on: windows-2022
+        name: Build Windows Installer
+        runs-on: windows-latest
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
+
+            - name: Setup Rust Toolchain
+              uses: dtolnay/rust-toolchain@stable
+
+            - name: Cache Cargo dependencies
+              uses: actions/cache@v4
+              with:
+                path: |
+                  ~\.cargo\registry\index\
+                  ~\.cargo\registry\cache\
+                  ~\.cargo\git\db\
+                key: cargo-win-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+                restore-keys: |
+                  cargo-win-${{ runner.os }}-
 
             - name: Setup Flutter
               uses: subosito/flutter-action@v2
               with:
                 flutter-version: '3.35.4'
                 channel: 'stable'
+                cache: true
 
-            - name: Verify Visual Studio installation
-              run: |
-                & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath
+            - name: Cache pub dependencies
+              uses: actions/cache@v4
+              with:
+                path: |
+                  ~\AppData\Local\Pub\Cache
+                  .dart_tool
+                key: pub-win-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+                restore-keys: |
+                  pub-win-${{ runner.os }}-
+
+            # NOTE: ilammy/msvc-dev-cmd is intentionally NOT used here.
+            # It can conflict with the Rust/cargo build environment on windows-latest.
+            # The GitHub-hosted windows-latest runner already has MSVC (VS 2022) on PATH.
 
             - name: Install Inno Setup
-              run: choco install innosetup -y
-
-            - name: Setup MSVC environment
-              uses: ilammy/msvc-dev-cmd@v1
-              with:
-                arch: x64
+              shell: powershell
+              run: choco install innosetup -y --no-progress
 
             - name: Install Dependencies
               run: flutter pub get
 
             - name: Extract version from pubspec.yaml
+              id: version
               shell: powershell
               run: |
                   $vLine = Select-String -Path pubspec.yaml -Pattern '^version:\s*(\S+)' | Select-Object -First 1
                   if (-not $vLine) { Write-Error 'version not found in pubspec.yaml'; exit 1 }
                   $ver = $vLine.Matches[0].Groups[1].Value.Split('+')[0]
                   echo "VERSION=$ver" >> $env:GITHUB_ENV
+                  echo "version=$ver" >> $env:GITHUB_OUTPUT
 
             - name: Build Windows App
-              run: |
-                  flutter clean
-                  flutter pub get
-                  flutter build windows --release --build-number ${{github.run_number}}
               shell: powershell
               env:
-                  CMAKE_GENERATOR: Visual Studio 17 2022
+                  CMAKE_POLICY_VERSION_MINIMUM: "3.5"
+                  CMAKE_ARGS: "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+              run: |
+                  flutter build windows --release --no-tree-shake-icons --build-number ${{github.run_number}}
 
-            - name: Create build-number.txt file
+            - name: Verify build output exists
+              shell: powershell
+              run: |
+                  $releaseDir = "build\windows\x64\runner\Release"
+                  if (-not (Test-Path $releaseDir)) {
+                      Write-Error "Flutter Windows build output not found at: $releaseDir"
+                      Write-Host "=== build directory contents ==="
+                      Get-ChildItem -Path "build" -Recurse -Depth 4 -ErrorAction SilentlyContinue | Select-Object FullName
+                      exit 1
+                  }
+                  Write-Host "=== Release folder contents ==="
+                  Get-ChildItem -Path $releaseDir -Recurse | Select-Object FullName, Length
+                  $exeFile = Get-ChildItem -Path $releaseDir -Filter "*.exe" | Select-Object -First 1
+                  if (-not $exeFile) {
+                      Write-Error "No .exe found in release folder!"
+                      exit 1
+                  }
+                  Write-Host "Main EXE: $($exeFile.FullName) ($([math]::Round($exeFile.Length/1MB,2)) MB)"
+
+            - name: Build Inno Setup Installer
+              shell: powershell
+              run: |
+                  $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+                  if (-not (Test-Path $iscc)) {
+                      Write-Error "ISCC.exe not found at: $iscc"
+                      exit 1
+                  }
+
+                  # Compute ABSOLUTE paths — this is the fix for the 21 KB corrupted installer.
+                  # Inno Setup resolves relative paths from the .iss file's directory, but
+                  # passing them as absolute /D defines eliminates all ambiguity.
+                  $repoRoot  = (Get-Location).Path
+                  $buildDir  = Join-Path $repoRoot "build\windows\x64\runner\Release"
+                  $icoFile   = Join-Path $repoRoot "windows\runner\resources\app_icon.ico"
+                  $outputDir = Join-Path $repoRoot "windows\Output"
+
+                  # Pre-flight: verify the Flutter build output exists and is not empty
+                  if (-not (Test-Path $buildDir)) {
+                      Write-Error "Flutter build output not found: $buildDir"
+                      exit 1
+                  }
+                  $releaseFiles = Get-ChildItem -Path $buildDir -Recurse -File
+                  Write-Host "=== Flutter release folder ($($releaseFiles.Count) files) ==="
+                  $releaseFiles | Select-Object -First 30 | ForEach-Object {
+                      Write-Host "  $($_.FullName)  ($([math]::Round($_.Length/1KB,1)) KB)"
+                  }
+                  $appExe = Join-Path $buildDir "voidmusic.exe"
+                  if (-not (Test-Path $appExe)) {
+                      Write-Error "voidmusic.exe not found in: $buildDir"
+                      Write-Host "Available .exe files:"
+                      Get-ChildItem -Path $buildDir -Filter "*.exe" | ForEach-Object { Write-Host "  $($_.Name)" }
+                      exit 1
+                  }
+                  Write-Host "App EXE: $appExe  ($([math]::Round((Get-Item $appExe).Length/1MB,2)) MB)"
+
+                  # Ensure output directory exists
+                  New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
+
+                  Write-Host ""
+                  Write-Host "=== Running ISCC with absolute paths ==="
+                  Write-Host "  BUILDDIR  = $buildDir"
+                  Write-Host "  ICOFILE   = $icoFile"
+                  Write-Host "  OUTPUTDIR = $outputDir"
+                  Write-Host "  VERSION   = ${{ env.VERSION }}"
+
+                  & $iscc `
+                      "/DVERSION=${{ env.VERSION }}" `
+                      "/DBUILDDIR=$buildDir" `
+                      "/DICOFILE=$icoFile" `
+                      "/DOUTPUTDIR=$outputDir" `
+                      "windows\installer.iss"
+
+                  if ($LASTEXITCODE -ne 0) {
+                      Write-Error "Inno Setup compilation failed with exit code $LASTEXITCODE"
+                      exit 1
+                  }
+
+            - name: Verify and rename installer
+              shell: powershell
+              run: |
+                  $outputDir = "windows\Output"
+                  Write-Host "=== Installer output directory ==="
+                  Get-ChildItem -Path $outputDir -ErrorAction SilentlyContinue | Select-Object FullName, Length
+
+                  $installer = Get-ChildItem -Path $outputDir -Filter "*.exe" | Select-Object -First 1
+                  if (-not $installer) {
+                      Write-Error "No installer .exe found in $outputDir"
+                      exit 1
+                  }
+
+                  $sizeMB = [math]::Round($installer.Length / 1MB, 2)
+                  Write-Host "Installer: $($installer.FullName)  (${sizeMB} MB)"
+
+                  if ($installer.Length -lt 10MB) {
+                      Write-Error "Installer is suspiciously small (${sizeMB} MB). Expected 30 MB+. ISCC likely did not find the Flutter build output."
+                      exit 1
+                  }
+
+                  $dest = "VoidMusic_Installer_v${{ env.VERSION }}+${{github.run_number}}.exe"
+                  Copy-Item $installer.FullName -Destination $dest
+                  Write-Host "Renamed to: $dest"
+
+            - name: Create build-number.txt
               shell: powershell
               run: |
                   "${{github.run_number}}" | Out-File -FilePath "build-number.txt" -Encoding utf8 -NoNewline
-
-            - name: Create Inno Setup installer
-              shell: powershell
-              run: |
-                  $env:VERSION = "${{ env.VERSION }}"
-                  & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DVERSION=$env:VERSION windows/installer.iss
-              continue-on-error: true
-
-            - name: Copy files to root for upload
-              shell: powershell
-              run: |
-                  # Find Windows executable - comprehensive search
-                  Write-Host "=== Searching for Windows EXE ==="
-                  
-                  # Try Release folder first
-                  $exeFiles = Get-ChildItem -Path "build/windows/x64/runner/Release" -Filter "*.exe" -ErrorAction SilentlyContinue
-                  if ($exeFiles) {
-                      Write-Host "Found EXE in Release folder"
-                  } else {
-                      # Search entire build/windows recursively, excluding installers
-                      Write-Host "Not found in Release, searching all of build/windows recursively..."
-                      $exeFiles = Get-ChildItem -Path "build/windows" -Filter "*.exe" -Recurse -ErrorAction SilentlyContinue |
-                                  Where-Object { $_.Name -notmatch "(?i)installer|setup|unins" }
-                  }
-                  
-                  if ($exeFiles) {
-                      $winExe = $exeFiles | Select-Object -First 1
-                      Write-Host "Found Windows EXE: $($winExe.FullName)"
-                      Copy-Item $winExe.FullName -Destination "VoidMusic_v$env:VERSION+${{github.run_number}}.exe"
-                  } else {
-                      Write-Error "No Windows EXE found anywhere under build/windows"
-                  }
-
-                  # Find Inno Setup installer output
-                  Write-Host "=== Searching for Inno Setup installer ==="
-                  $installerPath = Get-ChildItem -Path "." -Filter "*.exe" -Recurse -ErrorAction SilentlyContinue |
-                                   Where-Object { $_.DirectoryName -match "(?i)Output" -and $_.Name -match "(?i)VoidMusic" } |
-                                   Select-Object -First 1 -ExpandProperty FullName
-                  if ($installerPath) {
-                      Write-Host "Found installer: $installerPath"
-                      Copy-Item $installerPath -Destination "VoidMusic_Installer_v$env:VERSION+${{github.run_number}}.exe"
-                  } else {
-                      Write-Warning "Inno Setup installer not found - this is not critical, continuing."
-                  }
-
-            - name: List EXE files in workspace (debug)
-              shell: powershell
-              run: |
-                  Write-Host "=== All .exe files in workspace ==="
-                  Get-ChildItem -Path "." -Filter "*.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object FullName
 
             - name: Upload Artifacts
               uses: actions/upload-artifact@v4
               with:
                 name: Release-Windows
                 path: |
-                  VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.exe
                   VoidMusic_Installer_v${{ env.VERSION }}+${{github.run_number}}.exe
                   build-number.txt
-                if-no-files-found: warn
+                if-no-files-found: error
                 overwrite: true
 
             - name: Create Release
               uses: ncipollo/release-action@v1
               with:
                 artifacts: |
-                  VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.exe
                   VoidMusic_Installer_v${{ env.VERSION }}+${{github.run_number}}.exe
                   build-number.txt
                 tag: v${{ env.VERSION }}+${{github.run_number}}
@@ -134,6 +206,7 @@ jobs:
                 prerelease: true
                 allowUpdates: true
                 omitBodyDuringUpdate: true
+
 
     # JOB 2: ANDROID
     build-android:

@@ -1,6 +1,7 @@
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
+import 'package:voidmusic/screens/widgets/source_badge.dart';
 import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
 import 'package:voidmusic/src/rust/api/plugin/types.dart';
 import 'package:flutter/material.dart';
@@ -71,6 +72,7 @@ class PluginSelectorBar extends StatelessWidget {
                 final isActive = activePluginId == null;
                 return _PluginChip(
                   label: 'All',
+                  pluginId: null,
                   isActive: isActive,
                   onTap: onAllSelected ?? () {},
                 );
@@ -82,6 +84,7 @@ class PluginSelectorBar extends StatelessWidget {
 
               return _PluginChip(
                 label: plugin.manifest.name,
+                pluginId: id,
                 isActive: isActive,
                 onTap: () => onPluginSelected(plugin),
               );
@@ -95,11 +98,13 @@ class PluginSelectorBar extends StatelessWidget {
 
 class _PluginChip extends StatelessWidget {
   final String label;
+  final String? pluginId;
   final bool isActive;
   final VoidCallback onTap;
 
   const _PluginChip({
     required this.label,
+    required this.pluginId,
     required this.isActive,
     required this.onTap,
   });
@@ -124,17 +129,26 @@ class _PluginChip extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isActive
-                ? Default_Theme.accentColor2
-                : Default_Theme.primaryColor1.withValues(alpha: 0.7),
-            fontSize: 13,
-            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-          ).merge(Default_Theme.secondoryTextStyle),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (pluginId != null) ...[
+              SourceBadgeByPluginId(pluginId: pluginId!, size: 14),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: isActive
+                    ? Default_Theme.accentColor2
+                    : Default_Theme.primaryColor1.withValues(alpha: 0.7),
+                fontSize: 13,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+              ).merge(Default_Theme.secondoryTextStyle),
+            ),
+          ],
         ),
       ),
     );

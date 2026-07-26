@@ -142,8 +142,8 @@ class BackupSettings extends StatelessWidget {
                                   SharePlus.instance
                                       .share(ShareParams(
                                     files: [XFile(value)],
-                                    text: 'Bloomee JSON backup file',
-                                    subject: 'Bloomee JSON Backup',
+                                    text: 'Void Music JSON backup file',
+                                    subject: 'Void Music JSON Backup',
                                   ))
                                       .catchError((e) {
                                     SnackbarService.showMessage(

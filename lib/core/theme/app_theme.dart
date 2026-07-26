@@ -167,6 +167,115 @@ class AppTheme {
     );
   }
 
+  // ── Light Theme ───────────────────────────────────────────────────────────────
+  static const Color lightBg = Color(0xFFF2F1F6);
+  static const Color lightSurface = Color(0xFFFFFFFF);
+  static const Color lightCardSurface = Color(0xFFF8F8FA);
+  static const Color lightPrimaryText = Color(0xFF1C1C1E);
+  static const Color lightSecondaryText = Color(0xFF8E8E93);
+  static const Color lightBorder = Color(0xFFD1D1D6);
+
+  ThemeData get lightThemeData {
+    const lightScheme = ColorScheme.light(
+      primary: lightPrimaryText,
+      secondary: lightPrimaryText,
+      surface: lightBg,
+      surfaceContainerHighest: lightCardSurface,
+      onPrimary: lightSurface,
+      onSecondary: lightSurface,
+      onSurface: lightPrimaryText,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      scaffoldBackgroundColor: lightBg,
+      dialogTheme: const DialogThemeData(
+        backgroundColor: lightSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(24)),
+        ),
+      ),
+      fontFamily: 'Gilroy',
+      colorScheme: lightScheme,
+      iconTheme: const IconThemeData(color: lightPrimaryText),
+      scrollbarTheme: ScrollbarThemeData(
+        thumbColor: WidgetStateProperty.all(
+            lightSecondaryText.withValues(alpha: 0.4)),
+        interactive: true,
+        radius: const Radius.circular(10),
+        thickness: WidgetStateProperty.all(4),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: lightBg,
+        foregroundColor: lightPrimaryText,
+        surfaceTintColor: lightBg,
+        elevation: 0,
+        iconTheme: IconThemeData(color: lightPrimaryText),
+        titleTextStyle: TextStyle(
+          fontFamily: 'Gilroy',
+          fontSize: 28,
+          fontWeight: FontWeight.w800,
+          color: lightPrimaryText,
+        ),
+      ),
+      progressIndicatorTheme:
+          const ProgressIndicatorThemeData(color: lightPrimaryText),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: lightPrimaryText,
+        selectionColor: lightPrimaryText.withValues(alpha: 0.18),
+        selectionHandleColor: lightPrimaryText,
+      ),
+      brightness: Brightness.light,
+      switchTheme: SwitchThemeData(
+        thumbColor: const WidgetStatePropertyAll(lightSurface),
+        trackOutlineColor: WidgetStateProperty.all(
+            lightSecondaryText.withValues(alpha: 0.3)),
+        trackColor: WidgetStateProperty.resolveWith((states) =>
+            states.contains(WidgetState.selected)
+                ? lightPrimaryText
+                : lightSecondaryText.withValues(alpha: 0.2)),
+      ),
+      searchBarTheme: SearchBarThemeData(
+        backgroundColor: const WidgetStatePropertyAll(lightSurface),
+        elevation: const WidgetStatePropertyAll(0),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        ),
+        hintStyle: const WidgetStatePropertyAll(
+          TextStyle(
+              color: lightSecondaryText, fontFamily: 'Gilroy', fontSize: 14),
+        ),
+      ),
+      popupMenuTheme: const PopupMenuThemeData(
+        color: lightSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
+        textStyle: TextStyle(color: lightPrimaryText, fontFamily: 'Gilroy'),
+      ),
+      dropdownMenuTheme: const DropdownMenuThemeData(
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(lightSurface),
+        ),
+        textStyle: TextStyle(color: lightPrimaryText, fontFamily: 'Gilroy'),
+      ),
+      menuTheme: const MenuThemeData(
+        style: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(lightSurface),
+        ),
+      ),
+      cardTheme: CardThemeData(
+        color: lightSurface,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: lightBorder),
+        ),
+        surfaceTintColor: Colors.transparent,
+      ),
+    );
+  }
+
   // ── Liquid Glass Design Tokens & Helpers ─────────────────────────────────────
   static BoxDecoration liquidGlassDecoration({
     double borderRadius = 24.0,

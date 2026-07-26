@@ -216,8 +216,8 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
                         color: _cardColor,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: Default_Theme.primaryColor1
-                              .withValues(alpha: 0.1),
+                          color: const Color(0xFFFF2A5F)
+                              .withValues(alpha: 0.15),
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -280,7 +280,7 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
                                   height: 18,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Default_Theme.accentColor2,
+                                    color: Color(0xFFFF2A5F),
                                   ),
                                 ),
                               if (_isResolvingCountry)
@@ -312,21 +312,31 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
                             ),
                           ),
                           const SizedBox(height: 28),
-                          ElevatedButton(
-                            onPressed: _finish,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Default_Theme.accentColor2,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: Text(
-                              l10n.continueButton,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: _finish,
+                              borderRadius: BorderRadius.circular(14),
+                              splashColor: Colors.white.withValues(alpha: 0.15),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF2A5F),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 15),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    l10n.continueButton,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                      fontFamily: 'Gilroy',
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -443,11 +453,11 @@ class _AestheticSwitch extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           color: value
-              ? Default_Theme.accentColor2.withValues(alpha: 0.2)
+              ? const Color(0xFFFF2A5F).withValues(alpha: 0.2)
               : Default_Theme.primaryColor1.withValues(alpha: 0.06),
           border: Border.all(
             color: value
-                ? Default_Theme.accentColor2.withValues(alpha: 0.65)
+                ? const Color(0xFFFF2A5F).withValues(alpha: 0.65)
                 : Default_Theme.primaryColor1.withValues(alpha: 0.18),
             width: 1.4,
           ),
@@ -462,7 +472,7 @@ class _AestheticSwitch extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: value
-                  ? Default_Theme.accentColor2
+                  ? const Color(0xFFFF2A5F)
                   : Default_Theme.primaryColor1.withValues(alpha: 0.45),
             ),
           ),

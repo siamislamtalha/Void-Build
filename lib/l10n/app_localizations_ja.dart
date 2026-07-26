@@ -1533,7 +1533,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importVoidMusicFiles => 'Void Music ファイルをインポート';
 
   @override
-  String get importBloomeeFiles => 'Bloomee ファイルをインポート';
+  String get importBloomeeFiles => 'Void Music ファイルをインポート';
 
   @override
   String get importM3UFiles => 'M3U プレイリストをインポート';

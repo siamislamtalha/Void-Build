@@ -28,7 +28,7 @@ import 'package:async/async.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:rxdart/rxdart.dart';
 
-/// BloomeeTunes main audio player.
+/// Void Music main audio player.
 ///
 /// Extends [BaseAudioHandler] so the OS MediaSession contract is satisfied:
 /// the notification, headset buttons, lock screen, and Android Auto all work
