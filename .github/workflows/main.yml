@@ -14,6 +14,8 @@ jobs:
     build-windows-android:
         name: Build Windows & Android
         runs-on: windows-latest
+        env:
+          CMAKE_GENERATOR: Visual Studio 17 2022
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
@@ -44,10 +46,6 @@ jobs:
             - name: Install Dependencies
               run: flutter pub get
 
-            - name: Set CMake generator for VS 2022
-              run: echo "CMAKE_GENERATOR=Visual Studio 17 2022" >> $env:GITHUB_ENV
-              shell: powershell
-
             - name: Extract version from pubspec.yaml
               shell: powershell
               run: |
@@ -65,12 +63,20 @@ jobs:
                   Rename-Item -Path "build/app/outputs/flutter-apk/app-release.apk" -NewName "VoidMusic_v$env:VERSION+${{github.run_number}}_arm64-v8a.apk"
 
             - name: Clean Windows build directory
-              run: if (Test-Path "build/windows") { Remove-Item -Recurse -Force "build/windows" }
+              run: |
+                  if (Test-Path "build/windows") { Remove-Item -Recurse -Force "build/windows" }
+                  if (Test-Path "build\.flutter-plugins") { Remove-Item -Force "build\.flutter-plugins" }
+                  if (Test-Path "build\.flutter-plugins-dependencies") { Remove-Item -Force "build\.flutter-plugins-dependencies" }
+                  if (Test-Path "windows\CMakeCache.txt") { Remove-Item -Force "windows\CMakeCache.txt" }
+                  if (Test-Path "windows\CMakeFiles") { Remove-Item -Recurse -Force "windows\CMakeFiles" }
+                  if (Test-Path "windows\runner\CMakeCache.txt") { Remove-Item -Force "windows\runner\CMakeCache.txt" }
+                  if (Test-Path "windows\runner\CMakeFiles") { Remove-Item -Recurse -Force "windows\runner\CMakeFiles" }
               shell: powershell
 
             - name: Build Windows App
               run: |
-                  $env:CMAKE_GENERATOR = "Visual Studio 17 2022"
+                  flutter clean
+                  flutter pub get
                   flutter build windows --release --build-number ${{github.run_number}}
               shell: powershell
 
