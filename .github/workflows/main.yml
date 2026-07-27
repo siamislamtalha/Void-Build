@@ -71,8 +71,7 @@ jobs:
               shell: powershell
               env:
                   CMAKE_POLICY_VERSION_MINIMUM: "3.5"
-                  CMAKE_ARGS: "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
-                  CMAKE_GENERATOR: "Ninja Multi-Config"
+                  CMAKE_ARGS: "-DCMAKE_POLICY_VERSION_MINIMUM=3.5 -G \"Visual Studio 17 2022\" -A x64"
               run: |
                   flutter build windows --release --no-tree-shake-icons --build-number ${{github.run_number}}
 
