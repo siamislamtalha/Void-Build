@@ -57,7 +57,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
       child: DefaultTabController(
         length: 2,
         child: Scaffold(
-          backgroundColor: Default_Theme.themeColor,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: _buildAppBar(context, l10n),
           body: TabBarView(
             physics: const BouncingScrollPhysics(),
@@ -132,7 +132,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
   PreferredSizeWidget _buildAppBar(
       BuildContext context, AppLocalizations l10n) {
     return AppBar(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       leadingWidth: 64,
@@ -140,8 +140,8 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
         padding: const EdgeInsets.only(left: 12.0),
         child: Center(
           child: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded,
-                color: Default_Theme.primaryColor1, size: 24),
+            icon: Icon(Icons.arrow_back_rounded,
+                color: Theme.of(context).colorScheme.onSurface, size: 24),
             onPressed: () => Navigator.pop(context),
           ),
         ),

@@ -79,7 +79,7 @@ class _PlaylistCardState extends State<PlaylistCard> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.08),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
               width: 1,
             ),
             boxShadow: [
@@ -137,7 +137,7 @@ class _PlaylistCardState extends State<PlaylistCard> {
       style: Default_Theme.secondoryTextStyleMedium.merge(
         TextStyle(
           fontSize: 13,
-          color: Default_Theme.primaryColor1.withValues(alpha: 0.9),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
         ),
       ),
     );
@@ -154,7 +154,7 @@ class _PlaylistCardState extends State<PlaylistCard> {
         style: Default_Theme.secondoryTextStyleMedium.merge(
           TextStyle(
             fontSize: 11,
-            color: Default_Theme.primaryColor1.withValues(alpha: 0.55),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
           ),
         ),
       ),

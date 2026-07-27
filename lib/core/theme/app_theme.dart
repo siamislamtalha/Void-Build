@@ -10,7 +10,6 @@ class AppTheme {
   static const primaryTextStyle = TextStyle(
     fontFamily: "Gilroy",
     fontWeight: FontWeight.w700,
-    color: primaryColor1,
   );
   static const secondoryTextStyle = TextStyle(
     fontFamily: "Gilroy",
@@ -20,7 +19,6 @@ class AppTheme {
   static const secondoryTextStyleMedium = TextStyle(
     fontFamily: "Gilroy",
     fontWeight: FontWeight.w600,
-    color: primaryColor1,
   );
   static const tertiaryTextStyle = TextStyle(
     fontFamily: "Gilroy",
@@ -43,29 +41,78 @@ class AppTheme {
   static const accentColor2 = Color(0xFFFFFFFF);
   static const successColor = Color(0xFF5EFF43);
 
-  // Filter Pills
-  static final activePillDecoration = BoxDecoration(
+  // Filter Pills — now exposed as static functions so callers can pass context
+  static BoxDecoration activePillDecoration({required bool isDark}) => BoxDecoration(
+    color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+    borderRadius: BorderRadius.circular(24),
+  );
+  static TextStyle activePillTextStyle({required bool isDark}) => TextStyle(
+    fontFamily: "Gilroy",
+    fontWeight: FontWeight.w700,
+    fontSize: 14,
+    color: isDark ? Colors.black : Colors.white,
+  );
+
+  static BoxDecoration inactivePillDecoration({required bool isDark}) => BoxDecoration(
+    color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5EA),
+    borderRadius: BorderRadius.circular(24),
+    border: Border.all(
+      color: isDark
+          ? Colors.white.withValues(alpha: 0.08)
+          : Colors.black.withValues(alpha: 0.08),
+      width: 1,
+    ),
+  );
+  static TextStyle inactivePillTextStyle({required bool isDark}) => TextStyle(
+    fontFamily: "Gilroy",
+    fontWeight: FontWeight.w600,
+    fontSize: 14,
+    color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+  );
+
+  // Legacy static decorations kept for backward-compat (always dark)
+  static final activePillDecorationDark = BoxDecoration(
     color: Colors.white,
     borderRadius: BorderRadius.circular(24),
   );
-  static const activePillTextStyle = TextStyle(
+  static const activePillTextStyleDark = TextStyle(
     fontFamily: "Gilroy",
     fontWeight: FontWeight.w700,
     fontSize: 14,
     color: Colors.black,
   );
-
-  static final inactivePillDecoration = BoxDecoration(
+  static final inactivePillDecorationDark = BoxDecoration(
     color: const Color(0xFF1C1C1E),
     borderRadius: BorderRadius.circular(24),
-    border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 1),
+    border: Border.all(color: Colors.white54, width: 1),
   );
-  static const inactivePillTextStyle = TextStyle(
+  static const inactivePillTextStyleDark = TextStyle(
     fontFamily: "Gilroy",
     fontWeight: FontWeight.w600,
     fontSize: 14,
     color: Colors.white,
   );
+
+  // ── Theme-aware accent & text color helpers ───────────────────────────────
+  /// The primary accent that should have contrast against the surface.
+  /// In dark mode → white. In light mode → near-black.
+  static Color accentColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? Colors.white : const Color(0xFF1C1C1E);
+  }
+
+  /// Secondary / muted text color that works in both themes.
+  static Color secondaryTextColor(BuildContext context) {
+    return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55);
+  }
+
+  /// A translucent accent tint used for backgrounds of selected items.
+  static Color accentTintColor(BuildContext context, {double alpha = 0.10}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark
+        ? Colors.white.withValues(alpha: alpha)
+        : const Color(0xFF1C1C1E).withValues(alpha: alpha);
+  }
 
   // ── Theme Data ───────────────────────────────────────────────────────────────
   ThemeData get defaultThemeData {

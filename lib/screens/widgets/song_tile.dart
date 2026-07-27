@@ -62,6 +62,9 @@ class SongCardWidget extends StatelessWidget {
         final isPlaying = snapshot.data?.id == song.id;
         final l10n = AppLocalizations.of(context)!;
 
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final colorScheme = Theme.of(context).colorScheme;
+
         return AnimatedContainer(
           duration: const Duration(milliseconds: 350),
           curve: Curves.easeOutCubic,
@@ -69,10 +72,14 @@ class SongCardWidget extends StatelessWidget {
           margin: const EdgeInsets.symmetric(vertical: 2),
           decoration: isPlaying
               ? BoxDecoration(
-                  color: const Color(0xFF161618),
+                  color: isDark
+                      ? const Color(0xFF161618)
+                      : colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.18),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.18)
+                        : Colors.black.withValues(alpha: 0.10),
                     width: 1,
                   ),
                 )
@@ -84,9 +91,9 @@ class SongCardWidget extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(14),
-              splashColor: Default_Theme.primaryColor1.withValues(alpha: 0.06),
+              splashColor: colorScheme.onSurface.withValues(alpha: 0.06),
               highlightColor:
-                  Default_Theme.primaryColor1.withValues(alpha: 0.03),
+                  colorScheme.onSurface.withValues(alpha: 0.03),
               onTap: onTap,
               onLongPress: onOptionsTap,
               onSecondaryTap: onOptionsTap,
@@ -109,10 +116,10 @@ class SongCardWidget extends StatelessWidget {
                                   scale: animation, child: child),
                             ),
                             child: isPlaying
-                                ? const Icon(
+                                ? Icon(
                                     MingCute.right_fill,
-                                    key: ValueKey('playing_icon'),
-                                    color: Colors.white,
+                                    key: const ValueKey('playing_icon'),
+                                    color: colorScheme.primary,
                                     size: 18,
                                   )
                                 : Text(
@@ -154,8 +161,8 @@ class SongCardWidget extends StatelessWidget {
                           AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeOutCubic,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               letterSpacing: -0.2,
@@ -312,15 +319,15 @@ class _ActionButton extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: onTap,
-        splashColor: Default_Theme.primaryColor1.withValues(alpha: 0.1),
-        highlightColor: Default_Theme.primaryColor1.withValues(alpha: 0.05),
+        splashColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+        highlightColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Icon(
             icon,
             size: iconSize,
             color: iconColor ??
-                Default_Theme.primaryColor1.withValues(alpha: 0.65),
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
           ),
         ),
       ),

@@ -35,7 +35,7 @@ jobs:
             - name: Setup Flutter
               uses: subosito/flutter-action@v2
               with:
-                flutter-version: '3.35.4'
+                flutter-version: '3.44.6'
                 channel: 'stable'
                 cache: true
 
@@ -49,9 +49,6 @@ jobs:
                 restore-keys: |
                   pub-win-${{ runner.os }}-
 
-            # NOTE: ilammy/msvc-dev-cmd is intentionally NOT used here.
-            # It can conflict with the Rust/cargo build environment on windows-latest.
-            # The GitHub-hosted windows-latest runner already has MSVC (VS 2022) on PATH.
 
             - name: Install Inno Setup
               shell: powershell
@@ -97,6 +94,20 @@ jobs:
                   }
                   Write-Host "Main EXE: $($exeFile.FullName) ($([math]::Round($exeFile.Length/1MB,2)) MB)"
 
+            - name: Rename EXE to VOID_Music.exe
+              shell: powershell
+              run: |
+                  $releaseDir = "build\windows\x64\runner\Release"
+                  $src = Join-Path $releaseDir "voidmusic.exe"
+                  if (Test-Path $src) {
+                      Rename-Item -Path $src -NewName "VOID_Music.exe"
+                      Write-Host "Renamed voidmusic.exe -> VOID_Music.exe"
+                  } else {
+                      Write-Error "voidmusic.exe not found in $releaseDir"
+                      Get-ChildItem -Path $releaseDir -Filter "*.exe" | ForEach-Object { Write-Host "  $($_.Name)" }
+                      exit 1
+                  }
+
             - name: Build Inno Setup Installer
               shell: powershell
               run: |
@@ -105,51 +116,8 @@ jobs:
                       Write-Error "ISCC.exe not found at: $iscc"
                       exit 1
                   }
-
-                  # Compute ABSOLUTE paths — this is the fix for the 21 KB corrupted installer.
-                  # Inno Setup resolves relative paths from the .iss file's directory, but
-                  # passing them as absolute /D defines eliminates all ambiguity.
-                  $repoRoot  = (Get-Location).Path
-                  $buildDir  = Join-Path $repoRoot "build\windows\x64\runner\Release"
-                  $icoFile   = Join-Path $repoRoot "windows\runner\resources\app_icon.ico"
-                  $outputDir = Join-Path $repoRoot "windows\Output"
-
-                  # Pre-flight: verify the Flutter build output exists and is not empty
-                  if (-not (Test-Path $buildDir)) {
-                      Write-Error "Flutter build output not found: $buildDir"
-                      exit 1
-                  }
-                  $releaseFiles = Get-ChildItem -Path $buildDir -Recurse -File
-                  Write-Host "=== Flutter release folder ($($releaseFiles.Count) files) ==="
-                  $releaseFiles | Select-Object -First 30 | ForEach-Object {
-                      Write-Host "  $($_.FullName)  ($([math]::Round($_.Length/1KB,1)) KB)"
-                  }
-                  $appExe = Join-Path $buildDir "voidmusic.exe"
-                  if (-not (Test-Path $appExe)) {
-                      Write-Error "voidmusic.exe not found in: $buildDir"
-                      Write-Host "Available .exe files:"
-                      Get-ChildItem -Path $buildDir -Filter "*.exe" | ForEach-Object { Write-Host "  $($_.Name)" }
-                      exit 1
-                  }
-                  Write-Host "App EXE: $appExe  ($([math]::Round((Get-Item $appExe).Length/1MB,2)) MB)"
-
-                  # Ensure output directory exists
-                  New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
-
-                  Write-Host ""
-                  Write-Host "=== Running ISCC with absolute paths ==="
-                  Write-Host "  BUILDDIR  = $buildDir"
-                  Write-Host "  ICOFILE   = $icoFile"
-                  Write-Host "  OUTPUTDIR = $outputDir"
-                  Write-Host "  VERSION   = ${{ env.VERSION }}"
-
-                  & $iscc `
-                      "/DVERSION=${{ env.VERSION }}" `
-                      "/DBUILDDIR=$buildDir" `
-                      "/DICOFILE=$icoFile" `
-                      "/DOUTPUTDIR=$outputDir" `
-                      "windows\installer.iss"
-
+                  Write-Host "Building installer from installer\VoidMusic.iss"
+                  & $iscc "installer\VoidMusic.iss"
                   if ($LASTEXITCODE -ne 0) {
                       Write-Error "Inno Setup compilation failed with exit code $LASTEXITCODE"
                       exit 1
@@ -158,7 +126,7 @@ jobs:
             - name: Verify and rename installer
               shell: powershell
               run: |
-                  $outputDir = "windows\Output"
+                  $outputDir = "installer\Output"
                   Write-Host "=== Installer output directory ==="
                   Get-ChildItem -Path $outputDir -ErrorAction SilentlyContinue | Select-Object FullName, Length
 

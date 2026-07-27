@@ -135,7 +135,7 @@ class _PlaylistViewState extends State<PlaylistView> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
       body: BlocBuilder<CurrentPlaylistCubit, CurrentPlaylistState>(
@@ -217,12 +217,13 @@ class _PlaylistViewState extends State<PlaylistView> {
 
   Widget _buildAmbientBackground(
       String imageUrl, Color dominantColor, bool isMobile) {
+    final bgColor = Theme.of(context).scaffoldBackgroundColor;
     return Positioned.fill(
       child: RepaintBoundary(
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Container(color: Default_Theme.themeColor),
+            Container(color: bgColor),
             Positioned(
               top: isMobile ? -100 : -200,
               left: isMobile ? -50 : -200,
@@ -257,9 +258,9 @@ class _PlaylistViewState extends State<PlaylistView> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Default_Theme.themeColor.withValues(alpha: 0.1),
-                    Default_Theme.themeColor.withValues(alpha: 0.85),
-                    Default_Theme.themeColor,
+                    bgColor.withValues(alpha: 0.1),
+                    bgColor.withValues(alpha: 0.85),
+                    bgColor,
                   ],
                   stops: const [0.0, 0.45, 1.0],
                 ),
@@ -333,9 +334,9 @@ class _PlaylistViewState extends State<PlaylistView> {
             margin: const EdgeInsets.fromLTRB(
                 20, 90, 40, 40), // Matches left panel gap
             decoration: BoxDecoration(
-              color: Default_Theme.themeColor.withValues(alpha: 0.3),
+              color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.04)),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
               boxShadow: [
                 BoxShadow(
                     color: Colors.black.withValues(alpha: 0.1),

@@ -12,6 +12,8 @@ class SignBoardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -19,15 +21,19 @@ class SignBoardWidget extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           decoration: AppTheme.liquidGlassDecoration(
             borderRadius: 20,
-            glassColor: const Color(0x1A120B16),
-            borderColor: const Color(0x2DFFFFFF),
+            glassColor: isDark
+                ? const Color(0x1A120B16)
+                : Colors.white.withValues(alpha: 0.6),
+            borderColor: isDark
+                ? const Color(0x2DFFFFFF)
+                : Colors.black.withValues(alpha: 0.08),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 icon,
-                color: Default_Theme.primaryColor2.withValues(alpha: 0.7),
+                color: colorScheme.onSurface.withValues(alpha: 0.6),
                 size: 48,
               ),
               const SizedBox(height: 12),
@@ -35,7 +41,7 @@ class SignBoardWidget extends StatelessWidget {
                 message,
                 textAlign: TextAlign.center,
                 style: Default_Theme.tertiaryTextStyle.merge(TextStyle(
-                    color: Default_Theme.primaryColor2.withValues(alpha: 0.7),
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
                     fontSize: 14)),
               ),
             ],

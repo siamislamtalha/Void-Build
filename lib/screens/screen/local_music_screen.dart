@@ -7,6 +7,7 @@ import 'package:voidmusic/core/models/media_playlist_model.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:voidmusic/screens/widgets/bloomee_ui_kit/bloomee_dialog.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/more_bottom_sheet.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
@@ -129,7 +130,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Default_Theme.themeColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: BlocConsumer<LocalMusicCubit, LocalMusicState>(
           listener: (context, state) {
             if (state is LocalMusicLoaded) {
@@ -400,7 +401,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
           ),
         ),
       );
-      widgets.add(const SliverPadding(padding: EdgeInsets.only(bottom: 80)));
+      widgets.add(const SliverBottomSafeAreaSpacer());
     }
 
     return widgets;

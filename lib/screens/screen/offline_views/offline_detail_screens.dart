@@ -42,7 +42,7 @@ class OfflineArtistDetailScreen extends StatelessWidget {
     final coverUrl = songs.isNotEmpty ? songs.first.thumbnail.urlHigh ?? songs.first.thumbnail.url : '';
 
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -56,11 +56,11 @@ class OfflineArtistDetailScreen extends StatelessWidget {
               icon: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
                 ),
-                child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+                child: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
               ),
               onPressed: () => Navigator.of(context).pop(),
             ),
@@ -70,6 +70,7 @@ class OfflineArtistDetailScreen extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isMobile = constraints.maxWidth < 850;
+          final bgColor = Theme.of(context).scaffoldBackgroundColor;
           return Stack(
             fit: StackFit.expand,
             children: [
@@ -79,7 +80,7 @@ class OfflineArtistDetailScreen extends StatelessWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Container(color: Default_Theme.themeColor),
+                      Container(color: bgColor),
                       Positioned(
                         top: isMobile ? -100 : -200,
                         left: isMobile ? -50 : -200,
@@ -113,9 +114,9 @@ class OfflineArtistDetailScreen extends StatelessWidget {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Default_Theme.themeColor.withValues(alpha: 0.1),
-                              Default_Theme.themeColor.withValues(alpha: 0.85),
-                              Default_Theme.themeColor,
+                              bgColor.withValues(alpha: 0.1),
+                              bgColor.withValues(alpha: 0.85),
+                              bgColor,
                             ],
                             stops: const [0.0, 0.45, 1.0],
                           ),
@@ -319,7 +320,7 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
     final artistName = songs.isNotEmpty && songs.first.artists.isNotEmpty ? songs.first.artists.first.name : 'Unknown Artist';
 
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -333,11 +334,11 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
               icon: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
                 ),
-                child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+                child: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
               ),
               onPressed: () => Navigator.of(context).pop(),
             ),
@@ -347,6 +348,7 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isMobile = constraints.maxWidth < 850;
+          final bgColor = Theme.of(context).scaffoldBackgroundColor;
           return Stack(
             fit: StackFit.expand,
             children: [
@@ -356,7 +358,7 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Container(color: Default_Theme.themeColor),
+                      Container(color: bgColor),
                       Positioned(
                         top: isMobile ? -100 : -200,
                         left: isMobile ? -50 : -200,
@@ -390,9 +392,9 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Default_Theme.themeColor.withValues(alpha: 0.1),
-                              Default_Theme.themeColor.withValues(alpha: 0.85),
-                              Default_Theme.themeColor,
+                              bgColor.withValues(alpha: 0.1),
+                              bgColor.withValues(alpha: 0.85),
+                              bgColor,
                             ],
                             stops: const [0.0, 0.45, 1.0],
                           ),

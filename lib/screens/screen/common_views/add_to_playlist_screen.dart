@@ -152,10 +152,10 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Default_Theme.themeColor,
-        surfaceTintColor: Default_Theme.themeColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_rounded,
@@ -362,9 +362,9 @@ class _CreatePlaylistTile extends StatelessWidget {
                       width: 1.5,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.add_rounded,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 26,
                   ),
                 ),
@@ -372,8 +372,8 @@ class _CreatePlaylistTile extends StatelessWidget {
                 Text(
                   AppLocalizations.of(context)!.playlistCreateNew,
                   style: Default_Theme.secondoryTextStyleMedium.merge(
-                    const TextStyle(
-                      color: Colors.white,
+                    TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 15,
                     ),
                   ),
@@ -867,7 +867,7 @@ class _OverflowAvatar extends StatelessWidget {
         shape: BoxShape.circle,
         color: Default_Theme.accentColor1.withValues(alpha: 0.15),
         border: Border.all(
-          color: Default_Theme.themeColor,
+          color: Theme.of(context).scaffoldBackgroundColor,
           width: 2,
         ),
         boxShadow: [
@@ -911,7 +911,7 @@ class _PlaylistAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: Default_Theme.themeColor,
+          color: Theme.of(context).scaffoldBackgroundColor,
           width: 2,
         ),
         boxShadow: [

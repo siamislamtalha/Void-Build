@@ -60,8 +60,7 @@ class _AlbumCardState extends State<AlbumCard> {
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color:
-                          Default_Theme.primaryColor1.withValues(alpha: 0.08),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                       width: 1,
                     ),
                     boxShadow: [
@@ -128,7 +127,7 @@ class _AlbumCardState extends State<AlbumCard> {
                         style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
-                          color: Default_Theme.primaryColor1
+                          color: Theme.of(context).colorScheme.onSurface
                               .withValues(alpha: 0.9),
                           letterSpacing: -0.2,
                           height: 1.15,
@@ -144,7 +143,7 @@ class _AlbumCardState extends State<AlbumCard> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 10.5,
-                            color: Default_Theme.primaryColor1
+                            color: Theme.of(context).colorScheme.onSurface
                                 .withValues(alpha: 0.5),
                             fontWeight: FontWeight.w500,
                           ).merge(Default_Theme.secondoryTextStyle),

@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 
 import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
 import 'package:voidmusic/core/di/service_locator.dart';
@@ -124,7 +124,7 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
       body: Stack(
@@ -150,7 +150,7 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
             icon: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Default_Theme.themeColor.withValues(alpha: 0.5),
+                color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
                 border: Border.all(
                     color: Default_Theme.primaryColor1.withValues(alpha: 0.15)),
@@ -195,8 +195,8 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Default_Theme.themeColor.withValues(alpha: 0.4),
-                        Default_Theme.themeColor.withValues(alpha: 0.9),
+                        Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.4),
+                        Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
                         Default_Theme.themeColor,
                       ],
                       stops: const [0.0, 0.45, 1.0],
@@ -563,7 +563,7 @@ class _PremiumPlayButton extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             color: Colors.white.withValues(alpha: 0.1),
-            border: Border.all(color: Colors.white, width: 1.5),
+            border: Border.all(color: Theme.of(context).colorScheme.onSurface, width: 1.5),
           ),
           child: const Row(
             mainAxisSize: MainAxisSize.min,
@@ -622,7 +622,7 @@ class _PremiumCircularButton extends StatelessWidget {
             ),
             child: Center(
               child: Icon(icon,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 20),
             ),
           ),

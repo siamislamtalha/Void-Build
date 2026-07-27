@@ -53,7 +53,7 @@ class _ImportProcessScreenState extends State<ImportProcessScreen> {
         if (context.mounted) context.pop();
       },
       child: Scaffold(
-        backgroundColor: Default_Theme.themeColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: _buildAppBar(context),
         body: Center(
           child: ConstrainedBox(
@@ -268,10 +268,10 @@ class _UrlInputView extends StatelessWidget {
               textInputAction: TextInputAction.go,
               autofocus: true,
               cursorColor: Default_Theme.accentColor2,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
               ), // Clean standard typography for URL entry
               decoration: InputDecoration(
                 hintText: 'https://...',
@@ -311,7 +311,7 @@ class _UrlInputView extends StatelessWidget {
             onPressed: onSubmit,
             style: FilledButton.styleFrom(
               backgroundColor: Default_Theme.accentColor2,
-              foregroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.onSurface,
               padding: const EdgeInsets.symmetric(vertical: 18),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14)),
@@ -616,7 +616,7 @@ class _ReviewViewState extends State<_ReviewView> {
         Container(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           decoration: BoxDecoration(
-            color: Default_Theme.themeColor,
+            color: Theme.of(context).scaffoldBackgroundColor,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.15),
@@ -663,10 +663,10 @@ class _ReviewViewState extends State<_ReviewView> {
                   ),
                   child: Text(
                     AppLocalizations.of(context)!.importSaveTracks(toSave),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -762,8 +762,8 @@ class _ResolvingTrackTile extends StatelessWidget {
               children: [
                 Text(
                   src.title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -876,8 +876,8 @@ class _ReviewTrackTile extends StatelessWidget {
                       children: [
                         Text(
                           src.title,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
@@ -1237,8 +1237,8 @@ class _DoneView extends StatelessWidget {
               AppLocalizations.of(context)!
                   .importTracksSaved(state.resolvedCount),
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
               ),
@@ -1260,7 +1260,7 @@ class _DoneView extends StatelessWidget {
               onPressed: onDone,
               style: FilledButton.styleFrom(
                 backgroundColor: Default_Theme.accentColor2,
-                foregroundColor: Colors.white,
+                foregroundColor: Theme.of(context).colorScheme.onSurface,
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14)),
@@ -1333,7 +1333,7 @@ class _ErrorView extends StatelessWidget {
               label: Text(AppLocalizations.of(context)!.importTryAgain),
               style: FilledButton.styleFrom(
                 backgroundColor: Default_Theme.accentColor2,
-                foregroundColor: Colors.white,
+                foregroundColor: Theme.of(context).colorScheme.onSurface,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
                 shape: RoundedRectangleBorder(

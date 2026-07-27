@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+﻿// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:ui';
 
 import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
@@ -129,7 +129,7 @@ class _AlbumViewState extends State<AlbumView> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
       body: Stack(
@@ -155,7 +155,7 @@ class _AlbumViewState extends State<AlbumView> {
             icon: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Default_Theme.themeColor.withValues(alpha: 0.5),
+                color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
                 border: Border.all(
                     color: Default_Theme.primaryColor1.withValues(alpha: 0.15)),
@@ -202,8 +202,8 @@ class _AlbumViewState extends State<AlbumView> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Default_Theme.themeColor.withValues(alpha: 0.4),
-                        Default_Theme.themeColor.withValues(alpha: 0.9),
+                        Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.4),
+                        Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
                         Default_Theme.themeColor,
                       ],
                       stops: const [0.0, 0.45, 1.0],

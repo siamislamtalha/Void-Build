@@ -8,12 +8,13 @@ class SettingSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 12),
       child: Text(
         label.toUpperCase(),
         style: Default_Theme.secondoryTextStyleMedium.copyWith(
-          color: Default_Theme.primaryColor2.withValues(alpha: 0.5),
+          color: colorScheme.onSurface.withValues(alpha: 0.45),
           fontSize: 12,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.5,
@@ -29,12 +30,16 @@ class SettingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Default_Theme.primaryColor2.withValues(alpha: 0.03),
+        color: isDark
+            ? colorScheme.onSurface.withValues(alpha: 0.04)
+            : colorScheme.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Default_Theme.primaryColor2.withValues(alpha: 0.05),
+          color: colorScheme.onSurface.withValues(alpha: 0.06),
           width: 1,
         ),
       ),
@@ -54,7 +59,7 @@ class SettingDivider extends StatelessWidget {
         height: 1,
         indent: 16,
         endIndent: 16,
-        color: Default_Theme.primaryColor2.withValues(alpha: 0.05),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
       );
 }
 
@@ -65,21 +70,22 @@ class SettingIconBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        color: Default_Theme.primaryColor2.withValues(alpha: 0.05),
+        color: colorScheme.onSurface.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Default_Theme.primaryColor2.withValues(alpha: 0.05),
+          color: colorScheme.onSurface.withValues(alpha: 0.06),
         ),
       ),
       child: Center(
         child: Icon(
           icon,
           size: 20,
-          color: color ?? Default_Theme.primaryColor2.withValues(alpha: 0.7),
+          color: color ?? colorScheme.onSurface.withValues(alpha: 0.6),
         ),
       ),
     );
@@ -126,6 +132,7 @@ class _SettingToggleTileState extends State<SettingToggleTile> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Row(
@@ -140,7 +147,7 @@ class _SettingToggleTileState extends State<SettingToggleTile> {
                 Text(
                   widget.title,
                   style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                    color: Default_Theme.primaryColor2,
+                    color: colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.2,
@@ -150,7 +157,7 @@ class _SettingToggleTileState extends State<SettingToggleTile> {
                 Text(
                   widget.subtitle,
                   style: Default_Theme.secondoryTextStyle.copyWith(
-                    color: Default_Theme.primaryColor2.withValues(alpha: 0.5),
+                    color: colorScheme.onSurface.withValues(alpha: 0.5),
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
                   ),
@@ -193,6 +200,7 @@ class SettingNavTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -200,8 +208,8 @@ class SettingNavTile extends StatelessWidget {
         borderRadius: roundBottom
             ? const BorderRadius.vertical(bottom: Radius.circular(20))
             : BorderRadius.circular(20),
-        highlightColor: Default_Theme.primaryColor2.withValues(alpha: 0.05),
-        splashColor: Default_Theme.primaryColor2.withValues(alpha: 0.05),
+        highlightColor: colorScheme.onSurface.withValues(alpha: 0.05),
+        splashColor: colorScheme.onSurface.withValues(alpha: 0.05),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Row(
@@ -216,7 +224,7 @@ class SettingNavTile extends StatelessWidget {
                     Text(
                       title,
                       style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                        color: Default_Theme.primaryColor2,
+                        color: colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.2,
@@ -226,8 +234,7 @@ class SettingNavTile extends StatelessWidget {
                     Text(
                       subtitle,
                       style: Default_Theme.secondoryTextStyle.copyWith(
-                        color:
-                            Default_Theme.primaryColor2.withValues(alpha: 0.5),
+                        color: colorScheme.onSurface.withValues(alpha: 0.5),
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                       ),
@@ -259,7 +266,7 @@ class SettingNavTile extends StatelessWidget {
                 const SizedBox(width: 12),
               ],
               Icon(Icons.chevron_right_rounded,
-                  color: Default_Theme.primaryColor2.withValues(alpha: 0.4),
+                  color: colorScheme.onSurface.withValues(alpha: 0.4),
                   size: 22),
             ],
           ),
@@ -288,14 +295,15 @@ class SettingRadioTile<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelected = value == groupValue;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () => onChanged(value),
         borderRadius: BorderRadius.circular(20),
-        highlightColor: Default_Theme.primaryColor2.withValues(alpha: 0.05),
-        splashColor: Default_Theme.primaryColor2.withValues(alpha: 0.05),
+        highlightColor: colorScheme.onSurface.withValues(alpha: 0.05),
+        splashColor: colorScheme.onSurface.withValues(alpha: 0.05),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
@@ -307,8 +315,8 @@ class SettingRadioTile<T> extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isSelected
-                        ? Default_Theme.accentColor2
-                        : Default_Theme.primaryColor2.withValues(alpha: 0.3),
+                        ? colorScheme.primary
+                        : colorScheme.onSurface.withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),
@@ -317,9 +325,9 @@ class SettingRadioTile<T> extends StatelessWidget {
                         child: Container(
                           width: 10,
                           height: 10,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Default_Theme.accentColor2,
+                            color: colorScheme.primary,
                           ),
                         ),
                       )
@@ -335,9 +343,8 @@ class SettingRadioTile<T> extends StatelessWidget {
                       title,
                       style: Default_Theme.secondoryTextStyleMedium.copyWith(
                         color: isSelected
-                            ? Default_Theme.primaryColor2
-                            : Default_Theme.primaryColor2
-                                .withValues(alpha: 0.7),
+                            ? colorScheme.onSurface
+                            : colorScheme.onSurface.withValues(alpha: 0.7),
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.2,
@@ -347,8 +354,7 @@ class SettingRadioTile<T> extends StatelessWidget {
                     Text(
                       subtitle,
                       style: Default_Theme.secondoryTextStyle.copyWith(
-                        color:
-                            Default_Theme.primaryColor2.withValues(alpha: 0.45),
+                        color: colorScheme.onSurface.withValues(alpha: 0.45),
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
                       ),
@@ -378,26 +384,27 @@ class SettingQualityChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        splashColor: Default_Theme.accentColor2.withValues(alpha: 0.1),
-        highlightColor: Default_Theme.accentColor2.withValues(alpha: 0.05),
+        splashColor: colorScheme.primary.withValues(alpha: 0.1),
+        highlightColor: colorScheme.primary.withValues(alpha: 0.05),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
             color: isSelected
-                ? Default_Theme.accentColor2.withValues(alpha: 0.15)
-                : Default_Theme.primaryColor2.withValues(alpha: 0.04),
+                ? colorScheme.onSurface.withValues(alpha: 0.10)
+                : colorScheme.onSurface.withValues(alpha: 0.04),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected
-                  ? Default_Theme.accentColor2.withValues(alpha: 0.5)
-                  : Default_Theme.primaryColor2.withValues(alpha: 0.05),
+                  ? colorScheme.onSurface.withValues(alpha: 0.35)
+                  : colorScheme.onSurface.withValues(alpha: 0.07),
               width: 1.5,
             ),
           ),
@@ -405,8 +412,8 @@ class SettingQualityChip extends StatelessWidget {
             label,
             style: Default_Theme.secondoryTextStyleMedium.copyWith(
               color: isSelected
-                  ? Default_Theme.accentColor2
-                  : Default_Theme.primaryColor2.withValues(alpha: 0.7),
+                  ? colorScheme.onSurface
+                  : colorScheme.onSurface.withValues(alpha: 0.6),
               fontSize: 13,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             ),
@@ -437,6 +444,7 @@ class SettingQualityChipRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
@@ -455,7 +463,7 @@ class SettingQualityChipRow extends StatelessWidget {
                     Text(
                       title,
                       style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                        color: Default_Theme.primaryColor2,
+                        color: colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.2,
@@ -465,8 +473,7 @@ class SettingQualityChipRow extends StatelessWidget {
                     Text(
                       subtitle,
                       style: Default_Theme.secondoryTextStyle.copyWith(
-                        color:
-                            Default_Theme.primaryColor2.withValues(alpha: 0.5),
+                        color: colorScheme.onSurface.withValues(alpha: 0.5),
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                       ),
@@ -580,12 +587,13 @@ class SettingInfoText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Text(
         text,
         style: Default_Theme.secondoryTextStyle.copyWith(
-          color: color ?? Default_Theme.primaryColor2.withValues(alpha: 0.5),
+          color: color ?? colorScheme.onSurface.withValues(alpha: 0.5),
           fontSize: 13,
           height: 1.5,
         ),
@@ -607,28 +615,29 @@ class SettingTextFieldTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
-        style: const TextStyle(
-          color: Default_Theme.primaryColor2,
+        style: TextStyle(
+          color: colorScheme.onSurface,
           fontSize: 15,
           fontWeight: FontWeight.w500,
         ),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(
-            color: Default_Theme.primaryColor2.withValues(alpha: 0.5),
+            color: colorScheme.onSurface.withValues(alpha: 0.5),
             fontSize: 13,
           ),
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(
-                color: Default_Theme.primaryColor2.withValues(alpha: 0.2)),
+                color: colorScheme.onSurface.withValues(alpha: 0.2)),
           ),
-          focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Default_Theme.accentColor2),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: colorScheme.primary),
           ),
         ),
       ),
@@ -694,13 +703,14 @@ class SettingDropdownTile<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () => _openSelector(context),
         borderRadius: BorderRadius.circular(20),
-        highlightColor: Default_Theme.primaryColor2.withValues(alpha: 0.05),
-        splashColor: Default_Theme.primaryColor2.withValues(alpha: 0.05),
+        highlightColor: colorScheme.onSurface.withValues(alpha: 0.05),
+        splashColor: colorScheme.onSurface.withValues(alpha: 0.05),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Row(
@@ -715,7 +725,7 @@ class SettingDropdownTile<T> extends StatelessWidget {
                     Text(
                       title,
                       style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                        color: Default_Theme.primaryColor2,
+                        color: colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.2,
@@ -725,8 +735,7 @@ class SettingDropdownTile<T> extends StatelessWidget {
                     Text(
                       subtitle,
                       style: Default_Theme.secondoryTextStyle.copyWith(
-                        color:
-                            Default_Theme.primaryColor2.withValues(alpha: 0.5),
+                        color: colorScheme.onSurface.withValues(alpha: 0.5),
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                       ),
@@ -739,10 +748,10 @@ class SettingDropdownTile<T> extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                 decoration: BoxDecoration(
-                  color: Default_Theme.accentColor2.withValues(alpha: 0.10),
+                  color: colorScheme.onSurface.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: Default_Theme.accentColor2.withValues(alpha: 0.25),
+                    color: colorScheme.onSurface.withValues(alpha: 0.15),
                     width: 1,
                   ),
                 ),
@@ -752,7 +761,7 @@ class SettingDropdownTile<T> extends StatelessWidget {
                     Text(
                       _selectedLabel(),
                       style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                        color: Default_Theme.accentColor2,
+                        color: colorScheme.onSurface,
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.1,
@@ -761,7 +770,7 @@ class SettingDropdownTile<T> extends StatelessWidget {
                     const SizedBox(width: 4),
                     Icon(
                       Icons.unfold_more_rounded,
-                      color: Default_Theme.accentColor2.withValues(alpha: 0.7),
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
                       size: 16,
                     ),
                   ],
@@ -791,18 +800,20 @@ class _DropdownBottomSheet<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 24),
       decoration: BoxDecoration(
-        color: const Color(0xFF141414),
+        color: isDark ? const Color(0xFF141414) : colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: Default_Theme.primaryColor2.withValues(alpha: 0.08),
+          color: colorScheme.onSurface.withValues(alpha: 0.08),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
+            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.12),
             blurRadius: 30,
             offset: const Offset(0, -8),
           ),
@@ -873,26 +884,27 @@ class _DropdownOption<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        highlightColor: Default_Theme.accentColor2.withValues(alpha: 0.06),
-        splashColor: Default_Theme.accentColor2.withValues(alpha: 0.08),
+        highlightColor: colorScheme.onSurface.withValues(alpha: 0.06),
+        splashColor: colorScheme.onSurface.withValues(alpha: 0.08),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             color: isSelected
-                ? Default_Theme.accentColor2.withValues(alpha: 0.10)
+                ? colorScheme.onSurface.withValues(alpha: 0.08)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected
-                  ? Default_Theme.accentColor2.withValues(alpha: 0.30)
-                  : Default_Theme.primaryColor2.withValues(alpha: 0.04),
+                  ? colorScheme.onSurface.withValues(alpha: 0.25)
+                  : colorScheme.onSurface.withValues(alpha: 0.05),
               width: 1,
             ),
           ),
@@ -904,8 +916,8 @@ class _DropdownOption<T> extends StatelessWidget {
                   height: 36,
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? Default_Theme.accentColor2.withValues(alpha: 0.12)
-                        : Default_Theme.primaryColor2.withValues(alpha: 0.05),
+                        ? colorScheme.onSurface.withValues(alpha: 0.10)
+                        : colorScheme.onSurface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Center(
@@ -913,8 +925,8 @@ class _DropdownOption<T> extends StatelessWidget {
                       item.icon,
                       size: 18,
                       color: isSelected
-                          ? Default_Theme.accentColor2
-                          : Default_Theme.primaryColor2.withValues(alpha: 0.5),
+                          ? colorScheme.onSurface
+                          : colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ),
@@ -929,9 +941,8 @@ class _DropdownOption<T> extends StatelessWidget {
                       item.label,
                       style: Default_Theme.secondoryTextStyleMedium.copyWith(
                         color: isSelected
-                            ? Default_Theme.primaryColor2
-                            : Default_Theme.primaryColor2
-                                .withValues(alpha: 0.7),
+                            ? colorScheme.onSurface
+                            : colorScheme.onSurface.withValues(alpha: 0.7),
                         fontSize: 15,
                         fontWeight:
                             isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -943,8 +954,7 @@ class _DropdownOption<T> extends StatelessWidget {
                       Text(
                         item.description!,
                         style: Default_Theme.secondoryTextStyle.copyWith(
-                          color: Default_Theme.primaryColor2
-                              .withValues(alpha: 0.40),
+                          color: colorScheme.onSurface.withValues(alpha: 0.40),
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
                         ),
@@ -961,21 +971,21 @@ class _DropdownOption<T> extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isSelected
-                      ? Default_Theme.accentColor2
+                      ? colorScheme.primary
                       : Colors.transparent,
                   border: Border.all(
                     color: isSelected
-                        ? Default_Theme.accentColor2
-                        : Default_Theme.primaryColor2.withValues(alpha: 0.20),
+                        ? colorScheme.primary
+                        : colorScheme.onSurface.withValues(alpha: 0.20),
                     width: 2,
                   ),
                 ),
                 child: isSelected
-                    ? const Center(
+                    ? Center(
                         child: Icon(
                           Icons.check_rounded,
                           size: 14,
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                         ),
                       )
                     : null,
@@ -987,3 +997,4 @@ class _DropdownOption<T> extends StatelessWidget {
     );
   }
 }
+

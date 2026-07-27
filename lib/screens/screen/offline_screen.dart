@@ -3,6 +3,7 @@ import 'package:voidmusic/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:voidmusic/blocs/library/cubit/library_items_cubit.dart';
 import 'package:voidmusic/core/models/media_playlist_model.dart';
 import 'package:voidmusic/core/models/exported.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/downloading_item.dart';
 import 'package:voidmusic/screens/widgets/more_bottom_sheet.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
@@ -104,7 +105,7 @@ class _OfflineScreenState extends State<OfflineScreen> {
       length: 4,
       child: SafeArea(
         child: Scaffold(
-          backgroundColor: Default_Theme.themeColor,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: BlocBuilder<DownloaderCubit, DownloaderState>(
             builder: (context, state) {
               if (_searchController.text.isEmpty) {
@@ -217,6 +218,7 @@ class _OfflineScreenState extends State<OfflineScreen> {
             ],
           ),
         ),
+        const SliverBottomSafeAreaSpacer(),
       ],
     );
   }
@@ -233,8 +235,9 @@ class _OfflineScreenState extends State<OfflineScreen> {
     return ListView.builder(
       key: const PageStorageKey('offline-artists-tab'),
       physics: const BouncingScrollPhysics(),
-      itemCount: groups.length,
+      itemCount: groups.length + 1,
       itemBuilder: (context, index) {
+        if (index == groups.length) return const BottomSafeAreaSpacer();
         final artistName = groups.keys.elementAt(index);
         final artistSongs = groups[artistName]!;
         final firstSong = artistSongs.first;
@@ -273,8 +276,9 @@ class _OfflineScreenState extends State<OfflineScreen> {
     return ListView.builder(
       key: const PageStorageKey('offline-albums-tab'),
       physics: const BouncingScrollPhysics(),
-      itemCount: groups.length,
+      itemCount: groups.length + 1,
       itemBuilder: (context, index) {
+        if (index == groups.length) return const BottomSafeAreaSpacer();
         final albumName = groups.keys.elementAt(index);
         final albumSongs = groups[albumName]!;
         final firstSong = albumSongs.first;
@@ -375,6 +379,7 @@ class _OfflineScreenState extends State<OfflineScreen> {
                   childCount: playlists.length,
                 ),
               ),
+            const SliverBottomSafeAreaSpacer(),
           ],
         );
       },
@@ -386,8 +391,8 @@ class _OfflineScreenState extends State<OfflineScreen> {
     return SliverAppBar(
       floating: true,
       pinned: true,
-      surfaceTintColor: Default_Theme.themeColor,
-      backgroundColor: Default_Theme.themeColor,
+      surfaceTintColor: Colors.transparent,
+      backgroundColor: Colors.transparent,
       title: AnimatedSwitcher(
         duration: const Duration(milliseconds: 350),
         transitionBuilder: (Widget child, Animation<double> animation) {

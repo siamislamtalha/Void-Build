@@ -61,16 +61,16 @@ class _TimerViewState extends State<TimerView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Default_Theme.themeColor,
-        surfaceTintColor: Default_Theme.themeColor,
-        foregroundColor: Default_Theme.primaryColor1,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
         centerTitle: true,
         title: Text(
           l10n.timerTitle,
-          style: const TextStyle(
-                  color: Default_Theme.primaryColor1,
+          style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 20,
                   fontWeight: FontWeight.bold)
               .merge(Default_Theme.secondoryTextStyle),

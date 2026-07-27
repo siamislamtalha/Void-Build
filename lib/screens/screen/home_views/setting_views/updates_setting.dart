@@ -1,4 +1,4 @@
-import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
+﻿import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/check_update_view.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +14,9 @@ class UpdatesSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Default_Theme.themeColor,
+        backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leadingWidth: 64,
@@ -24,7 +24,7 @@ class UpdatesSettings extends StatelessWidget {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_rounded,
                 color: Default_Theme.primaryColor1,
                 size: 24,
@@ -35,8 +35,8 @@ class UpdatesSettings extends StatelessWidget {
         ),
         title: Text(
           l10n.updateSettingTitle,
-          style: const TextStyle(
-            color: Default_Theme.primaryColor1,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 22,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,

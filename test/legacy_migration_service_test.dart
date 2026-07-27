@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:voidmusic/services/db/dao/library_dao.dart';
@@ -15,7 +16,18 @@ import 'package:path/path.dart' as p;
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  setUpAll(() async {
+    await Isar.initializeIsarCore(
+      libraries: {
+        Abi.windowsX64:
+            'windows/flutter/ephemeral/.plugin_symlinks/isar_community_flutter_libs/windows/libisar.dll',
+      },
+    );
+  });
+
+
   group('legacy migration', () {
+
     late Directory tempRoot;
     late Directory supportDir;
     late Directory docsDir;

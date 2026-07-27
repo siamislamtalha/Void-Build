@@ -102,7 +102,7 @@ class _SongInfoScreenState extends State<SongInfoScreen> {
     final imageUrl = song.thumbnail.urlHigh ?? song.thumbnail.url;
 
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -113,7 +113,7 @@ class _SongInfoScreenState extends State<SongInfoScreen> {
           padding: const EdgeInsets.only(left: 16.0),
           child: Center(
             child: Material(
-              color: Default_Theme.themeColor.withValues(alpha: 0.5),
+              color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
               shape: CircleBorder(
                 side: BorderSide(
                   color: Default_Theme.primaryColor2.withValues(alpha: 0.15),
@@ -156,8 +156,8 @@ class _SongInfoScreenState extends State<SongInfoScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Default_Theme.themeColor.withValues(alpha: 0.75),
-                      Default_Theme.themeColor.withValues(alpha: 0.9),
+                      Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.75),
+                      Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
                       Default_Theme.themeColor,
                     ],
                   ),
@@ -729,19 +729,19 @@ class _ActionButton extends StatelessWidget {
               mainAxisSize: isWide ? MainAxisSize.max : MainAxisSize.min,
               children: [
                 if (isLoading)
-                  const SizedBox(
+                  SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   )
                 else
                   Icon(
                     icon,
                     size: 20,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 const SizedBox(width: 12),
                 Flexible(
@@ -750,8 +750,8 @@ class _ActionButton extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Default_Theme.secondoryTextStyleMedium.merge(
-                      const TextStyle(
-                        color: Colors.white,
+                      TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),

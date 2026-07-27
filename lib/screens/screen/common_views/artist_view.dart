@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+﻿// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:ui';
 
 import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
@@ -119,7 +119,7 @@ class _ArtistViewState extends State<ArtistView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
       body: Stack(
@@ -147,7 +147,7 @@ class _ArtistViewState extends State<ArtistView> {
             icon: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Default_Theme.themeColor.withValues(alpha: 0.5),
+                color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: Default_Theme.primaryColor1.withValues(alpha: 0.15),
@@ -197,8 +197,8 @@ class _ArtistViewState extends State<ArtistView> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Default_Theme.themeColor.withValues(alpha: 0.4),
-                        Default_Theme.themeColor.withValues(alpha: 0.9),
+                        Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.4),
+                        Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
                         Default_Theme.themeColor,
                       ],
                       stops: const [0.0, 0.45, 1.0],
@@ -761,7 +761,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
         child: Container(
-          color: Default_Theme.themeColor.withValues(alpha: 0.2),
+          color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.2),
           alignment: Alignment.center,
           child: Container(
             height: 44,

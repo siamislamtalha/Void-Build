@@ -41,22 +41,22 @@ class _PlaylistEditViewState extends State<PlaylistEditView> {
                 state is CurrentPlaylistLoading);
 
         if (isLoading) {
-          return const Scaffold(
-            backgroundColor: Default_Theme.themeColor,
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
 
         return Scaffold(
-          backgroundColor: Default_Theme.themeColor,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: CustomScrollView(
             slivers: [
               SliverAppBar(
                 floating: true,
                 centerTitle: true,
-                surfaceTintColor: Default_Theme.themeColor,
+                surfaceTintColor: Colors.transparent,
                 foregroundColor: Default_Theme.primaryColor1,
-                backgroundColor: Default_Theme.themeColor,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 title: Text(
                   'Edit Playlist',
                   style: Default_Theme.secondoryTextStyleMedium.merge(
@@ -274,7 +274,7 @@ Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
       final double elevation = lerpDouble(0, 6, animValue)!;
       return Material(
         elevation: elevation,
-        color: Default_Theme.themeColor,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(12),
         shadowColor: Default_Theme.accentColor2.withValues(alpha: 0.25),
         child: DecoratedBox(

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
+import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
 import 'package:voidmusic/screens/widgets/player_overlay_wrapper.dart';
 import 'package:voidmusic/screens/widgets/mini_player_widget.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
@@ -49,23 +50,30 @@ class GlobalFooter extends StatelessWidget {
             await _handleHardwareBackPress(context);
           },
           child: Scaffold(
-            backgroundColor: Default_Theme.themeColor,
-            drawerScrimColor: Default_Theme.themeColor,
+            // Keep fully transparent so the BackdropFilter blur in the mini player
+            // and nav bar can composite against whatever is painted below them.
+            backgroundColor: Colors.transparent,
+            drawerScrimColor: Colors.black54,
+            // extendBody=true allows the body ScrollView to paint under the
+            // floating footer so content scrolls behind the glassmorphic blur.
             extendBody: true,
+            extendBodyBehindAppBar: true,
             body: Stack(
+              fit: StackFit.expand,
               children: [
-                Positioned.fill(
-                  child: _FooterAwareBody(
-                    isMobile: isMobile,
-                    navigationShell: navigationShell,
-                  ),
+                // ── Main navigation body ──
+                _FooterAwareBody(
+                  isMobile: isMobile,
+                  navigationShell: navigationShell,
                 ),
+                // ── Floating footer overlay ──
                 Positioned(
                   left: 0,
                   right: 0,
                   bottom: 0,
                   child: SafeArea(
                     top: false,
+                    // Don't let SafeArea add its own background
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 6),
                       child: Column(
@@ -118,19 +126,23 @@ class GlobalFooter extends StatelessWidget {
 }
 
 // Heights of the floating overlay elements (in logical pixels).
-// Mini player card height + vertical padding = 64 + 4 + 4 = 72.
+// Mini player card height (64) + vertical padding (4+4) = 72.
 // SizedBox gap between mini player and nav bar = 6.
 // Nav bar item circle height + vertical padding = 56 + 5 + 5 = 66.
 // Outer bottom padding on the Column = 6.
-// Mobile total = 72 + 6 + 66 + 6 = 150.
-// Desktop (no nav bar) = 72 + 6 = 78.
-const double _kMiniPlayerFooterHeight = 78.0;
+// Mobile total WITH mini player = 72 + 6 + 66 + 6 = 150.
+// Mobile total WITHOUT mini player = 0 + 66 + 6 = 72.
+// Desktop (no nav bar) WITH mini player = 72 + 6 = 78.
+// Desktop (no nav bar) WITHOUT mini player = 6.
+const double _kMiniPlayerHeight = 72.0; // card(64) + vertical padding(4+4)
+const double _kMiniPlayerGap = 6.0;     // gap between mini player and nav bar
 const double _kNavBarFooterHeight = 72.0; // gap(6) + navBar(66)
+const double _kOuterBottomPadding = 6.0;
 
 /// Wraps the navigation shell with a [MediaQuery] that adds extra bottom
 /// padding equal to the height of the floating footer (mini player + nav bar).
-/// This ensures every inner screen's [SafeArea] and scroll views naturally
-/// clear the overlay without needing per-screen workarounds.
+/// Dynamically adjusts based on whether the mini player is visible so no
+/// content is hidden behind the overlay.
 class _FooterAwareBody extends StatelessWidget {
   const _FooterAwareBody({
     required this.isMobile,
@@ -142,32 +154,49 @@ class _FooterAwareBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    // Total footer height above the system bottom inset.
-    final footerExtra = _kMiniPlayerFooterHeight +
-        (isMobile ? _kNavBarFooterHeight : 0.0);
-    // Override bottom padding so SafeArea / scroll views clear the footer.
-    final updatedMq = mq.copyWith(
-      padding: mq.padding.copyWith(
-        bottom: mq.padding.bottom + footerExtra,
-      ),
-    );
+    return BlocBuilder<MiniPlayerCubit, MiniPlayerState>(
+      builder: (context, miniState) {
+        final mq = MediaQuery.of(context);
+        final hasMiniPlayer = miniState.isVisible;
 
-    return MediaQuery(
-      data: updatedMq,
-      child: isMobile
-          ? _AnimatedPageView(navigationShell: navigationShell)
-          : Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 4),
-                  child: VerticalNavBar(navigationShell: navigationShell),
-                ),
-                Expanded(
-                  child: _AnimatedPageView(navigationShell: navigationShell),
-                ),
-              ],
-            ),
+        // Calculate dynamic footer height:
+        // Nav bar (mobile only) + optional mini player
+        double footerExtra = _kOuterBottomPadding;
+        if (isMobile) footerExtra += _kNavBarFooterHeight;
+        if (hasMiniPlayer) footerExtra += _kMiniPlayerHeight + _kMiniPlayerGap;
+
+        // Inject footer height into MediaQuery so scrollable children
+        // automatically add bottom padding to avoid content being hidden
+        // behind the floating footer. We add it to viewPadding.bottom so
+        // that screens using SafeArea or MediaQuery.padding.bottom
+        // see the correct safe area.
+        final updatedMq = mq.copyWith(
+          padding: mq.padding.copyWith(
+            bottom: (mq.padding.bottom + footerExtra)
+                .clamp(0.0, double.infinity),
+          ),
+          viewPadding: mq.viewPadding.copyWith(
+            bottom: (mq.viewPadding.bottom + footerExtra)
+                .clamp(0.0, double.infinity),
+          ),
+        );
+
+        final body = isMobile
+            ? _AnimatedPageView(navigationShell: navigationShell)
+            : Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4),
+                    child: VerticalNavBar(navigationShell: navigationShell),
+                  ),
+                  Expanded(
+                    child: _AnimatedPageView(navigationShell: navigationShell),
+                  ),
+                ],
+              );
+
+        return MediaQuery(data: updatedMq, child: body);
+      },
     );
   }
 }
@@ -247,8 +276,11 @@ class VerticalNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return NavigationRail(
-      backgroundColor: Default_Theme.themeColor.withValues(alpha: 0.3),
+      backgroundColor: isDark
+          ? Colors.black.withValues(alpha: 0.15)
+          : Colors.white.withValues(alpha: 0.15),
       destinations: [
         NavigationRailDestination(
             icon: const Icon(MingCute.home_4_fill), label: Text(l10n.navHome)),
@@ -271,7 +303,9 @@ class VerticalNavBar extends StatelessWidget {
       groupAlignment: 0.0,
       unselectedIconTheme:
           const IconThemeData(color: Default_Theme.primaryColor2),
-      indicatorColor: Colors.white.withValues(alpha: 0.2),
+      indicatorColor: isDark
+          ? Colors.white.withValues(alpha: 0.2)
+          : const Color(0xFF1C1C1E).withValues(alpha: 0.08),
       indicatorShape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(15)),
       ),
@@ -287,6 +321,29 @@ class HorizontalNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final currentIndex = navigationShell.currentIndex;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Theme-aware glass colors
+    // In dark mode: translucent white glass (appears dark since bg is dark)
+    // In light mode: slightly frosted white with more opacity to stand out against bg
+    final glassColor = isDark
+        ? Colors.black.withValues(alpha: 0.45)
+        : Colors.white.withValues(alpha: 0.75);
+    final glassBorder = isDark
+        ? Colors.white.withValues(alpha: 0.18)
+        : Colors.black.withValues(alpha: 0.10);
+    // Active icon: pink accent matching the reference image
+    const accentPink = Color(0xFFFF2D55);
+    const activeIconColor = accentPink;
+    final inactiveIconColor = isDark
+        ? Colors.white.withValues(alpha: 0.55)
+        : const Color(0xFF8E8E93);
+    final selectedCircleColor = isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : const Color(0xFF1C1C1E).withValues(alpha: 0.07);
+    final selectedCircleBorder = isDark
+        ? Colors.white.withValues(alpha: 0.22)
+        : Colors.black.withValues(alpha: 0.12);
 
     final capsuleItems = [
       _NavItemData(branchIndex: 0, icon: MingCute.home_4_fill, label: l10n.navHome),
@@ -310,22 +367,15 @@ class HorizontalNavBar extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
                   decoration: BoxDecoration(
-                    // Liquid glass — layered translucency
-                    color: Colors.white.withValues(alpha: 0.10),
+                    color: glassColor,
                     borderRadius: BorderRadius.circular(36),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.22),
+                      color: glassBorder,
                       width: 1.0,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white.withValues(alpha: 0.06),
-                        blurRadius: 1,
-                        spreadRadius: 0,
-                        offset: const Offset(0, 1),
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.30),
+                        color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.10),
                         blurRadius: 20,
                         spreadRadius: 0,
                         offset: const Offset(0, 8),
@@ -340,6 +390,10 @@ class HorizontalNavBar extends StatelessWidget {
                       return _NavItemButton(
                         item: item,
                         isSelected: isSelected,
+                        activeColor: activeIconColor,
+                        inactiveColor: inactiveIconColor,
+                        selectedCircleColor: selectedCircleColor,
+                        selectedCircleBorder: selectedCircleBorder,
                         onTap: () {
                           HapticFeedback.selectionClick();
                           navigationShell.goBranch(item.branchIndex);
@@ -363,47 +417,36 @@ class HorizontalNavBar extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    // Only show glass circle when selected
                     color: isSearchSelected
-                        ? Colors.white.withValues(alpha: 0.18)
-                        : Colors.transparent,
-                    border: isSearchSelected
-                        ? Border.all(
-                            color: Colors.white.withValues(alpha: 0.35),
-                            width: 1.0,
-                          )
-                        : null,
-                    boxShadow: isSearchSelected
-                        ? [
-                            BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.06),
-                              blurRadius: 1,
-                              spreadRadius: 0,
-                              offset: const Offset(0, 1),
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.30),
-                              blurRadius: 20,
-                              spreadRadius: 0,
-                              offset: const Offset(0, 8),
-                            ),
-                          ]
-                        : null,
+                        ? (isDark
+                            ? Colors.white.withValues(alpha: 0.22)
+                            : Colors.black.withValues(alpha: 0.15))
+                        : glassColor,
+                    border: Border.all(
+                      color: isSearchSelected ? selectedCircleBorder : glassBorder,
+                      width: 1.0,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.10),
+                        blurRadius: 20,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
                   child: Center(
                     child: Icon(
                       MingCute.search_2_line,
                       size: 24,
-                      color: isSearchSelected
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.55),
+                      color: isSearchSelected ? activeIconColor : inactiveIconColor,
                     ),
                   ),
                 ),
@@ -420,20 +463,24 @@ class HorizontalNavBar extends StatelessWidget {
 class _NavItemButton extends StatelessWidget {
   final _NavItemData item;
   final bool isSelected;
+  final Color activeColor;
+  final Color inactiveColor;
+  final Color selectedCircleColor;
+  final Color selectedCircleBorder;
   final VoidCallback onTap;
 
   const _NavItemButton({
     required this.item,
     required this.isSelected,
+    required this.activeColor,
+    required this.inactiveColor,
+    required this.selectedCircleColor,
+    required this.selectedCircleBorder,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Active color matches app's white monochromatic theme
-    const activeColor = Colors.white;
-    const inactiveColor = Color(0x8CFFFFFF);
-
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -446,13 +493,10 @@ class _NavItemButton extends StatelessWidget {
           height: 56,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            // Only show background + border on selected item
-            color: isSelected
-                ? Colors.white.withValues(alpha: 0.15)
-                : Colors.transparent,
+            color: isSelected ? selectedCircleColor : Colors.transparent,
             border: isSelected
                 ? Border.all(
-                    color: Colors.white.withValues(alpha: 0.30),
+                    color: selectedCircleBorder,
                     width: 1.0,
                   )
                 : null,

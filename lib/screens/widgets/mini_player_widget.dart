@@ -152,6 +152,14 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
     final song = widget.state.track!;
     final isDesktop = ResponsiveBreakpoints.of(context).isDesktop;
     final thumbUrl = song.thumbnail.urlLow ?? song.thumbnail.url;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final glassColor = isDark
+        ? Colors.white.withValues(alpha: 0.10)
+        : Colors.white.withValues(alpha: 0.60);
+    final glassBorder = isDark
+        ? Colors.white.withValues(alpha: 0.22)
+        : Colors.black.withValues(alpha: 0.08);
 
     return GestureDetector(
       onTap: () {
@@ -173,21 +181,15 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                 height: _cardHeight,
                 decoration: BoxDecoration(
                   // Liquid glass — layered translucency
-                  color: Colors.white.withValues(alpha: 0.10),
+                  color: glassColor,
                   borderRadius: BorderRadius.circular(34),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.22),
+                    color: glassBorder,
                     width: 1.0,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.06),
-                      blurRadius: 1,
-                      spreadRadius: 0,
-                      offset: const Offset(0, 1),
-                    ),
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.30),
+                      color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.12),
                       blurRadius: 20,
                       spreadRadius: 0,
                       offset: const Offset(0, 8),
@@ -213,6 +215,7 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                               song: song,
                               waveController: _waveController,
                               isPlaying: widget.state.isPlaying,
+                              isDark: isDark,
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -221,11 +224,13 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                             state: widget.state,
                             isDesktop: isDesktop,
                             song: song,
+                            isDark: isDark,
                           ),
                         ],
                       ),
                     ),
-                    if (!widget.state.isCompleted) const _GlowingProgressBar(),
+                    if (!widget.state.isCompleted)
+                      _GlowingProgressBar(isDark: isDark),
                   ],
                 ),
               ),
@@ -242,15 +247,23 @@ class _ControlsCapsule extends StatelessWidget {
   final MiniPlayerState state;
   final bool isDesktop;
   final dynamic song;
+  final bool isDark;
 
   const _ControlsCapsule({
     required this.state,
     required this.isDesktop,
     required this.song,
+    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
+    final capsuleColor = isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : Colors.black.withValues(alpha: 0.06);
+    final capsuleBorder = isDark
+        ? Colors.white.withValues(alpha: 0.22)
+        : Colors.black.withValues(alpha: 0.10);
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
       child: BackdropFilter(
@@ -258,15 +271,15 @@ class _ControlsCapsule extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.12),
+            color: capsuleColor,
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.22),
+              color: capsuleBorder,
               width: 1.0,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.20),
+                color: Colors.black.withValues(alpha: isDark ? 0.20 : 0.08),
                 blurRadius: 12,
                 spreadRadius: 0,
                 offset: const Offset(0, 4),
@@ -280,6 +293,7 @@ class _ControlsCapsule extends StatelessWidget {
                 _ControlButton(
                   icon: FontAwesome.backward_step_solid,
                   size: 16,
+                  isDark: isDark,
                   onPressed: () {
                     HapticFeedback.lightImpact();
                     context
@@ -288,10 +302,11 @@ class _ControlsCapsule extends StatelessWidget {
                         .skipToPrevious();
                   },
                 ),
-              _PlayPauseButton(state: state),
+              _PlayPauseButton(state: state, isDark: isDark),
               _ControlButton(
                 icon: FontAwesome.forward_step_solid,
                 size: 16,
+                isDark: isDark,
                 onPressed: () {
                   HapticFeedback.lightImpact();
                   context
@@ -350,15 +365,22 @@ class _TrackInfo extends StatelessWidget {
   final dynamic song;
   final AnimationController waveController;
   final bool isPlaying;
+  final bool isDark;
 
   const _TrackInfo({
     required this.song,
     required this.waveController,
     required this.isPlaying,
+    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
+    final titleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final subtitleColor = isDark
+        ? Colors.white.withValues(alpha: 0.55)
+        : const Color(0xFF8E8E93);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,17 +388,17 @@ class _TrackInfo extends StatelessWidget {
         Row(
           children: [
             if (isPlaying) ...[
-              _NowPlayingWave(controller: waveController),
+              _NowPlayingWave(controller: waveController, color: titleColor),
               const SizedBox(width: 7),
             ],
             Expanded(
               child: Text(
                 song.title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Unageo',
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: titleColor,
                   letterSpacing: 0.2,
                 ),
                 maxLines: 1,
@@ -392,7 +414,7 @@ class _TrackInfo extends StatelessWidget {
             fontFamily: 'Unageo',
             fontWeight: FontWeight.w600,
             fontSize: 11.5,
-            color: Colors.white.withValues(alpha: 0.55),
+            color: subtitleColor,
             letterSpacing: 0.1,
           ),
           maxLines: 1,
@@ -405,7 +427,8 @@ class _TrackInfo extends StatelessWidget {
 
 class _NowPlayingWave extends StatelessWidget {
   final AnimationController controller;
-  const _NowPlayingWave({required this.controller});
+  final Color color;
+  const _NowPlayingWave({required this.controller, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -416,7 +439,7 @@ class _NowPlayingWave extends StatelessWidget {
           size: const Size(18, 14),
           painter: _WavePainter(
             progress: controller.value,
-            color: Colors.white,
+            color: color,
           ),
         );
       },
@@ -462,18 +485,20 @@ class _WavePainter extends CustomPainter {
 
 class _PlayPauseButton extends StatelessWidget {
   final MiniPlayerState state;
-  const _PlayPauseButton({required this.state});
+  final bool isDark;
+  const _PlayPauseButton({required this.state, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
+    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     if (state.isLoading || state.isResolving) {
-      return const Padding(
-        padding: EdgeInsets.all(10),
+      return Padding(
+        padding: const EdgeInsets.all(10),
         child: SizedBox.square(
           dimension: 18,
           child: CircularProgressIndicator(
             strokeWidth: 2.5,
-            color: Colors.white,
+            color: iconColor,
           ),
         ),
       );
@@ -483,6 +508,7 @@ class _PlayPauseButton extends StatelessWidget {
       return _ControlButton(
         icon: FontAwesome.rotate_right_solid,
         size: 18,
+        isDark: isDark,
         onPressed: () {
           HapticFeedback.mediumImpact();
           context.read<BloomeePlayerCubit>().bloomeePlayer.rewind();
@@ -493,6 +519,7 @@ class _PlayPauseButton extends StatelessWidget {
     return _ControlButton(
       icon: state.isPlaying ? FontAwesome.pause_solid : FontAwesome.play_solid,
       size: 18,
+      isDark: isDark,
       onPressed: () {
         HapticFeedback.lightImpact();
         state.isPlaying
@@ -507,15 +534,20 @@ class _ControlButton extends StatelessWidget {
   final IconData icon;
   final double size;
   final VoidCallback onPressed;
+  final bool isDark;
 
   const _ControlButton({
     required this.icon,
     required this.size,
     required this.onPressed,
+    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
+    final iconColor = isDark
+        ? Colors.white.withValues(alpha: 0.9)
+        : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -523,8 +555,7 @@ class _ControlButton extends StatelessWidget {
         onTap: onPressed,
         child: Padding(
           padding: const EdgeInsets.all(10),
-          child: Icon(icon,
-              size: size, color: Colors.white.withValues(alpha: 0.9)),
+          child: Icon(icon, size: size, color: iconColor),
         ),
       ),
     );
@@ -532,10 +563,17 @@ class _ControlButton extends StatelessWidget {
 }
 
 class _GlowingProgressBar extends StatelessWidget {
-  const _GlowingProgressBar();
+  final bool isDark;
+  const _GlowingProgressBar({required this.isDark});
 
   @override
   Widget build(BuildContext context) {
+    final barColor = isDark
+        ? Colors.white.withValues(alpha: 0.8)
+        : const Color(0xFF1C1C1E).withValues(alpha: 0.7);
+    final glowColor = isDark
+        ? Colors.white.withValues(alpha: 0.4)
+        : const Color(0xFF1C1C1E).withValues(alpha: 0.15);
     return Positioned(
       bottom: 0,
       left: 0,
@@ -564,7 +602,7 @@ class _GlowingProgressBar extends StatelessWidget {
                       decoration: BoxDecoration(
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.white.withValues(alpha: 0.4),
+                            color: glowColor,
                             blurRadius: 8,
                             spreadRadius: 1,
                           ),
@@ -584,8 +622,8 @@ class _GlowingProgressBar extends StatelessWidget {
                           right: Radius.circular(2),
                         ),
                         gradient: LinearGradient(colors: [
-                          Colors.white.withValues(alpha: 0.8),
-                          Colors.white.withValues(alpha: 0.6),
+                          barColor,
+                          barColor.withValues(alpha: isDark ? 0.6 : 0.5),
                         ]),
                       ),
                     ),

@@ -37,7 +37,7 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: Default_Theme.themeColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
@@ -48,8 +48,8 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
         contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
         title: Text(
           l10n.pluginRepositoryAddTitle,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 18,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.3,
@@ -74,8 +74,8 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
                 controller: _urlController,
                 autofocus: true,
                 keyboardType: TextInputType.url,
-                style: const TextStyle(
-                    color: Colors.white,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.w500),
                 decoration: InputDecoration(

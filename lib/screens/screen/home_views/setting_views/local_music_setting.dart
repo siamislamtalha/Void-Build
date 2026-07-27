@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:voidmusic/blocs/local_music/cubit/local_music_cubit.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
@@ -83,9 +83,9 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Default_Theme.themeColor,
+        backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leadingWidth: 64,
@@ -93,7 +93,7 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_rounded,
                 color: Default_Theme.primaryColor1,
                 size: 24,
@@ -104,8 +104,8 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
         ),
         title: Text(
           l10n.localSettingTitle,
-          style: const TextStyle(
-            color: Default_Theme.primaryColor1,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 22,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,

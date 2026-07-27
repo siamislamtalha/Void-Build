@@ -12,6 +12,7 @@ import 'package:voidmusic/screens/screen/plugin_manager_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 class SettingsView extends StatelessWidget {
@@ -19,18 +20,19 @@ class SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Default_Theme.primaryColor1),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
         title: Text(
           AppLocalizations.of(context)!.settingsTitle,
-          style: const TextStyle(
-            color: Default_Theme.primaryColor1,
+          style: TextStyle(
+            color: colorScheme.onSurface,
             fontSize: 22,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
@@ -162,7 +164,7 @@ class SettingsView extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 32), // Bottom padding
+              const BottomSafeAreaSpacer(),
             ],
           ),
         ),
@@ -187,12 +189,17 @@ class _SettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       decoration: AppTheme.liquidGlassDecoration(
         borderRadius: 24,
-        glassColor: const Color(0x1A120B16),
-        borderColor: const Color(0x2DFFFFFF),
+        glassColor: isDark
+            ? const Color(0x1A120B16)
+            : Colors.white.withValues(alpha: 0.65),
+        borderColor: isDark
+            ? const Color(0x2DFFFFFF)
+            : Colors.black.withValues(alpha: 0.08),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
@@ -201,14 +208,15 @@ class _SettingsSection extends StatelessWidget {
               .transparent, // Required to let the InkWell splash render correctly inside
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: _buildChildrenWithDividers(),
+            children: _buildChildrenWithDividers(context),
           ),
         ),
       ),
     );
   }
 
-  List<Widget> _buildChildrenWithDividers() {
+  List<Widget> _buildChildrenWithDividers(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final List<Widget> result = [];
     for (int i = 0; i < children.length; i++) {
       result.add(children[i]);
@@ -217,8 +225,7 @@ class _SettingsSection extends StatelessWidget {
         result.add(
           Divider(
             height: 1,
-            color: Default_Theme.primaryColor1
-                .withValues(alpha: 0.04), // Very faint line
+            color: colorScheme.onSurface.withValues(alpha: 0.08),
             indent: 66, // Aligns perfectly with the text start
             endIndent: 16,
           ),
@@ -249,11 +256,13 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: onTap,
-      // Overriding the default harsh white/blue splash with a subtle, cohesive dark tint
-      splashColor: Default_Theme.primaryColor1.withValues(alpha: 0.06),
-      highlightColor: Default_Theme.primaryColor1.withValues(alpha: 0.04),
+      // Overriding the default harsh white/blue splash with a subtle, cohesive tint
+      splashColor: colorScheme.onSurface.withValues(alpha: 0.06),
+      highlightColor: colorScheme.onSurface.withValues(alpha: 0.04),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
@@ -265,9 +274,7 @@ class _SettingsTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isHighlightIcon
                     ? iconColor.withValues(alpha: 0.12)
-                    : Default_Theme.primaryColor1.withValues(
-                        alpha:
-                            0.06), // Muted background for non-highlight icons
+                    : colorScheme.onSurface.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -288,8 +295,7 @@ class _SettingsTile extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      // Using 0.92 opacity pure white prevents halation (harsh glow) on dark screens
-                      color: Colors.white.withValues(alpha: 0.92),
+                      color: colorScheme.onSurface.withValues(alpha: 0.92),
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.2,
@@ -301,8 +307,7 @@ class _SettingsTile extends StatelessWidget {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Default_Theme.primaryColor2.withValues(
-                          alpha: 0.65), // Softer, highly readable description
+                      color: colorScheme.onSurface.withValues(alpha: isDark ? 0.45 : 0.55),
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                     ),
@@ -316,7 +321,7 @@ class _SettingsTile extends StatelessWidget {
             // Dimmed right chevron hint
             Icon(
               Icons.chevron_right_rounded,
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.3),
+              color: colorScheme.onSurface.withValues(alpha: 0.3),
               size: 22,
             ),
           ],

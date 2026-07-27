@@ -40,6 +40,9 @@ class LibItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: StreamBuilder<String>(
@@ -50,9 +53,9 @@ class LibItemCard extends StatelessWidget {
         builder: (context, snapshot) {
           final isPlaying = snapshot.hasData && snapshot.data == title;
           return InkWell(
-            splashColor: Default_Theme.primaryColor2.withValues(alpha: 0.1),
-            hoverColor: Colors.white.withValues(alpha: 0.05),
-            highlightColor: Default_Theme.primaryColor2.withValues(alpha: 0.1),
+            splashColor: colorScheme.onSurface.withValues(alpha: 0.08),
+            hoverColor: colorScheme.onSurface.withValues(alpha: 0.05),
+            highlightColor: colorScheme.onSurface.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(16),
             onTap: onTap ?? () {},
             onSecondaryTap: onSecondaryTap ?? () {},
@@ -62,8 +65,12 @@ class LibItemCard extends StatelessWidget {
               decoration: isPlaying
                   ? AppTheme.liquidGlassDecoration(
                       borderRadius: 16,
-                      glassColor: Colors.white.withValues(alpha: 0.08),
-                      borderColor: Colors.white.withValues(alpha: 0.2),
+                      glassColor: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : Colors.black.withValues(alpha: 0.04),
+                      borderColor: isDark
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : Colors.black.withValues(alpha: 0.10),
                     )
                   : null,
               child: Row(
@@ -117,10 +124,10 @@ class LibItemCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: Default_Theme.secondoryTextStyle.merge(
-                              const TextStyle(
+                              TextStyle(
                                   fontSize: 16.5,
                                   fontWeight: FontWeight.w700,
-                                  color: Default_Theme.primaryColor1)),
+                                  color: colorScheme.onSurface)),
                         ),
                         Row(
                           children: [
@@ -138,11 +145,11 @@ class LibItemCard extends StatelessWidget {
                                 subtitle,
                                 maxLines: 1,
                                 style: Default_Theme.secondoryTextStyle.merge(
-                                    const TextStyle(
+                                    TextStyle(
                                         fontSize: 14,
                                         overflow: TextOverflow.fade,
                                         fontWeight: FontWeight.w500,
-                                        color: Default_Theme.primaryColor1)),
+                                        color: colorScheme.onSurface.withValues(alpha: 0.65))),
                               ),
                             ),
                           ],
@@ -159,8 +166,7 @@ class LibItemCard extends StatelessWidget {
                         icon: Icon(
                           Icons.more_vert_rounded,
                           size: 20,
-                          color:
-                              Default_Theme.primaryColor1.withValues(alpha: 0.72),
+                          color: colorScheme.onSurface.withValues(alpha: 0.60),
                         ),
                       ),
                     ),

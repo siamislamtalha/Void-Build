@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -92,7 +92,7 @@ class _PlaylistOptionsSheet extends StatelessWidget {
             filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
             child: Container(
               decoration: BoxDecoration(
-                color: Default_Theme.themeColor.withValues(alpha: 0.85),
+                color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.85),
                 border: Border(
                     top: BorderSide(
                         color: Colors.white.withValues(alpha: 0.08), width: 1)),

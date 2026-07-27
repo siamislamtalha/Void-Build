@@ -29,6 +29,7 @@ import 'package:voidmusic/src/rust/api/plugin/commands.dart';
 import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
 import 'package:voidmusic/src/rust/api/plugin/models.dart' as plugin_models;
 import 'package:voidmusic/screens/widgets/source_badge.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 
 class SearchScreen extends StatefulWidget {
   final String searchQuery;
@@ -233,7 +234,7 @@ class _SearchScreenState extends State<SearchScreen> {
           _closeSuggestionPanel();
         },
         child: Scaffold(
-          backgroundColor: Default_Theme.themeColor,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           resizeToAvoidBottomInset: false,
           body: Stack(
             children: [
@@ -310,6 +311,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             contentBloc: _contentBloc,
                             activePluginNotifier: _activePluginIdNotifier,
                           ),
+                        const SliverBottomSafeAreaSpacer(),
                       ],
                     );
                   },
@@ -493,6 +495,7 @@ class _AestheticFilterChipsSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SliverToBoxAdapter(
       child: ValueListenableBuilder<ContentSearchFilter>(
         valueListenable: filterNotifier,
@@ -525,13 +528,13 @@ class _AestheticFilterChipsSliver extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 18),
                     alignment: Alignment.center,
                     decoration: isSelected
-                        ? AppTheme.activePillDecoration
-                        : AppTheme.inactivePillDecoration,
+                        ? AppTheme.activePillDecoration(isDark: isDark)
+                        : AppTheme.inactivePillDecoration(isDark: isDark),
                     child: Text(
                       displayName,
                       style: isSelected
-                          ? AppTheme.activePillTextStyle
-                          : AppTheme.inactivePillTextStyle,
+                          ? AppTheme.activePillTextStyle(isDark: isDark)
+                          : AppTheme.inactivePillTextStyle(isDark: isDark),
                     ),
                   ),
                 );

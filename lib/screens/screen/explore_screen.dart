@@ -17,6 +17,7 @@ import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
 import 'package:voidmusic/screens/screen/home_views/recents_view.dart';
 import 'package:voidmusic/screens/widgets/more_bottom_sheet.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/screens/screen/home_views/notification_view.dart';
@@ -404,10 +405,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     ],
                   ),
                 ),
+                const SliverBottomSafeAreaSpacer(),
               ],
             ),
           ),
-          backgroundColor: Default_Theme.themeColor,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         ),
       ),
     );
@@ -490,7 +492,7 @@ class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
       fit: StackFit.expand,
       children: [
         // Solid background so the bar itself is opaque
-        Container(color: Default_Theme.themeColor),
+        Container(color: Theme.of(context).scaffoldBackgroundColor),
         // The actual app bar content
         SafeArea(
           bottom: false,
@@ -502,9 +504,9 @@ class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
                 Text(
                   AppLocalizations.of(context)!.exploreDiscover,
                   style: Default_Theme.primaryTextStyle.merge(
-                    const TextStyle(
+                    TextStyle(
                       fontSize: 34,
-                      color: Default_Theme.primaryColor1,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -530,8 +532,8 @@ class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Default_Theme.themeColor.withOpacity(0.0),
-                  Default_Theme.themeColor,
+                  Theme.of(context).scaffoldBackgroundColor.withOpacity(0.0),
+                  Theme.of(context).scaffoldBackgroundColor,
                 ],
               ),
             ),

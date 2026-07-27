@@ -111,8 +111,12 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
             child: DecoratedBox(
               decoration: AppTheme.liquidGlassDecoration(
                 borderRadius: 24,
-                glassColor: const Color(0xF50A040C),
-                borderColor: const Color(0x3BFFFFFF),
+                glassColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xF50A040C)
+                    : Colors.white.withValues(alpha: 0.85),
+                borderColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0x3BFFFFFF)
+                    : Colors.black.withValues(alpha: 0.10),
                 borderWidth: 1,
               ),
               child: Column(

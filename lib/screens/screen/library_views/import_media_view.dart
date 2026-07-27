@@ -30,7 +30,7 @@ class _ImportMediaFromPlatformsViewState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -135,7 +135,7 @@ class _ImportMediaFromPlatformsViewState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Default_Theme.themeColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
         contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
@@ -188,7 +188,7 @@ class _ImportMediaFromPlatformsViewState
             },
             style: FilledButton.styleFrom(
               backgroundColor: Default_Theme.accentColor2,
-              foregroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.onSurface,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
@@ -296,21 +296,21 @@ class _ImportMediaFromPlatformsViewState
     return showDialog<String>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
-        backgroundColor: Default_Theme.themeColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
         contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
         title: Text(
           AppLocalizations.of(context)!.importM3UNameDialogTitle,
           style: Default_Theme.primaryTextStyle.merge(
-            const TextStyle(color: Default_Theme.primaryColor1, fontSize: 18),
+            TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
           ),
         ),
         content: TextField(
           controller: controller,
           autofocus: true,
           cursorColor: Default_Theme.accentColor2,
-          style: const TextStyle(color: Colors.white, fontSize: 15),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15),
           decoration: InputDecoration(
             hintText: AppLocalizations.of(context)!.importM3UNameHint,
             hintStyle: TextStyle(
@@ -348,7 +348,7 @@ class _ImportMediaFromPlatformsViewState
                   : () => Navigator.of(dialogCtx).pop(val.text.trim()),
               style: FilledButton.styleFrom(
                 backgroundColor: Default_Theme.accentColor2,
-                foregroundColor: Colors.white,
+                foregroundColor: Theme.of(context).colorScheme.onSurface,
                 disabledBackgroundColor:
                     Default_Theme.accentColor2.withValues(alpha: 0.4),
                 padding:
@@ -426,8 +426,8 @@ class _ImporterPluginTile extends StatelessWidget {
                     children: [
                       Text(
                         pluginName,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -505,7 +505,7 @@ class _ImportFromBtn extends StatelessWidget {
                   ),
                   child: Icon(
                     btnIcon,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 24,
                   ),
                 ),
@@ -513,8 +513,8 @@ class _ImportFromBtn extends StatelessWidget {
                 Expanded(
                   child: Text(
                     btnName,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),

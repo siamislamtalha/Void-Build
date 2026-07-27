@@ -18,6 +18,7 @@ import 'package:go_router/go_router.dart';
 import 'package:voidmusic/blocs/library/cubit/library_items_cubit.dart';
 import 'package:voidmusic/core/constants/route_paths.dart';
 import 'package:voidmusic/screens/widgets/create_playlist_bottomsheet.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/libitem_tile.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
@@ -103,7 +104,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: BlocBuilder<LibraryItemsCubit, LibraryItemsState>(
           builder: (context, itemsState) {
@@ -272,6 +273,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                         ),
                       ],
                     ],
+                    const SliverBottomSafeAreaSpacer(),
                   ],
                 );
               },
@@ -392,8 +394,8 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
     return SliverAppBar(
       floating: true,
       pinned: false, // Set to false if you don't want it to stick at the top
-      surfaceTintColor: Default_Theme.themeColor,
-      backgroundColor: Default_Theme.themeColor,
+      surfaceTintColor: Colors.transparent,
+      backgroundColor: Colors.transparent,
       title: Row(
         children: [
           Text(
@@ -639,7 +641,7 @@ Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
       final double elevation = lerpDouble(0, 6, animValue)!;
       return Material(
         elevation: elevation,
-        color: Default_Theme.themeColor,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(12),
         shadowColor: Default_Theme.accentColor2.withValues(alpha: 0.25),
         child: DecoratedBox(

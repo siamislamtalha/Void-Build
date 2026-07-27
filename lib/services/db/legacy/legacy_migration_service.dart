@@ -1,4 +1,4 @@
-﻿library;
+library;
 
 import 'dart:convert';
 import 'dart:developer';
@@ -365,14 +365,17 @@ Future<_MigrationPlan> _buildMigrationPlan(Isar legacyIsar) async {
       legacyIsar.collection<legacy.DownloadDB>().where().findAllSync();
   for (var index = 0; index < legacyDownloads.length; index++) {
     final download = legacyDownloads[index];
-    final mediaItem = mediaByLegacyMediaId[download.mediaId];
+    final rawDownloadMediaId = download.mediaId;
+    final cleanedDownloadMediaId = _stripYoutubePrefix(rawDownloadMediaId);
+    final mediaItem = mediaByLegacyMediaId[rawDownloadMediaId] ??
+        mediaByLegacyMediaId[cleanedDownloadMediaId];
     final newMediaId = mediaItem != null
         ? _buildNewMediaId(
-            download.mediaId,
+            rawDownloadMediaId,
             mediaItem.source ?? '',
             permaUrl: mediaItem.permaURL,
           )
-        : _coerceExistingMediaId(download.mediaId);
+        : _coerceExistingMediaId(rawDownloadMediaId);
 
     if (newMediaId == null) {
       skippedDownloads++;
