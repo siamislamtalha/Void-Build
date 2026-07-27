@@ -93,7 +93,7 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_back_rounded,
                 color: Default_Theme.primaryColor1,
                 size: 24,
@@ -187,7 +187,7 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                           ),
                         ),
                         if (_scanning)
-                          const SizedBox(
+                          SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
@@ -294,14 +294,14 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                           horizontal: 16, vertical: 16),
                       child: Row(
                         children: [
-                          const SettingIconBox(
+                          SettingIconBox(
                             icon: Icons.create_new_folder_outlined,
                             color: AppTheme.accentColor(context),
                           ),
                           const SizedBox(width: 14),
                           Text(
                             l10n.localSettingAddFolder,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppTheme.accentColor(context),
                               fontSize: 16,
                               fontWeight: FontWeight.w600,

@@ -24,7 +24,7 @@ class UpdatesSettings extends StatelessWidget {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_back_rounded,
                 color: Default_Theme.primaryColor1,
                 size: 24,

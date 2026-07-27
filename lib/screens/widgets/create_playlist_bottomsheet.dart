@@ -125,7 +125,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                         Text(
                           l10n.playlistCreateNew,
                           style: Default_Theme.secondoryTextStyleMedium.merge(
-                            const TextStyle(
+                            TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
                               color: AppTheme.accentColor(context),
@@ -190,7 +190,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                               width: _isInputValid
                                   ? MediaQuery.of(context).size.width
                                   : 30,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 color: AppTheme.accentColor(context),
                               ),
                             ),
@@ -250,7 +250,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                                     style: Default_Theme
                                         .secondoryTextStyleMedium
                                         .merge(
-                                      const TextStyle(
+                                      TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         color: AppTheme.accentColor(context),

@@ -168,7 +168,7 @@ class _TimerViewState extends State<TimerView> {
                         child: Text(
                           l10n.timerFinishedMessage,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: AppTheme.accentColor(context),
                               fontSize: 40,
                               fontFamily: "Unageo",

@@ -240,7 +240,7 @@ class _UrlInputView extends StatelessWidget {
               color: AppTheme.accentColor(context).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(MingCute.link_fill,
+            child: Icon(MingCute.link_fill,
                 color: AppTheme.accentColor(context), size: 48),
           ),
           const SizedBox(height: 32),
@@ -501,7 +501,7 @@ class _ResolvingView extends StatelessWidget {
               ),
               Text(
                 '${(progress * 100).toStringAsFixed(0)}%',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.accentColor(context),
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
@@ -520,7 +520,7 @@ class _ResolvingView extends StatelessWidget {
               backgroundColor:
                   Default_Theme.primaryColor1.withValues(alpha: 0.1),
               valueColor:
-                  const AlwaysStoppedAnimation(AppTheme.accentColor(context)),
+                  AlwaysStoppedAnimation(AppTheme.accentColor(context)),
             ),
           ),
         ),
@@ -725,7 +725,7 @@ class _ResolvingTrackTile extends StatelessWidget {
     final statusWidget = switch (entry.status) {
       TrackResolutionStatus.pending => Icon(Icons.hourglass_empty,
           size: 20, color: Default_Theme.primaryColor2.withValues(alpha: 0.5)),
-      TrackResolutionStatus.resolving => const SizedBox(
+      TrackResolutionStatus.resolving => SizedBox(
           width: 20,
           height: 20,
           child: CircularProgressIndicator(
@@ -901,7 +901,7 @@ class _ReviewTrackTile extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 6),
                             child: Row(
                               children: [
-                                const Icon(MingCute.arrows_right_line,
+                                Icon(MingCute.arrows_right_line,
                                     size: 14,
                                     color: AppTheme.accentColor(context)),
                                 const SizedBox(width: 6),
@@ -1005,7 +1005,7 @@ class _CandidateList extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
             child: Text(
               AppLocalizations.of(context)!.importMatchOptions,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppTheme.accentColor(context),
                 fontSize: 12,
                 fontWeight: FontWeight.w700,

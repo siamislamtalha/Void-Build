@@ -111,7 +111,7 @@ class _ThemeSegmentedControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final segments = const [
+    const segments = [
       _Segment(value: 'system', icon: Icons.brightness_auto_rounded, label: 'Auto'),
       _Segment(value: 'light', icon: Icons.light_mode_rounded, label: 'Light'),
       _Segment(value: 'dark', icon: Icons.dark_mode_rounded, label: 'Dark'),

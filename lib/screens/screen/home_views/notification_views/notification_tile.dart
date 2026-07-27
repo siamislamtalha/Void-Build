@@ -39,7 +39,7 @@ class NotificationTile extends StatelessWidget {
         ),
         title: Text(
           notification.title,
-          style: const TextStyle(
+          style: TextStyle(
                   color: AppTheme.accentColor(context),
                   fontSize: 16,
                   fontWeight: FontWeight.bold)

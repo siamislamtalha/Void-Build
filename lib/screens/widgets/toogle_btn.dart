@@ -1,4 +1,3 @@
-import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class ToggleButton extends StatefulWidget {
@@ -22,7 +21,6 @@ class ToggleButtonState extends State<ToggleButton>
     with SingleTickerProviderStateMixin {
   late bool _isActive;
   late AnimationController _animationController;
-  late Animation<Color?> _textColorAnimation;
 
   @override
   void initState() {
@@ -33,10 +31,6 @@ class ToggleButtonState extends State<ToggleButton>
           const Duration(milliseconds: 200), // Lightweight, fast animation
       vsync: this,
     );
-    _textColorAnimation = ColorTween(
-      begin: Colors.grey[700], // Low-opacity border color for inactive state
-      end: Colors.white, // Full white for active state
-    ).animate(_animationController);
     if (_isActive) _animationController.forward();
   }
 

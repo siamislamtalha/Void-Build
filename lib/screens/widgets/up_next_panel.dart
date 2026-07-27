@@ -505,7 +505,7 @@ class _DesktopSongListState extends State<_DesktopSongList> {
               scrollController: _scrollController,
               physics: const BouncingScrollPhysics(),
               itemCount: uniqueQueue.length,
-              onReorder: widget.playerCubit.bloomeePlayer.moveQueueItem,
+              onReorderItem: (oldIndex, newIndex) => widget.playerCubit.bloomeePlayer.moveQueueItem(oldIndex, newIndex),
               buildDefaultDragHandles: false,
               itemBuilder: (context, index) {
                 return _QueueItem(
@@ -588,7 +588,7 @@ class _SongListSliverState extends State<_SongListSliver> {
 
             return SliverReorderableList(
               itemCount: uniqueQueue.length,
-              onReorder: widget.playerCubit.bloomeePlayer.moveQueueItem,
+              onReorderItem: (oldIndex, newIndex) => widget.playerCubit.bloomeePlayer.moveQueueItem(oldIndex, newIndex),
               itemBuilder: (context, index) {
                 return _QueueItem(
                   key: ValueKey('mobile_${uniqueQueue[index].id}'),

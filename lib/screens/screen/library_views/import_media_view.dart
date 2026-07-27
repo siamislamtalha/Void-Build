@@ -321,7 +321,7 @@ class _ImportMediaFromPlatformsViewState
               borderSide: BorderSide(
                   color: Default_Theme.primaryColor2.withValues(alpha: 0.3)),
             ),
-            focusedBorder: const UnderlineInputBorder(
+            focusedBorder: UnderlineInputBorder(
               borderSide:
                   BorderSide(color: AppTheme.accentColor(context), width: 2),
             ),
@@ -412,7 +412,7 @@ class _ImporterPluginTile extends StatelessWidget {
                     color: AppTheme.accentColor(context).withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     MingCute.download_2_fill,
                     color: AppTheme.accentColor(context),
                     size: 24,

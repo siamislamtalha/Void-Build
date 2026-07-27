@@ -65,9 +65,6 @@ Future<T?> showBloomeeDialog<T>({
 
 // ── Surface Colors ──────────────────────────────────────────────────────────
 
-const _kDialogSurface = Color(0xFF1A1626);
-const _kDialogBorder = Color(0xFF2A2438);
-
 /// The dialog surface widget. Can be used directly as a dialog builder return
 /// value for dialogs that manage their own state (e.g., Smart Replace).
 class BloomeeDialogSurface extends StatelessWidget {

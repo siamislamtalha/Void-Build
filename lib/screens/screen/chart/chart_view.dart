@@ -373,7 +373,7 @@ class _ChartScreenBodyState extends State<_ChartScreenBody> {
         body: BlocBuilder<ChartBloc, ChartState>(
           builder: (context, state) {
             if (state.chartDetailStatus == ChartStatus.loading) {
-              return const Center(
+              return Center(
                 child: CircularProgressIndicator(
                     color: AppTheme.accentColor(context)),
               );
@@ -908,7 +908,7 @@ class _HeroActionContent extends StatelessWidget {
 
     switch (status) {
       case ChartResolveActionStatus.resolving:
-        leading = const SizedBox(
+        leading = SizedBox(
           width: 18,
           height: 18,
           child: CircularProgressIndicator(
@@ -919,7 +919,7 @@ class _HeroActionContent extends StatelessWidget {
         label = AppLocalizations.of(context)!.chartResolving;
         break;
       case ChartResolveActionStatus.success:
-        leading = const Icon(
+        leading = Icon(
           Icons.check_rounded,
           size: 18,
           color: AppTheme.accentColor(context),
@@ -940,7 +940,7 @@ class _HeroActionContent extends StatelessWidget {
         Text(
           label,
           style: Default_Theme.secondoryTextStyleMedium.merge(
-            const TextStyle(
+            TextStyle(
               color: AppTheme.accentColor(context),
               fontSize: 14,
               fontWeight: FontWeight.w700,

@@ -146,7 +146,7 @@ class _PlaylistViewState extends State<PlaylistView> {
           if (waitingForTarget ||
               state.status == CurrentPlaylistLoadStatus.initial ||
               state.status == CurrentPlaylistLoadStatus.loading) {
-            return const Center(
+            return Center(
                 child: CircularProgressIndicator(
                     color: AppTheme.accentColor(context)));
           }
@@ -365,9 +365,9 @@ class _PlaylistViewState extends State<PlaylistView> {
                       sliver: _buildTrackList(state),
                     ),
                   if (state.isLoadingMore || state.hasMore)
-                    const SliverToBoxAdapter(
+                    SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 24),
+                        padding: const EdgeInsets.symmetric(vertical: 24),
                         child: Center(
                             child: CircularProgressIndicator(
                                 color: AppTheme.accentColor(context))),
@@ -433,9 +433,9 @@ class _PlaylistViewState extends State<PlaylistView> {
             sliver: _buildTrackList(state),
           ),
         if (state.isLoadingMore || state.hasMore)
-          const SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.symmetric(vertical: 24),
               child: Center(
                   child: CircularProgressIndicator(
                       color: AppTheme.accentColor(context))),
@@ -575,7 +575,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                       shape: BoxShape.circle,
                       color:
                           AppTheme.accentColor(context).withValues(alpha: 0.15)),
-                  child: const Icon(Icons.offline_pin_rounded,
+                  child: Icon(Icons.offline_pin_rounded,
                       color: AppTheme.accentColor(context), size: 20),
                 ),
               );
@@ -817,7 +817,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                             : (completed / items.length).clamp(0.0, 1.0),
                         minHeight: 6,
                         backgroundColor: Colors.white.withValues(alpha: 0.1),
-                        valueColor: const AlwaysStoppedAnimation<Color>(
+                        valueColor: AlwaysStoppedAnimation<Color>(
                             AppTheme.accentColor(context)),
                       ),
                     ),

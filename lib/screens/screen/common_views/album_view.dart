@@ -343,7 +343,7 @@ class _AlbumViewState extends State<AlbumView> {
                   ),
                 )
               else
-                const SliverFillRemaining(
+                SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
                       child: CircularProgressIndicator(
@@ -351,9 +351,9 @@ class _AlbumViewState extends State<AlbumView> {
                 ),
 
               if (status == DetailStatus.loadingMore)
-                const SliverToBoxAdapter(
+                SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Center(
                         child: CircularProgressIndicator(
                             color: AppTheme.accentColor(context))),
@@ -595,12 +595,12 @@ class _PremiumPlayButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(MingCute.play_fill,
+              Icon(MingCute.play_fill,
                   size: 20, color: AppTheme.accentColor(context)),
               const SizedBox(width: 8),
               Text(
                 AppLocalizations.of(context)!.chartPlay,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.accentColor(context)),

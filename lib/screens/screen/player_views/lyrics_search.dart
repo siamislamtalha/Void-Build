@@ -211,7 +211,7 @@ class LyricsSearchDelegate extends SearchDelegate {
       future: _debouncedSearch(query),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(
                 color: AppTheme.accentColor(context), strokeWidth: 3),
           );
@@ -385,7 +385,7 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
                     ),
                     child: Center(
                       child: _isApplying
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
@@ -442,7 +442,7 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
                                 ),
                                 child: Text(
                                   l10n.lyricsSearchSynced,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: AppTheme.accentColor(context),
                                       fontSize: 9,
                                       fontWeight: FontWeight.w800,
@@ -666,7 +666,7 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
           // Body (Lyrics)
           Expanded(
             child: _isLoading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(
                         color: AppTheme.accentColor(context)))
                 : _fetchedLyrics == null || _fetchedLyrics!.lyricsPlain.isEmpty
@@ -743,7 +743,7 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
                     ),
                     child: Text(
                       l10n.lyricsSearchApplyAction,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppTheme.accentColor(context),
                         fontSize: 16,
                         fontWeight: FontWeight.w700,

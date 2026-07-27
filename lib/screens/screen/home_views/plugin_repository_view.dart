@@ -189,7 +189,7 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
                 },
                 builder: (context, state) {
                   if (state is PluginRepositoryLoading) {
-                    return const Center(
+                    return Center(
                       child: CircularProgressIndicator(
                           color: AppTheme.accentColor(context), strokeWidth: 3),
                     );
@@ -305,7 +305,7 @@ class _RepoCard extends StatelessWidget {
                               color: AppTheme.accentColor(context)
                                   .withValues(alpha: 0.2)),
                         ),
-                        child: const Icon(MingCute.cloud_line,
+                        child: Icon(MingCute.cloud_line,
                             size: 20, color: AppTheme.accentColor(context)),
                       ),
                       const SizedBox(width: 14),

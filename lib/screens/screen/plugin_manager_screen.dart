@@ -86,7 +86,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
       },
       builder: (context, state) {
         if (!state.isInitialized) {
-          return const Center(
+          return Center(
               child: CircularProgressIndicator(
                   color: AppTheme.accentColor(context), strokeWidth: 3));
         }
@@ -215,8 +215,8 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
         BlocBuilder<PluginBloc, PluginState>(
           builder: (context, state) {
             if (state.hasActiveOperations) {
-              return const Padding(
-                padding: EdgeInsets.only(right: 16),
+              return Padding(
+                padding: const EdgeInsets.only(right: 16),
                 child: SizedBox(
                     width: 20,
                     height: 20,
@@ -235,7 +235,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
         ),
         IconButton(
           tooltip: l10n.pluginManagerTooltipInstall,
-          icon: const Icon(MingCute.add_circle_line,
+          icon: Icon(MingCute.add_circle_line,
               color: AppTheme.accentColor(context), size: 24),
           onPressed: () => _installPlugin(context),
         ),
@@ -464,6 +464,7 @@ class _PluginCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: _pluginAvatar(
+                    context: context,
                     manifest: manifest,
                     type: plugin.pluginType,
                     isLoaded: isLoaded,
@@ -568,6 +569,7 @@ class _PluginCard extends StatelessWidget {
   }
 
   static Widget _pluginAvatar({
+    required BuildContext context,
     required Manifest manifest,
     required PluginType type,
     required bool isLoaded,
@@ -585,15 +587,15 @@ class _PluginCard extends StatelessWidget {
             image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
           ),
         ),
-        placeholder: (context, url) => _fallbackIcon(type, isLoaded, iconSize),
+        placeholder: (context, url) => _fallbackIcon(context, type, isLoaded, iconSize),
         errorWidget: (context, url, error) =>
-            _fallbackIcon(type, isLoaded, iconSize),
+            _fallbackIcon(context, type, isLoaded, iconSize),
       );
     }
-    return _fallbackIcon(type, isLoaded, iconSize);
+    return _fallbackIcon(context, type, isLoaded, iconSize);
   }
 
-  Widget _fallbackIcon(PluginType type, bool isLoaded, double iconSize) {
+  static Widget _fallbackIcon(BuildContext context, PluginType type, bool isLoaded, double iconSize) {
     return Center(
       child: Icon(
         _pluginTypeIcon(type),
@@ -784,6 +786,7 @@ class _PluginDetailSheet extends StatelessWidget {
                     ),
                     child: Center(
                       child: _PluginCard._pluginAvatar(
+                        context: context,
                         manifest: manifest,
                         type: plugin.pluginType,
                         isLoaded: isLoaded,
@@ -968,7 +971,7 @@ class _PluginDetailSheet extends StatelessWidget {
                                 width: 1.5),
                           ),
                         ),
-                        icon: const Icon(Icons.key_rounded,
+                        icon: Icon(Icons.key_rounded,
                             color: AppTheme.accentColor(context), size: 22),
                       ),
                     ),
@@ -1126,7 +1129,7 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
       future: _future,
       builder: (ctx, snapshot) {
         if (!snapshot.hasData) {
-          return const SizedBox(
+          return SizedBox(
               height: 200,
               child: Center(
                   child: CircularProgressIndicator(
@@ -1211,7 +1214,7 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
                                       .withValues(alpha: 0.08))),
                           focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
-                              borderSide: const BorderSide(
+                              borderSide: BorderSide(
                                   color: AppTheme.accentColor(context),
                                   width: 1.5)),
                         ),
@@ -1301,7 +1304,7 @@ class _InlineOperationIndicator extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(
+          SizedBox(
               width: 14,
               height: 14,
               child: CircularProgressIndicator(

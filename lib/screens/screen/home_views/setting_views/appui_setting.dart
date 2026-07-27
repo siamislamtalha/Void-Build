@@ -92,9 +92,9 @@ class _AppUISettingsState extends State<AppUISettings> {
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             children: [
-              SettingSectionHeader(label: 'Appearance'),
-              SettingCard(
-                children: const [
+              const SettingSectionHeader(label: 'Appearance'),
+              const SettingCard(
+                children: [
                   ThemeSwitchTile(),
                 ],
               ),

@@ -208,12 +208,12 @@ class _SpinnerBody extends StatelessWidget {
               ),
               child: Center(
                 child: isDone
-                    ? const Icon(
+                    ? Icon(
                         Icons.check_rounded,
                         color: AppTheme.accentColor(context),
                         size: 36,
                       )
-                    : const SizedBox(
+                    : SizedBox(
                         width: 36,
                         height: 36,
                         child: CircularProgressIndicator(

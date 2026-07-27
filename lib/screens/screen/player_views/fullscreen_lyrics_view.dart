@@ -146,10 +146,10 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 400),
                     child: switch (state) {
-                      LyricsInitial() => const Center(
+                      LyricsInitial() => Center(
                           child: CircularProgressIndicator(
                               color: AppTheme.accentColor(context))),
-                      LyricsLoading() => const Center(
+                      LyricsLoading() => Center(
                           child: CircularProgressIndicator(
                               color: AppTheme.accentColor(context))),
                       LyricsLoaded() => state.lyrics.parsedLyrics != null

@@ -459,7 +459,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       child: BlocBuilder<BloomeePlayerCubit, BloomeePlayerState>(
         builder: (context, state) {
           if (state is BloomeePlayerInitial) {
-            return const Center(
+            return Center(
               child: SizedBox(
                 width: 50,
                 height: 50,

@@ -89,7 +89,7 @@ class _PlaylistEditViewState extends State<PlaylistEditView> {
                         navigator.pop();
                       },
                       padding: const EdgeInsets.symmetric(horizontal: 8),
-                      icon: const Icon(
+                      icon: Icon(
                         MingCute.check_fill,
                         color: AppTheme.accentColor(context),
                       ),
@@ -207,8 +207,11 @@ class _SliverPlaylistItemsState extends State<SliverPlaylistItems> {
         itemCount: _tracks.length,
         itemExtent: 70,
         proxyDecorator: _proxyDecorator,
-        onReorder: (oldIndex, newIndex) {
+        onReorderItem: (oldIndex, newIndex) {
           setState(() {
+            if (oldIndex < newIndex) {
+              newIndex -= 1;
+            }
             final Track item = _tracks.removeAt(oldIndex);
             _tracks.insert(newIndex, item);
           });

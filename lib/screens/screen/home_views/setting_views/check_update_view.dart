@@ -27,7 +27,7 @@ class CheckUpdateView extends StatelessWidget {
             const Spacer(),
             Text(
               "🎧 Update Check Temporarily Disabled 🎧",
-              style: const TextStyle(
+              style: TextStyle(
                       color: AppTheme.accentColor(context), fontSize: 20)
                   .merge(Default_Theme.secondoryTextStyleMedium),
               textAlign: TextAlign.center,

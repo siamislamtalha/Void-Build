@@ -132,7 +132,7 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
                         (widget.isLoadingMore ? 1 : 0),
                     itemBuilder: (context, i) {
                       if (i >= widget.section.items.length) {
-                        return const SizedBox(
+                        return SizedBox(
                           width: 96,
                           child: Center(
                             child: CircularProgressIndicator(

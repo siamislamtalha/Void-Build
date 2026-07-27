@@ -329,7 +329,7 @@ class _ArtistViewState extends State<ArtistView> {
 
         if (state.artistDetailStatus != DetailStatus.loaded &&
             state.artistDetailStatus != DetailStatus.loadingMore) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(color: AppTheme.accentColor(context)),
           );
         }
@@ -438,7 +438,7 @@ class _ArtistViewState extends State<ArtistView> {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       if (index == albums.length) {
-                        return const Center(
+                        return Center(
                             child: CircularProgressIndicator(
                                 color: AppTheme.accentColor(context)));
                       }
@@ -505,7 +505,7 @@ class _ArtistHeaderContent extends StatelessWidget {
           children: [
             _buildAvatar(150),
             const SizedBox(height: 24),
-            _buildInfo(isCentered: true),
+            _buildInfo(context, isCentered: true),
             const SizedBox(height: 24),
             _buildActions(context, isCentered: true),
             const SizedBox(height: 16),
@@ -525,7 +525,7 @@ class _ArtistHeaderContent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfo(isCentered: false),
+                _buildInfo(context, isCentered: false),
                 const SizedBox(height: 24),
                 _buildActions(context, isCentered: false),
               ],
@@ -567,7 +567,7 @@ class _ArtistHeaderContent extends StatelessWidget {
     );
   }
 
-  Widget _buildInfo({required bool isCentered}) {
+  Widget _buildInfo(BuildContext context, {required bool isCentered}) {
     return Column(
       crossAxisAlignment:
           isCentered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
@@ -654,12 +654,12 @@ class _ArtistHeaderContent extends StatelessWidget {
                   border:
                       Border.all(color: AppTheme.accentColor(context), width: 1.5),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(MingCute.play_fill,
                         size: 20, color: AppTheme.accentColor(context)),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text('Play',
                         style: TextStyle(
                             fontSize: 15,

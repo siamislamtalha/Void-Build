@@ -276,7 +276,7 @@ class _EqualizerViewState extends State<EqualizerView>
     final bands = _engine.equalizerBands;
     final isEnabled = _engine.equalizerEnabled;
     final isBuiltinMode = _eqSource == EqSourceValues.builtin;
-    const accent = AppTheme.accentColor(context);
+    final accent = AppTheme.accentColor(context);
 
     return Scaffold(
       backgroundColor: Default_Theme.themeColor,
@@ -374,7 +374,7 @@ class _EqualizerViewState extends State<EqualizerView>
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.info_outline_rounded,
+                                  Icon(Icons.info_outline_rounded,
                                       color: accent, size: 16),
                                   const SizedBox(width: 8),
                                   Expanded(

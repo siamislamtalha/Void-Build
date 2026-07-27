@@ -230,7 +230,7 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Icon(
+                          Icon(
                             MingCute.music_2_fill,
                             size: 70,
                             color: AppTheme.accentColor(context),

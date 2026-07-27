@@ -63,7 +63,7 @@ class _DownloadSettingsState extends State<DownloadSettings> {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_back_rounded,
                 color: Default_Theme.primaryColor1,
                 size: 24,
@@ -330,7 +330,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                   );
                 },
                 itemCount: _selectedIds.length,
-                onReorder: (oldIndex, newIndex) {
+                onReorderItem: (oldIndex, newIndex) {
                   setState(() {
                     final item = _selectedIds.removeAt(oldIndex);
                     _selectedIds.insert(newIndex, item);
@@ -357,7 +357,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                             alignment: Alignment.center,
                             child: Text(
                               '${index + 1}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppTheme.accentColor(context),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,

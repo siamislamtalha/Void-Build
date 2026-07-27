@@ -170,7 +170,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
   }
 
   Widget _buildLoadingSliver() {
-    return const SliverFillRemaining(
+    return SliverFillRemaining(
       child: Center(
         child: CircularProgressIndicator(color: AppTheme.accentColor(context)),
       ),
@@ -233,7 +233,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircularProgressIndicator(color: AppTheme.accentColor(context)),
+            CircularProgressIndicator(color: AppTheme.accentColor(context)),
             const SizedBox(height: 20),
             Text(AppLocalizations.of(context)!.localMusicScanning,
                 style: const TextStyle(

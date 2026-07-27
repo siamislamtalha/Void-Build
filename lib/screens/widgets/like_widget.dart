@@ -24,7 +24,6 @@ class LikeBtnWidget extends StatefulWidget {
 class _LikeBtnWidgetState extends State<LikeBtnWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _colorController;
-  late Animation<Color?> _colorAnimation;
 
   @override
   void initState() {
@@ -33,20 +32,9 @@ class _LikeBtnWidgetState extends State<LikeBtnWidget>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-    _setupAnimation();
     if (widget.isPlaying) {
       _colorController.value = 1.0;
     }
-  }
-
-  void _setupAnimation() {
-    _colorAnimation = ColorTween(
-      begin: AppTheme.secondaryTextColor(context), // Pink (paused)
-      end: AppTheme.accentColor(context), // Sky Blue (playing)
-    ).animate(CurvedAnimation(
-      parent: _colorController,
-      curve: Curves.easeOutCubic,
-    ));
   }
 
   @override

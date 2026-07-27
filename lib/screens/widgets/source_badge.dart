@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/plugins/utils/media_id.dart';
 
 /// Maps a plugin ID string to an SVG asset path.

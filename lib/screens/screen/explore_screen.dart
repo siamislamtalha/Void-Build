@@ -194,7 +194,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           child: BlocBuilder<RecentlyCubit, RecentlyCubitState>(
                             builder: (context, state) {
                               if (state is RecentlyCubitInitial) {
-                                return const Center(
+                                return Center(
                                   child: SizedBox(
                                     height: 60,
                                     width: 60,
@@ -358,8 +358,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                   );
                                 }
 
-                                return const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 40),
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 40),
                                   child: Center(
                                     child: CircularProgressIndicator(
                                       color: AppTheme.accentColor(context),
@@ -585,7 +585,7 @@ class NotificationIcon extends StatelessWidget {
               ),
             ),
           ),
-          badgeStyle: const badges.BadgeStyle(
+          badgeStyle: badges.BadgeStyle(
             badgeColor: AppTheme.accentColor(context),
             shape: badges.BadgeShape.circle,
           ),

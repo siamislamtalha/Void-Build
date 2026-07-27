@@ -397,7 +397,7 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
               color: AppTheme.accentColor(context).withValues(alpha: 0.3))),
-      child: const Icon(MingCute.plugin_2_line,
+      child: Icon(MingCute.plugin_2_line,
           color: AppTheme.accentColor(context), size: 24),
     );
   }
@@ -414,7 +414,7 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
     if (phase == _RemoteInstallPhase.downloading ||
         phase == _RemoteInstallPhase.installing) {
-      return const _AestheticButton(
+      return _AestheticButton(
           text: '', isLoading: true, color: AppTheme.accentColor(context));
     }
 

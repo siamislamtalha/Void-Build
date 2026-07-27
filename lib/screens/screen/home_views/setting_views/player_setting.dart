@@ -26,7 +26,7 @@ class PlayerSettings extends StatelessWidget {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_back_rounded,
                 color: Default_Theme.primaryColor1,
                 size: 24,
@@ -232,7 +232,7 @@ class _CrossfadeSliderState extends State<_CrossfadeSlider> {
                     : Text(
                         '${_localValue.toInt()}s',
                         key: ValueKey(_localValue.toInt()),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppTheme.accentColor(context),
                           fontSize: 16,
                           fontWeight: FontWeight.w700,

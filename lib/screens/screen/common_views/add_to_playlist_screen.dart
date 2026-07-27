@@ -175,7 +175,7 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               MingCute.add_circle_line,
               color: AppTheme.accentColor(context),
               size: 26,
@@ -235,7 +235,7 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
                   child: BlocBuilder<LibraryItemsCubit, LibraryItemsState>(
                     builder: (context, libraryState) {
                       if (libraryState is LibraryItemsLoading) {
-                        return const Center(
+                        return Center(
                           child: CircularProgressIndicator(
                             color: AppTheme.accentColor(context),
                           ),

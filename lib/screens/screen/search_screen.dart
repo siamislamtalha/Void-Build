@@ -803,9 +803,9 @@ class _SuggestionsSliver extends StatelessWidget {
     return BlocBuilder<SearchSuggestionBloc, SearchSuggestionState>(
       builder: (context, state) {
         if (state is SearchSuggestionLoading) {
-          return const SliverToBoxAdapter(
+          return SliverToBoxAdapter(
             child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 48),
+                padding: const EdgeInsets.symmetric(vertical: 48),
                 child: Center(
                     child: CircularProgressIndicator(
                         color: AppTheme.accentColor(context)))),
@@ -834,7 +834,7 @@ class _SuggestionsSliver extends StatelessWidget {
               .addPostFrameCallback((_) => onSuggestionsGenerated(combined));
 
           if (combined.isEmpty && isPluginLoading) {
-            return const SliverFillRemaining(
+            return SliverFillRemaining(
               hasScrollBody: false,
               child: Center(
                 child: SizedBox(
@@ -1204,7 +1204,7 @@ class _ContentSliver extends StatelessWidget {
                 state.searchResults!.items.isNotEmpty;
 
             if (state.searchStatus == SearchStatus.loading && !hasResults) {
-              return const SliverFillRemaining(
+              return SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
                       child: CircularProgressIndicator(
@@ -1357,9 +1357,9 @@ class _SliverSearchResults extends StatelessWidget {
               .toList()),
         ],
         if (isLoadingMore)
-          const SliverToBoxAdapter(
+          SliverToBoxAdapter(
               child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32),
+                  padding: const EdgeInsets.symmetric(vertical: 32),
                   child: Center(
                       child: CircularProgressIndicator(
                           color: AppTheme.accentColor(context)))))

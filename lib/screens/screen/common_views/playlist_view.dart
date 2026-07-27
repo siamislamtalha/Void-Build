@@ -327,18 +327,18 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
                   ),
                 )
               else
-                const SliverToBoxAdapter(
+                SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.only(top: 100, bottom: 120),
+                    padding: const EdgeInsets.only(top: 100, bottom: 120),
                     child: Center(
                         child: CircularProgressIndicator(
                             color: AppTheme.accentColor(context))),
                   ),
                 ),
               if (status == DetailStatus.loadingMore)
-                const SliverToBoxAdapter(
+                SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.only(top: 20, bottom: 120),
+                    padding: const EdgeInsets.only(top: 20, bottom: 120),
                     child: Center(
                         child: CircularProgressIndicator(
                             color: AppTheme.accentColor(context))),

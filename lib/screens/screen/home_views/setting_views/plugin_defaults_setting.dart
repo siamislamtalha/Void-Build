@@ -27,7 +27,7 @@ class PluginDefaultsSettings extends StatelessWidget {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_back_rounded,
                 color: Default_Theme.primaryColor1,
                 size: 24,
@@ -399,8 +399,11 @@ class _ResolverPriorityListState extends State<_ResolverPriorityList> {
             );
           },
           itemCount: _items.length,
-          onReorder: (oldIndex, newIndex) {
+          onReorderItem: (oldIndex, newIndex) {
             setState(() {
+              if (oldIndex < newIndex) {
+                newIndex -= 1;
+              }
               final item = _items.removeAt(oldIndex);
               _items.insert(newIndex, item);
             });
@@ -487,7 +490,7 @@ class _PriorityTile extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               '$rank',
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppTheme.accentColor(context),
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
