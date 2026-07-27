@@ -1,7 +1,4 @@
 # Project-level configuration.
-# MUST be first: tells CMake sub-projects the minimum policy version,
-# preventing "Visual Studio 16 2019" generator selection failures on CI.
-set(CMAKE_POLICY_VERSION_MINIMUM "3.5" CACHE STRING "Minimum policy version for subprojects" FORCE)
 cmake_minimum_required(VERSION 3.14)
 project(voidmusic LANGUAGES CXX)
 
