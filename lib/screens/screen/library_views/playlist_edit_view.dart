@@ -207,7 +207,7 @@ class _SliverPlaylistItemsState extends State<SliverPlaylistItems> {
         itemCount: _tracks.length,
         itemExtent: 70,
         proxyDecorator: _proxyDecorator,
-        onReorderItem: (oldIndex, newIndex) {
+        onReorder: (oldIndex, newIndex) {
           setState(() {
             if (oldIndex < newIndex) {
               newIndex -= 1;
