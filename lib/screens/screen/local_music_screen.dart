@@ -172,7 +172,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
   Widget _buildLoadingSliver() {
     return const SliverFillRemaining(
       child: Center(
-        child: CircularProgressIndicator(color: Default_Theme.accentColor2),
+        child: CircularProgressIndicator(color: AppTheme.accentColor(context)),
       ),
     );
   }
@@ -212,7 +212,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                 label: Text(
                     AppLocalizations.of(context)!.localMusicGrantPermission),
                 style: FilledButton.styleFrom(
-                  backgroundColor: Default_Theme.accentColor2,
+                  backgroundColor: AppTheme.accentColor(context),
                   foregroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -233,7 +233,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircularProgressIndicator(color: Default_Theme.accentColor2),
+            const CircularProgressIndicator(color: AppTheme.accentColor(context)),
             const SizedBox(height: 20),
             Text(AppLocalizations.of(context)!.localMusicScanning,
                 style: const TextStyle(
@@ -338,7 +338,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                       label: Text(
                           AppLocalizations.of(context)!.localMusicAddFolder),
                       style: FilledButton.styleFrom(
-                        backgroundColor: Default_Theme.accentColor2,
+                        backgroundColor: AppTheme.accentColor(context),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12),
@@ -514,11 +514,15 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
   }
 
   SliverAppBar _buildSliverAppBar(BuildContext context, LocalMusicState state) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+
     return SliverAppBar(
       floating: true,
       pinned: false,
       surfaceTintColor: Colors.transparent,
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Colors.transparent,
       automaticallyImplyLeading: false,
       titleSpacing: 16,
       title: AnimatedSwitcher(
@@ -528,26 +532,24 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                 key: const ValueKey('search'),
                 controller: _searchController,
                 autofocus: true,
-                cursorColor: Default_Theme.primaryColor1,
+                cursorColor: titleColor,
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context)!.localMusicSearchHint,
                   border: InputBorder.none,
                   hintStyle: TextStyle(
-                      color:
-                          Default_Theme.primaryColor1.withValues(alpha: 0.4)),
+                      color: isDark ? Colors.white54 : const Color(0xFF8E8E93)),
                 ),
-                style: Default_Theme.secondoryTextStyle.merge(const TextStyle(
-                    color: Default_Theme.primaryColor1, fontSize: 16.0)),
+                style: Default_Theme.secondoryTextStyle.copyWith(
+                    color: titleColor, fontSize: 16.0),
               )
             : Row(
                 key: const ValueKey('title'),
                 children: [
                   Text(AppLocalizations.of(context)!.localMusicTitle,
-                      style: Default_Theme.primaryTextStyle.merge(
-                          const TextStyle(
-                              fontSize: 34,
-                              color: Default_Theme.primaryColor1,
-                              fontWeight: FontWeight.w700))),
+                      style: Default_Theme.primaryTextStyle.copyWith(
+                          fontSize: 34,
+                          color: titleColor,
+                          fontWeight: FontWeight.w700)),
                   const Spacer(),
                 ],
               ),
@@ -556,15 +558,15 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
         if (!_isSearch && state is LocalMusicLoaded)
           IconButton(
             tooltip: AppLocalizations.of(context)!.localMusicRescanDevice,
-            icon: const Icon(MingCute.refresh_2_line,
-                color: Default_Theme.primaryColor1),
+            icon: Icon(MingCute.refresh_2_line,
+                color: iconColor),
             onPressed: () => context.read<LocalMusicCubit>().scan(),
           ),
         if (!_isSearch && !LocalMusicService.isMobile)
           IconButton(
             tooltip: AppLocalizations.of(context)!.localMusicAddFolder,
-            icon: const Icon(MingCute.new_folder_line,
-                color: Default_Theme.primaryColor1),
+            icon: Icon(MingCute.new_folder_line,
+                color: iconColor),
             onPressed: () =>
                 context.read<LocalMusicCubit>().addFolderViaPicker(),
           ),
@@ -573,7 +575,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
               ? AppLocalizations.of(context)!.localMusicCloseSearch
               : AppLocalizations.of(context)!.localMusicOpenSearch,
           icon: Icon(_isSearch ? Icons.close : MingCute.search_2_line,
-              color: Default_Theme.primaryColor1),
+              color: iconColor),
           onPressed: _toggleSearch,
         ),
         const SizedBox(width: 8),
@@ -592,8 +594,11 @@ class _ActionChipButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = AppTheme.accentColor(context);
+    final tint = AppTheme.accentTintColor(context, alpha: 0.12);
+
     return Material(
-      color: Default_Theme.accentColor2.withValues(alpha: 0.12),
+      color: tint,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
@@ -603,11 +608,11 @@ class _ActionChipButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 16, color: Default_Theme.accentColor2),
+              Icon(icon, size: 16, color: accent),
               const SizedBox(width: 6),
               Text(label,
-                  style: const TextStyle(
-                      color: Default_Theme.accentColor2,
+                  style: TextStyle(
+                      color: accent,
                       fontSize: 13,
                       fontWeight: FontWeight.w600)),
             ],
@@ -712,7 +717,7 @@ class _DeleteConfirmDialogState extends State<_DeleteConfirmDialog> {
                 child: Checkbox(
                   value: _dontAskAgain,
                   onChanged: (v) => setState(() => _dontAskAgain = v ?? false),
-                  activeColor: Default_Theme.accentColor2,
+                  activeColor: AppTheme.accentColor(context),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4)),
                   side: BorderSide(
@@ -753,8 +758,8 @@ class _DeleteConfirmDialogState extends State<_DeleteConfirmDialog> {
                     context, _DeleteResult(neverAskAgain: _dontAskAgain)),
                 style: TextButton.styleFrom(
                   backgroundColor:
-                      const Color(0xFFFF4D6A).withValues(alpha: 0.14),
-                  foregroundColor: const Color(0xFFFF4D6A),
+                      Theme.of(context).colorScheme.error.withValues(alpha: 0.14),
+                  foregroundColor: Theme.of(context).colorScheme.error,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   shape: RoundedRectangleBorder(

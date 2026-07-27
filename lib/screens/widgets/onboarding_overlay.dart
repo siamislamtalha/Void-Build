@@ -216,8 +216,8 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
                         color: _cardColor,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: const Color(0xFFFF2A5F)
-                              .withValues(alpha: 0.15),
+                          color: AppTheme.accentColor(context)
+                              .withValues(alpha: 0.25),
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -233,7 +233,7 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
                           const Icon(
                             MingCute.music_2_fill,
                             size: 70,
-                            color: Default_Theme.accentColor2,
+                            color: AppTheme.accentColor(context),
                           ),
                           const SizedBox(height: 18),
                           Text(
@@ -275,12 +275,12 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
                                 ),
                               ),
                               if (_isResolvingCountry)
-                                const SizedBox(
+                                SizedBox(
                                   width: 18,
                                   height: 18,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Color(0xFFFF2A5F),
+                                    color: AppTheme.accentColor(context),
                                   ),
                                 ),
                               if (_isResolvingCountry)
@@ -320,7 +320,7 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
                               splashColor: Colors.white.withValues(alpha: 0.15),
                               child: Ink(
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFF2A5F),
+                                  color: AppTheme.accentColor(context),
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                                 child: Container(
@@ -453,11 +453,11 @@ class _AestheticSwitch extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           color: value
-              ? const Color(0xFFFF2A5F).withValues(alpha: 0.2)
+              ? AppTheme.accentColor(context).withValues(alpha: 0.2)
               : Default_Theme.primaryColor1.withValues(alpha: 0.06),
           border: Border.all(
             color: value
-                ? const Color(0xFFFF2A5F).withValues(alpha: 0.65)
+                ? AppTheme.accentColor(context).withValues(alpha: 0.65)
                 : Default_Theme.primaryColor1.withValues(alpha: 0.18),
             width: 1.4,
           ),
@@ -472,7 +472,7 @@ class _AestheticSwitch extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: value
-                  ? const Color(0xFFFF2A5F)
+                  ? AppTheme.accentColor(context)
                   : Default_Theme.primaryColor1.withValues(alpha: 0.45),
             ),
           ),

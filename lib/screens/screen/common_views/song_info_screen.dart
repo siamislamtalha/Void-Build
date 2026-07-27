@@ -614,13 +614,13 @@ class _DetailRow extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: Default_Theme.accentColor2.withValues(alpha: 0.1),
+              color: AppTheme.accentColor(context).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               icon,
               size: 20,
-              color: Default_Theme.accentColor2,
+              color: AppTheme.accentColor(context),
             ),
           ),
           const SizedBox(width: 16),
@@ -671,7 +671,7 @@ class _DetailRow extends StatelessWidget {
                   child: Icon(
                     MingCute.search_2_line,
                     size: 16,
-                    color: Default_Theme.accentColor2.withValues(alpha: 0.4),
+                    color: AppTheme.accentColor(context).withValues(alpha: 0.4),
                   ),
                 ),
               ),

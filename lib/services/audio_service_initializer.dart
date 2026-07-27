@@ -86,7 +86,7 @@ class PlayerInitializer {
         androidShowNotificationBadge: true,
         // Keep foreground service alive while paused — reduces OEM process kills.
         androidStopForegroundOnPause: false,
-        notificationColor: Default_Theme.accentColor2,
+        notificationColor: AppTheme.accentColor1,
       ),
     );
     _player = player;

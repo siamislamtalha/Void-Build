@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
@@ -110,65 +111,94 @@ class _ThemeSegmentedControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final segments = [
+    final segments = const [
       _Segment(value: 'system', icon: Icons.brightness_auto_rounded, label: 'Auto'),
       _Segment(value: 'light', icon: Icons.light_mode_rounded, label: 'Light'),
       _Segment(value: 'dark', icon: Icons.dark_mode_rounded, label: 'Dark'),
     ];
 
-    final bgColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.06);
+    // Theme-aware glass colors matching footer and mini player
+    final glassColor = isDark
+        ? Colors.black.withValues(alpha: 0.40)
+        : Colors.white.withValues(alpha: 0.70);
+    final glassBorder = isDark
+        ? Colors.white.withValues(alpha: 0.16)
+        : Colors.black.withValues(alpha: 0.10);
     final selectedBg = isDark
         ? Colors.white.withValues(alpha: 0.18)
-        : Colors.black.withValues(alpha: 0.10);
+        : Colors.black.withValues(alpha: 0.08);
+    final selectedBorder = isDark
+        ? Colors.white.withValues(alpha: 0.22)
+        : Colors.black.withValues(alpha: 0.12);
     final selectedColor = isDark ? Colors.white : AppTheme.lightPrimaryText;
     final unselectedColor = isDark
-        ? Colors.white.withValues(alpha: 0.35)
-        : AppTheme.lightSecondaryText.withValues(alpha: 0.6);
+        ? Colors.white.withValues(alpha: 0.45)
+        : AppTheme.lightSecondaryText;
 
-    return Container(
-      height: 36,
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: segments.map((seg) {
-          final isSelected = current == seg.value;
-          return GestureDetector(
-            onTap: () => onChanged(seg.value),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: isSelected ? selectedBg : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    seg.icon,
-                    size: 15,
-                    color: isSelected ? selectedColor : unselectedColor,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    seg.label,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      fontFamily: 'Gilroy',
-                      color: isSelected ? selectedColor : unselectedColor,
-                    ),
-                  ),
-                ],
-              ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          height: 30,
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            color: glassColor,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: glassBorder,
+              width: 1.0,
             ),
-          );
-        }).toList(),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
+                blurRadius: 12,
+                spreadRadius: 0,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: segments.map((seg) {
+              final isSelected = current == seg.value;
+              return GestureDetector(
+                onTap: () => onChanged(seg.value),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutCubic,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: isSelected ? selectedBg : Colors.transparent,
+                    borderRadius: BorderRadius.circular(7),
+                    border: isSelected
+                        ? Border.all(color: selectedBorder, width: 1.0)
+                        : null,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        seg.icon,
+                        size: 13,
+                        color: isSelected ? selectedColor : unselectedColor,
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        seg.label,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          fontFamily: 'Gilroy',
+                          color: isSelected ? selectedColor : unselectedColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
       ),
     );
   }

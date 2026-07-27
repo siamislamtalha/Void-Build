@@ -177,7 +177,7 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
           IconButton(
             icon: const Icon(
               MingCute.add_circle_line,
-              color: Default_Theme.accentColor2,
+              color: AppTheme.accentColor(context),
               size: 26,
             ),
             tooltip: l10n.playlistCreateNew,
@@ -237,7 +237,7 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
                       if (libraryState is LibraryItemsLoading) {
                         return const Center(
                           child: CircularProgressIndicator(
-                            color: Default_Theme.accentColor2,
+                            color: AppTheme.accentColor(context),
                           ),
                         );
                       }
@@ -344,8 +344,8 @@ class _CreatePlaylistTile extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          splashColor: Default_Theme.accentColor2.withValues(alpha: 0.08),
-          highlightColor: Default_Theme.accentColor2.withValues(alpha: 0.04),
+          splashColor: AppTheme.accentColor(context).withValues(alpha: 0.08),
+          highlightColor: AppTheme.accentColor(context).withValues(alpha: 0.04),
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),

@@ -187,7 +187,7 @@ class _ImportMediaFromPlatformsViewState
               });
             },
             style: FilledButton.styleFrom(
-              backgroundColor: Default_Theme.accentColor2,
+              backgroundColor: AppTheme.accentColor(context),
               foregroundColor: Theme.of(context).colorScheme.onSurface,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -309,7 +309,7 @@ class _ImportMediaFromPlatformsViewState
         content: TextField(
           controller: controller,
           autofocus: true,
-          cursorColor: Default_Theme.accentColor2,
+          cursorColor: AppTheme.accentColor(context),
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15),
           decoration: InputDecoration(
             hintText: AppLocalizations.of(context)!.importM3UNameHint,
@@ -323,7 +323,7 @@ class _ImportMediaFromPlatformsViewState
             ),
             focusedBorder: const UnderlineInputBorder(
               borderSide:
-                  BorderSide(color: Default_Theme.accentColor2, width: 2),
+                  BorderSide(color: AppTheme.accentColor(context), width: 2),
             ),
           ),
           onSubmitted: (v) {
@@ -347,10 +347,10 @@ class _ImportMediaFromPlatformsViewState
                   ? null
                   : () => Navigator.of(dialogCtx).pop(val.text.trim()),
               style: FilledButton.styleFrom(
-                backgroundColor: Default_Theme.accentColor2,
+                backgroundColor: AppTheme.accentColor(context),
                 foregroundColor: Theme.of(context).colorScheme.onSurface,
                 disabledBackgroundColor:
-                    Default_Theme.accentColor2.withValues(alpha: 0.4),
+                    AppTheme.accentColor(context).withValues(alpha: 0.4),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -409,12 +409,12 @@ class _ImporterPluginTile extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Default_Theme.accentColor2.withValues(alpha: 0.15),
+                    color: AppTheme.accentColor(context).withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     MingCute.download_2_fill,
-                    color: Default_Theme.accentColor2,
+                    color: AppTheme.accentColor(context),
                     size: 24,
                   ),
                 ),

@@ -55,7 +55,7 @@ class _SmartReplaceDialogState extends State<_SmartReplaceDialog> {
         future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return const SizedBox(
+            return SizedBox(
               height: 160,
               child: Center(
                 child: SizedBox(
@@ -63,7 +63,7 @@ class _SmartReplaceDialogState extends State<_SmartReplaceDialog> {
                   height: 28,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
-                    color: Default_Theme.accentColor2,
+                    color: AppTheme.accentColor(context),
                   ),
                 ),
               ),
@@ -121,12 +121,12 @@ class _SmartReplaceDialogState extends State<_SmartReplaceDialog> {
                           child: BloomeeDialogBadge(l10n.smartReplaceBestMatch),
                         ),
                       isApplying
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Default_Theme.accentColor2,
+                                color: AppTheme.accentColor(context),
                               ),
                             )
                           : BloomeeDialogBadge(
@@ -224,13 +224,13 @@ class _SmartReplaceEmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon,
-                color: Default_Theme.primaryColor2.withValues(alpha: 0.6),
+                color: AppTheme.secondaryTextColor(context),
                 size: 28),
             const SizedBox(height: 12),
             Text(
               title,
-              style: const TextStyle(
-                color: Default_Theme.primaryColor1,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -240,7 +240,7 @@ class _SmartReplaceEmptyState extends StatelessWidget {
               subtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Default_Theme.primaryColor2.withValues(alpha: 0.55),
+                color: AppTheme.secondaryTextColor(context),
                 fontSize: 12,
               ),
             ),

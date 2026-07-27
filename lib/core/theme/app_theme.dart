@@ -54,12 +54,12 @@ class AppTheme {
   );
 
   static BoxDecoration inactivePillDecoration({required bool isDark}) => BoxDecoration(
-    color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5EA),
+    color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF0F0F3),
     borderRadius: BorderRadius.circular(24),
     border: Border.all(
       color: isDark
           ? Colors.white.withValues(alpha: 0.08)
-          : Colors.black.withValues(alpha: 0.08),
+          : const Color(0xFFE5E5EA),
       width: 1,
     ),
   );
@@ -215,12 +215,12 @@ class AppTheme {
   }
 
   // ── Light Theme ───────────────────────────────────────────────────────────────
-  static const Color lightBg = Color(0xFFF2F1F6);
+  static const Color lightBg = Color(0xFFFAFAFD);
   static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightCardSurface = Color(0xFFF8F8FA);
-  static const Color lightPrimaryText = Color(0xFF1C1C1E);
-  static const Color lightSecondaryText = Color(0xFF8E8E93);
-  static const Color lightBorder = Color(0xFFD1D1D6);
+  static const Color lightCardSurface = Color(0xFFF2F2F5);
+  static const Color lightPrimaryText = Color(0xFF000000);
+  static const Color lightSecondaryText = Color(0xFF66666E);
+  static const Color lightBorder = Color(0xFFE5E5EA);
 
   ThemeData get lightThemeData {
     const lightScheme = ColorScheme.light(

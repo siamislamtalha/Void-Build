@@ -122,7 +122,7 @@ class _TimerViewState extends State<TimerView> {
                                   .add(const TimerStopped());
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Default_Theme.accentColor2,
+                              backgroundColor: AppTheme.accentColor(context),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 8),
                               shape: RoundedRectangleBorder(
@@ -169,7 +169,7 @@ class _TimerViewState extends State<TimerView> {
                           l10n.timerFinishedMessage,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                              color: Default_Theme.accentColor2,
+                              color: AppTheme.accentColor(context),
                               fontSize: 40,
                               fontFamily: "Unageo",
                               fontWeight: FontWeight.bold),
@@ -180,7 +180,7 @@ class _TimerViewState extends State<TimerView> {
                           context.read<TimerBloc>().add(const TimerReset());
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Default_Theme.accentColor2,
+                          backgroundColor: AppTheme.accentColor(context),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 8),
                           shape: RoundedRectangleBorder(
@@ -354,7 +354,7 @@ class _TimerViewState extends State<TimerView> {
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Default_Theme.accentColor2,
+              backgroundColor: AppTheme.accentColor(context),
               padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),

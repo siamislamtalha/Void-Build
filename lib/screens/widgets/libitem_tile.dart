@@ -135,7 +135,7 @@ class LibItemCard extends StatelessWidget {
                               Icon(
                                 MingCute.pin_2_fill,
                                 size: 12,
-                                color: Default_Theme.accentColor2
+                                color: AppTheme.accentColor(context)
                                     .withValues(alpha: 0.85),
                               ),
                               const SizedBox(width: 4),

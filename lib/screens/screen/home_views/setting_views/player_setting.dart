@@ -233,7 +233,7 @@ class _CrossfadeSliderState extends State<_CrossfadeSlider> {
                         '${_localValue.toInt()}s',
                         key: ValueKey(_localValue.toInt()),
                         style: const TextStyle(
-                          color: Default_Theme.accentColor2,
+                          color: AppTheme.accentColor(context),
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ).merge(Default_Theme.secondoryTextStyleMedium),
@@ -247,11 +247,11 @@ class _CrossfadeSliderState extends State<_CrossfadeSlider> {
               trackHeight: 4,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
-              activeTrackColor: Default_Theme.accentColor2,
+              activeTrackColor: AppTheme.accentColor(context),
               inactiveTrackColor:
                   Default_Theme.primaryColor2.withValues(alpha: 0.1),
-              thumbColor: Default_Theme.accentColor2,
-              overlayColor: Default_Theme.accentColor2.withValues(alpha: 0.15),
+              thumbColor: AppTheme.accentColor(context),
+              overlayColor: AppTheme.accentColor(context).withValues(alpha: 0.15),
               tickMarkShape:
                   const RoundSliderTickMarkShape(tickMarkRadius: 2.5),
               activeTickMarkColor:
@@ -278,7 +278,7 @@ class _CrossfadeSliderState extends State<_CrossfadeSlider> {
                   v == 0 ? offLabel : '${v}s',
                   style: TextStyle(
                     color: active
-                        ? Default_Theme.accentColor2
+                        ? AppTheme.accentColor(context)
                         : Default_Theme.primaryColor2.withValues(alpha: 0.3),
                     fontSize: 11,
                     fontWeight: active ? FontWeight.w700 : FontWeight.w500,

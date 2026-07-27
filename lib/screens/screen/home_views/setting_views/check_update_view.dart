@@ -28,7 +28,7 @@ class CheckUpdateView extends StatelessWidget {
             Text(
               "🎧 Update Check Temporarily Disabled 🎧",
               style: const TextStyle(
-                      color: Default_Theme.accentColor2, fontSize: 20)
+                      color: AppTheme.accentColor(context), fontSize: 20)
                   .merge(Default_Theme.secondoryTextStyleMedium),
               textAlign: TextAlign.center,
             ),
@@ -70,7 +70,7 @@ class CheckUpdateView extends StatelessWidget {
         //             Text(
         //               l10n.updateUpToDate,
         //               style: const TextStyle(
-        //                       color: Default_Theme.accentColor2, fontSize: 20)
+        //                       color: AppTheme.accentColor(context), fontSize: 20)
         //                   .merge(Default_Theme.secondoryTextStyleMedium),
         //             ),
         //             Padding(
@@ -127,7 +127,7 @@ class CheckUpdateView extends StatelessWidget {
         //             Text(
         //               l10n.updateNewVersionAvailable,
         //               style: const TextStyle(
-        //                       color: Default_Theme.accentColor2, fontSize: 20)
+        //                       color: AppTheme.accentColor(context), fontSize: 20)
         //                   .merge(Default_Theme.tertiaryTextStyle),
         //               textAlign: TextAlign.center,
         //             ),
@@ -195,7 +195,7 @@ class CheckUpdateView extends StatelessWidget {
         //                 height: 50,
         //                 width: 50,
         //                 child: CircularProgressIndicator(
-        //                   color: Default_Theme.accentColor2,
+        //                   color: AppTheme.accentColor(context),
         //                 )),
         //           ),
         //           LayoutBuilder(
@@ -204,7 +204,7 @@ class CheckUpdateView extends StatelessWidget {
         //                 width: constraints.maxWidth * 0.6,
         //                 child: Text(l10n.updateChecking,
         //                     style: const TextStyle(
-        //                             color: Default_Theme.accentColor2,
+        //                             color: AppTheme.accentColor(context),
         //                             fontSize: 20)
         //                         .merge(Default_Theme.tertiaryTextStyle),
         //                     textAlign: TextAlign.center),

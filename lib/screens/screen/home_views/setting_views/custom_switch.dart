@@ -57,11 +57,11 @@ class _BloomeeSwitchState extends State<BloomeeSwitch> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           color: _localValue
-              ? Default_Theme.accentColor2.withValues(alpha: 0.15)
+              ? AppTheme.accentColor(context).withValues(alpha: 0.15)
               : Default_Theme.primaryColor2.withValues(alpha: 0.05),
           border: Border.all(
             color: _localValue
-                ? Default_Theme.accentColor2.withValues(alpha: 0.5)
+                ? AppTheme.accentColor(context).withValues(alpha: 0.5)
                 : Default_Theme.primaryColor2.withValues(alpha: 0.15),
             width: 1.5,
           ),
@@ -77,7 +77,7 @@ class _BloomeeSwitchState extends State<BloomeeSwitch> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: _localValue
-                  ? Default_Theme.accentColor2
+                  ? AppTheme.accentColor(context)
                   : Default_Theme.primaryColor2.withValues(alpha: 0.4),
             ),
           ),

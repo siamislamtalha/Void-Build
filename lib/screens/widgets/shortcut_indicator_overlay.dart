@@ -187,13 +187,13 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
         icon = isMuted ? MingCute.volume_off_fill : MingCute.volume_fill;
         color = isMuted
             ? Colors.white.withValues(alpha: 0.5)
-            : Default_Theme.accentColor2;
+            : AppTheme.accentColor(context);
         break;
 
       case ShortcutIndicatorType.shuffle:
         icon = MingCute.shuffle_2_line;
         color = (widget.state.isShuffleOn ?? false)
-            ? Default_Theme.accentColor2
+            ? AppTheme.accentColor(context)
             : Colors.white.withValues(alpha: 0.5);
         break;
 
@@ -206,11 +206,11 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
             break;
           case LoopMode.one:
             icon = MingCute.repeat_one_line;
-            color = Default_Theme.accentColor2;
+            color = AppTheme.accentColor(context);
             break;
           case LoopMode.all:
             icon = MingCute.repeat_line;
-            color = Default_Theme.accentColor2;
+            color = AppTheme.accentColor(context);
             break;
         }
         break;
@@ -219,7 +219,7 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
         final isLiked = widget.state.isLiked ?? false;
         icon = isLiked ? AntDesign.heart_fill : AntDesign.heart_outline;
         color = isLiked
-            ? Default_Theme.accentColor2
+            ? AppTheme.accentColor(context)
             : Colors.white.withValues(alpha: 0.9);
         break;
     }
@@ -251,13 +251,13 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
       case ShortcutIndicatorType.mute:
         final isMuted = widget.state.isMuted ?? false;
         label = isMuted ? 'Muted' : 'Unmuted';
-        if (!isMuted) labelColor = Default_Theme.accentColor2;
+        if (!isMuted) labelColor = AppTheme.accentColor(context);
         break;
 
       case ShortcutIndicatorType.shuffle:
         final isOn = widget.state.isShuffleOn ?? false;
         label = isOn ? 'Shuffle On' : 'Shuffle Off';
-        if (isOn) labelColor = Default_Theme.accentColor2;
+        if (isOn) labelColor = AppTheme.accentColor(context);
         break;
 
       case ShortcutIndicatorType.loop:
@@ -268,11 +268,11 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
             break;
           case LoopMode.one:
             label = 'Repeat One';
-            labelColor = Default_Theme.accentColor2;
+            labelColor = AppTheme.accentColor(context);
             break;
           case LoopMode.all:
             label = 'Repeat All';
-            labelColor = Default_Theme.accentColor2;
+            labelColor = AppTheme.accentColor(context);
             break;
         }
         break;
@@ -280,7 +280,7 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
       case ShortcutIndicatorType.like:
         final isLiked = widget.state.isLiked ?? false;
         label = isLiked ? 'Liked' : 'Unliked';
-        if (isLiked) labelColor = Default_Theme.accentColor2;
+        if (isLiked) labelColor = AppTheme.accentColor(context);
         break;
     }
 
@@ -323,13 +323,13 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
         height: 6,
         decoration: BoxDecoration(
           color: level > 0
-              ? Default_Theme.accentColor2
+              ? AppTheme.accentColor(context)
               : Colors.white.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(3),
           boxShadow: level > 0
               ? [
                   BoxShadow(
-                    color: Default_Theme.accentColor2.withValues(alpha: 0.4),
+                    color: AppTheme.accentColor(context).withValues(alpha: 0.4),
                     blurRadius: 8,
                     spreadRadius: 1,
                     offset: const Offset(0, 0),

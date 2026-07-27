@@ -533,7 +533,7 @@ class _PlayerProgressBar extends StatelessWidget {
             onSeek: playerCubit.bloomeePlayer.seek,
             isPlaying: data?.isPlaying ?? false,
             activeAccentColor: Default_Theme.accentColor1,
-            inactiveAccentColor: Default_Theme.accentColor2,
+            inactiveAccentColor: AppTheme.accentColor(context),
             activeGradientStyle: GradientStyle.lightAndBreezy,
             inactiveGradientStyle: GradientStyle.warmAndRich,
             trackHeight: 6.0,

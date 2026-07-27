@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/plugins/utils/media_id.dart';
 
 /// Maps a plugin ID string to an SVG asset path.
@@ -45,13 +46,15 @@ class SourceBadge extends StatelessWidget {
     final svgPath = _svgPathForPluginId(parts.pluginId);
     if (svgPath == null) return const SizedBox.shrink();
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+
     return SvgPicture.asset(
       svgPath,
       width: size,
       height: size,
       fit: BoxFit.contain,
-      // Allow SVG's own fill colors to show through
-      colorFilter: null,
+      colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
     );
   }
 }
@@ -72,12 +75,15 @@ class SourceBadgeByPluginId extends StatelessWidget {
     final svgPath = _svgPathForPluginId(pluginId);
     if (svgPath == null) return const SizedBox.shrink();
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+
     return SvgPicture.asset(
       svgPath,
       width: size,
       height: size,
       fit: BoxFit.contain,
-      colorFilter: null,
+      colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
     );
   }
 }

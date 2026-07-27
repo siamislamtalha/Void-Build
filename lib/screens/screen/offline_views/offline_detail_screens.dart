@@ -91,7 +91,7 @@ class OfflineArtistDetailScreen extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                Default_Theme.accentColor2.withValues(alpha: 0.25),
+                                AppTheme.accentColor(context).withValues(alpha: 0.25),
                                 Colors.transparent
                               ],
                             ),
@@ -163,8 +163,8 @@ class OfflineArtistDetailScreen extends StatelessWidget {
                           Text(
                             artistName,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 32,
                               fontWeight: FontWeight.w800,
                               letterSpacing: -0.5,
@@ -174,7 +174,7 @@ class OfflineArtistDetailScreen extends StatelessWidget {
                           Text(
                             l10n.playlistSongCount(songs.length),
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.6),
+                              color: AppTheme.secondaryTextColor(context),
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -185,6 +185,7 @@ class OfflineArtistDetailScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               _buildActionButton(
+                                context: context,
                                 icon: MingCute.shuffle_line,
                                 tooltip: l10n.playlistShuffle,
                                 onTap: () => _playFromList(context, shuffle: true),
@@ -203,7 +204,7 @@ class OfflineArtistDetailScreen extends StatelessWidget {
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Default_Theme.accentColor2.withValues(alpha: 0.3),
+                                              color: AppTheme.accentTintColor(context, alpha: 0.25),
                                               blurRadius: 20,
                                               offset: const Offset(0, 8),
                                             ),
@@ -262,10 +263,12 @@ class OfflineArtistDetailScreen extends StatelessWidget {
   }
 
   Widget _buildActionButton({
+    required BuildContext context,
     required IconData icon,
     required String tooltip,
     required VoidCallback onTap,
   }) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Tooltip(
       message: tooltip,
       child: Material(
@@ -278,10 +281,10 @@ class OfflineArtistDetailScreen extends StatelessWidget {
             width: 44,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.04),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              color: onSurface.withValues(alpha: 0.05),
+              border: Border.all(color: onSurface.withValues(alpha: 0.12)),
             ),
-            child: Icon(icon, color: Colors.white.withValues(alpha: 0.85), size: 20),
+            child: Icon(icon, color: onSurface.withValues(alpha: 0.85), size: 20),
           ),
         ),
       ),
@@ -442,8 +445,8 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
                           Text(
                             albumName,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 32,
                               fontWeight: FontWeight.w800,
                               letterSpacing: -0.5,
@@ -454,7 +457,7 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
                             artistName,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.7),
+                              color: AppTheme.secondaryTextColor(context),
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -463,7 +466,7 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
                           Text(
                             l10n.playlistSongCount(songs.length),
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
+                              color: AppTheme.secondaryTextColor(context).withValues(alpha: 0.8),
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -474,6 +477,7 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               _buildActionButton(
+                                context: context,
                                 icon: MingCute.shuffle_line,
                                 tooltip: l10n.playlistShuffle,
                                 onTap: () => _playFromList(context, shuffle: true),
@@ -492,7 +496,7 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Default_Theme.accentColor1.withValues(alpha: 0.3),
+                                              color: AppTheme.accentTintColor(context, alpha: 0.25),
                                               blurRadius: 20,
                                               offset: const Offset(0, 8),
                                             ),
@@ -551,10 +555,12 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
   }
 
   Widget _buildActionButton({
+    required BuildContext context,
     required IconData icon,
     required String tooltip,
     required VoidCallback onTap,
   }) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Tooltip(
       message: tooltip,
       child: Material(
@@ -567,10 +573,10 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
             width: 44,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.04),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              color: onSurface.withValues(alpha: 0.05),
+              border: Border.all(color: onSurface.withValues(alpha: 0.12)),
             ),
-            child: Icon(icon, color: Colors.white.withValues(alpha: 0.85), size: 20),
+            child: Icon(icon, color: onSurface.withValues(alpha: 0.85), size: 20),
           ),
         ),
       ),

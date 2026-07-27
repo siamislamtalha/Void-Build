@@ -375,7 +375,7 @@ class _ChartScreenBodyState extends State<_ChartScreenBody> {
             if (state.chartDetailStatus == ChartStatus.loading) {
               return const Center(
                 child: CircularProgressIndicator(
-                    color: Default_Theme.accentColor2),
+                    color: AppTheme.accentColor(context)),
               );
             }
 
@@ -621,7 +621,7 @@ class _EditorialHeroMasthead extends StatelessWidget {
           fontSize: 11,
           fontWeight: FontWeight.w800,
           letterSpacing: 2.0,
-          color: Default_Theme.accentColor2.withValues(alpha: 0.9),
+          color: AppTheme.accentColor(context).withValues(alpha: 0.9),
         ),
       ),
     );
@@ -855,15 +855,15 @@ class _HeroPlayButton extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(30),
-        splashColor: Default_Theme.accentColor2.withValues(alpha: 0.15),
-        highlightColor: Default_Theme.accentColor2.withValues(alpha: 0.08),
+        splashColor: AppTheme.accentColor(context).withValues(alpha: 0.15),
+        highlightColor: AppTheme.accentColor(context).withValues(alpha: 0.08),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
-            color: Default_Theme.accentColor2.withValues(alpha: 0.18),
+            color: AppTheme.accentColor(context).withValues(alpha: 0.18),
             borderRadius: BorderRadius.circular(30),
             border: Border.all(
-              color: Default_Theme.accentColor2.withValues(alpha: 0.4),
+              color: AppTheme.accentColor(context).withValues(alpha: 0.4),
             ),
           ),
           child: AnimatedSwitcher(
@@ -913,7 +913,7 @@ class _HeroActionContent extends StatelessWidget {
           height: 18,
           child: CircularProgressIndicator(
             strokeWidth: 2.2,
-            color: Default_Theme.accentColor2,
+            color: AppTheme.accentColor(context),
           ),
         );
         label = AppLocalizations.of(context)!.chartResolving;
@@ -922,12 +922,12 @@ class _HeroActionContent extends StatelessWidget {
         leading = const Icon(
           Icons.check_rounded,
           size: 18,
-          color: Default_Theme.accentColor2,
+          color: AppTheme.accentColor(context),
         );
         label = AppLocalizations.of(context)!.chartReady;
         break;
       case ChartResolveActionStatus.idle:
-        leading = Icon(icon, size: 18, color: Default_Theme.accentColor2);
+        leading = Icon(icon, size: 18, color: AppTheme.accentColor(context));
         label = idleLabel;
         break;
     }
@@ -941,7 +941,7 @@ class _HeroActionContent extends StatelessWidget {
           label,
           style: Default_Theme.secondoryTextStyleMedium.merge(
             const TextStyle(
-              color: Default_Theme.accentColor2,
+              color: AppTheme.accentColor(context),
               fontSize: 14,
               fontWeight: FontWeight.w700,
             ),

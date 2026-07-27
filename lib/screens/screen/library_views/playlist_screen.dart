@@ -148,7 +148,7 @@ class _PlaylistViewState extends State<PlaylistView> {
               state.status == CurrentPlaylistLoadStatus.loading) {
             return const Center(
                 child: CircularProgressIndicator(
-                    color: Default_Theme.accentColor2));
+                    color: AppTheme.accentColor(context)));
           }
 
           if (state.status == CurrentPlaylistLoadStatus.error) {
@@ -370,7 +370,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                         padding: EdgeInsets.symmetric(vertical: 24),
                         child: Center(
                             child: CircularProgressIndicator(
-                                color: Default_Theme.accentColor2)),
+                                color: AppTheme.accentColor(context))),
                       ),
                     ),
                 ],
@@ -438,7 +438,7 @@ class _PlaylistViewState extends State<PlaylistView> {
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Center(
                   child: CircularProgressIndicator(
-                      color: Default_Theme.accentColor2)),
+                      color: AppTheme.accentColor(context))),
             ),
           ),
       ],
@@ -574,9 +574,9 @@ class _PlaylistViewState extends State<PlaylistView> {
                   decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color:
-                          Default_Theme.accentColor2.withValues(alpha: 0.15)),
+                          AppTheme.accentColor(context).withValues(alpha: 0.15)),
                   child: const Icon(Icons.offline_pin_rounded,
-                      color: Default_Theme.accentColor2, size: 20),
+                      color: AppTheme.accentColor(context), size: 20),
                 ),
               );
             }
@@ -609,7 +609,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                                color: Default_Theme.accentColor2
+                                color: AppTheme.accentColor(context)
                                     .withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8)),
@@ -739,7 +739,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                       TextStyle(color: Colors.white.withValues(alpha: 0.7)))),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Default_Theme.accentColor2,
+              backgroundColor: AppTheme.accentColor(context),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
@@ -818,7 +818,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                         minHeight: 6,
                         backgroundColor: Colors.white.withValues(alpha: 0.1),
                         valueColor: const AlwaysStoppedAnimation<Color>(
-                            Default_Theme.accentColor2),
+                            AppTheme.accentColor(context)),
                       ),
                     ),
                     const SizedBox(height: 12),

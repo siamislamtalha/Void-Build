@@ -30,6 +30,9 @@ class _PlayPauseButtonState extends State<PlayPauseButton> {
   @override
   Widget build(BuildContext context) {
     final size = widget.size;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final btnBg = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final iconColor = isDark ? Colors.black : Colors.white;
 
     return GestureDetector(
       onTap: _togglePlayPause,
@@ -38,10 +41,10 @@ class _PlayPauseButtonState extends State<PlayPauseButton> {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white,
+          color: btnBg,
           boxShadow: [
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.25),
+              color: btnBg.withValues(alpha: isDark ? 0.25 : 0.15),
               blurRadius: 16,
               spreadRadius: 2,
             )
@@ -66,13 +69,13 @@ class _PlayPauseButtonState extends State<PlayPauseButton> {
                     FontAwesome.pause_solid,
                     key: const ValueKey('pause'),
                     size: size * 0.45,
-                    color: Colors.black,
+                    color: iconColor,
                   )
                 : Icon(
                     FontAwesome.play_solid,
                     key: const ValueKey('play'),
                     size: size * 0.45,
-                    color: Colors.black,
+                    color: iconColor,
                   ),
           ),
         ),

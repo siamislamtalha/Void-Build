@@ -113,7 +113,7 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
             _AestheticButton(
               text: l10n.pluginRepositoryAddAction,
               icon: MingCute.add_line,
-              color: Default_Theme.accentColor2,
+              color: AppTheme.accentColor(context),
               fullWidth: true,
               onTap: () {
                 final url = _urlController.text.trim();
@@ -172,7 +172,7 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
                   _AestheticButton(
                     text: l10n.pluginRepositoryAddAction,
                     icon: MingCute.add_line,
-                    color: Default_Theme.accentColor2,
+                    color: AppTheme.accentColor(context),
                     onTap: () => _showAddRepositoryDialog(context),
                   ),
                 ],
@@ -191,7 +191,7 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
                   if (state is PluginRepositoryLoading) {
                     return const Center(
                       child: CircularProgressIndicator(
-                          color: Default_Theme.accentColor2, strokeWidth: 3),
+                          color: AppTheme.accentColor(context), strokeWidth: 3),
                     );
                   } else if (state is PluginRepositoryLoaded) {
                     if (state.repositories.isEmpty) {
@@ -201,7 +201,7 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
                       );
                     }
                     return RefreshIndicator(
-                      color: Default_Theme.accentColor2,
+                      color: AppTheme.accentColor(context),
                       backgroundColor:
                           Default_Theme.primaryColor1.withValues(alpha: 0.1),
                       onRefresh: () async => await context
@@ -298,15 +298,15 @@ class _RepoCard extends StatelessWidget {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: Default_Theme.accentColor2
+                          color: AppTheme.accentColor(context)
                               .withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                              color: Default_Theme.accentColor2
+                              color: AppTheme.accentColor(context)
                                   .withValues(alpha: 0.2)),
                         ),
                         child: const Icon(MingCute.cloud_line,
-                            size: 20, color: Default_Theme.accentColor2),
+                            size: 20, color: AppTheme.accentColor(context)),
                       ),
                       const SizedBox(width: 14),
                       Expanded(

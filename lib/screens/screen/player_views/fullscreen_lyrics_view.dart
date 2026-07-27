@@ -148,10 +148,10 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                     child: switch (state) {
                       LyricsInitial() => const Center(
                           child: CircularProgressIndicator(
-                              color: Default_Theme.accentColor2)),
+                              color: AppTheme.accentColor(context))),
                       LyricsLoading() => const Center(
                           child: CircularProgressIndicator(
-                              color: Default_Theme.accentColor2)),
+                              color: AppTheme.accentColor(context))),
                       LyricsLoaded() => state.lyrics.parsedLyrics != null
                           ? FullscreenSyncedLyrics(
                               state: state,
@@ -942,7 +942,7 @@ class _LyricsSettingsBottomSheet extends StatelessWidget {
               icon: MingCute.time_line,
               title: l10n.lyricsSettingsSyncTitle,
               subtitle: l10n.lyricsSettingsSyncSubtitle,
-              color: Default_Theme.accentColor2,
+              color: AppTheme.accentColor(context),
               onTap: onSyncTap,
             ),
             const Padding(

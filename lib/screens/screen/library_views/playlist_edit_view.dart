@@ -91,7 +91,7 @@ class _PlaylistEditViewState extends State<PlaylistEditView> {
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       icon: const Icon(
                         MingCute.check_fill,
-                        color: Default_Theme.accentColor2,
+                        color: AppTheme.accentColor(context),
                       ),
                     ),
                   ),
@@ -109,7 +109,7 @@ class _PlaylistEditViewState extends State<PlaylistEditView> {
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color:
-                            Default_Theme.accentColor2.withValues(alpha: 0.22),
+                            AppTheme.accentColor(context).withValues(alpha: 0.22),
                       ),
                     ),
                     child: Row(
@@ -118,14 +118,14 @@ class _PlaylistEditViewState extends State<PlaylistEditView> {
                           width: 28,
                           height: 28,
                           decoration: BoxDecoration(
-                            color: Default_Theme.accentColor2
+                            color: AppTheme.accentColor(context)
                                 .withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
                             Icons.drag_indicator_rounded,
                             size: 16,
-                            color: Default_Theme.accentColor2
+                            color: AppTheme.accentColor(context)
                                 .withValues(alpha: 0.95),
                           ),
                         ),
@@ -239,17 +239,17 @@ class _SliverPlaylistItemsState extends State<SliverPlaylistItems> {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: Default_Theme.accentColor2
+                          color: AppTheme.accentColor(context)
                               .withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: Default_Theme.accentColor2
+                            color: AppTheme.accentColor(context)
                                 .withValues(alpha: 0.20),
                           ),
                         ),
                         child: Icon(
                           Icons.drag_handle_rounded,
-                          color: Default_Theme.accentColor2
+                          color: AppTheme.accentColor(context)
                               .withValues(alpha: 0.88),
                           size: 18,
                         ),
@@ -276,12 +276,12 @@ Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
         elevation: elevation,
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(12),
-        shadowColor: Default_Theme.accentColor2.withValues(alpha: 0.25),
+        shadowColor: AppTheme.accentColor(context).withValues(alpha: 0.25),
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Default_Theme.accentColor2.withValues(alpha: 0.20),
+              color: AppTheme.accentColor(context).withValues(alpha: 0.20),
             ),
           ),
           child: child,

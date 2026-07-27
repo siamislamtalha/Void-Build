@@ -389,7 +389,7 @@ class _ResolverPriorityListState extends State<_ResolverPriorityList> {
               animation: animation,
               builder: (context, child) {
                 return Material(
-                  color: Default_Theme.accentColor2.withValues(alpha: 0.08),
+                  color: AppTheme.accentColor(context).withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
                   elevation: 4,
                   child: child,
@@ -481,14 +481,14 @@ class _PriorityTile extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: Default_Theme.accentColor2.withValues(alpha: 0.12),
+              color: AppTheme.accentColor(context).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             alignment: Alignment.center,
             child: Text(
               '$rank',
               style: const TextStyle(
-                color: Default_Theme.accentColor2,
+                color: AppTheme.accentColor(context),
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
               ),
@@ -679,7 +679,7 @@ class _MultiPluginSelectorState extends State<_MultiPluginSelector> {
                     ),
                     value: isSelected,
                     onChanged: (_) => _togglePlugin(plugin.manifest.id),
-                    activeColor: Default_Theme.accentColor2,
+                    activeColor: AppTheme.accentColor(context),
                     checkColor: Colors.white,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,

@@ -332,7 +332,7 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
                     padding: EdgeInsets.only(top: 100, bottom: 120),
                     child: Center(
                         child: CircularProgressIndicator(
-                            color: Default_Theme.accentColor2)),
+                            color: AppTheme.accentColor(context))),
                   ),
                 ),
               if (status == DetailStatus.loadingMore)
@@ -341,7 +341,7 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
                     padding: EdgeInsets.only(top: 20, bottom: 120),
                     child: Center(
                         child: CircularProgressIndicator(
-                            color: Default_Theme.accentColor2)),
+                            color: AppTheme.accentColor(context))),
                   ),
                 ),
             ],

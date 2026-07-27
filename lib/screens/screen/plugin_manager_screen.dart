@@ -88,7 +88,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
         if (!state.isInitialized) {
           return const Center(
               child: CircularProgressIndicator(
-                  color: Default_Theme.accentColor2, strokeWidth: 3));
+                  color: AppTheme.accentColor(context), strokeWidth: 3));
         }
 
         if (state.availablePlugins.isEmpty) {
@@ -221,7 +221,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                        strokeWidth: 2.5, color: Default_Theme.accentColor2)),
+                        strokeWidth: 2.5, color: AppTheme.accentColor(context))),
               );
             }
             return IconButton(
@@ -236,7 +236,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
         IconButton(
           tooltip: l10n.pluginManagerTooltipInstall,
           icon: const Icon(MingCute.add_circle_line,
-              color: Default_Theme.accentColor2, size: 24),
+              color: AppTheme.accentColor(context), size: 24),
           onPressed: () => _installPlugin(context),
         ),
         const SizedBox(width: 8),
@@ -277,12 +277,12 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? Default_Theme.accentColor2.withValues(alpha: 0.15)
+                        ? AppTheme.accentColor(context).withValues(alpha: 0.15)
                         : Default_Theme.primaryColor1.withValues(alpha: 0.04),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isSelected
-                          ? Default_Theme.accentColor2.withValues(alpha: 0.5)
+                          ? AppTheme.accentColor(context).withValues(alpha: 0.5)
                           : Default_Theme.primaryColor1.withValues(alpha: 0.05),
                       width: 1.2,
                     ),
@@ -291,7 +291,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
                     label,
                     style: TextStyle(
                       color: isSelected
-                          ? Default_Theme.accentColor2
+                          ? AppTheme.accentColor(context)
                           : Default_Theme.primaryColor1.withValues(alpha: 0.7),
                       fontSize: 13,
                       fontWeight:
@@ -440,7 +440,7 @@ class _PluginCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isLoaded
-                  ? Default_Theme.accentColor2.withValues(alpha: 0.2)
+                  ? AppTheme.accentColor(context).withValues(alpha: 0.2)
                   : Default_Theme.primaryColor1.withValues(alpha: 0.05),
               width: 1,
             ),
@@ -452,12 +452,12 @@ class _PluginCard extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   color: isLoaded
-                      ? Default_Theme.accentColor2.withValues(alpha: 0.15)
+                      ? AppTheme.accentColor(context).withValues(alpha: 0.15)
                       : Default_Theme.primaryColor1.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isLoaded
-                        ? Default_Theme.accentColor2.withValues(alpha: 0.4)
+                        ? AppTheme.accentColor(context).withValues(alpha: 0.4)
                         : Colors.transparent,
                     width: 1.5,
                   ),
@@ -593,12 +593,12 @@ class _PluginCard extends StatelessWidget {
     return _fallbackIcon(type, isLoaded, iconSize);
   }
 
-  static Widget _fallbackIcon(PluginType type, bool isLoaded, double iconSize) {
+  Widget _fallbackIcon(PluginType type, bool isLoaded, double iconSize) {
     return Center(
       child: Icon(
         _pluginTypeIcon(type),
         color: isLoaded
-            ? Default_Theme.accentColor2
+            ? AppTheme.accentColor(context)
             : Default_Theme.primaryColor1.withValues(alpha: 0.5),
         size: iconSize,
       ),
@@ -676,11 +676,11 @@ class _CustomSwitchState extends State<_CustomSwitch> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             color: _localValue
-                ? Default_Theme.accentColor2.withValues(alpha: 0.15)
+                ? AppTheme.accentColor(context).withValues(alpha: 0.15)
                 : Default_Theme.primaryColor1.withValues(alpha: 0.05),
             border: Border.all(
               color: _localValue
-                  ? Default_Theme.accentColor2.withValues(alpha: 0.5)
+                  ? AppTheme.accentColor(context).withValues(alpha: 0.5)
                   : Default_Theme.primaryColor1.withValues(alpha: 0.15),
               width: 1.5,
             ),
@@ -698,7 +698,7 @@ class _CustomSwitchState extends State<_CustomSwitch> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: _localValue
-                    ? Default_Theme.accentColor2
+                    ? AppTheme.accentColor(context)
                     : Default_Theme.primaryColor1.withValues(alpha: 0.4),
               ),
               child: widget.isLoading
@@ -772,12 +772,12 @@ class _PluginDetailSheet extends StatelessWidget {
                     height: 64,
                     decoration: BoxDecoration(
                       color: isLoaded
-                          ? Default_Theme.accentColor2.withValues(alpha: 0.15)
+                          ? AppTheme.accentColor(context).withValues(alpha: 0.15)
                           : Default_Theme.primaryColor1.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
                         color: isLoaded
-                            ? Default_Theme.accentColor2.withValues(alpha: 0.5)
+                            ? AppTheme.accentColor(context).withValues(alpha: 0.5)
                             : Colors.transparent,
                         width: 1.5,
                       ),
@@ -909,11 +909,11 @@ class _PluginDetailSheet extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isLoaded
                               ? Colors.transparent
-                              : Default_Theme.accentColor2
+                              : AppTheme.accentColor(context)
                                   .withValues(alpha: 0.15),
                           foregroundColor: isLoaded
                               ? Default_Theme.primaryColor1
-                              : Default_Theme.accentColor2,
+                              : AppTheme.accentColor(context),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -921,7 +921,7 @@ class _PluginDetailSheet extends StatelessWidget {
                               color: isLoaded
                                   ? Default_Theme.primaryColor1
                                       .withValues(alpha: 0.2)
-                                  : Default_Theme.accentColor2
+                                  : AppTheme.accentColor(context)
                                       .withValues(alpha: 0.5),
                               width: 1.5,
                             ),
@@ -937,7 +937,7 @@ class _PluginDetailSheet extends StatelessWidget {
                                         ? Colors.red
                                         : isLoaded
                                             ? Default_Theme.primaryColor1
-                                            : Default_Theme.accentColor2))
+                                            : AppTheme.accentColor(context)))
                             : Text(
                                 deleting
                                     ? l10n.pluginManagerDeleting
@@ -958,18 +958,18 @@ class _PluginDetailSheet extends StatelessWidget {
                       child: IconButton(
                         onPressed: () => _showKeysDialog(context, manifest),
                         style: IconButton.styleFrom(
-                          backgroundColor: Default_Theme.accentColor2
+                          backgroundColor: AppTheme.accentColor(context)
                               .withValues(alpha: 0.15),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                             side: BorderSide(
-                                color: Default_Theme.accentColor2
+                                color: AppTheme.accentColor(context)
                                     .withValues(alpha: 0.5),
                                 width: 1.5),
                           ),
                         ),
                         icon: const Icon(Icons.key_rounded,
-                            color: Default_Theme.accentColor2, size: 22),
+                            color: AppTheme.accentColor(context), size: 22),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -1130,7 +1130,7 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
               height: 200,
               child: Center(
                   child: CircularProgressIndicator(
-                      color: Default_Theme.accentColor2)));
+                      color: AppTheme.accentColor(context))));
         }
 
         final existing = snapshot.data!;
@@ -1212,7 +1212,7 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
                           focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: const BorderSide(
-                                  color: Default_Theme.accentColor2,
+                                  color: AppTheme.accentColor(context),
                                   width: 1.5)),
                         ),
                       ),
@@ -1259,7 +1259,7 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
                               l10n.pluginManagerApiKeysSaved);
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Default_Theme.accentColor2,
+                    backgroundColor: AppTheme.accentColor(context),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
@@ -1305,7 +1305,7 @@ class _InlineOperationIndicator extends StatelessWidget {
               width: 14,
               height: 14,
               child: CircularProgressIndicator(
-                  strokeWidth: 2, color: Default_Theme.accentColor2)),
+                  strokeWidth: 2, color: AppTheme.accentColor(context))),
           const SizedBox(width: 8),
           Text(label,
               style: TextStyle(
@@ -1331,12 +1331,12 @@ class _StatusBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: isLoaded
-            ? Default_Theme.accentColor2.withValues(alpha: 0.15)
+            ? AppTheme.accentColor(context).withValues(alpha: 0.15)
             : Default_Theme.primaryColor1.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
             color: isLoaded
-                ? Default_Theme.accentColor2.withValues(alpha: 0.5)
+                ? AppTheme.accentColor(context).withValues(alpha: 0.5)
                 : Colors.transparent,
             width: 1),
       ),
@@ -1346,7 +1346,7 @@ class _StatusBadge extends StatelessWidget {
             : l10n.pluginManagerStatusInactive,
         style: TextStyle(
             color: isLoaded
-                ? Default_Theme.accentColor2
+                ? AppTheme.accentColor(context)
                 : Default_Theme.primaryColor1.withValues(alpha: 0.6),
             fontSize: 11,
             fontWeight: FontWeight.w700),

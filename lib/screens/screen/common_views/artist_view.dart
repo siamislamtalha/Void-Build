@@ -234,16 +234,16 @@ class _ArtistViewState extends State<ArtistView> {
                       indicatorSize: TabBarIndicatorSize.tab,
                       indicator: BoxDecoration(
                         color:
-                            Default_Theme.accentColor2.withValues(alpha: 0.15),
+                            AppTheme.accentColor(context).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
                           color:
-                              Default_Theme.accentColor2.withValues(alpha: 0.5),
+                              AppTheme.accentColor(context).withValues(alpha: 0.5),
                           width: 1.5,
                         ),
                       ),
                       splashBorderRadius: BorderRadius.circular(24),
-                      labelColor: Default_Theme.accentColor2,
+                      labelColor: AppTheme.accentColor(context),
                       unselectedLabelColor:
                           Default_Theme.primaryColor1.withValues(alpha: 0.6),
                       labelStyle: const TextStyle(
@@ -330,7 +330,7 @@ class _ArtistViewState extends State<ArtistView> {
         if (state.artistDetailStatus != DetailStatus.loaded &&
             state.artistDetailStatus != DetailStatus.loadingMore) {
           return const Center(
-            child: CircularProgressIndicator(color: Default_Theme.accentColor2),
+            child: CircularProgressIndicator(color: AppTheme.accentColor(context)),
           );
         }
 
@@ -440,7 +440,7 @@ class _ArtistViewState extends State<ArtistView> {
                       if (index == albums.length) {
                         return const Center(
                             child: CircularProgressIndicator(
-                                color: Default_Theme.accentColor2));
+                                color: AppTheme.accentColor(context)));
                       }
                       return AnimatedListItem(
                         index: index,
@@ -576,7 +576,7 @@ class _ArtistHeaderContent extends StatelessWidget {
           Text(
             subtitle!.toUpperCase(),
             style: TextStyle(
-              color: Default_Theme.accentColor2.withValues(alpha: 0.9),
+              color: AppTheme.accentColor(context).withValues(alpha: 0.9),
               fontSize: 12,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.5,
@@ -645,26 +645,26 @@ class _ArtistHeaderContent extends StatelessWidget {
                         idx: 0,
                       ),
               borderRadius: BorderRadius.circular(30),
-              splashColor: Default_Theme.accentColor2.withValues(alpha: 0.2),
+              splashColor: AppTheme.accentColor(context).withValues(alpha: 0.2),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 28),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
-                  color: Default_Theme.accentColor2.withValues(alpha: 0.1),
+                  color: AppTheme.accentColor(context).withValues(alpha: 0.1),
                   border:
-                      Border.all(color: Default_Theme.accentColor2, width: 1.5),
+                      Border.all(color: AppTheme.accentColor(context), width: 1.5),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(MingCute.play_fill,
-                        size: 20, color: Default_Theme.accentColor2),
+                        size: 20, color: AppTheme.accentColor(context)),
                     SizedBox(width: 8),
                     Text('Play',
                         style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: Default_Theme.accentColor2)),
+                            color: AppTheme.accentColor(context))),
                   ],
                 ),
               ),
@@ -675,7 +675,7 @@ class _ArtistHeaderContent extends StatelessWidget {
           icon:
               isSaved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
           color: isSaved
-              ? Default_Theme.accentColor2
+              ? AppTheme.accentColor(context)
               : Default_Theme.primaryColor1,
           isActive: isSaved,
           tooltip: isSaved ? 'Remove from Library' : 'Save to Library',
@@ -727,11 +727,11 @@ class _PremiumCircularButton extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isActive
-                  ? Default_Theme.accentColor2.withValues(alpha: 0.15)
+                  ? AppTheme.accentColor(context).withValues(alpha: 0.15)
                   : Default_Theme.primaryColor1.withValues(alpha: 0.05),
               border: Border.all(
                 color: isActive
-                    ? Default_Theme.accentColor2.withValues(alpha: 0.5)
+                    ? AppTheme.accentColor(context).withValues(alpha: 0.5)
                     : Default_Theme.primaryColor1.withValues(alpha: 0.15),
                 width: 1.5,
               ),

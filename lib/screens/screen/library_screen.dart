@@ -204,7 +204,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                                   color: Colors.white.withValues(alpha: 0.035),
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: Default_Theme.accentColor2
+                                    color: AppTheme.accentColor(context)
                                         .withValues(alpha: 0.22),
                                   ),
                                 ),
@@ -214,13 +214,13 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                                       width: 28,
                                       height: 28,
                                       decoration: BoxDecoration(
-                                        color: Default_Theme.accentColor2
+                                        color: AppTheme.accentColor(context)
                                             .withValues(alpha: 0.12),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Icon(
                                         Icons.drag_indicator_rounded,
-                                        color: Default_Theme.accentColor2
+                                        color: AppTheme.accentColor(context)
                                             .withValues(alpha: 0.95),
                                         size: 16,
                                       ),
@@ -244,7 +244,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                                           setState(() => _isReordering = false),
                                       style: TextButton.styleFrom(
                                         foregroundColor:
-                                            Default_Theme.accentColor2,
+                                            AppTheme.accentColor(context),
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 10, vertical: 6),
                                         minimumSize: Size.zero,
@@ -391,6 +391,10 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
   }
 
   SliverAppBar customDiscoverBar(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+
     return SliverAppBar(
       floating: true,
       pinned: false, // Set to false if you don't want it to stick at the top
@@ -401,9 +405,9 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
           Text(
             AppLocalizations.of(context)!.libraryTitle,
             style: Default_Theme.primaryTextStyle.merge(
-              const TextStyle(
+              TextStyle(
                 fontSize: 34,
-                color: Default_Theme.primaryColor1,
+                color: titleColor,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -421,16 +425,14 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
             icon: Icon(
               _isSearching ? MingCute.close_fill : MingCute.search_line,
               size: 24,
-              color: _isSearching
-                  ? Default_Theme.accentColor2
-                  : Default_Theme.primaryColor1,
+              color: iconColor,
             ),
           ),
           IconButton(
             padding: const EdgeInsets.all(8),
             onPressed: () => createPlaylistDialog(context),
-            icon: const Icon(MingCute.add_fill,
-                size: 25, color: Default_Theme.primaryColor1),
+            icon: Icon(MingCute.add_fill,
+                size: 25, color: iconColor),
           ),
           IconButton(
             padding: const EdgeInsets.all(8),
@@ -449,8 +451,8 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                 context.pushNamed(RoutePaths.importMediaFromPlatforms);
               }
             },
-            icon: const Icon(FontAwesome.file_import_solid,
-                size: 22, color: Default_Theme.primaryColor1),
+            icon: Icon(FontAwesome.file_import_solid,
+                size: 22, color: iconColor),
           ),
         ],
       ),
@@ -602,17 +604,17 @@ class _ListOfPlaylists extends StatelessWidget {
                       height: 32,
                       decoration: BoxDecoration(
                         color:
-                            Default_Theme.accentColor2.withValues(alpha: 0.10),
+                            AppTheme.accentColor(context).withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: Default_Theme.accentColor2
+                          color: AppTheme.accentColor(context)
                               .withValues(alpha: 0.20),
                         ),
                       ),
                       child: Icon(
                         Icons.drag_handle_rounded,
                         color:
-                            Default_Theme.accentColor2.withValues(alpha: 0.90),
+                            AppTheme.accentColor(context).withValues(alpha: 0.90),
                         size: 18,
                       ),
                     ),
@@ -643,12 +645,12 @@ Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
         elevation: elevation,
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(12),
-        shadowColor: Default_Theme.accentColor2.withValues(alpha: 0.25),
+        shadowColor: AppTheme.accentColor(context).withValues(alpha: 0.25),
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Default_Theme.accentColor2.withValues(alpha: 0.20),
+              color: AppTheme.accentColor(context).withValues(alpha: 0.20),
             ),
           ),
           child: child,

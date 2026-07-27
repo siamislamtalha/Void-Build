@@ -6,35 +6,51 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui';
 import 'dart:math';
 
-// Color palette
-// Darken background slightly for higher contrast against foreground elements
-const Color kBackgroundColor = Color(0xFF0B0710);
-const Color kPrimaryTextColor = Colors.white;
-const Color kSecondaryTextColor = Color(0xFFC3B9CF);
-// Make the frosted card a bit less translucent so it reads clearer on darkbg
-const Color kCardBackgroundColor = Color.fromRGBO(40, 32, 50, 0.18);
+// Gradients adapted dynamically to theme mode
+Gradient getTitleGradient(BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  return isDark
+      ? const LinearGradient(
+          colors: [Color(0xFFFFFFFF), Color(0xFFB0B0B5)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        )
+      : const LinearGradient(
+          colors: [Color(0xFF1C1C1E), Color(0xFF505055)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+}
 
-// Gradients
-const Gradient kTitleGradient = LinearGradient(
-  colors: [Color(0xFFFEBD88), Color(0xFFF17C98)],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
-const Gradient kButtonGradient = LinearGradient(
-  colors: [Color(0xFFFFB88C), Color(0xFFDE6262)],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
-const Gradient kHandleGradient = LinearGradient(
-  colors: [Color(0xFFFFB88C), Color(0xFFF88A6B)],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
-const Gradient kWaveformGradient = LinearGradient(
-  colors: [Color(0xFFE3729A), Color(0xFFF88A6B)],
-  begin: Alignment.centerLeft,
-  end: Alignment.centerRight,
-);
+Gradient getButtonGradient(BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  return isDark
+      ? const LinearGradient(
+          colors: [Color(0xFFFFFFFF), Color(0xFFD1D1D6)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        )
+      : const LinearGradient(
+          colors: [Color(0xFF1C1C1E), Color(0xFF3A3A3C)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+}
+
+Gradient getWaveformGradient(BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  return isDark
+      ? const LinearGradient(
+          colors: [Color(0xFFE5E5EA), Color(0xFF8E8E93)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        )
+      : const LinearGradient(
+          colors: [Color(0xFF1C1C1E), Color(0xFF636366)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        );
+}
 
 class About extends StatelessWidget {
   const About({super.key});
@@ -42,26 +58,23 @@ class About extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final cardBgColor = isDark
+        ? const Color.fromRGBO(30, 30, 35, 0.45)
+        : const Color.fromRGBO(240, 240, 245, 0.65);
+
     return Scaffold(
-      backgroundColor: kBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: kPrimaryTextColor.withValues(alpha: 0.5)),
+              color: primaryTextColor.withValues(alpha: 0.7)),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        // title: const Text(
-        //   'Glass Blossom',
-        //   style: TextStyle(
-        //     color: kPrimaryTextColor,
-        //     fontWeight: FontWeight.bold,
-        //     letterSpacing: 1.1,
-        //   ),
-        // ),
-        // centerTitle: true,
       ),
       body: Stack(
         alignment: Alignment.center,
@@ -78,13 +91,13 @@ class About extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Spacer(),
-                    _buildInfoCard(context, l10n),
+                    _buildInfoCard(context, l10n, primaryTextColor, cardBgColor),
                     const SizedBox(height: 50),
-                    _buildSupportSection(l10n),
+                    _buildSupportSection(context, l10n, primaryTextColor),
                     const Spacer(),
                     // Footer moved to bottom of screen
                     const SizedBox(height: 12),
-                    _buildFooter(l10n),
+                    _buildFooter(context, l10n),
                     const SizedBox(height: 12),
                   ],
                 ),
@@ -96,7 +109,12 @@ class About extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(BuildContext context, AppLocalizations l10n) {
+  Widget _buildInfoCard(BuildContext context, AppLocalizations l10n,
+      Color primaryTextColor, Color cardBgColor) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final secondaryTextColor = isDark ? const Color(0xFF8E8E93) : const Color(0xFF66666E);
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.12) : const Color(0xFFE5E5EA);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(28.0),
       child: BackdropFilter(
@@ -104,9 +122,9 @@ class About extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
           decoration: BoxDecoration(
-            color: kCardBackgroundColor,
+            color: cardBgColor,
             borderRadius: BorderRadius.circular(28.0),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(color: borderColor),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -116,10 +134,9 @@ class About extends StatelessWidget {
                 children: [
                   ShaderMask(
                     blendMode: BlendMode.srcIn,
-                    shaderCallback: (bounds) => kTitleGradient.createShader(
+                    shaderCallback: (bounds) => getTitleGradient(context).createShader(
                       Rect.fromLTWH(0, 0, bounds.width, bounds.height),
                     ),
-                    // Use Wrap so title + flower can wrap on narrow widths.
                     child: const Wrap(
                       alignment: WrapAlignment.center,
                       crossAxisAlignment: WrapCrossAlignment.center,
@@ -133,8 +150,7 @@ class About extends StatelessWidget {
                             fontFamily: 'Gilroy',
                           ),
                         ),
-                        // Small animated flower
-                        GentleRotatingFlower(size: 28),
+                        GentleRotatingFlower(size: 24),
                       ],
                     ),
                   ),
@@ -143,9 +159,9 @@ class About extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 l10n.aboutCraftingSubtitle,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 16,
-                    color: kSecondaryTextColor,
+                    color: secondaryTextColor,
                     fontFamily: 'Gilroy'),
               ),
               const SizedBox(height: 35),
@@ -153,7 +169,9 @@ class About extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.3),
+                  color: isDark
+                      ? Colors.black.withValues(alpha: 0.35)
+                      : const Color(0xFFE5E5EA).withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Row(
@@ -162,11 +180,10 @@ class About extends StatelessWidget {
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: kHandleGradient,
+                        gradient: getButtonGradient(context),
                         boxShadow: [
                           BoxShadow(
-                            color:
-                                const Color(0xFFF88A6B).withValues(alpha: 0.5),
+                            color: primaryTextColor.withValues(alpha: 0.25),
                             blurRadius: 10,
                           ),
                         ],
@@ -180,18 +197,10 @@ class About extends StatelessWidget {
                         '@siamislamtalha',
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: kPrimaryTextColor,
+                          color: primaryTextColor,
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
                           fontFamily: 'Gilroy',
-                          shadows: [
-                            Shadow(
-                              color: const Color.fromARGB(255, 255, 246, 238)
-                                  .withValues(alpha: 0.4),
-                              blurRadius: 12,
-                              offset: const Offset(0, 0),
-                            ),
-                          ],
                         ),
                       ),
                     ),
@@ -199,15 +208,13 @@ class About extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 35),
-              // Use Wrap to prevent overflow on small screens; center wrapped items
               Wrap(
                 alignment: WrapAlignment.center,
                 runAlignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
-                runSpacing: 12.0, // Spacing when items wrap to the next line
-                spacing: 12.0, // Horizontal spacing
+                runSpacing: 12.0,
+                spacing: 12.0,
                 children: [
-                  // Maintainer opens GitHub account
                   _InfoPill(
                       icon: Icons.shield_outlined,
                       text: 'Maintainer',
@@ -216,7 +223,6 @@ class About extends StatelessWidget {
                         launchUrl(Uri.parse('https://github.com/siamislamtalha'),
                             mode: LaunchMode.externalApplication);
                       }),
-                  // Short label 'Email' opens mail composer
                   _InfoPill(
                       icon: FontAwesome.x_twitter_brand,
                       text: 'Contact',
@@ -227,7 +233,6 @@ class About extends StatelessWidget {
                           mode: LaunchMode.externalApplication,
                         );
                       }),
-                  // Short label 'Linkedin' opens Linkedin profile
                   _InfoPill(
                       icon: FontAwesome.linkedin_brand,
                       text: 'Linkedin',
@@ -246,7 +251,11 @@ class About extends StatelessWidget {
     );
   }
 
-  Widget _buildSupportSection(AppLocalizations l10n) {
+  Widget _buildSupportSection(BuildContext context, AppLocalizations l10n, Color primaryTextColor) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final secondaryTextColor = isDark ? const Color(0xFF8E8E93) : const Color(0xFF66666E);
+    final buttonTextColor = isDark ? Colors.black : Colors.white;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -255,19 +264,18 @@ class About extends StatelessWidget {
           child: Text(
             l10n.aboutTipQuote,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-                color: kSecondaryTextColor, fontSize: 14, fontFamily: 'Gilroy'),
+            style: TextStyle(
+                color: secondaryTextColor, fontSize: 14, fontFamily: 'Gilroy'),
           ),
         ),
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
-            gradient: kButtonGradient,
-            // slightly larger radius for a more prominent pill
+            gradient: getButtonGradient(context),
             borderRadius: BorderRadius.circular(34.0),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFDE6262).withValues(alpha: 0.5),
+                color: primaryTextColor.withValues(alpha: 0.15),
                 blurRadius: 25,
                 offset: const Offset(0, 8),
               ),
@@ -276,7 +284,6 @@ class About extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              // increase the ink response radius to match the larger pill
               borderRadius: BorderRadius.circular(32.0),
               onTap: () {
                 launchUrl(
@@ -285,25 +292,24 @@ class About extends StatelessWidget {
                 );
               },
               child: Container(
-                // increased padding for a larger touch target
                 padding:
                     const EdgeInsets.symmetric(horizontal: 44, vertical: 16),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(32.0),
                   border:
-                      Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                      Border.all(color: primaryTextColor.withValues(alpha: 0.15)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Icon(Icons.favorite,
-                        color: kPrimaryTextColor, size: 20),
+                    Icon(Icons.favorite,
+                        color: buttonTextColor, size: 20),
                     const SizedBox(width: 10),
                     Text(
                       l10n.aboutTipButton,
-                      style: const TextStyle(
-                        color: kPrimaryTextColor,
+                      style: TextStyle(
+                        color: buttonTextColor,
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         fontFamily: 'Gilroy',
@@ -319,14 +325,17 @@ class About extends StatelessWidget {
         Text(
           l10n.aboutTipDesc,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-              color: kSecondaryTextColor, fontSize: 14, fontFamily: 'Gilroy'),
+          style: TextStyle(
+              color: secondaryTextColor, fontSize: 14, fontFamily: 'Gilroy'),
         ),
       ],
     );
   }
 
-  Widget _buildFooter(AppLocalizations l10n) {
+  Widget _buildFooter(BuildContext context, AppLocalizations l10n) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final secondaryTextColor = isDark ? const Color(0xFF8E8E93) : const Color(0xFF66666E);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Center(
@@ -343,12 +352,12 @@ class About extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(MingCute.github_fill,
-                      color: kSecondaryTextColor, size: 16),
+                  Icon(MingCute.github_fill,
+                      color: secondaryTextColor, size: 16),
                   const SizedBox(width: 8),
                   Text(l10n.aboutGitHub,
-                      style: const TextStyle(
-                          color: kSecondaryTextColor,
+                      style: TextStyle(
+                          color: secondaryTextColor,
                           fontSize: 12,
                           fontFamily: 'Gilroy')),
                 ],
@@ -362,8 +371,8 @@ class About extends StatelessWidget {
                     ? 'v${snapshot.data!.version}+${snapshot.data!.buildNumber}'
                     : 'Not able to retrieve version';
                 return Text(ver,
-                    style: const TextStyle(
-                        color: kSecondaryTextColor,
+                    style: TextStyle(
+                        color: secondaryTextColor,
                         fontSize: 12,
                         fontFamily: 'Gilroy'));
               },
@@ -384,14 +393,17 @@ class _InfoPill extends StatelessWidget {
       {required this.icon, required this.text, this.onTap, this.tooltip});
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final secondaryTextColor = isDark ? const Color(0xFF8E8E93) : const Color(0xFF66666E);
+
     final child = Row(
-      mainAxisSize: MainAxisSize.min, // Important for Wrap widget
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: kSecondaryTextColor, size: 18),
+        Icon(icon, color: secondaryTextColor, size: 18),
         const SizedBox(width: 8),
         Text(text,
-            style: const TextStyle(
-                color: kSecondaryTextColor,
+            style: TextStyle(
+                color: secondaryTextColor,
                 fontSize: 13,
                 fontFamily: 'Gilroy')),
       ],
@@ -446,7 +458,7 @@ class _AnimatedWaveformState extends State<AnimatedWaveform>
         builder: (context, child) {
           return CustomPaint(
             size: const Size(double.infinity, double.infinity),
-            painter: WaveformPainter(_controller.value),
+            painter: WaveformPainter(_controller.value, context),
           );
         });
   }
@@ -454,7 +466,8 @@ class _AnimatedWaveformState extends State<AnimatedWaveform>
 
 class WaveformPainter extends CustomPainter {
   final double time;
-  WaveformPainter(this.time);
+  final BuildContext context;
+  WaveformPainter(this.time, this.context);
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -462,8 +475,9 @@ class WaveformPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
+    final waveGradient = getWaveformGradient(context);
     final animatedGradient = LinearGradient(
-        colors: kWaveformGradient.colors,
+        colors: waveGradient.colors,
         transform: GradientRotation(2 * pi * time));
     paint.shader = animatedGradient
         .createShader(Rect.fromLTWH(0, 0, size.width, size.height));
@@ -499,9 +513,8 @@ class _ParticleBackgroundState extends State<ParticleBackground>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late List<Particle> _particles;
-  final int _numberOfParticles = 40; // Reduced for a more subtle effect
+  final int _numberOfParticles = 40;
   final Random _random = Random();
-  // track time between frames for smooth motion (seconds)
   late double _lastTickSeconds;
 
   @override
@@ -519,11 +532,9 @@ class _ParticleBackgroundState extends State<ParticleBackground>
     return Particle(
       position: Offset(_random.nextDouble(), _random.nextDouble()),
       radius: _random.nextDouble() * 1.5 + 0.5,
-      // velocities are in normalized units per second (x: left/right, y: up/down)
-      // give a gentle upward bias so particles slowly drift up the screen
       velocity: Offset((_random.nextDouble() - 0.5) * 0.01,
           -(_random.nextDouble() * 0.02 + 0.002)),
-      lifespan: _random.nextDouble() * 8 + 4, // 4..12s
+      lifespan: _random.nextDouble() * 8 + 4,
       isSharp: _random.nextDouble() > 0.4,
       maxLifespan: 0.0,
     )..maxLifespan = _random.nextDouble() * 8 + 4;
@@ -540,66 +551,60 @@ class _ParticleBackgroundState extends State<ParticleBackground>
     return AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          // compute actual delta time (seconds) since last frame for smooth
           final now = DateTime.now().millisecondsSinceEpoch / 1000.0;
           final dt = (now - _lastTickSeconds).clamp(0.0, 0.05);
           _lastTickSeconds = now;
 
           for (var p in _particles) {
-            // decrease lifespan by real time
             p.lifespan -= dt;
-            // move according to velocity (velocity is per-second)
             p.position = Offset(p.position.dx + p.velocity.dx * dt,
                 p.position.dy + p.velocity.dy * dt);
 
-            // when particle dies, respawn at bottom with new random life/velocity
             if (p.lifespan <= 0) {
               p.position = Offset(
                   _random.nextDouble(), 1.02 + _random.nextDouble() * 0.06);
               p.lifespan = _random.nextDouble() * 8 + 4;
               p.maxLifespan = p.lifespan;
-              // slight variation so new particle isn't identical
               p.velocity = Offset((_random.nextDouble() - 0.5) * 0.01,
                   -(_random.nextDouble() * 0.02 + 0.002));
             }
 
-            // wrap horizontally
             if (p.position.dx < -0.1) p.position = Offset(1.1, p.position.dy);
             if (p.position.dx > 1.1) p.position = Offset(-0.1, p.position.dy);
-            // if particle floats too far above, move it back to bottom to keep counts stable
             if (p.position.dy < -0.2) {
               p.position =
                   Offset(p.position.dx, 1.02 + _random.nextDouble() * 0.06);
             }
           }
           return CustomPaint(
-              size: Size.infinite, painter: ParticlePainter(_particles));
+              size: Size.infinite, painter: ParticlePainter(_particles, context));
         });
   }
 }
 
 class ParticlePainter extends CustomPainter {
   final List<Particle> particles;
-  ParticlePainter(this.particles);
+  final BuildContext context;
+  ParticlePainter(this.particles, this.context);
   @override
   void paint(Canvas canvas, Size size) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final rect = Rect.fromCircle(
         center: size.center(Offset.zero), radius: size.width * 0.9);
     final bgPaint = Paint()
-      // Use a deeper radial tint with slightly higher opacity so edges stay dark
       ..shader = RadialGradient(colors: [
-        const Color(0xFF2A1726).withValues(alpha: 0.6),
-        kBackgroundColor.withValues(alpha: 0)
+        isDark ? const Color(0x33FFFFFF) : const Color(0x1A000000),
+        Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0)
       ]).createShader(rect);
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
 
     final paint = Paint();
+    final particleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     for (var p in particles) {
       final progress = 1.0 - (p.lifespan / p.maxLifespan);
       final opacity = max(0.0, -4 * (progress - 0.5) * (progress - 0.5) + 1);
 
-      // Lower particle brightness so they don't wash out the dark background
-      paint.color = Colors.white.withValues(alpha: opacity * 0.35);
+      paint.color = particleColor.withValues(alpha: opacity * 0.25);
       paint.maskFilter =
           p.isSharp ? null : MaskFilter.blur(BlurStyle.normal, p.radius * 2);
 
@@ -631,7 +636,6 @@ class Particle {
       required this.isSharp});
 }
 
-// A calming, natural-looking rotating flower using a sinusoidal motion.
 class GentleRotatingFlower extends StatefulWidget {
   final double size;
   const GentleRotatingFlower({this.size = 28, super.key});
@@ -647,7 +651,6 @@ class _GentleRotatingFlowerState extends State<GentleRotatingFlower>
   @override
   void initState() {
     super.initState();
-    // Slow, calming cycle. Repeats forever.
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
@@ -662,15 +665,16 @@ class _GentleRotatingFlowerState extends State<GentleRotatingFlower>
 
   @override
   Widget build(BuildContext context) {
+    final iconColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : const Color(0xFF1C1C1E);
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        final t = _controller.value; // 0..1
-        // Sinusoidal rotation: small angle in radians (~ +/-9 deg)
+        final t = _controller.value;
         final angle = sin(t * 2 * pi) * (pi / 20);
-        // Slight 'breathing' scale for softness
         final scale = 1 + 0.03 * sin(t * 2 * pi);
-        // Gentle horizontal sway in logical pixels
         final dx = 2.0 * sin(t * 2 * pi);
 
         return Transform.translate(
@@ -679,9 +683,10 @@ class _GentleRotatingFlowerState extends State<GentleRotatingFlower>
             angle: angle,
             child: Transform.scale(
               scale: scale,
-              child: Text(
-                "🌸",
-                style: TextStyle(fontSize: widget.size),
+              child: Icon(
+                MingCute.sparkles_2_fill,
+                size: widget.size,
+                color: iconColor,
               ),
             ),
           ),

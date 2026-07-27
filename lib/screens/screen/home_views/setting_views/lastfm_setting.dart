@@ -273,7 +273,7 @@ class _AuthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = destructive ? Colors.red : Default_Theme.accentColor2;
+    final activeColor = destructive ? Colors.red : AppTheme.accentColor(context);
 
     return ElevatedButton(
       onPressed: enabled ? onPressed : null,

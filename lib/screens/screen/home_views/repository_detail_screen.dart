@@ -393,12 +393,12 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
       width: 56,
       height: 56,
       decoration: BoxDecoration(
-          color: Default_Theme.accentColor2.withValues(alpha: 0.12),
+          color: AppTheme.accentColor(context).withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-              color: Default_Theme.accentColor2.withValues(alpha: 0.3))),
+              color: AppTheme.accentColor(context).withValues(alpha: 0.3))),
       child: const Icon(MingCute.plugin_2_line,
-          color: Default_Theme.accentColor2, size: 24),
+          color: AppTheme.accentColor(context), size: 24),
     );
   }
 
@@ -415,7 +415,7 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
     if (phase == _RemoteInstallPhase.downloading ||
         phase == _RemoteInstallPhase.installing) {
       return const _AestheticButton(
-          text: '', isLoading: true, color: Default_Theme.accentColor2);
+          text: '', isLoading: true, color: AppTheme.accentColor(context));
     }
 
     if (phase == _RemoteInstallPhase.failed) {
@@ -440,7 +440,7 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
     if (canUpdate) {
       return _AestheticButton(
         text: l10n.buttonUpdate,
-        color: Default_Theme.accentColor2,
+        color: AppTheme.accentColor(context),
         onTap: () => _downloadAndInstallPlugin(context, plugin),
       );
     }
@@ -455,7 +455,7 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
     if (canInstall) {
       return _AestheticButton(
         text: l10n.pluginRepositoryActionInstall,
-        color: Default_Theme.accentColor2,
+        color: AppTheme.accentColor(context),
         onTap: () => _downloadAndInstallPlugin(context, plugin),
       );
     }

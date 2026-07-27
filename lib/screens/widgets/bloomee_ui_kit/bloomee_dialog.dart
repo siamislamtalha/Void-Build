@@ -87,9 +87,13 @@ class BloomeeDialogSurface extends StatelessWidget {
   });
 
   @override
+  @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context).size;
     final maxW = mq.width > 560 ? 480.0 : mq.width * 0.9;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassColor = isDark ? const Color(0xF5161618) : const Color(0xF5F2F2F5);
+    final borderColor = isDark ? const Color(0x3BFFFFFF) : const Color(0xFFE5E5EA);
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -102,14 +106,14 @@ class BloomeeDialogSurface extends StatelessWidget {
             constraints: BoxConstraints(maxWidth: maxW),
             decoration: AppTheme.liquidGlassDecoration(
               borderRadius: 24,
-              glassColor: const Color(0xF50A040C),
-              borderColor: const Color(0x3BFFFFFF),
+              glassColor: glassColor,
+              borderColor: borderColor,
               borderWidth: 1,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _header(),
+                _header(context),
                 if (body != null)
                   Flexible(
                     child: Padding(
@@ -126,7 +130,12 @@ class BloomeeDialogSurface extends StatelessWidget {
     );
   }
 
-  Widget _header() {
+  Widget _header(BuildContext context) {
+    final accent = AppTheme.accentColor(context);
+    final tint = AppTheme.accentTintColor(context, alpha: 0.12);
+    final primaryText = Theme.of(context).colorScheme.onSurface;
+    final secondaryText = AppTheme.secondaryTextColor(context);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
       child: Row(
@@ -137,10 +146,10 @@ class BloomeeDialogSurface extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: Default_Theme.accentColor2.withValues(alpha: 0.12),
+                color: tint,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: Default_Theme.accentColor2, size: 20),
+              child: Icon(icon, color: accent, size: 20),
             ),
             const SizedBox(width: 14),
           ],
@@ -151,8 +160,8 @@ class BloomeeDialogSurface extends StatelessWidget {
                 Text(
                   title,
                   style: Default_Theme.secondoryTextStyleMedium.merge(
-                    const TextStyle(
-                      color: Default_Theme.primaryColor1,
+                    TextStyle(
+                      color: primaryText,
                       fontSize: 17,
                       height: 1.3,
                     ),
@@ -163,8 +172,7 @@ class BloomeeDialogSurface extends StatelessWidget {
                   Text(
                     subtitle!,
                     style: TextStyle(
-                      color:
-                          Default_Theme.primaryColor2.withValues(alpha: 0.62),
+                      color: secondaryText,
                       fontSize: 13,
                       height: 1.4,
                     ),
@@ -194,9 +202,10 @@ class BloomeeDialogSurface extends StatelessWidget {
   }
 
   Widget _buildAction(BuildContext context, BloomeeDialogAction action) {
+    final accent = AppTheme.accentColor(context);
     final color = action.isDestructive
-        ? const Color(0xFFFF4D6A)
-        : Default_Theme.accentColor2;
+        ? Theme.of(context).colorScheme.error
+        : accent;
 
     if (action.isFilled) {
       return TextButton(
@@ -225,7 +234,7 @@ class BloomeeDialogSurface extends StatelessWidget {
         action.onPressed?.call();
       },
       style: TextButton.styleFrom(
-        foregroundColor: Default_Theme.primaryColor2.withValues(alpha: 0.72),
+        foregroundColor: AppTheme.secondaryTextColor(context),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         textStyle: const TextStyle(
           fontWeight: FontWeight.w600,
@@ -238,9 +247,6 @@ class BloomeeDialogSurface extends StatelessWidget {
 }
 
 /// A Bloomee-styled list-tile for use inside dialog bodies.
-///
-/// Shows a leading thumbnail/icon, title, subtitle, and an optional trailing
-/// widget. Used for candidate lists (Smart Replace, search picks, etc.).
 class BloomeeDialogTile extends StatelessWidget {
   final String title;
   final String? subtitle;
@@ -263,30 +269,34 @@ class BloomeeDialogTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = AppTheme.accentColor(context);
+    final tint = AppTheme.accentTintColor(context, alpha: 0.10);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tileBg = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F5);
+    final borderCol = isDark ? const Color(0x33FFFFFF) : const Color(0xFFE5E5EA);
+    final primaryText = Theme.of(context).colorScheme.onSurface;
+    final secondaryText = AppTheme.secondaryTextColor(context);
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-        splashColor: Default_Theme.accentColor2.withValues(alpha: 0.08),
-        highlightColor: Default_Theme.accentColor2.withValues(alpha: 0.04),
+        splashColor: tint,
+        highlightColor: tint,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: selected
-                ? Default_Theme.accentColor2.withValues(alpha: 0.08)
-                : _kDialogSurface.withValues(alpha: 0.6),
+            color: selected ? tint : tileBg.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: selected
-                  ? Default_Theme.accentColor2.withValues(alpha: 0.35)
-                  : _kDialogBorder.withValues(alpha: 0.5),
+              color: selected ? accent.withValues(alpha: 0.35) : borderCol,
             ),
           ),
           child: Row(
             children: [
-              _leading(),
+              _leading(context),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -297,8 +307,8 @@ class BloomeeDialogTile extends StatelessWidget {
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Default_Theme.primaryColor1,
+                      style: TextStyle(
+                        color: primaryText,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -310,8 +320,7 @@ class BloomeeDialogTile extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Default_Theme.primaryColor2
-                              .withValues(alpha: 0.58),
+                          color: secondaryText,
                           fontSize: 12,
                         ),
                       ),
@@ -330,7 +339,10 @@ class BloomeeDialogTile extends StatelessWidget {
     );
   }
 
-  Widget _leading() {
+  Widget _leading(BuildContext context) {
+    final accent = AppTheme.accentColor(context);
+    final tint = AppTheme.accentTintColor(context, alpha: 0.10);
+
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(10),
@@ -349,12 +361,12 @@ class BloomeeDialogTile extends StatelessWidget {
       width: 44,
       height: 44,
       decoration: BoxDecoration(
-        color: Default_Theme.accentColor2.withValues(alpha: 0.10),
+        color: tint,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Icon(
         leadingIcon ?? Icons.music_note_rounded,
-        color: Default_Theme.accentColor2.withValues(alpha: 0.7),
+        color: accent.withValues(alpha: 0.85),
         size: 20,
       ),
     );
@@ -370,7 +382,7 @@ class BloomeeDialogBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? Default_Theme.accentColor2;
+    final c = color ?? AppTheme.accentColor(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(

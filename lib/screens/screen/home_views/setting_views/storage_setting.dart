@@ -371,7 +371,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
                         style: Default_Theme.secondoryTextStyle
                             .merge(const TextStyle(color: Colors.white))),
                     controlAffinity: ListTileControlAffinity.leading,
-                    activeColor: Default_Theme.accentColor2,
+                    activeColor: AppTheme.accentColor(context),
                     checkColor: Colors.white,
                   ),
                   const Divider(color: Colors.white12),
@@ -385,7 +385,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
                         style: Default_Theme.secondoryTextStyle
                             .merge(const TextStyle(color: Colors.white))),
                     controlAffinity: ListTileControlAffinity.leading,
-                    activeColor: Default_Theme.accentColor2,
+                    activeColor: AppTheme.accentColor(context),
                     checkColor: Colors.white,
                   ),
                   CheckboxListTile(
@@ -398,7 +398,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
                         style: Default_Theme.secondoryTextStyle
                             .merge(const TextStyle(color: Colors.white))),
                     controlAffinity: ListTileControlAffinity.leading,
-                    activeColor: Default_Theme.accentColor2,
+                    activeColor: AppTheme.accentColor(context),
                     checkColor: Colors.white,
                   ),
                 ],
@@ -413,7 +413,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Default_Theme.accentColor2),
+                    backgroundColor: AppTheme.accentColor(context)),
                 onPressed: () {
                   Navigator.of(ctx2).pop(_RestoreOptions(
                     restoreMediaItems: mediaItems,
@@ -463,7 +463,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Default_Theme.accentColor2),
+                  backgroundColor: AppTheme.accentColor(context)),
               onPressed: () => Navigator.of(ctx).pop(true),
               child: Text(l10n.storageRestoreYes,
                   style: Default_Theme.secondoryTextStyle
@@ -686,7 +686,7 @@ Future<void> _showResultDialog(
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Default_Theme.accentColor2),
+                backgroundColor: AppTheme.accentColor(context)),
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               l10n.buttonOk,

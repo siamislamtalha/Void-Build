@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/services.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
 import 'package:voidmusic/screens/widgets/player_overlay_wrapper.dart';
@@ -6,7 +7,6 @@ import 'package:voidmusic/screens/widgets/mini_player_widget.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -49,48 +49,59 @@ class GlobalFooter extends StatelessWidget {
             if (didPop) return;
             await _handleHardwareBackPress(context);
           },
-          child: Scaffold(
-            // Keep fully transparent so the BackdropFilter blur in the mini player
-            // and nav bar can composite against whatever is painted below them.
-            backgroundColor: Colors.transparent,
-            drawerScrimColor: Colors.black54,
-            // extendBody=true allows the body ScrollView to paint under the
-            // floating footer so content scrolls behind the glassmorphic blur.
-            extendBody: true,
-            extendBodyBehindAppBar: true,
-            body: Stack(
-              fit: StackFit.expand,
-              children: [
-                // ── Main navigation body ──
-                _FooterAwareBody(
-                  isMobile: isMobile,
-                  navigationShell: navigationShell,
-                ),
-                // ── Floating footer overlay ──
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: SafeArea(
-                    top: false,
-                    // Don't let SafeArea add its own background
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const MiniPlayerWidget(),
-                          if (isMobile) ...[
-                            const SizedBox(height: 6),
-                            HorizontalNavBar(navigationShell: navigationShell),
-                          ],
-                        ],
-                      ),
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            // Force the system navigation bar to be fully transparent so
+            // the glass footer can visually extend to the true screen edge.
+            value: SystemUiOverlayStyle(
+              systemNavigationBarColor: Colors.transparent,
+              systemNavigationBarDividerColor: Colors.transparent,
+              systemNavigationBarIconBrightness:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Brightness.light
+                      : Brightness.dark,
+              statusBarColor: Colors.transparent,
+              statusBarBrightness:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Brightness.dark
+                      : Brightness.light,
+              statusBarIconBrightness:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Brightness.light
+                      : Brightness.dark,
+            ),
+            child: Scaffold(
+              // Keep fully transparent so the BackdropFilter blur in the mini player
+              // and nav bar can composite against whatever is painted below them.
+              backgroundColor: Colors.transparent,
+              drawerScrimColor: Colors.black54,
+              // extendBody=true allows the body ScrollView to paint under the
+              // floating footer so content scrolls behind the glassmorphic blur.
+              extendBody: true,
+              extendBodyBehindAppBar: true,
+              body: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // ── Main navigation body ──
+                  _FooterAwareBody(
+                    isMobile: isMobile,
+                    navigationShell: navigationShell,
+                  ),
+                  // ── Floating footer overlay ──
+                  // We skip SafeArea and instead manually add the device bottom
+                  // inset so the glass pills sit just above the home indicator /
+                  // gesture bar, while the BackdropFilter blur visually extends
+                  // all the way to the true screen edge (no opaque black strip).
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: _GlassFooterOverlay(
+                      isMobile: isMobile,
+                      navigationShell: navigationShell,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -197,6 +208,86 @@ class _FooterAwareBody extends StatelessWidget {
 
         return MediaQuery(data: updatedMq, child: body);
       },
+    );
+  }
+}
+
+/// Renders the glass footer overlay (mini player + nav bar) with a
+/// [BackdropFilter] that extends all the way to the true screen edge.
+///
+/// Instead of relying on [SafeArea] (which fills the inset region with the
+/// scaffold background color creating a black strip), we:
+///   1. Stretch the [ClipRRect] + [BackdropFilter] to cover the full height
+///      including the system navigation bar inset.
+///   2. Position the visible pills above that inset using [Padding].
+///
+/// This ensures the blur composites against whatever screen content is below
+/// the footer, with zero opaque fill in either light or dark mode.
+class _GlassFooterOverlay extends StatelessWidget {
+  const _GlassFooterOverlay({
+    required this.isMobile,
+    required this.navigationShell,
+  });
+
+  final bool isMobile;
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  Widget build(BuildContext context) {
+    // Bottom inset = device home indicator / gesture bar height.
+    final bottomInset = MediaQuery.of(context).viewPadding.bottom;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const MiniPlayerWidget(),
+        if (isMobile) const SizedBox(height: 6),
+        // The nav bar glass capsule extends below the visible pill area into
+        // the system inset so the blur covers the black strip.
+        if (isMobile)
+          _BlurredNavBarArea(
+            bottomInset: bottomInset,
+            navigationShell: navigationShell,
+          )
+        else
+          // On desktop there is no nav bar; just add a small spacer so
+          // the mini player sits 6dp above the window edge.
+          SizedBox(height: bottomInset + _kOuterBottomPadding),
+      ],
+    );
+  }
+}
+
+/// The horizontal nav bar wrapped in a [BackdropFilter] that extends through
+/// the device bottom inset (home indicator / gesture bar) so no opaque black
+/// strip appears beneath it.
+class _BlurredNavBarArea extends StatelessWidget {
+  const _BlurredNavBarArea({
+    required this.bottomInset,
+    required this.navigationShell,
+  });
+
+  final double bottomInset;
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        child: Container(
+          // Fully transparent — the blur above provides the frosted glass
+          // effect; no solid fill so no black strip in any theme.
+          color: Colors.transparent,
+          padding: EdgeInsets.only(
+            // Pills sit 6dp above the bottom edge of the screen (or above the
+            // gesture/home indicator bar on phones).
+            top: 0,
+            bottom: bottomInset + _kOuterBottomPadding,
+          ),
+          child: HorizontalNavBar(navigationShell: navigationShell),
+        ),
+      ),
     );
   }
 }
@@ -328,22 +419,22 @@ class HorizontalNavBar extends StatelessWidget {
     // In light mode: slightly frosted white with more opacity to stand out against bg
     final glassColor = isDark
         ? Colors.black.withValues(alpha: 0.45)
-        : Colors.white.withValues(alpha: 0.75);
+        : const Color(0xF5F4F4F7);
     final glassBorder = isDark
         ? Colors.white.withValues(alpha: 0.18)
-        : Colors.black.withValues(alpha: 0.10);
-    // Active icon: pink accent matching the reference image
-    const accentPink = Color(0xFFFF2D55);
-    const activeIconColor = accentPink;
+        : const Color(0xFFE5E5EA);
+    final activeIconColor = isDark
+        ? Colors.white
+        : const Color(0xFF1C1C1E);
     final inactiveIconColor = isDark
         ? Colors.white.withValues(alpha: 0.55)
         : const Color(0xFF8E8E93);
     final selectedCircleColor = isDark
         ? Colors.white.withValues(alpha: 0.12)
-        : const Color(0xFF1C1C1E).withValues(alpha: 0.07);
+        : const Color(0xFFE5E5EA);
     final selectedCircleBorder = isDark
         ? Colors.white.withValues(alpha: 0.22)
-        : Colors.black.withValues(alpha: 0.12);
+        : const Color(0xFFD1D1D6);
 
     final capsuleItems = [
       _NavItemData(branchIndex: 0, icon: MingCute.home_4_fill, label: l10n.navHome),

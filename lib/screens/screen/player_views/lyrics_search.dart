@@ -213,7 +213,7 @@ class LyricsSearchDelegate extends SearchDelegate {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator(
-                color: Default_Theme.accentColor2, strokeWidth: 3),
+                color: AppTheme.accentColor(context), strokeWidth: 3),
           );
         }
 
@@ -374,12 +374,12 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
                     height: 48,
                     decoration: BoxDecoration(
                       color: hasSynced
-                          ? Default_Theme.accentColor2.withValues(alpha: 0.12)
+                          ? AppTheme.accentColor(context).withValues(alpha: 0.12)
                           : Default_Theme.primaryColor1.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: hasSynced
-                            ? Default_Theme.accentColor2.withValues(alpha: 0.2)
+                            ? AppTheme.accentColor(context).withValues(alpha: 0.2)
                             : Colors.transparent,
                       ),
                     ),
@@ -390,13 +390,13 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
                               height: 20,
                               child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
-                                  color: Default_Theme.accentColor2))
+                                  color: AppTheme.accentColor(context)))
                           : Icon(
                               hasSynced
                                   ? MingCute.align_center_fill
                                   : MingCute.document_line,
                               color: hasSynced
-                                  ? Default_Theme.accentColor2
+                                  ? AppTheme.accentColor(context)
                                   : Default_Theme.primaryColor1
                                       .withValues(alpha: 0.6),
                               size: 22,
@@ -433,17 +433,17 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: Default_Theme.accentColor2
+                                  color: AppTheme.accentColor(context)
                                       .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
-                                      color: Default_Theme.accentColor2
+                                      color: AppTheme.accentColor(context)
                                           .withValues(alpha: 0.2)),
                                 ),
                                 child: Text(
                                   l10n.lyricsSearchSynced,
                                   style: const TextStyle(
-                                      color: Default_Theme.accentColor2,
+                                      color: AppTheme.accentColor(context),
                                       fontSize: 9,
                                       fontWeight: FontWeight.w800,
                                       letterSpacing: 0.5),
@@ -626,7 +626,7 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
                               Text(
                                 l10n.lyricsSearchPreview,
                                 style: TextStyle(
-                                  color: Default_Theme.accentColor2
+                                  color: AppTheme.accentColor(context)
                                       .withValues(alpha: 0.8),
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
@@ -668,7 +668,7 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
             child: _isLoading
                 ? const Center(
                     child: CircularProgressIndicator(
-                        color: Default_Theme.accentColor2))
+                        color: AppTheme.accentColor(context)))
                 : _fetchedLyrics == null || _fetchedLyrics!.lyricsPlain.isEmpty
                     ? Center(
                         child: SignBoardWidget(
@@ -726,25 +726,25 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
                   },
                   borderRadius: BorderRadius.circular(16),
                   splashColor:
-                      Default_Theme.accentColor2.withValues(alpha: 0.2),
+                      AppTheme.accentColor(context).withValues(alpha: 0.2),
                   highlightColor:
-                      Default_Theme.accentColor2.withValues(alpha: 0.1),
+                      AppTheme.accentColor(context).withValues(alpha: 0.1),
                   child: Container(
                     height: 54,
                     width: double.infinity,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: Default_Theme.accentColor2.withValues(alpha: 0.15),
+                      color: AppTheme.accentColor(context).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                           color:
-                              Default_Theme.accentColor2.withValues(alpha: 0.4),
+                              AppTheme.accentColor(context).withValues(alpha: 0.4),
                           width: 1.5),
                     ),
                     child: Text(
                       l10n.lyricsSearchApplyAction,
                       style: const TextStyle(
-                        color: Default_Theme.accentColor2,
+                        color: AppTheme.accentColor(context),
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.2,

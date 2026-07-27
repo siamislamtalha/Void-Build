@@ -68,7 +68,7 @@ class DownloadingCardWidget extends StatelessWidget {
             value: progress,
             backgroundColor: Default_Theme.primaryColor2.withValues(alpha: 0.2),
             valueColor:
-                const AlwaysStoppedAnimation<Color>(Default_Theme.accentColor2),
+                const AlwaysStoppedAnimation<Color>(AppTheme.accentColor(context)),
             strokeWidth: 5,
           ),
         ),

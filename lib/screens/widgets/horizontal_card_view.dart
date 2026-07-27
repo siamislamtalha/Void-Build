@@ -136,7 +136,7 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
                           width: 96,
                           child: Center(
                             child: CircularProgressIndicator(
-                              color: Default_Theme.accentColor2,
+                              color: AppTheme.accentColor(context),
                             ),
                           ),
                         );

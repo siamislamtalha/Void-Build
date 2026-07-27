@@ -276,7 +276,7 @@ class _EqualizerViewState extends State<EqualizerView>
     final bands = _engine.equalizerBands;
     final isEnabled = _engine.equalizerEnabled;
     final isBuiltinMode = _eqSource == EqSourceValues.builtin;
-    const accent = Default_Theme.accentColor2;
+    const accent = AppTheme.accentColor(context);
 
     return Scaffold(
       backgroundColor: Default_Theme.themeColor,

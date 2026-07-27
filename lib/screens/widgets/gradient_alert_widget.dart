@@ -43,14 +43,14 @@ class _GradientDialogState extends State<GradientDialog> {
   // Presets curated for dark-themed UIs. Slightly darker / more saturated
   // variants so white text remains readable while keeping the same palettes.
   static const List<GradientPreset> presets = [
-    GradientPreset('Pink Sunset', Color(0xFFFF3B5A), Color(0xFFFFB570),
-        Color(0xFFE63A63)), // default (darker pink-to-warm)
-    GradientPreset('Cherry Blossom', Color(0xFFFF9DB8), Color(0xFFFFC9DE),
-        Color(0xFFFF7FA6)),
+    GradientPreset('Obsidian Charcoal', Color(0xFF1C1C1E), Color(0xFF3A3A3C),
+        Color(0xFF111113)), // default
+    GradientPreset('Steel Slate', Color(0xFF485563), Color(0xFF29323C),
+        Color(0xFF3A4454)),
     GradientPreset(
         'Sky Blue', Color(0xFF38A8FF), Color(0xFF6FD9FF), Color(0xFF1E90FF)),
     GradientPreset(
-        'Lavender', Color(0xFF7A4DFF), Color(0xFFFF6FB3), Color(0xFF6B3CFF)),
+        'Midnight', Color(0xFF232526), Color(0xFF414345), Color(0xFF191919)),
     GradientPreset(
         'Mint', Color(0xFF3ED6A5), Color(0xFF24C1A0), Color(0xFF12B886)),
     GradientPreset(

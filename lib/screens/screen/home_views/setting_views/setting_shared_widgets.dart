@@ -247,17 +247,17 @@ class SettingNavTile extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Default_Theme.accentColor2.withValues(alpha: 0.15),
+                    color: AppTheme.accentColor(context).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: Default_Theme.accentColor2.withValues(alpha: 0.5),
+                      color: AppTheme.accentColor(context).withValues(alpha: 0.5),
                       width: 1,
                     ),
                   ),
                   child: Text(
                     badge!,
                     style: Default_Theme.secondoryTextStyle.copyWith(
-                      color: Default_Theme.accentColor2,
+                      color: AppTheme.accentColor(context),
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                     ),

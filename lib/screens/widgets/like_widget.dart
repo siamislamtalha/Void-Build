@@ -41,8 +41,8 @@ class _LikeBtnWidgetState extends State<LikeBtnWidget>
 
   void _setupAnimation() {
     _colorAnimation = ColorTween(
-      begin: Default_Theme.accentColor2, // Pink (paused)
-      end: Default_Theme.accentColor1, // Sky Blue (playing)
+      begin: AppTheme.secondaryTextColor(context), // Pink (paused)
+      end: AppTheme.accentColor(context), // Sky Blue (playing)
     ).animate(CurvedAnimation(
       parent: _colorController,
       curve: Curves.easeOutCubic,
@@ -69,24 +69,23 @@ class _LikeBtnWidgetState extends State<LikeBtnWidget>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _colorController,
-      builder: (context, child) {
-        return IconButton(
-          onPressed: () {
-            if (widget.isLiked) {
-              widget.onDisliked?.call();
-            } else {
-              widget.onLiked?.call();
-            }
-          },
-          icon: Icon(
-            widget.isLiked ? AntDesign.heart_fill : AntDesign.heart_outline,
-            color: _colorAnimation.value,
-            size: widget.iconSize,
-          ),
-        );
+    final activeColor = AppTheme.accentColor(context);
+    final inactiveColor = AppTheme.secondaryTextColor(context);
+    final iconColor = widget.isLiked ? activeColor : inactiveColor;
+
+    return IconButton(
+      onPressed: () {
+        if (widget.isLiked) {
+          widget.onDisliked?.call();
+        } else {
+          widget.onLiked?.call();
+        }
       },
+      icon: Icon(
+        widget.isLiked ? AntDesign.heart_fill : AntDesign.heart_outline,
+        color: iconColor,
+        size: widget.iconSize,
+      ),
     );
   }
 }

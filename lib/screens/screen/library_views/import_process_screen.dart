@@ -237,11 +237,11 @@ class _UrlInputView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Default_Theme.accentColor2.withValues(alpha: 0.1),
+              color: AppTheme.accentColor(context).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(MingCute.link_fill,
-                color: Default_Theme.accentColor2, size: 48),
+                color: AppTheme.accentColor(context), size: 48),
           ),
           const SizedBox(height: 32),
           Text(
@@ -267,7 +267,7 @@ class _UrlInputView extends StatelessWidget {
               controller: controller,
               textInputAction: TextInputAction.go,
               autofocus: true,
-              cursorColor: Default_Theme.accentColor2,
+              cursorColor: AppTheme.accentColor(context),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -310,7 +310,7 @@ class _UrlInputView extends StatelessWidget {
           FilledButton(
             onPressed: onSubmit,
             style: FilledButton.styleFrom(
-              backgroundColor: Default_Theme.accentColor2,
+              backgroundColor: AppTheme.accentColor(context),
               foregroundColor: Theme.of(context).colorScheme.onSurface,
               padding: const EdgeInsets.symmetric(vertical: 18),
               shape: RoundedRectangleBorder(
@@ -353,7 +353,7 @@ class _LoadingView extends StatelessWidget {
               const SizedBox(height: 40),
             ],
             CircularProgressIndicator(
-              color: Default_Theme.accentColor2,
+              color: AppTheme.accentColor(context),
               backgroundColor:
                   Default_Theme.primaryColor1.withValues(alpha: 0.1),
               strokeWidth: 4,
@@ -444,7 +444,7 @@ class _CollectionHeader extends StatelessWidget {
                     AppLocalizations.of(context)!
                         .importTrackCount(info.trackCount!),
                     style: TextStyle(
-                      color: Default_Theme.accentColor2.withValues(alpha: 0.9),
+                      color: AppTheme.accentColor(context).withValues(alpha: 0.9),
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                     ),
@@ -502,7 +502,7 @@ class _ResolvingView extends StatelessWidget {
               Text(
                 '${(progress * 100).toStringAsFixed(0)}%',
                 style: const TextStyle(
-                  color: Default_Theme.accentColor2,
+                  color: AppTheme.accentColor(context),
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                 ),
@@ -520,7 +520,7 @@ class _ResolvingView extends StatelessWidget {
               backgroundColor:
                   Default_Theme.primaryColor1.withValues(alpha: 0.1),
               valueColor:
-                  const AlwaysStoppedAnimation(Default_Theme.accentColor2),
+                  const AlwaysStoppedAnimation(AppTheme.accentColor(context)),
             ),
           ),
         ),
@@ -653,9 +653,9 @@ class _ReviewViewState extends State<_ReviewView> {
                 child: FilledButton(
                   onPressed: toSave > 0 ? widget.onSave : null,
                   style: FilledButton.styleFrom(
-                    backgroundColor: Default_Theme.accentColor2,
+                    backgroundColor: AppTheme.accentColor(context),
                     disabledBackgroundColor:
-                        Default_Theme.accentColor2.withValues(alpha: 0.3),
+                        AppTheme.accentColor(context).withValues(alpha: 0.3),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
@@ -729,7 +729,7 @@ class _ResolvingTrackTile extends StatelessWidget {
           width: 20,
           height: 20,
           child: CircularProgressIndicator(
-              strokeWidth: 2, color: Default_Theme.accentColor2),
+              strokeWidth: 2, color: AppTheme.accentColor(context)),
         ),
       TrackResolutionStatus.resolved =>
         const Icon(Icons.check_circle, size: 22, color: Colors.green),
@@ -841,7 +841,7 @@ class _ReviewTrackTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isExpanded
-              ? Default_Theme.accentColor2.withValues(alpha: 0.2)
+              ? AppTheme.accentColor(context).withValues(alpha: 0.2)
               : Colors.transparent,
         ),
       ),
@@ -903,7 +903,7 @@ class _ReviewTrackTile extends StatelessWidget {
                               children: [
                                 const Icon(MingCute.arrows_right_line,
                                     size: 14,
-                                    color: Default_Theme.accentColor2),
+                                    color: AppTheme.accentColor(context)),
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(
@@ -1006,7 +1006,7 @@ class _CandidateList extends StatelessWidget {
             child: Text(
               AppLocalizations.of(context)!.importMatchOptions,
               style: const TextStyle(
-                color: Default_Theme.accentColor2,
+                color: AppTheme.accentColor(context),
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.5,
@@ -1047,7 +1047,7 @@ class _CandidateTile extends StatelessWidget {
         child: Row(
           children: [
             _CustomRadio(
-                isSelected: isSelected, color: Default_Theme.accentColor2),
+                isSelected: isSelected, color: AppTheme.accentColor(context)),
             const SizedBox(width: 14),
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
@@ -1259,7 +1259,7 @@ class _DoneView extends StatelessWidget {
             FilledButton(
               onPressed: onDone,
               style: FilledButton.styleFrom(
-                backgroundColor: Default_Theme.accentColor2,
+                backgroundColor: AppTheme.accentColor(context),
                 foregroundColor: Theme.of(context).colorScheme.onSurface,
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
@@ -1332,7 +1332,7 @@ class _ErrorView extends StatelessWidget {
               icon: const Icon(Icons.refresh, size: 20),
               label: Text(AppLocalizations.of(context)!.importTryAgain),
               style: FilledButton.styleFrom(
-                backgroundColor: Default_Theme.accentColor2,
+                backgroundColor: AppTheme.accentColor(context),
                 foregroundColor: Theme.of(context).colorScheme.onSurface,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 28, vertical: 16),

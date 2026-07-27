@@ -34,7 +34,7 @@ class _PluginBootstrapOverlayState extends State<PluginBootstrapOverlay>
   static const _bgBase = Color(0xFF060608);
   static const _surfaceCol = Color(0xFF14141A);
   static const _errorAccent = Color(0xFFFF4C4C);
-  static const _successAccent = Color(0xFFFF2A5F);
+  static const _successAccent = Color(0xFF5EFF43);
 
   final ValueNotifier<_Phase> _phase = ValueNotifier(_Phase.running);
   final ValueNotifier<int> _progress = ValueNotifier(0);
@@ -200,9 +200,9 @@ class _SpinnerBody extends StatelessWidget {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Default_Theme.accentColor2.withValues(alpha: 0.12),
+                color: AppTheme.accentColor(context).withValues(alpha: 0.12),
                 border: Border.all(
-                  color: Default_Theme.accentColor2.withValues(alpha: 0.4),
+                  color: AppTheme.accentColor(context).withValues(alpha: 0.4),
                   width: 1.5,
                 ),
               ),
@@ -210,7 +210,7 @@ class _SpinnerBody extends StatelessWidget {
                 child: isDone
                     ? const Icon(
                         Icons.check_rounded,
-                        color: Default_Theme.accentColor2,
+                        color: AppTheme.accentColor(context),
                         size: 36,
                       )
                     : const SizedBox(
@@ -218,7 +218,7 @@ class _SpinnerBody extends StatelessWidget {
                         height: 36,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.5,
-                          color: Default_Theme.accentColor2,
+                          color: AppTheme.accentColor(context),
                         ),
                       ),
               ),

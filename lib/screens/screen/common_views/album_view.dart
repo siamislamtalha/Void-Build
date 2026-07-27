@@ -347,7 +347,7 @@ class _AlbumViewState extends State<AlbumView> {
                   hasScrollBody: false,
                   child: Center(
                       child: CircularProgressIndicator(
-                          color: Default_Theme.accentColor2)),
+                          color: AppTheme.accentColor(context))),
                 ),
 
               if (status == DetailStatus.loadingMore)
@@ -356,7 +356,7 @@ class _AlbumViewState extends State<AlbumView> {
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: Center(
                         child: CircularProgressIndicator(
-                            color: Default_Theme.accentColor2)),
+                            color: AppTheme.accentColor(context))),
                   ),
                 ),
             ],
@@ -582,28 +582,28 @@ class _PremiumPlayButton extends StatelessWidget {
       child: InkWell(
         onTap: isEmpty ? null : onTap,
         borderRadius: BorderRadius.circular(30),
-        splashColor: Default_Theme.accentColor2.withValues(alpha: 0.2),
+        splashColor: AppTheme.accentColor(context).withValues(alpha: 0.2),
         child: Container(
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 28),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
-            color: Default_Theme.accentColor2.withValues(alpha: 0.1),
-            border: Border.all(color: Default_Theme.accentColor2, width: 1.5),
+            color: AppTheme.accentColor(context).withValues(alpha: 0.1),
+            border: Border.all(color: AppTheme.accentColor(context), width: 1.5),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(MingCute.play_fill,
-                  size: 20, color: Default_Theme.accentColor2),
+                  size: 20, color: AppTheme.accentColor(context)),
               const SizedBox(width: 8),
               Text(
                 AppLocalizations.of(context)!.chartPlay,
                 style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: Default_Theme.accentColor2),
+                    color: AppTheme.accentColor(context)),
               ),
             ],
           ),
@@ -641,11 +641,11 @@ class _PremiumCircularButton extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isActive
-                  ? Default_Theme.accentColor2.withValues(alpha: 0.15)
+                  ? AppTheme.accentColor(context).withValues(alpha: 0.15)
                   : Default_Theme.primaryColor1.withValues(alpha: 0.05),
               border: Border.all(
                 color: isActive
-                    ? Default_Theme.accentColor2.withValues(alpha: 0.5)
+                    ? AppTheme.accentColor(context).withValues(alpha: 0.5)
                     : Default_Theme.primaryColor1.withValues(alpha: 0.15),
                 width: 1.5,
               ),
@@ -654,7 +654,7 @@ class _PremiumCircularButton extends StatelessWidget {
               child: Icon(
                 icon,
                 color: isActive
-                    ? Default_Theme.accentColor2
+                    ? AppTheme.accentColor(context)
                     : Default_Theme.primaryColor1,
                 size: 20,
               ),

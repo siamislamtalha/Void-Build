@@ -158,10 +158,10 @@ class _SquareImgCardState extends State<SquareImgCard> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: Default_Theme.secondoryTextStyle.merge(
-                            const TextStyle(
+                            TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
-                              color: Default_Theme.primaryColor1,
+                              color: Theme.of(context).colorScheme.onSurface,
                               height: 1.1,
                             ),
                           ),
@@ -176,8 +176,8 @@ class _SquareImgCardState extends State<SquareImgCard> {
                               Default_Theme.secondoryTextStyle.merge(TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: Default_Theme.primaryColor1
-                                .withValues(alpha: 0.62),
+                            color: Theme.of(context).colorScheme.onSurface
+                                .withValues(alpha: 0.55),
                             height: 1.1,
                           )),
                         ),

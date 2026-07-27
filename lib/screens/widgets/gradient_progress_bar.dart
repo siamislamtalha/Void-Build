@@ -199,7 +199,7 @@ class GradientProgressBar extends StatefulWidget {
     required this.total,
     this.buffered = Duration.zero,
     this.onSeek,
-    this.activeGradientColors = const [Color(0xFFFF6B8B), Color(0xFFFF2E63)],
+    this.activeGradientColors = const [Colors.white, Color(0xFFE5E5EA)],
     this.inactiveGradientColors = const [Colors.white, Color(0xFF0EA5E0)],
     this.isPlaying = true,
     this.trackHeight = 6.0,
@@ -683,32 +683,32 @@ class _GradientProgressBarPainter extends CustomPainter {
 class ProgressBarGradients {
   ProgressBarGradients._();
 
-  /// Iconic Play Pink - Hot pink gradient (for playing state)
-  static const iconicPlayPink = [Color(0xFFFF6B8B), Color(0xFFFF2E63)];
+  /// Iconic Monochrome - Crisp monochrome gradient (for playing state)
+  static const iconicPlayPink = [Colors.white, Color(0xFFE5E5EA)];
 
   /// Sky Blue to White - For paused state
   static const skyBlueWhite = [Colors.white, Color(0xFF0EA5E0)];
 
-  /// Electric Watermelon - Warm pink/red gradient
-  static const electricWatermelon = [Color(0xFFFF512F), Color(0xFFDD2476)];
+  /// Ocean Slate - Clean slate to cyan gradient
+  static const electricWatermelon = [Color(0xFF2C3E50), Color(0xFF4CA1AF)];
 
-  /// Hot Magenta Glow - Deep magenta gradient
-  static const hotMagentaGlow = [Color(0xFFFF4081), Color(0xFFF50057)];
+  /// Deep Cyber Glow - Deep blue gradient
+  static const hotMagentaGlow = [Color(0xFF0052D4), Color(0xFF4364F7)];
 
-  /// Vaporwave Sunset - Cyan to magenta aesthetic
-  static const vaporwaveSunset = [Color(0xFF00C6FF), Color(0xFFFF00CC)];
+  /// Vaporwave Sky - Cyan to blue aesthetic
+  static const vaporwaveSunset = [Color(0xFF00C6FF), Color(0xFF0072FF)];
 
-  /// Cotton Candy Skies - Soft blue to pink
-  static const cottonCandySkies = [Color(0xFF89F7FE), Color(0xFFF68084)];
+  /// Cotton Candy Skies - Soft sky blue
+  static const cottonCandySkies = [Color(0xFF89F7FE), Color(0xFF66A6FF)];
 
-  /// Cyber Twilight - Deep blue to neon red
-  static const cyberTwilight = [Color(0xFF0072FF), Color(0xFFFF2E63)];
+  /// Cyber Twilight - Deep blue to electric cyan
+  static const cyberTwilight = [Color(0xFF0072FF), Color(0xFF00C6FF)];
 
-  /// Electric Bubblegum - Turquoise to shocking pink
-  static const electricBubblegum = [Color(0xFF00DBDE), Color(0xFFFC00FF)];
+  /// Electric Bubblegum - Turquoise to cyan
+  static const electricBubblegum = [Color(0xFF00DBDE), Color(0xFF1DB954)];
 
-  /// Malibu Drive - Light blue to salmon pink
-  static const malibuDrive = [Color(0xFF43CBFF), Color(0xFFFF96F9)];
+  /// Malibu Drive - Light blue to ocean cyan
+  static const malibuDrive = [Color(0xFF43CBFF), Color(0xFF0072FF)];
 
   /// Cyber Blue - Electric blue gradient
   static const cyberBlue = [Color(0xFF00F2FF), Color(0xFF007BFF)];

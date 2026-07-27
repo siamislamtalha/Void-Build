@@ -18,7 +18,7 @@ class NotificationTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 5),
       child: ListTile(
-        // splashColor: Default_Theme.accentColor2.withValues(alpha: 0.1),
+        // splashColor: AppTheme.accentColor(context).withValues(alpha: 0.1),
         onTap: () {
           if (notification.type == "app_update") {
             Navigator.push(
@@ -40,7 +40,7 @@ class NotificationTile extends StatelessWidget {
         title: Text(
           notification.title,
           style: const TextStyle(
-                  color: Default_Theme.accentColor2,
+                  color: AppTheme.accentColor(context),
                   fontSize: 16,
                   fontWeight: FontWeight.bold)
               .merge(Default_Theme.secondoryTextStyle),

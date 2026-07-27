@@ -541,7 +541,7 @@ class VersionCardState extends State<VersionCard> {
           shape: const Border(),
           collapsedShape: const Border(),
           iconColor:
-              isUnreleased ? Colors.amberAccent : Colors.purpleAccent.shade100,
+              isUnreleased ? Colors.amberAccent : Theme.of(context).colorScheme.primary,
           collapsedIconColor: Colors.white70,
           title: Row(
             children: [

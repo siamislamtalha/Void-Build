@@ -141,7 +141,7 @@ class _PlaylistOptionsSheet extends StatelessWidget {
                                 children: [
                                   _BottomSheetTile(
                                     icon: MingCute.play_circle_fill,
-                                    iconColor: Default_Theme.accentColor2,
+                                    iconColor: AppTheme.accentColor(context),
                                     title: l10n.playlistPlay,
                                     onTap: () async {
                                       final libraryCubit =
@@ -240,7 +240,7 @@ class _PlaylistOptionsSheet extends StatelessWidget {
                                         : MingCute.pin_2_fill,
                                     iconColor: isPinned
                                         ? null
-                                        : Default_Theme.accentColor2,
+                                        : AppTheme.accentColor(context),
                                     title: isPinned
                                         ? l10n.playlistUnpin
                                         : l10n.playlistPinToTop,

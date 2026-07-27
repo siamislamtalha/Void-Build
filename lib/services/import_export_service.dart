@@ -470,7 +470,7 @@ class ImportExportService {
                 ),
                 FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: Default_Theme.accentColor2,
+                    backgroundColor: AppTheme.accentColor1,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () => Navigator.pop(ctx, true),
@@ -499,7 +499,7 @@ class ImportExportService {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const CircularProgressIndicator(color: Default_Theme.accentColor2),
+                      const CircularProgressIndicator(color: AppTheme.accentColor1),
                       const SizedBox(height: 16),
                       Text(l10n.storageRestoring, style: const TextStyle(color: Colors.white, decoration: TextDecoration.none, fontSize: 14), textAlign: TextAlign.center),
                     ],
@@ -532,7 +532,7 @@ class ImportExportService {
               actions: [
                 FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: Default_Theme.accentColor2,
+                    backgroundColor: AppTheme.accentColor1,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () => Navigator.pop(ctx),
@@ -565,7 +565,7 @@ class ImportExportService {
                 ),
                 FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: Default_Theme.accentColor2,
+                    backgroundColor: AppTheme.accentColor1,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () => Navigator.pop(ctx, true),
@@ -594,7 +594,7 @@ class ImportExportService {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const CircularProgressIndicator(color: Default_Theme.accentColor2),
+                      const CircularProgressIndicator(color: AppTheme.accentColor1),
                       const SizedBox(height: 16),
                       Text(l10n.storageRestoring, style: const TextStyle(color: Colors.white, decoration: TextDecoration.none, fontSize: 14), textAlign: TextAlign.center),
                     ],
@@ -627,7 +627,7 @@ class ImportExportService {
               actions: [
                 FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: Default_Theme.accentColor2,
+                    backgroundColor: AppTheme.accentColor1,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () => Navigator.pop(ctx),

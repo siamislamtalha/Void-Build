@@ -43,6 +43,7 @@ import 'package:voidmusic/utils/ticker.dart';
 import 'package:voidmusic/utils/url_checker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:voidmusic/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
@@ -153,6 +154,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GestureBinding.instance.resamplingEnabled = true;
   MediaKit.ensureInitialized();
+  // Enable edge-to-edge rendering so the system navigation bar area is
+  // transparent and the glass footer can composite through it.
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   await bootstrapApp();
   setHighRefreshRate();
   await setupPlayerCubit();
@@ -460,7 +464,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 width: 50,
                 height: 50,
                 child: CircularProgressIndicator(
-                  color: Default_Theme.accentColor2,
+                  color: AppTheme.accentColor(context),
                 ),
               ),
             );

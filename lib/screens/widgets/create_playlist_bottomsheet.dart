@@ -111,7 +111,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                   Container(
                     height: 6,
                     width: double.infinity,
-                    color: Default_Theme.accentColor2,
+                    color: AppTheme.accentColor(context),
                   ),
 
                   // --- Main Content ---
@@ -128,7 +128,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                             const TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
-                              color: Default_Theme.accentColor2,
+                              color: AppTheme.accentColor(context),
                             ),
                           ),
                         ),
@@ -141,7 +141,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                           textInputAction: TextInputAction.done,
                           maxLines: 1,
                           maxLength: 35,
-                          cursorColor: Default_Theme.accentColor2,
+                          cursorColor: AppTheme.accentColor(context),
                           cursorWidth: 3,
                           cursorRadius: const Radius.circular(3),
                           style: Default_Theme.secondoryTextStyleMedium.merge(
@@ -180,7 +180,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                             Container(
                               height: 1.5,
                               width: double.infinity,
-                              color: Default_Theme.accentColor2
+                              color: AppTheme.accentColor(context)
                                   .withValues(alpha: 0.1),
                             ),
                             AnimatedContainer(
@@ -191,7 +191,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                                   ? MediaQuery.of(context).size.width
                                   : 30,
                               decoration: const BoxDecoration(
-                                color: Default_Theme.accentColor2,
+                                color: AppTheme.accentColor(context),
                               ),
                             ),
                           ],
@@ -237,11 +237,11 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 24, vertical: 12),
                                   decoration: BoxDecoration(
-                                    color: Default_Theme.accentColor2
+                                    color: AppTheme.accentColor(context)
                                         .withValues(alpha: 0.08),
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
-                                      color: Default_Theme.accentColor2,
+                                      color: AppTheme.accentColor(context),
                                       width: 1.2,
                                     ),
                                   ),
@@ -253,7 +253,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                                       const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: Default_Theme.accentColor2,
+                                        color: AppTheme.accentColor(context),
                                       ),
                                     ),
                                   ),

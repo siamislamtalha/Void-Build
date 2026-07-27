@@ -54,7 +54,7 @@ class SettingsView extends StatelessWidget {
                     subtitle:
                         AppLocalizations.of(context)!.settingsPluginsSubtitle,
                     icon: MingCute.plugin_2_fill,
-                    iconColor: Default_Theme.accentColor2,
+                    iconColor: AppTheme.accentColor(context),
                     isHighlightIcon:
                         true, // Gives the accent color a bit more pop
                     onTap: () =>
@@ -65,7 +65,7 @@ class SettingsView extends StatelessWidget {
                     subtitle: AppLocalizations.of(context)!
                         .settingsPluginDefaultsSubtitle,
                     icon: MingCute.settings_6_fill,
-                    iconColor: Default_Theme.accentColor2,
+                    iconColor: AppTheme.accentColor(context),
                     onTap: () =>
                         _navigate(context, const PluginDefaultsSettings()),
                   ),
@@ -74,7 +74,7 @@ class SettingsView extends StatelessWidget {
                     subtitle:
                         AppLocalizations.of(context)!.settingsUpdatesSubtitle,
                     icon: MingCute.download_3_fill,
-                    iconColor: Default_Theme.accentColor2,
+                    iconColor: AppTheme.accentColor(context),
                     onTap: () => _navigate(context, const UpdatesSettings()),
                   ),
                 ],
@@ -88,7 +88,7 @@ class SettingsView extends StatelessWidget {
                     subtitle:
                         AppLocalizations.of(context)!.settingsPlayerSubtitle,
                     icon: MingCute.airpods_fill,
-                    iconColor: Default_Theme.accentColor2,
+                    iconColor: AppTheme.accentColor(context),
                     onTap: () => _navigate(context, const PlayerSettings()),
                   ),
                   _SettingsTile(
@@ -96,7 +96,7 @@ class SettingsView extends StatelessWidget {
                     subtitle:
                         AppLocalizations.of(context)!.settingsDownloadsSubtitle,
                     icon: MingCute.folder_download_fill,
-                    iconColor: Default_Theme.accentColor2,
+                    iconColor: AppTheme.accentColor(context),
                     onTap: () => _navigate(context, const DownloadSettings()),
                   ),
                   _SettingsTile(
@@ -104,7 +104,7 @@ class SettingsView extends StatelessWidget {
                     subtitle: AppLocalizations.of(context)!
                         .settingsLocalTracksSubtitle,
                     icon: MingCute.music_2_fill,
-                    iconColor: Default_Theme.accentColor2,
+                    iconColor: AppTheme.accentColor(context),
                     onTap: () => _navigate(context, const LocalMusicSettings()),
                   ),
                 ],
@@ -118,7 +118,7 @@ class SettingsView extends StatelessWidget {
                     subtitle: AppLocalizations.of(context)!
                         .settingsUIElementsSubtitle,
                     icon: MingCute.display_fill,
-                    iconColor: Default_Theme.accentColor2,
+                    iconColor: AppTheme.accentColor(context),
                     onTap: () => _navigate(context, const AppUISettings()),
                   ),
                   _SettingsTile(
@@ -127,7 +127,7 @@ class SettingsView extends StatelessWidget {
                     subtitle: AppLocalizations.of(context)!
                         .settingsLanguageCountrySubtitle,
                     icon: MingCute.globe_fill,
-                    iconColor: Default_Theme.accentColor2,
+                    iconColor: AppTheme.accentColor(context),
                     onTap: () => _navigate(context, const CountrySettings()),
                   ),
                   _SettingsTile(
@@ -135,7 +135,7 @@ class SettingsView extends StatelessWidget {
                     subtitle:
                         AppLocalizations.of(context)!.settingsStorageSubtitle,
                     icon: MingCute.coin_2_fill,
-                    iconColor: Default_Theme.accentColor2,
+                    iconColor: AppTheme.accentColor(context),
                     onTap: () => _navigate(context, const BackupSettings()),
                   ),
                   _SettingsTile(
@@ -143,7 +143,7 @@ class SettingsView extends StatelessWidget {
                     subtitle:
                         AppLocalizations.of(context)!.settingsLastFMSubtitle,
                     icon: FontAwesome.lastfm_brand,
-                    iconColor: Default_Theme.accentColor2,
+                    iconColor: AppTheme.accentColor(context),
                     onTap: () => _navigate(context, const LastDotFM()),
                   ),
                 ],
@@ -157,7 +157,7 @@ class SettingsView extends StatelessWidget {
                     subtitle:
                         AppLocalizations.of(context)!.settingsAboutSubtitle,
                     icon: MingCute.flower_4_fill,
-                    iconColor: Default_Theme.accentColor2,
+                    iconColor: AppTheme.accentColor(context),
                     isHighlightIcon: true,
                     onTap: () => _navigate(context, const About()),
                   ),

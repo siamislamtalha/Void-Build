@@ -418,7 +418,12 @@ class _OfflineScreenState extends State<OfflineScreen> {
           Tooltip(
             message: l10n.offlineRefreshTooltip,
             child: IconButton(
-              icon: const Icon(MingCute.refresh_2_line),
+              icon: Icon(
+                MingCute.refresh_2_line,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : const Color(0xFF1C1C1E),
+              ),
               onPressed: () {
                 context.read<DownloaderCubit>().refreshDownloadedSongs();
               },
@@ -429,7 +434,9 @@ class _OfflineScreenState extends State<OfflineScreen> {
           child: IconButton(
             icon: Icon(
               _isSearch ? Icons.close : Icons.search,
-              color: Default_Theme.primaryColor1,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : const Color(0xFF1C1C1E),
             ),
             onPressed: _toggleSearch,
           ),
@@ -445,10 +452,12 @@ class _OfflineScreenState extends State<OfflineScreen> {
               isScrollable: true,
               tabAlignment: TabAlignment.start,
               dividerColor: Colors.transparent,
-              indicatorColor: Default_Theme.accentColor2,
+              indicatorColor: Theme.of(context).colorScheme.onSurface,
               indicatorSize: TabBarIndicatorSize.label,
-              labelColor: Colors.white,
-              unselectedLabelColor: Default_Theme.primaryColor1.withValues(alpha: 0.5),
+              labelColor: Theme.of(context).colorScheme.onSurface,
+              unselectedLabelColor: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white54
+                  : const Color(0xFF8E8E93),
               labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
               tabs: const [
@@ -465,14 +474,20 @@ class _OfflineScreenState extends State<OfflineScreen> {
   }
 
   Widget _buildTitle(AppLocalizations l10n) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     return Container(
       key: const ValueKey('title'),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(l10n.offlineTitle,
-              style: Default_Theme.primaryTextStyle.merge(const TextStyle(
-                  fontSize: 34, color: Default_Theme.primaryColor1))),
+          Text(
+            l10n.offlineTitle,
+            style: Default_Theme.primaryTextStyle.copyWith(
+              fontSize: 34,
+              color: titleColor,
+            ),
+          ),
           const Spacer(),
         ],
       ),
@@ -480,23 +495,24 @@ class _OfflineScreenState extends State<OfflineScreen> {
   }
 
   Widget _buildSearchField(AppLocalizations l10n) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     return Container(
       key: const ValueKey('search'),
       child: TextField(
         controller: _searchController,
         autofocus: true,
-        cursorColor: Default_Theme.primaryColor1,
+        cursorColor: textColor,
         decoration: InputDecoration(
           hintText: l10n.offlineSearchHint,
           border: InputBorder.none,
           hintStyle: TextStyle(
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.7)),
-        ),
-        style: Default_Theme.secondoryTextStyle.merge(
-          const TextStyle(
-            color: Default_Theme.primaryColor1,
-            fontSize: 15.0,
+            color: isDark ? Colors.white54 : const Color(0xFF8E8E93),
           ),
+        ),
+        style: Default_Theme.secondoryTextStyle.copyWith(
+          color: textColor,
+          fontSize: 16.0,
         ),
       ),
     );
@@ -516,8 +532,11 @@ class _ActionChipButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = AppTheme.accentColor(context);
+    final tint = AppTheme.accentTintColor(context, alpha: 0.12);
+
     return Material(
-      color: Default_Theme.accentColor2.withValues(alpha: 0.12),
+      color: tint,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
@@ -527,12 +546,12 @@ class _ActionChipButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 16, color: Default_Theme.accentColor2),
+              Icon(icon, size: 16, color: accent),
               const SizedBox(width: 6),
               Text(
                 label,
-                style: const TextStyle(
-                  color: Default_Theme.accentColor2,
+                style: TextStyle(
+                  color: accent,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),

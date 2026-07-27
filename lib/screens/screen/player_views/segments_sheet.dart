@@ -160,7 +160,7 @@ class _SegmentsSheetBodyState extends State<_SegmentsSheetBody> {
               child: _loading
                   ? const Center(
                       child: CircularProgressIndicator(
-                          color: Default_Theme.accentColor2))
+                          color: AppTheme.accentColor(context)))
                   : _segments == null || _segments!.isEmpty
                       ? Center(
                           child: Text(

@@ -192,7 +192,7 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Default_Theme.accentColor2,
+                              color: AppTheme.accentColor(context),
                             ),
                           ),
                       ],
@@ -296,13 +296,13 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                         children: [
                           const SettingIconBox(
                             icon: Icons.create_new_folder_outlined,
-                            color: Default_Theme.accentColor2,
+                            color: AppTheme.accentColor(context),
                           ),
                           const SizedBox(width: 14),
                           Text(
                             l10n.localSettingAddFolder,
                             style: const TextStyle(
-                              color: Default_Theme.accentColor2,
+                              color: AppTheme.accentColor(context),
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               letterSpacing: -0.2,

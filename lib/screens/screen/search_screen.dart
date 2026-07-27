@@ -364,81 +364,90 @@ class _FloatingSearchBarSliver extends StatelessWidget {
       toolbarHeight: 70,
       title: Focus(
         onKeyEvent: handleKeyEvent,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(18),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.08), width: 1),
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(width: 16),
-                  _buildAnimatedSearchLeadingIcon(),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      controller: textEditingController,
-                      focusNode: searchFocusNode,
-                      style: TextStyle(
-                        color:
-                            Default_Theme.primaryColor1.withValues(alpha: 0.95),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      onChanged: onQueryChanged,
-                      onSubmitted: (val) {
-                        final hIndex = highlightedIndexNotifier.value;
-                        if (hIndex >= 0 &&
-                            hIndex < currentCombinedSuggestions.length) {
-                          final selected = currentCombinedSuggestions[hIndex];
-                          onSearchRequested(
-                              query: selected.query, filter: selected.filter);
-                        } else {
-                          onSearchRequested(
-                              query: val, filter: ContentSearchFilter.all);
-                        }
-                      },
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 14),
-                        hintText:
-                            AppLocalizations.of(context)!.searchHintExplore,
-                        hintStyle: TextStyle(
-                          color: Default_Theme.primaryColor1
-                              .withValues(alpha: 0.35),
-                          fontSize: 15,
-                        ),
-                      ),
+        child: Builder(
+          builder: (context) {
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            final onSurface = Theme.of(context).colorScheme.onSurface;
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.black.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : Colors.black.withValues(alpha: 0.08),
+                      width: 1,
                     ),
                   ),
-                  ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: textEditingController,
-                    builder: (context, value, child) {
-                      if (value.text.isNotEmpty) {
-                        return IconButton(
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          icon: Icon(MingCute.close_fill,
-                              color: Default_Theme.primaryColor1
-                                  .withValues(alpha: 0.5),
-                              size: 18),
-                          onPressed: onClearRequested,
-                        );
-                      }
-                      return const SizedBox(width: 16);
-                    },
-                  )
-                ],
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 16),
+                      _buildAnimatedSearchLeadingIcon(),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: textEditingController,
+                          focusNode: searchFocusNode,
+                          style: TextStyle(
+                            color: onSurface.withValues(alpha: 0.95),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          onChanged: onQueryChanged,
+                          onSubmitted: (val) {
+                            final hIndex = highlightedIndexNotifier.value;
+                            if (hIndex >= 0 &&
+                                hIndex < currentCombinedSuggestions.length) {
+                              final selected = currentCombinedSuggestions[hIndex];
+                              onSearchRequested(
+                                  query: selected.query, filter: selected.filter);
+                            } else {
+                              onSearchRequested(
+                                  query: val, filter: ContentSearchFilter.all);
+                            }
+                          },
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 14),
+                            hintText:
+                                AppLocalizations.of(context)!.searchHintExplore,
+                            hintStyle: TextStyle(
+                              color: onSurface.withValues(alpha: 0.40),
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      ),
+                      ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: textEditingController,
+                        builder: (context, value, child) {
+                          if (value.text.isNotEmpty) {
+                            return IconButton(
+                              splashColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              icon: Icon(MingCute.close_fill,
+                                  color: onSurface.withValues(alpha: 0.5),
+                                  size: 18),
+                              onPressed: onClearRequested,
+                            );
+                          }
+                          return const SizedBox(width: 16);
+                        },
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
@@ -452,6 +461,7 @@ class _FloatingSearchBarSliver extends StatelessWidget {
       builder: (context, state) {
         final isLoading = state.searchStatus == SearchStatus.loading ||
             state.searchStatus == SearchStatus.loadingMore;
+        final onSurface = Theme.of(context).colorScheme.onSurface;
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 240),
           switchInCurve: Curves.easeOutCubic,
@@ -470,12 +480,11 @@ class _FloatingSearchBarSliver extends StatelessWidget {
                   height: 16,
                   child: CircularProgressIndicator(
                       strokeWidth: 2.2,
-                      color:
-                          Default_Theme.primaryColor1.withValues(alpha: 0.5)),
+                      color: onSurface.withValues(alpha: 0.5)),
                 )
               : Icon(MingCute.search_2_line,
                   key: const ValueKey('search-idle'),
-                  color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
+                  color: onSurface.withValues(alpha: 0.5),
                   size: 20),
         );
       },
@@ -592,8 +601,8 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const Icon(MingCute.plugin_2_line,
-                                size: 18, color: Default_Theme.accentColor2),
+                            Icon(MingCute.plugin_2_line,
+                                size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                             const SizedBox(width: 8),
                             Text(
                               AppLocalizations.of(context)!.searchSources,
@@ -602,7 +611,7 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                                 fontSize: 12,
                                 letterSpacing: 1.5,
                                 fontWeight: FontWeight.w800,
-                                color: Default_Theme.primaryColor1
+                                color: Theme.of(context).colorScheme.onSurface
                                     .withValues(alpha: 0.7),
                               ),
                             ),
@@ -617,7 +626,7 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                           child: Text(
                             AppLocalizations.of(context)!.searchNoPlugins,
                             style: TextStyle(
-                                color: Default_Theme.primaryColor1
+                                color: Theme.of(context).colorScheme.onSurface
                                     .withValues(alpha: 0.4),
                                 fontStyle: FontStyle.italic),
                           ),
@@ -702,13 +711,13 @@ class _PluginChip extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5.5),
             decoration: BoxDecoration(
               color: isSelected
-                  ? Colors.white.withValues(alpha: 0.12)
-                  : const Color(0xFF1C1C1E),
+                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)
+                  : Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(50),
               border: Border.all(
                 color: isSelected
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.12),
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
                 width: 1.2,
               ),
             ),
@@ -719,8 +728,8 @@ class _PluginChip extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (isSelected) ...[
-                    const Icon(MingCute.check_line,
-                        size: 14, color: Colors.white),
+                    Icon(MingCute.check_line,
+                        size: 14, color: Theme.of(context).colorScheme.onSurface),
                     const SizedBox(width: 5),
                   ],
                   SourceBadgeByPluginId(
@@ -732,7 +741,7 @@ class _PluginChip extends StatelessWidget {
                     plugin.name,
                     style: TextStyle(
                       fontFamily: 'Gilroy',
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 13,
                       fontWeight:
                           isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -799,7 +808,7 @@ class _SuggestionsSliver extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 48),
                 child: Center(
                     child: CircularProgressIndicator(
-                        color: Default_Theme.accentColor2))),
+                        color: AppTheme.accentColor(context)))),
           );
         }
 
@@ -833,7 +842,7 @@ class _SuggestionsSliver extends StatelessWidget {
                   height: 28,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Default_Theme.accentColor2,
+                    color: AppTheme.accentColor(context),
                   ),
                 ),
               ),
@@ -876,9 +885,9 @@ class _SuggestionsSliver extends StatelessWidget {
                   borderRadius: BorderRadius.circular(99),
                   child: LinearProgressIndicator(
                     minHeight: 2,
-                    color: Default_Theme.accentColor2.withValues(alpha: 0.7),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     backgroundColor:
-                        Default_Theme.primaryColor1.withValues(alpha: 0.06),
+                        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
                   ),
                 ),
               ),
@@ -929,19 +938,21 @@ class _SuggestionsSliver extends StatelessWidget {
   Widget _buildSuggestionSectionHeader(String title, IconData icon) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 4, 10, 8),
-      child: Row(
-        children: [
-          Icon(icon,
-              size: 14,
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.5)),
-          const SizedBox(width: 8),
-          Text(title,
-              style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                  color: Default_Theme.primaryColor1.withValues(alpha: 0.55),
-                  fontSize: 11.5,
-                  letterSpacing: 1.1,
-                  fontWeight: FontWeight.w700)),
-        ],
+      child: Builder(
+        builder: (context) => Row(
+          children: [
+            Icon(icon,
+                size: 14,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+            const SizedBox(width: 8),
+            Text(title,
+                style: Default_Theme.secondoryTextStyleMedium.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
+                    fontSize: 11.5,
+                    letterSpacing: 1.1,
+                    fontWeight: FontWeight.w700)),
+          ],
+        ),
       ),
     );
   }
@@ -973,7 +984,7 @@ class _SuggestionTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         onTap: () => onSearch(suggestion),
         splashColor: Colors.transparent,
-        highlightColor: Default_Theme.primaryColor1.withValues(alpha: 0.05),
+        highlightColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         child: ValueListenableBuilder<int>(
           valueListenable: highlightedIndexNotifier,
           builder: (context, highlightedIndex, child) {
@@ -983,7 +994,7 @@ class _SuggestionTile extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
               decoration: BoxDecoration(
                 color: isHighlighted
-                    ? Default_Theme.primaryColor1.withValues(alpha: 0.065)
+                    ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.065)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -994,12 +1005,12 @@ class _SuggestionTile extends StatelessWidget {
             children: [
               Icon(icon,
                   size: 18,
-                  color: Default_Theme.primaryColor1.withValues(alpha: 0.48)),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.48)),
               const SizedBox(width: 14),
               Expanded(
                   child: Text(suggestion,
                       style: TextStyle(
-                              color: Default_Theme.primaryColor1
+                              color: Theme.of(context).colorScheme.onSurface
                                   .withValues(alpha: 0.9),
                               fontSize: 15)
                           .merge(Default_Theme.secondoryTextStyle))),
@@ -1010,7 +1021,7 @@ class _SuggestionTile extends StatelessWidget {
                         .add(SearchSuggestionClear(suggestion)),
                     child: Icon(MingCute.close_fill,
                         color:
-                            Default_Theme.primaryColor1.withValues(alpha: 0.4),
+                            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                         size: 18))
               else
                 GestureDetector(
@@ -1018,7 +1029,7 @@ class _SuggestionTile extends StatelessWidget {
                         suggestion.trim().replaceAll(RegExp(r'\s+'), ' ')),
                     child: Icon(MingCute.arrow_left_up_line,
                         color:
-                            Default_Theme.primaryColor1.withValues(alpha: 0.4),
+                            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                         size: 18))
             ],
           ),
@@ -1067,7 +1078,7 @@ class _EntitySuggestionTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         onTap: () => onSearch(query, filter),
         splashColor: Colors.transparent,
-        highlightColor: Default_Theme.primaryColor1.withValues(alpha: 0.05),
+        highlightColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         child: ValueListenableBuilder<int>(
           valueListenable: highlightedIndexNotifier,
           builder: (context, highlightedIndex, child) {
@@ -1077,13 +1088,13 @@ class _EntitySuggestionTile extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: isHighlighted
-                    ? Default_Theme.primaryColor1.withValues(alpha: 0.07)
-                    : Default_Theme.primaryColor2.withValues(alpha: 0.02),
+                    ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07)
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.02),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                     color: isHighlighted
-                        ? Default_Theme.primaryColor1.withValues(alpha: 0.12)
-                        : Colors.white.withValues(alpha: 0.04)),
+                        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)
+                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04)),
               ),
               child: child,
             );
@@ -1105,7 +1116,7 @@ class _EntitySuggestionTile extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                                color: Default_Theme.primaryColor1
+                                color: Theme.of(context).colorScheme.onSurface
                                     .withValues(alpha: 0.9),
                                 fontSize: 14.5)
                             .merge(Default_Theme.secondoryTextStyleMedium)),
@@ -1115,7 +1126,7 @@ class _EntitySuggestionTile extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                                  color: Default_Theme.primaryColor1
+                                  color: Theme.of(context).colorScheme.onSurface
                                       .withValues(alpha: 0.5),
                                   fontSize: 12)
                               .merge(Default_Theme.secondoryTextStyle)),
@@ -1128,15 +1139,15 @@ class _EntitySuggestionTile extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                    color: Default_Theme.primaryColor1.withValues(alpha: 0.06),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(
-                        color: Default_Theme.primaryColor1
+                        color: Theme.of(context).colorScheme.onSurface
                             .withValues(alpha: 0.08))),
                 child: Text(typeLabel,
                     style: Default_Theme.secondoryTextStyleMedium.copyWith(
                         color:
-                            Default_Theme.primaryColor1.withValues(alpha: 0.52),
+                            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.52),
                         fontSize: 11,
                         fontWeight: FontWeight.w700)),
               ),
@@ -1197,7 +1208,7 @@ class _ContentSliver extends StatelessWidget {
                   hasScrollBody: false,
                   child: Center(
                       child: CircularProgressIndicator(
-                          color: Default_Theme.accentColor2)));
+                          color: AppTheme.accentColor(context))));
             }
             if ((state.searchStatus == SearchStatus.loading ||
                     state.searchStatus == SearchStatus.loaded ||
@@ -1277,22 +1288,22 @@ class _SliverSearchResults extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                    color: Default_Theme.primaryColor2.withValues(alpha: 0.06),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.05))),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05))),
                 child: Row(
                   children: [
-                    const SizedBox(
+                    SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(
                             strokeWidth: 2.2,
-                            color: Default_Theme.accentColor2)),
+                            color: Theme.of(context).colorScheme.onSurface)),
                     const SizedBox(width: 10),
                     Text('Searching...',
                         style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                            color: Default_Theme.primaryColor1
+                            color: Theme.of(context).colorScheme.onSurface
                                 .withValues(alpha: 0.78),
                             fontSize: 12.5)),
                   ],
@@ -1351,7 +1362,7 @@ class _SliverSearchResults extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 32),
                   child: Center(
                       child: CircularProgressIndicator(
-                          color: Default_Theme.accentColor2))))
+                          color: AppTheme.accentColor(context)))))
         else
           const SliverPadding(padding: EdgeInsets.only(bottom: 30)),
       ],
@@ -1362,12 +1373,14 @@ class _SliverSearchResults extends StatelessWidget {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.only(left: 20, top: 20, bottom: 12),
-        child: Text(
-          title,
-          style: Default_Theme.secondoryTextStyleMedium.merge(TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.9))),
+        child: Builder(
+          builder: (context) => Text(
+            title,
+            style: Default_Theme.secondoryTextStyleMedium.merge(TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9))),
+          ),
         ),
       ),
     );

@@ -10,7 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// Horizontal scrolling chip bar for selecting the active plugin.
 ///
 /// Displays loaded plugins of a given [pluginType] as selectable chips.
-/// The currently active plugin is highlighted with [Default_Theme.accentColor2].
+/// The currently active plugin is highlighted with dynamic theme color.
 ///
 /// Usage:
 /// ```dart
@@ -111,19 +111,20 @@ class _PluginChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = AppTheme.accentColor(context);
+    final tint = AppTheme.accentTintColor(context, alpha: 0.15);
+    final inactiveBorder = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2);
+    final inactiveText = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOutCubic,
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
-          backgroundColor: isActive
-              ? Default_Theme.accentColor2.withValues(alpha: 0.22)
-              : Colors.transparent,
+          backgroundColor: isActive ? tint : Colors.transparent,
           side: BorderSide(
-            color: isActive
-                ? Default_Theme.accentColor2
-                : Default_Theme.primaryColor1.withValues(alpha: 0.2),
+            color: isActive ? accent : inactiveBorder,
             width: 1.2,
           ),
           shape: RoundedRectangleBorder(
@@ -141,9 +142,7 @@ class _PluginChip extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: isActive
-                    ? Default_Theme.accentColor2
-                    : Default_Theme.primaryColor1.withValues(alpha: 0.7),
+                color: isActive ? accent : inactiveText,
                 fontSize: 13,
                 fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
               ).merge(Default_Theme.secondoryTextStyle),

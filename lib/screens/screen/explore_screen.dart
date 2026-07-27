@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:voidmusic/blocs/explore/cubit/explore_cubits.dart';
 import 'package:voidmusic/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
@@ -198,7 +199,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                     height: 60,
                                     width: 60,
                                     child: CircularProgressIndicator(
-                                      color: Default_Theme.accentColor2,
+                                      color: AppTheme.accentColor(context),
                                     ),
                                   ),
                                 );
@@ -361,7 +362,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                   padding: EdgeInsets.symmetric(vertical: 40),
                                   child: Center(
                                     child: CircularProgressIndicator(
-                                      color: Default_Theme.accentColor2,
+                                      color: AppTheme.accentColor(context),
                                     ),
                                   ),
                                 );
@@ -472,8 +473,8 @@ class CustomDiscoverBar extends StatelessWidget {
 }
 
 class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
-  static const double _minH = 0;
-  static const double _maxH = 96;
+  static const double _minH = 76;
+  static const double _maxH = 76;
 
   @override
   double get minExtent => _minH;
@@ -488,58 +489,56 @@ class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Solid background so the bar itself is opaque
-        Container(color: Theme.of(context).scaffoldBackgroundColor),
-        // The actual app bar content
-        SafeArea(
-          bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.exploreDiscover,
-                  style: Default_Theme.primaryTextStyle.merge(
-                    TextStyle(
-                      fontSize: 34,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                const NotificationIcon(),
-                const SizedBox(width: 8),
-                const TimerIcon(),
-                const SizedBox(width: 8),
-                const SettingsIcon(),
-              ],
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassColor = isDark
+        ? Colors.black.withValues(alpha: 0.45)
+        : Colors.white.withValues(alpha: 0.70);
+    final glassBorder = isDark
+        ? Colors.white.withValues(alpha: 0.15)
+        : Colors.black.withValues(alpha: 0.08);
+
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        child: Container(
+          decoration: BoxDecoration(
+            color: glassColor,
+            border: Border(
+              bottom: BorderSide(
+                color: glassBorder,
+                width: 1.0,
+              ),
             ),
           ),
-        ),
-        // Gradient fade at the bottom — blends the header into the content
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: Container(
-            height: 28,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Theme.of(context).scaffoldBackgroundColor.withOpacity(0.0),
-                  Theme.of(context).scaffoldBackgroundColor,
+          child: SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.exploreDiscover,
+                    style: Default_Theme.primaryTextStyle.merge(
+                      TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  const NotificationIcon(),
+                  const SizedBox(width: 8),
+                  const TimerIcon(),
+                  const SizedBox(width: 8),
+                  const SettingsIcon(),
                 ],
               ),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -549,6 +548,8 @@ class NotificationIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     return BlocBuilder<NotificationCubit, NotificationState>(
       builder: (context, state) {
         if (state is NotificationInitial || state.notifications.isEmpty) {
@@ -563,10 +564,10 @@ class NotificationIcon extends StatelessWidget {
                 ),
               );
             },
-            icon: const Icon(
+            icon: Icon(
               MingCute.notification_line,
-              color: Default_Theme.primaryColor1,
-              size: 30.0,
+              color: iconColor,
+              size: 26.0,
             ),
           );
         }
@@ -579,13 +580,13 @@ class NotificationIcon extends StatelessWidget {
                 const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: Default_Theme.primaryColor2,
+                  color: Colors.white,
                 ),
               ),
             ),
           ),
           badgeStyle: const badges.BadgeStyle(
-            badgeColor: Default_Theme.accentColor2,
+            badgeColor: AppTheme.accentColor(context),
             shape: badges.BadgeShape.circle,
           ),
           position: badges.BadgePosition.topEnd(top: -10, end: -5),
@@ -600,10 +601,10 @@ class NotificationIcon extends StatelessWidget {
                 ),
               );
             },
-            icon: const Icon(
+            icon: Icon(
               MingCute.notification_line,
-              color: Default_Theme.primaryColor1,
-              size: 30.0,
+              color: iconColor,
+              size: 26.0,
             ),
           ),
         );
@@ -617,6 +618,8 @@ class TimerIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     return IconButton(
       padding: const EdgeInsets.all(5),
       constraints: const BoxConstraints(),
@@ -626,10 +629,10 @@ class TimerIcon extends StatelessWidget {
           MaterialPageRoute(builder: (context) => const TimerView()),
         );
       },
-      icon: const Icon(
+      icon: Icon(
         MingCute.stopwatch_line,
-        color: Default_Theme.primaryColor1,
-        size: 30.0,
+        color: iconColor,
+        size: 26.0,
       ),
     );
   }
@@ -640,6 +643,8 @@ class SettingsIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     return IconButton(
       padding: const EdgeInsets.all(5),
       constraints: const BoxConstraints(),
@@ -649,10 +654,10 @@ class SettingsIcon extends StatelessWidget {
           MaterialPageRoute(builder: (context) => const SettingsView()),
         );
       },
-      icon: const Icon(
+      icon: Icon(
         MingCute.settings_3_line,
-        color: Default_Theme.primaryColor1,
-        size: 30.0,
+        color: iconColor,
+        size: 26.0,
       ),
     );
   }

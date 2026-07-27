@@ -60,44 +60,39 @@ class ToggleButtonState extends State<ToggleButton>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeBg = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final activeText = isDark ? Colors.black : Colors.white;
+    final inactiveBg = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF0F0F3);
+    final inactiveText = isDark ? Colors.white70 : const Color(0xFF66666E);
+    final inactiveBorder = isDark ? Colors.white24 : const Color(0xFFE5E5EA);
+
     return GestureDetector(
       onTap: () {
         updateState(!_isActive);
       },
       child: AnimatedContainer(
-        duration:
-            const Duration(milliseconds: 200), // Smooth, lightweight transition
-        constraints: const BoxConstraints(
-            minHeight: 30), // Minimum height to ensure visibility
-        padding: const EdgeInsets.symmetric(
-            vertical: 4, horizontal: 8), // Reduced padding for responsiveness
+        duration: const Duration(milliseconds: 200),
+        constraints: const BoxConstraints(minHeight: 30),
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         decoration: BoxDecoration(
-          color: _isActive
-              ? Default_Theme.accentColor2
-              : Colors.grey[900], // Pink for active, dark grey for inactive
-          borderRadius: BorderRadius.circular(
-              20), // More rounded corners like in the image
+          color: _isActive ? activeBg : inactiveBg,
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: _isActive
-                ? Default_Theme.accentColor2
-                : Colors.grey[700]!, // Match border color in inactive state
-            width: 2,
+            color: _isActive ? activeBg : inactiveBorder,
+            width: 1.5,
           ),
         ),
         child: FittedBox(
-          fit: BoxFit.scaleDown, // Scales text down to fit within the button
-          child: AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) {
-              return Text(
-                widget.label,
-                style: TextStyle(
-                  color: _textColorAnimation.value!, // Animated text color
-                  fontSize: 12, // Default font size, will scale with FittedBox
-                  fontWeight: FontWeight.bold, // Bold text for clarity
-                ),
-              );
-            },
+          fit: BoxFit.scaleDown,
+          child: Text(
+            widget.label,
+            style: TextStyle(
+              color: _isActive ? activeText : inactiveText,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Gilroy',
+            ),
           ),
         ),
       ),
