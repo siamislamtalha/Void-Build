@@ -27,7 +27,7 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
 
   String _selectedLang = '';
   String _selectedCountry = CountryInfoService.defaultCountryCode;
-  bool _autoDetectCountry = false;
+  bool _autoDetectCountry = true;
   bool _isResolvingCountry = false;
   bool _countryTouchedByUser = false;
   Locale? _currentLocale;
@@ -42,7 +42,7 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
     final lang =
         await _settingsDao.getSettingStr(SettingKeys.languageCode) ?? '';
     final auto =
-        await _settingsDao.getSettingBool(SettingKeys.autoGetCountry) ?? false;
+        await _settingsDao.getSettingBool(SettingKeys.autoGetCountry) ?? true;
 
     final storedCountryRaw =
         await _settingsDao.getSettingStr(SettingKeys.countryCode);
@@ -67,10 +67,13 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
       _currentLocale = normalizedLang.isEmpty ? null : Locale(normalizedLang);
     });
 
-    // Improve first guess quickly without network delay.
-    _updateCountryFromDeviceLocaleIfNeeded(
-      shouldGuess: storedCountry.isEmpty,
-    );
+    if (auto) {
+      _updateAutoDetect(true);
+    } else {
+      _updateCountryFromDeviceLocaleIfNeeded(
+        shouldGuess: storedCountry.isEmpty,
+      );
+    }
   }
 
   Future<void> _updateCountryFromDeviceLocaleIfNeeded({
@@ -329,10 +332,13 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
                                   alignment: Alignment.center,
                                   child: Text(
                                     l10n.continueButton,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700,
-                                      color: Colors.white,
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.black
+                                          : Colors.white,
                                       fontFamily: 'Gilroy',
                                     ),
                                   ),
