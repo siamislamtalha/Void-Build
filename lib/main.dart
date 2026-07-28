@@ -496,15 +496,19 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                       supportedLocales: AppLocalizations.supportedLocales,
                       locale: locale,
                       builder: (context, child) {
-                        // Set system UI overlay style based on theme brightness
-                        final brightness = Theme.of(context).brightness;
+                        // Determine brightness from resolved theme mode
+                        final isDark = resolvedThemeMode == ThemeMode.dark ||
+                            (resolvedThemeMode == ThemeMode.system &&
+                                MediaQuery.platformBrightnessOf(context) ==
+                                    Brightness.dark);
                         SystemChrome.setSystemUIOverlayStyle(
                           SystemUiOverlayStyle(
+                            statusBarColor: Colors.transparent,
+                            systemNavigationBarColor: Colors.transparent,
                             statusBarIconBrightness:
-                                brightness == Brightness.dark
-                                    ? Brightness.light
-                                    : Brightness.dark,
-                            statusBarBrightness: brightness,
+                                isDark ? Brightness.light : Brightness.dark,
+                            statusBarBrightness:
+                                isDark ? Brightness.dark : Brightness.light,
                           ),
                         );
                         return ResponsiveBreakpoints.builder(

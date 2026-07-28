@@ -290,7 +290,7 @@ class _ChartScreenBodyState extends State<_ChartScreenBody> {
         if (context.mounted) context.pop();
       },
       child: Scaffold(
-        backgroundColor: Default_Theme.themeColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -304,16 +304,16 @@ class _ChartScreenBodyState extends State<_ChartScreenBody> {
                 icon: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Default_Theme.themeColor.withValues(alpha: 0.5),
+                    color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
                     shape: BoxShape.circle,
                     border: Border.all(
                       color:
-                          Default_Theme.primaryColor1.withValues(alpha: 0.15),
+                          Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_back_rounded,
-                    color: Default_Theme.primaryColor1,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 20,
                   ),
                 ),
@@ -341,12 +341,10 @@ class _ChartScreenBodyState extends State<_ChartScreenBody> {
                       icon: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color:
-                              Default_Theme.themeColor.withValues(alpha: 0.5),
+                          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Default_Theme.primaryColor1
-                                .withValues(alpha: 0.15),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
                           ),
                         ),
                         child: isLoading
@@ -517,9 +515,9 @@ class _EditorialHeroMasthead extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Default_Theme.themeColor.withValues(alpha: 0.05),
-                      Default_Theme.themeColor.withValues(alpha: 0.85),
-                      Default_Theme.themeColor,
+                      Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.05),
+                      Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.85),
+                      Theme.of(context).scaffoldBackgroundColor,
                     ],
                     stops: const [0.0, 0.65, 1.0],
                   ),
@@ -776,7 +774,7 @@ class _ChartControlBarDelegate extends SliverPersistentHeaderDelegate {
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      color: Default_Theme.themeColor,
+      color: Theme.of(context).scaffoldBackgroundColor,
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       alignment: Alignment.bottomCenter,
       child: Padding(

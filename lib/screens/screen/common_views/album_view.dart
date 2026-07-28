@@ -1,4 +1,4 @@
-﻿// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:ui';
 
 import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
@@ -204,7 +204,7 @@ class _AlbumViewState extends State<AlbumView> {
                       colors: [
                         Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.4),
                         Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
-                        Default_Theme.themeColor,
+                        Theme.of(context).scaffoldBackgroundColor,
                       ],
                       stops: const [0.0, 0.45, 1.0],
                     ),

@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'dart:ui';
+import 'dart:ui' show lerpDouble;
 
 import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
@@ -155,10 +155,10 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final glassColor = isDark
-        ? Colors.white.withValues(alpha: 0.05)
-        : Colors.black.withValues(alpha: 0.05);
+        ? const Color(0xFF1C1C1E).withValues(alpha: 0.72)
+        : Colors.white.withValues(alpha: 0.82);
     final glassBorder = isDark
-        ? Colors.white.withValues(alpha: 0.08)
+        ? Colors.white.withValues(alpha: 0.16)
         : Colors.black.withValues(alpha: 0.08);
 
     return GestureDetector(
@@ -172,59 +172,60 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
       child: Transform.translate(
         offset: Offset(_dragOffset, 0),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(34),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-              child: Container(
-                height: _cardHeight,
-                decoration: BoxDecoration(
-                  color: glassColor,
-                  borderRadius: BorderRadius.circular(34),
-                  border: Border.all(
-                    color: glassBorder,
-                    width: 1.0,
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+          // NOTE: We intentionally do NOT use BackdropFilter here.
+          // Screens like Explore, Library and Search create their own
+          // BackdropFilter layers in their sticky headers.  A nested
+          // BackdropFilter would composite against those intermediate layers
+          // (not the actual content behind it) and produce a solid opaque
+          // result.  A solid semi-transparent color gives a consistent,
+          // glass-like appearance on every single screen.
+          child: Container(
+            height: _cardHeight,
+            decoration: BoxDecoration(
+              color: glassColor,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: glassBorder,
+                width: 1.0,
+              ),
+            ),
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 6),
+                  child: Row(
+                    children: [
+                      // ── Album Art ──
+                      _Artwork(
+                        imageUrl: thumbUrl,
+                        fallbackUrl: song.thumbnail.url,
+                        size: _artworkSize,
+                      ),
+                      const SizedBox(width: 10),
+                      // ── Song Info ──
+                      Expanded(
+                        child: _TrackInfo(
+                          song: song,
+                          waveController: _waveController,
+                          isPlaying: widget.state.isPlaying,
+                          isDark: isDark,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      // ── Controls ──
+                      _ControlsCapsule(
+                        state: widget.state,
+                        isDesktop: isDesktop,
+                        song: song,
+                        isDark: isDark,
+                      ),
+                    ],
                   ),
                 ),
-                  child: Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, right: 6),
-                      child: Row(
-                        children: [
-                          // ── Album Art ──
-                          _Artwork(
-                            imageUrl: thumbUrl,
-                            fallbackUrl: song.thumbnail.url,
-                            size: _artworkSize,
-                          ),
-                          const SizedBox(width: 10),
-                          // ── Song Info ──
-                          Expanded(
-                            child: _TrackInfo(
-                              song: song,
-                              waveController: _waveController,
-                              isPlaying: widget.state.isPlaying,
-                              isDark: isDark,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          // ── Controls in glass capsule ──
-                          _ControlsCapsule(
-                            state: widget.state,
-                            isDesktop: isDesktop,
-                            song: song,
-                            isDark: isDark,
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (!widget.state.isCompleted)
-                      _GlowingProgressBar(isDark: isDark),
-                  ],
-                ),
-              ),
+                if (!widget.state.isCompleted)
+                  _GlowingProgressBar(isDark: isDark),
+              ],
             ),
           ),
         ),
@@ -249,45 +250,32 @@ class _ControlsCapsule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Controls capsule: frosted glass without BackdropFilter for same reason
+    // as the footer nav bar — reliability across all screens.
     final capsuleColor = isDark
-        ? Colors.white.withValues(alpha: 0.05)
-        : Colors.black.withValues(alpha: 0.05);
-    final capsuleBorder = isDark
-        ? Colors.white.withValues(alpha: 0.08)
+        ? Colors.white.withValues(alpha: 0.10)
         : Colors.black.withValues(alpha: 0.08);
+    final capsuleBorder = isDark
+        ? Colors.white.withValues(alpha: 0.14)
+        : Colors.black.withValues(alpha: 0.10);
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          decoration: BoxDecoration(
-            color: capsuleColor,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-              color: capsuleBorder,
-              width: 1.0,
-            ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        decoration: BoxDecoration(
+          color: capsuleColor,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: capsuleBorder,
+            width: 1.0,
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (isDesktop)
-                _ControlButton(
-                  icon: FontAwesome.backward_step_solid,
-                  size: 16,
-                  isDark: isDark,
-                  onPressed: () {
-                    HapticFeedback.lightImpact();
-                    context
-                        .read<BloomeePlayerCubit>()
-                        .bloomeePlayer
-                        .skipToPrevious();
-                  },
-                ),
-              _PlayPauseButton(state: state, isDark: isDark),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isDesktop)
               _ControlButton(
-                icon: FontAwesome.forward_step_solid,
+                icon: FontAwesome.backward_step_solid,
                 size: 16,
                 isDark: isDark,
                 onPressed: () {
@@ -295,11 +283,23 @@ class _ControlsCapsule extends StatelessWidget {
                   context
                       .read<BloomeePlayerCubit>()
                       .bloomeePlayer
-                      .skipToNext();
+                      .skipToPrevious();
                 },
               ),
-            ],
-          ),
+            _PlayPauseButton(state: state, isDark: isDark),
+            _ControlButton(
+              icon: FontAwesome.forward_step_solid,
+              size: 16,
+              isDark: isDark,
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                context
+                    .read<BloomeePlayerCubit>()
+                    .bloomeePlayer
+                    .skipToNext();
+              },
+            ),
+          ],
         ),
       ),
     );

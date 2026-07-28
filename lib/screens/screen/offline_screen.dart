@@ -103,36 +103,34 @@ class _OfflineScreenState extends State<OfflineScreen> {
     final l10n = AppLocalizations.of(context)!;
     return DefaultTabController(
       length: 4,
-      child: SafeArea(
-        child: Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          body: BlocBuilder<DownloaderCubit, DownloaderState>(
-            builder: (context, state) {
-              if (_searchController.text.isEmpty) {
-                _filteredSongs = state.downloaded;
-              }
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: BlocBuilder<DownloaderCubit, DownloaderState>(
+          builder: (context, state) {
+            if (_searchController.text.isEmpty) {
+              _filteredSongs = state.downloaded;
+            }
 
-              final artistGroups = _groupSongsByArtist(_filteredSongs);
-              final albumGroups = _groupSongsByAlbum(_filteredSongs);
+            final artistGroups = _groupSongsByArtist(_filteredSongs);
+            final albumGroups = _groupSongsByAlbum(_filteredSongs);
 
-              return NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  return [
-                    customDiscoverSliverBar(context, l10n),
-                  ];
-                },
-                body: TabBarView(
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    _buildSongsTab(context, state, l10n),
-                    _buildArtistsTab(context, artistGroups, l10n),
-                    _buildAlbumsTab(context, albumGroups, l10n),
-                    _buildPlaylistsTab(context, l10n),
-                  ],
-                ),
-              );
-            },
-          ),
+            return NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  customDiscoverSliverBar(context, l10n),
+                ];
+              },
+              body: TabBarView(
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  _buildSongsTab(context, state, l10n),
+                  _buildArtistsTab(context, artistGroups, l10n),
+                  _buildAlbumsTab(context, albumGroups, l10n),
+                  _buildPlaylistsTab(context, l10n),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

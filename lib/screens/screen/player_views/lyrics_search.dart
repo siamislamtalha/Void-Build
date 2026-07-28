@@ -137,29 +137,32 @@ class LyricsSearchDelegate extends SearchDelegate {
 
   @override
   ThemeData appBarTheme(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = Theme.of(context).scaffoldBackgroundColor;
+    final textColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     return Theme.of(context).copyWith(
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Default_Theme.themeColor,
+      appBarTheme: AppBarTheme(
+        backgroundColor: bgColor,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: textColor),
       ),
       inputDecorationTheme: InputDecorationTheme(
         hintStyle: TextStyle(
-          color: Default_Theme.primaryColor1.withValues(alpha: 0.4),
+          color: textColor.withValues(alpha: 0.4),
           fontSize: 16,
           fontWeight: FontWeight.w400,
         ),
         border: InputBorder.none,
       ),
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         titleLarge: TextStyle(
-          color: Colors.white,
+          color: textColor,
           fontSize: 17,
           fontWeight: FontWeight.w500,
         ),
       ),
-      scaffoldBackgroundColor: Default_Theme.themeColor,
+      scaffoldBackgroundColor: bgColor,
     );
   }
 

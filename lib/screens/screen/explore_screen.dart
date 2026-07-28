@@ -134,8 +134,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: MultiBlocListener(
+    return MultiBlocListener(
         listeners: [
           BlocListener<SettingsCubit, SettingsState>(
             listenWhen: (previous, current) =>
@@ -173,6 +172,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           ),
         ],
         child: Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: RefreshIndicator(
             onRefresh: () async {
               final pluginId = _effectiveHomePluginId(
@@ -418,9 +418,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ],
             ),
           ),
-          backgroundColor: Colors.transparent,
         ),
-      ),
     );
   }
 }

@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 
 import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
 import 'package:voidmusic/core/di/service_locator.dart';
@@ -197,7 +197,7 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
                       colors: [
                         Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.4),
                         Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
-                        Default_Theme.themeColor,
+                        Theme.of(context).scaffoldBackgroundColor,
                       ],
                       stops: const [0.0, 0.45, 1.0],
                     ),

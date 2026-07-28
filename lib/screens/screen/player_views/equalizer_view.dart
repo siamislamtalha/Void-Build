@@ -279,7 +279,7 @@ class _EqualizerViewState extends State<EqualizerView>
     final accent = AppTheme.accentColor(context);
 
     return Scaffold(
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

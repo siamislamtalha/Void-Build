@@ -159,7 +159,7 @@ class _SongInfoScreenState extends State<SongInfoScreen> {
                     colors: [
                       Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.75),
                       Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
-                      Default_Theme.themeColor,
+                      Theme.of(context).scaffoldBackgroundColor,
                     ],
                   ),
                 ),

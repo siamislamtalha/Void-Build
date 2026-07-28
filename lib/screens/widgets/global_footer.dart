@@ -52,6 +52,8 @@ class GlobalFooter extends StatelessWidget {
           child: AnnotatedRegion<SystemUiOverlayStyle>(
             // Force the system navigation bar to be fully transparent so
             // the glass footer can visually extend to the true screen edge.
+            // statusBarBrightness is iOS-only and omitted here to avoid
+            // conflicting with main.dart's SystemChrome call on Android.
             value: SystemUiOverlayStyle(
               systemNavigationBarColor: Colors.transparent,
               systemNavigationBarDividerColor: Colors.transparent,
@@ -60,10 +62,6 @@ class GlobalFooter extends StatelessWidget {
                       ? Brightness.light
                       : Brightness.dark,
               statusBarColor: Colors.transparent,
-              statusBarBrightness:
-                  Theme.of(context).brightness == Brightness.dark
-                      ? Brightness.dark
-                      : Brightness.light,
               statusBarIconBrightness:
                   Theme.of(context).brightness == Brightness.dark
                       ? Brightness.light
@@ -212,17 +210,15 @@ class _FooterAwareBody extends StatelessWidget {
   }
 }
 
-/// Renders the glass footer overlay (mini player + nav bar) with a
-/// [BackdropFilter] that extends all the way to the true screen edge.
+/// Renders the glass footer overlay (mini player + nav bar).
 ///
-/// Instead of relying on [SafeArea] (which fills the inset region with the
-/// scaffold background color creating a black strip), we:
-///   1. Stretch the [ClipRRect] + [BackdropFilter] to cover the full height
-///      including the system navigation bar inset.
-///   2. Position the visible pills above that inset using [Padding].
-///
-/// This ensures the blur composites against whatever screen content is below
-/// the footer, with zero opaque fill in either light or dark mode.
+/// Uses solid semi-transparent frosted-glass colors instead of BackdropFilter
+/// because child-screen headers (discover bar, library header, search bar)
+/// each create a BackdropFilterLayer in Flutter's compositing tree.  The
+/// footer's own BackdropFilter would then only see that intermediate layer
+/// (essentially empty/black) and produce a solid dark background instead of
+/// the desired frosted look.  A properly-opaque semi-transparent container
+/// gives a consistent appearance on every screen.
 class _GlassFooterOverlay extends StatelessWidget {
   const _GlassFooterOverlay({
     required this.isMobile,
@@ -237,30 +233,28 @@ class _GlassFooterOverlay extends StatelessWidget {
     // Bottom inset = device home indicator / gesture bar height.
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const MiniPlayerWidget(),
-        if (isMobile) const SizedBox(height: 6),
-        // The nav bar glass capsule extends below the visible pill area into
-        // the system inset so the blur covers the black strip.
-        if (isMobile)
-          _BlurredNavBarArea(
-            bottomInset: bottomInset,
-            navigationShell: navigationShell,
-          )
-        else
-          // On desktop there is no nav bar; just add a small spacer so
-          // the mini player sits 6dp above the window edge.
-          SizedBox(height: bottomInset + _kOuterBottomPadding),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const MiniPlayerWidget(),
+          if (isMobile) const SizedBox(height: 6),
+          if (isMobile)
+            _FrostedNavBarArea(
+              bottomInset: bottomInset,
+              navigationShell: navigationShell,
+            )
+          else
+            SizedBox(height: bottomInset + _kOuterBottomPadding),
+        ],
+      ),
     );
   }
 }
 
-/// The horizontal nav bar with no background - only individual pills on selected icons
-class _BlurredNavBarArea extends StatelessWidget {
-  const _BlurredNavBarArea({
+class _FrostedNavBarArea extends StatelessWidget {
+  const _FrostedNavBarArea({
     required this.bottomInset,
     required this.navigationShell,
   });
@@ -272,7 +266,6 @@ class _BlurredNavBarArea extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        top: 0,
         bottom: bottomInset + _kOuterBottomPadding,
       ),
       child: HorizontalNavBar(navigationShell: navigationShell),
@@ -401,23 +394,23 @@ class HorizontalNavBar extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final glassColor = isDark
-        ? Colors.white.withValues(alpha: 0.05)
-        : Colors.black.withValues(alpha: 0.05);
+        ? const Color(0xFF1C1C1E).withValues(alpha: 0.72)
+        : Colors.white.withValues(alpha: 0.82);
     final glassBorder = isDark
-        ? Colors.white.withValues(alpha: 0.08)
+        ? Colors.white.withValues(alpha: 0.16)
         : Colors.black.withValues(alpha: 0.08);
-    final activeIconColor = isDark
-        ? Colors.white
-        : const Color(0xFF1C1C1E);
+
+    const activeAccentColor = Color(0xFFFF5B79); // Coral pink accent from reference UI
     final inactiveIconColor = isDark
-        ? Colors.white.withValues(alpha: 0.55)
-        : const Color(0xFF8E8E93);
-    final selectedCircleColor = isDark
-        ? Colors.white.withValues(alpha: 0.12)
-        : const Color(0xFFE5E5EA);
-    final selectedCircleBorder = isDark
-        ? Colors.white.withValues(alpha: 0.22)
-        : const Color(0xFFD1D1D6);
+        ? Colors.white.withValues(alpha: 0.85)
+        : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
+
+    final selectedPillColor = isDark
+        ? Colors.white.withValues(alpha: 0.14)
+        : Colors.black.withValues(alpha: 0.06);
+    final selectedPillBorder = isDark
+        ? Colors.white.withValues(alpha: 0.26)
+        : Colors.black.withValues(alpha: 0.12);
 
     final capsuleItems = [
       _NavItemData(branchIndex: 0, icon: MingCute.home_4_fill, label: l10n.navHome),
@@ -428,37 +421,37 @@ class HorizontalNavBar extends StatelessWidget {
 
     final isSearchSelected = currentIndex == 2;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          decoration: BoxDecoration(
-            color: glassColor,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: glassBorder,
-              width: 1.0,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: [
-                // ── Nav Items (Home, Library, Local, Offline) with pill on selected only ──
-                Expanded(
+    return Row(
+      children: [
+        // ── Main Left Nav Capsule (Home, Library, Local, Offline) ──
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(
+                height: 58,
+                decoration: BoxDecoration(
+                  color: glassColor,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: glassBorder,
+                    width: 1.0,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
                   child: Row(
-                    mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: capsuleItems.map((item) {
                       final isSelected = currentIndex == item.branchIndex;
                       return _NavItemButton(
                         item: item,
                         isSelected: isSelected,
-                        activeColor: activeIconColor,
+                        activeColor: activeAccentColor,
                         inactiveColor: inactiveIconColor,
-                        selectedCircleColor: selectedCircleColor,
-                        selectedCircleBorder: selectedCircleBorder,
+                        selectedPillColor: selectedPillColor,
+                        selectedPillBorder: selectedPillBorder,
                         onTap: () {
                           HapticFeedback.selectionClick();
                           navigationShell.goBranch(item.branchIndex);
@@ -467,27 +460,48 @@ class HorizontalNavBar extends StatelessWidget {
                     }).toList(),
                   ),
                 ),
-                const SizedBox(width: 10),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
 
-                // ── Search Button (Branch 2) with pill when selected ──
-                GestureDetector(
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    navigationShell.goBranch(2);
-                  },
-                  behavior: HitTestBehavior.opaque,
+        // ── Separate Right Floating Search Circle Button (Branch 2) ──
+        GestureDetector(
+          onTap: () {
+            HapticFeedback.selectionClick();
+            navigationShell.goBranch(2);
+          },
+          behavior: HitTestBehavior.opaque,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(29),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: glassColor,
+                  border: Border.all(
+                    color: isSearchSelected ? selectedPillBorder : glassBorder,
+                    width: 1.0,
+                  ),
+                ),
+                child: Center(
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 56,
-                    height: 56,
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOutCubic,
+                    width: isSearchSelected ? 48 : 42,
+                    height: isSearchSelected ? 48 : 42,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: isSearchSelected
-                          ? selectedCircleColor
+                          ? selectedPillColor
                           : Colors.transparent,
                       border: isSearchSelected
                           ? Border.all(
-                              color: selectedCircleBorder,
+                              color: selectedPillBorder,
                               width: 1.0,
                             )
                           : null,
@@ -496,28 +510,29 @@ class HorizontalNavBar extends StatelessWidget {
                       child: Icon(
                         MingCute.search_2_line,
                         size: 24,
-                        color: isSearchSelected ? activeIconColor : inactiveIconColor,
+                        color: isSearchSelected ? activeAccentColor : inactiveIconColor,
                       ),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
 
-/// Individual nav item with its own circular glass background (matching the reference image)
+/// Individual nav item with its own oval-pill glass background (matching the
+/// desired reference image — wider than tall, like a stadium capsule).
 class _NavItemButton extends StatelessWidget {
   final _NavItemData item;
   final bool isSelected;
   final Color activeColor;
   final Color inactiveColor;
-  final Color selectedCircleColor;
-  final Color selectedCircleBorder;
+  final Color selectedPillColor;
+  final Color selectedPillBorder;
   final VoidCallback onTap;
 
   const _NavItemButton({
@@ -525,54 +540,53 @@ class _NavItemButton extends StatelessWidget {
     required this.isSelected,
     required this.activeColor,
     required this.inactiveColor,
-    required this.selectedCircleColor,
-    required this.selectedCircleBorder,
+    required this.selectedPillColor,
+    required this.selectedPillBorder,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOutCubic,
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isSelected ? selectedCircleColor : Colors.transparent,
-            border: isSelected
-                ? Border.all(
-                    color: selectedCircleBorder,
-                    width: 1.0,
-                  )
-                : null,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                item.icon,
-                size: 22,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        // Selected: wider oval (72 px) gives a clear stadium/capsule pill.
+        // Unselected: narrower to not crowd items.
+        width: isSelected ? 72 : 54,
+        height: 48,
+        decoration: BoxDecoration(
+          // borderRadius = half of height → perfect stadium pill (fully rounded ends)
+          borderRadius: BorderRadius.circular(24),
+          color: isSelected ? selectedPillColor : Colors.transparent,
+          border: isSelected
+              ? Border.all(
+                  color: selectedPillBorder,
+                  width: 1.0,
+                )
+              : null,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              item.icon,
+              size: 20,
+              color: isSelected ? activeColor : inactiveColor,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              item.label,
+              style: TextStyle(
+                fontSize: 9.5,
+                fontFamily: 'Gilroy',
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                 color: isSelected ? activeColor : inactiveColor,
               ),
-              const SizedBox(height: 2),
-              Text(
-                item.label,
-                style: TextStyle(
-                  fontSize: 9,
-                  fontFamily: 'Gilroy',
-                  fontWeight: FontWeight.w700,
-                  color: isSelected ? activeColor : inactiveColor,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

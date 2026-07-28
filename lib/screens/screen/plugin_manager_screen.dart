@@ -756,7 +756,7 @@ class _PluginDetailSheet extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: Default_Theme.themeColor,
+            color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             border: Border(
                 top: BorderSide(
@@ -1086,7 +1086,7 @@ class _PluginDetailSheet extends StatelessWidget {
   void _showKeysDialog(BuildContext context, Manifest manifest) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Default_Theme.themeColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),

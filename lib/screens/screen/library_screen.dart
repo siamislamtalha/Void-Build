@@ -105,181 +105,179 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
-        child: BlocBuilder<LibraryItemsCubit, LibraryItemsState>(
-          builder: (context, itemsState) {
-            if (itemsState is LibraryItemsLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+      body: BlocBuilder<LibraryItemsCubit, LibraryItemsState>(
+        builder: (context, itemsState) {
+          if (itemsState is LibraryItemsLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            if (itemsState is LibraryItemsError) {
-              return Center(
-                child: SignBoardWidget(
-                  message: itemsState.message,
-                  icon: Icons.error_outline_rounded,
+          if (itemsState is LibraryItemsError) {
+            return Center(
+              child: SignBoardWidget(
+                message: itemsState.message,
+                icon: Icons.error_outline_rounded,
+              ),
+            );
+          }
+
+          if (itemsState.playlists.isEmpty) {
+            return CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                customDiscoverBar(context),
+                SliverFillRemaining(
+                  child: Center(
+                    child: SignBoardWidget(
+                      message:
+                          AppLocalizations.of(context)!.libraryEmptyState,
+                      icon: MingCute.playlist_fill,
+                    ),
+                  ),
                 ),
-              );
-            }
+              ],
+            );
+          }
 
-            if (itemsState.playlists.isEmpty) {
+          return BlocBuilder<LibrarySearchCubit, LibrarySearchState>(
+            builder: (context, searchState) {
+              final isSearching = searchState is LibrarySearchSuccess;
+              final isLoading = searchState is LibrarySearchLoading;
+
+              final filteredPlaylists = isSearching
+                  ? searchState.filteredPlaylists
+                  : itemsState.playlists;
+              final filteredSongs = isSearching
+                  ? searchState.songResults
+                  : <SongSearchResult>[];
+
+              final hasResults =
+                  filteredPlaylists.isNotEmpty || filteredSongs.isNotEmpty;
+
               return CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: [
                   customDiscoverBar(context),
-                  SliverFillRemaining(
-                    child: Center(
-                      child: SignBoardWidget(
-                        message:
-                            AppLocalizations.of(context)!.libraryEmptyState,
-                        icon: MingCute.playlist_fill,
+                  if (_isSearching)
+                    SliverToBoxAdapter(
+                      child: _buildSearchBar(),
+                    ),
+                  if (isLoading)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 4, bottom: 8),
+                        child: Center(
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Default_Theme.accentColor1
+                                  .withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  if (_isSearching && !hasResults && !isLoading)
+                    SliverFillRemaining(
+                      child: Center(
+                        child: SignBoardWidget(
+                          message:
+                              AppLocalizations.of(context)!.emptyNoResults,
+                          icon: MingCute.search_line,
+                        ),
+                      ),
+                    ),
+                  if (hasResults) ...[
+                    if (filteredSongs.isNotEmpty)
+                      _buildSongSearchResults(context, filteredSongs),
+                    if (filteredPlaylists.isNotEmpty) ...[
+                      if (_isReordering && !isSearching)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.035),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: AppTheme.accentColor(context)
+                                      .withValues(alpha: 0.22),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 28,
+                                    height: 28,
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.accentColor(context)
+                                          .withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      Icons.drag_indicator_rounded,
+                                      color: AppTheme.accentColor(context)
+                                          .withValues(alpha: 0.95),
+                                      size: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .importReorderTip,
+                                      style: Default_Theme.secondoryTextStyle
+                                          .merge(TextStyle(
+                                        color: Default_Theme.primaryColor2
+                                            .withValues(alpha: 0.72),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      )),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        setState(() => _isReordering = false),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor:
+                                          AppTheme.accentColor(context),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 6),
+                                      minimumSize: Size.zero,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .importDone,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      _ListOfPlaylists(
+                        playlists: filteredPlaylists,
+                        isReorderable: _isReordering && !isSearching,
+                        onEnterReorder: isSearching
+                            ? null
+                            : () => setState(() => _isReordering = true),
+                      ),
+                    ],
+                  ],
+                  const SliverBottomSafeAreaSpacer(),
                 ],
               );
-            }
-
-            return BlocBuilder<LibrarySearchCubit, LibrarySearchState>(
-              builder: (context, searchState) {
-                final isSearching = searchState is LibrarySearchSuccess;
-                final isLoading = searchState is LibrarySearchLoading;
-
-                final filteredPlaylists = isSearching
-                    ? searchState.filteredPlaylists
-                    : itemsState.playlists;
-                final filteredSongs = isSearching
-                    ? searchState.songResults
-                    : <SongSearchResult>[];
-
-                final hasResults =
-                    filteredPlaylists.isNotEmpty || filteredSongs.isNotEmpty;
-
-                return CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    customDiscoverBar(context),
-                    if (_isSearching)
-                      SliverToBoxAdapter(
-                        child: _buildSearchBar(),
-                      ),
-                    if (isLoading)
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 4, bottom: 8),
-                          child: Center(
-                            child: SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Default_Theme.accentColor1
-                                    .withValues(alpha: 0.6),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    if (_isSearching && !hasResults && !isLoading)
-                      SliverFillRemaining(
-                        child: Center(
-                          child: SignBoardWidget(
-                            message:
-                                AppLocalizations.of(context)!.emptyNoResults,
-                            icon: MingCute.search_line,
-                          ),
-                        ),
-                      ),
-                    if (hasResults) ...[
-                      if (filteredSongs.isNotEmpty)
-                        _buildSongSearchResults(context, filteredSongs),
-                      if (filteredPlaylists.isNotEmpty) ...[
-                        if (_isReordering && !isSearching)
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.035),
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: AppTheme.accentColor(context)
-                                        .withValues(alpha: 0.22),
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 28,
-                                      height: 28,
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.accentColor(context)
-                                            .withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Icon(
-                                        Icons.drag_indicator_rounded,
-                                        color: AppTheme.accentColor(context)
-                                            .withValues(alpha: 0.95),
-                                        size: 16,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        AppLocalizations.of(context)!
-                                            .importReorderTip,
-                                        style: Default_Theme.secondoryTextStyle
-                                            .merge(TextStyle(
-                                          color: Default_Theme.primaryColor2
-                                              .withValues(alpha: 0.72),
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        )),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          setState(() => _isReordering = false),
-                                      style: TextButton.styleFrom(
-                                        foregroundColor:
-                                            AppTheme.accentColor(context),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 6),
-                                        minimumSize: Size.zero,
-                                        tapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                      ),
-                                      child: Text(
-                                        AppLocalizations.of(context)!
-                                            .importDone,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        _ListOfPlaylists(
-                          playlists: filteredPlaylists,
-                          isReorderable: _isReordering && !isSearching,
-                          onEnterReorder: isSearching
-                              ? null
-                              : () => setState(() => _isReordering = true),
-                        ),
-                      ],
-                    ],
-                    const SliverBottomSafeAreaSpacer(),
-                  ],
-                );
-              },
-            );
-          },
-        ),
+            },
+          );
+        },
       ),
     );
   }

@@ -727,19 +727,18 @@ class _PlaylistViewState extends State<PlaylistView> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Default_Theme.themeColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text(l10n.dialogDownloadPlaylist,
-            style: const TextStyle(color: Colors.white)),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         content: Text(
             l10n.dialogDownloadPlaylistMessage(
                 items.length, state.playlist.title),
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: Text(l10n.buttonCancel,
-                  style:
-                      TextStyle(color: Colors.white.withValues(alpha: 0.7)))),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)))),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.accentColor(context),
@@ -794,7 +793,7 @@ class _PlaylistViewState extends State<PlaylistView> {
           builder: (sbCtx, sbSetState) {
             setStateRef = sbSetState;
             return AlertDialog(
-              backgroundColor: Default_Theme.themeColor,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
               content: SizedBox(
                 width: 320,
@@ -803,14 +802,14 @@ class _PlaylistViewState extends State<PlaylistView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(l10n.dialogAddingToDownloadQueue,
-                        style: const TextStyle(
-                            color: Colors.white,
+                        style: TextStyle(
+                            color: Theme.of(sbCtx).colorScheme.onSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Text('$completed/${items.length} items',
                         style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7))),
+                            color: Theme.of(sbCtx).colorScheme.onSurface.withValues(alpha: 0.7))),
                     const SizedBox(height: 16),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(4),
@@ -819,9 +818,9 @@ class _PlaylistViewState extends State<PlaylistView> {
                             ? 0
                             : (completed / items.length).clamp(0.0, 1.0),
                         minHeight: 6,
-                        backgroundColor: Colors.white.withValues(alpha: 0.1),
+                        backgroundColor: Theme.of(sbCtx).colorScheme.onSurface.withValues(alpha: 0.1),
                         valueColor: AlwaysStoppedAnimation<Color>(
-                            AppTheme.accentColor(context)),
+                            AppTheme.accentColor(sbCtx)),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -829,7 +828,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: Theme.of(sbCtx).colorScheme.onSurface.withValues(alpha: 0.5),
                             fontSize: 12)),
                   ],
                 ),

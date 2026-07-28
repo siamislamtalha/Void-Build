@@ -1,4 +1,4 @@
-﻿// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
@@ -257,7 +257,7 @@ class _CrossfadeSliderState extends State<_CrossfadeSlider> {
               tickMarkShape:
                   const RoundSliderTickMarkShape(tickMarkRadius: 2.5),
               activeTickMarkColor:
-                  Default_Theme.themeColor.withValues(alpha: 0.5),
+                  Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
               inactiveTickMarkColor:
                   Default_Theme.primaryColor2.withValues(alpha: 0.2),
             ),

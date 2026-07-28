@@ -129,24 +129,22 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: BlocConsumer<LocalMusicCubit, LocalMusicState>(
-          listener: (context, state) {
-            if (state is LocalMusicLoaded) {
-              _syncFilteredTracks(state.tracks);
-            }
-          },
-          builder: (context, state) {
-            return CustomScrollView(
-              slivers: [
-                _buildSliverAppBar(context, state),
-                ..._buildBody(context, state),
-              ],
-            );
-          },
-        ),
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: BlocConsumer<LocalMusicCubit, LocalMusicState>(
+        listener: (context, state) {
+          if (state is LocalMusicLoaded) {
+            _syncFilteredTracks(state.tracks);
+          }
+        },
+        builder: (context, state) {
+          return CustomScrollView(
+            slivers: [
+              _buildSliverAppBar(context, state),
+              ..._buildBody(context, state),
+            ],
+          );
+        },
       ),
     );
   }
