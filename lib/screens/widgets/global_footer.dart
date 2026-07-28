@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
@@ -73,7 +72,7 @@ class GlobalFooter extends StatelessWidget {
               // Keep fully transparent so the BackdropFilter blur in the mini player
               // and nav bar can composite against whatever is painted below them.
               backgroundColor: Colors.transparent,
-              drawerScrimColor: Colors.black54,
+              drawerScrimColor: Colors.transparent,
               // extendBody=true allows the body ScrollView to paint under the
               // floating footer so content scrolls behind the glassmorphic blur.
               extendBody: true,
@@ -273,20 +272,13 @@ class _BlurredNavBarArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-        child: Container(
-          // Fully transparent — the blur above provides the frosted glass
-          // effect; no solid fill so no black strip in any theme.
-          color: Colors.transparent,
-          padding: EdgeInsets.only(
-            // Pills sit 6dp above the bottom edge of the screen (or above the
-            // gesture/home indicator bar on phones).
-            top: 0,
-            bottom: bottomInset + _kOuterBottomPadding,
-          ),
-          child: HorizontalNavBar(navigationShell: navigationShell),
+      child: Container(
+        color: Colors.transparent,
+        padding: EdgeInsets.only(
+          top: 0,
+          bottom: bottomInset + _kOuterBottomPadding,
         ),
+        child: HorizontalNavBar(navigationShell: navigationShell),
       ),
     );
   }
@@ -369,9 +361,7 @@ class VerticalNavBar extends StatelessWidget {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return NavigationRail(
-      backgroundColor: isDark
-          ? Colors.black.withValues(alpha: 0.15)
-          : Colors.white.withValues(alpha: 0.15),
+      backgroundColor: Colors.transparent,
       destinations: [
         NavigationRailDestination(
             icon: const Icon(MingCute.home_4_fill), label: Text(l10n.navHome)),
@@ -414,15 +404,8 @@ class HorizontalNavBar extends StatelessWidget {
     final currentIndex = navigationShell.currentIndex;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Theme-aware glass colors
-    // In dark mode: translucent white glass (appears dark since bg is dark)
-    // In light mode: slightly frosted white with more opacity to stand out against bg
-    final glassColor = isDark
-        ? Colors.black.withValues(alpha: 0.45)
-        : const Color(0xF5F4F4F7);
-    final glassBorder = isDark
-        ? Colors.white.withValues(alpha: 0.18)
-        : const Color(0xFFE5E5EA);
+    const glassColor = Colors.transparent;
+    const glassBorder = Colors.transparent;
     final activeIconColor = isDark
         ? Colors.white
         : const Color(0xFF1C1C1E);
@@ -453,9 +436,7 @@ class HorizontalNavBar extends StatelessWidget {
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(36),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                child: Container(
+              child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
                   decoration: BoxDecoration(
                     color: glassColor,
@@ -464,14 +445,6 @@ class HorizontalNavBar extends StatelessWidget {
                       color: glassBorder,
                       width: 1.0,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.10),
-                        blurRadius: 20,
-                        spreadRadius: 0,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
@@ -495,7 +468,6 @@ class HorizontalNavBar extends StatelessWidget {
                 ),
               ),
             ),
-          ),
           const SizedBox(width: 10),
 
           // ── Right Glass Search Circle Button (Branch 2) ──
@@ -507,38 +479,27 @@ class HorizontalNavBar extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isSearchSelected
-                        ? (isDark
-                            ? Colors.white.withValues(alpha: 0.22)
-                            : Colors.black.withValues(alpha: 0.15))
-                        : glassColor,
-                    border: Border.all(
-                      color: isSearchSelected ? selectedCircleBorder : glassBorder,
-                      width: 1.0,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.10),
-                        blurRadius: 20,
-                        spreadRadius: 0,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isSearchSelected
+                      ? (isDark
+                          ? Colors.white.withValues(alpha: 0.22)
+                          : Colors.black.withValues(alpha: 0.15))
+                      : glassColor,
+                  border: Border.all(
+                    color: isSearchSelected ? selectedCircleBorder : glassBorder,
+                    width: 1.0,
                   ),
-                  child: Center(
-                    child: Icon(
-                      MingCute.search_2_line,
-                      size: 24,
-                      color: isSearchSelected ? activeIconColor : inactiveIconColor,
-                    ),
+                ),
+                child: Center(
+                  child: Icon(
+                    MingCute.search_2_line,
+                    size: 24,
+                    color: isSearchSelected ? activeIconColor : inactiveIconColor,
                   ),
                 ),
               ),

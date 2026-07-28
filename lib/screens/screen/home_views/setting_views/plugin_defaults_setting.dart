@@ -1,4 +1,4 @@
-﻿import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
+import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
 import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
@@ -391,7 +391,7 @@ class _ResolverPriorityListState extends State<_ResolverPriorityList> {
                 return Material(
                   color: AppTheme.accentColor(context).withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
-                  elevation: 4,
+                  elevation: 0,
                   child: child,
                 );
               },

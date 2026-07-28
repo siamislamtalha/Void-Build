@@ -1,343 +1,703 @@
 name: "Build & Release"
 
+
+
 on:
+
   workflow_dispatch:
+
   push:
+
     branches:
+
       - master
 
+
+
 permissions:
+
   contents: write
 
+
+
 jobs:
+
     # JOB 1: WINDOWS
+
     build-windows:
+
         name: Build Windows Installer
+
         runs-on: windows-latest
+
         steps:
+
             - name: Checkout Repository
+
               uses: actions/checkout@v4
 
+
+
             - name: Setup Rust Toolchain
+
               uses: dtolnay/rust-toolchain@stable
 
+              with:
+
+                  toolchain: stable
+
+                  targets: x86_64-pc-windows-msvc
+
+
+
             - name: Install Ninja
+
               run: choco install ninja -y
 
+
+
             - name: Cache Cargo dependencies
+
               uses: actions/cache@v4
+
               with:
+
                 path: |
+
                   ~\.cargo\registry\index\
+
                   ~\.cargo\registry\cache\
+
                   ~\.cargo\git\db\
+
                 key: cargo-win-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+
                 restore-keys: |
+
                   cargo-win-${{ runner.os }}-
 
+
+
             - name: Setup Flutter
+
               uses: subosito/flutter-action@v2
+
               with:
+
                 flutter-version: '3.35.4'
+
                 channel: 'stable'
+
                 cache: true
 
+
+
             - name: Cache pub dependencies
+
               uses: actions/cache@v4
+
               with:
+
                 path: |
+
                   ~\AppData\Local\Pub\Cache
+
                   .dart_tool
+
                 key: pub-win-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+
                 restore-keys: |
+
                   pub-win-${{ runner.os }}-
 
 
+
+
+
             - name: Install Inno Setup
+
               shell: powershell
+
               run: choco install innosetup -y --no-progress
 
+
+
             - name: Install Dependencies
+
               run: flutter pub get
 
-            - name: Extract version from pubspec.yaml
-              id: version
+
+
+            - name: Clean build directory
+
               shell: powershell
+
               run: |
+
+                  if (Test-Path "build") { Remove-Item -Recurse -Force "build" }
+
+                  if (Test-Path "windows\.dart_tool") { Remove-Item -Recurse -Force "windows\.dart_tool" }
+
+                  if (Test-Path "windows\flutter\ephemeral") { Remove-Item -Recurse -Force "windows\flutter\ephemeral" }
+
+
+
+            - name: Extract version from pubspec.yaml
+
+              id: version
+
+              shell: powershell
+
+              run: |
+
                   $vLine = Select-String -Path pubspec.yaml -Pattern '^version:\s*(\S+)' | Select-Object -First 1
+
                   if (-not $vLine) { Write-Error 'version not found in pubspec.yaml'; exit 1 }
+
                   $ver = $vLine.Matches[0].Groups[1].Value.Split('+')[0]
+
                   echo "VERSION=$ver" >> $env:GITHUB_ENV
+
                   echo "version=$ver" >> $env:GITHUB_OUTPUT
 
-            - name: Setup Visual Studio environment
-              uses: ilammy/msvc-dev-cmd@v1
-              with:
-                arch: x64
+
 
             - name: Build Windows App
+
               shell: powershell
+
               env:
-                CMAKE_GENERATOR: "Ninja Multi-Config"
-                CMAKE_POLICY_VERSION_MINIMUM: "3.5"
+
+                  CMAKE_GENERATOR: "Ninja"
+
+                  CMAKE_GENERATOR_INSTANCE: ""
+
+                  CMAKE_PREFIX_PATH: ""
+
               run: |
+
+                  $env:CMAKE_GENERATOR = "Ninja"
+
+                  $env:CC = "cl"
+
+                  $env:CXX = "cl"
+
                   flutter build windows --release --no-tree-shake-icons --build-number ${{github.run_number}}
 
+
+
             - name: Verify build output exists
+
               shell: powershell
+
               run: |
+
                   $releaseDir = "build\windows\x64\runner\Release"
+
                   if (-not (Test-Path $releaseDir)) {
+
                       Write-Error "Flutter Windows build output not found at: $releaseDir"
+
                       Write-Host "=== build directory contents ==="
+
                       Get-ChildItem -Path "build" -Recurse -Depth 4 -ErrorAction SilentlyContinue | Select-Object FullName
+
                       exit 1
+
                   }
+
                   Write-Host "=== Release folder contents ==="
+
                   Get-ChildItem -Path $releaseDir -Recurse | Select-Object FullName, Length
+
                   $exeFile = Get-ChildItem -Path $releaseDir -Filter "*.exe" | Select-Object -First 1
+
                   if (-not $exeFile) {
+
                       Write-Error "No .exe found in release folder!"
+
                       exit 1
+
                   }
+
                   Write-Host "Main EXE: $($exeFile.FullName) ($([math]::Round($exeFile.Length/1MB,2)) MB)"
 
+
+
             - name: Rename EXE to VOID_Music.exe
+
               shell: powershell
+
               run: |
+
                   $releaseDir = "build\windows\x64\runner\Release"
+
                   $src = Join-Path $releaseDir "voidmusic.exe"
+
                   if (Test-Path $src) {
+
                       Rename-Item -Path $src -NewName "VOID_Music.exe"
+
                       Write-Host "Renamed voidmusic.exe -> VOID_Music.exe"
+
                   } else {
+
                       Write-Error "voidmusic.exe not found in $releaseDir"
+
                       Get-ChildItem -Path $releaseDir -Filter "*.exe" | ForEach-Object { Write-Host "  $($_.Name)" }
+
                       exit 1
+
                   }
+
+
 
             - name: Build Inno Setup Installer
+
               shell: powershell
+
               run: |
+
                   $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+
                   if (-not (Test-Path $iscc)) {
+
                       Write-Error "ISCC.exe not found at: $iscc"
+
                       exit 1
+
                   }
+
                   Write-Host "Building installer from installer\VoidMusic.iss"
+
                   & $iscc "installer\VoidMusic.iss"
+
                   if ($LASTEXITCODE -ne 0) {
+
                       Write-Error "Inno Setup compilation failed with exit code $LASTEXITCODE"
+
                       exit 1
+
                   }
+
+
 
             - name: Verify and rename installer
+
               shell: powershell
+
               run: |
+
                   $outputDir = "installer\Output"
+
                   Write-Host "=== Installer output directory ==="
+
                   Get-ChildItem -Path $outputDir -ErrorAction SilentlyContinue | Select-Object FullName, Length
 
+
+
                   $installer = Get-ChildItem -Path $outputDir -Filter "*.exe" | Select-Object -First 1
+
                   if (-not $installer) {
+
                       Write-Error "No installer .exe found in $outputDir"
+
                       exit 1
+
                   }
+
+
 
                   $sizeMB = [math]::Round($installer.Length / 1MB, 2)
+
                   Write-Host "Installer: $($installer.FullName)  (${sizeMB} MB)"
 
+
+
                   if ($installer.Length -lt 10MB) {
+
                       Write-Error "Installer is suspiciously small (${sizeMB} MB). Expected 30 MB+. ISCC likely did not find the Flutter build output."
+
                       exit 1
+
                   }
 
+
+
                   $dest = "VoidMusic_Installer_v${{ env.VERSION }}+${{github.run_number}}.exe"
+
                   Copy-Item $installer.FullName -Destination $dest
+
                   Write-Host "Renamed to: $dest"
 
+
+
             - name: Create build-number.txt
+
               shell: powershell
+
               run: |
+
                   "${{github.run_number}}" | Out-File -FilePath "build-number.txt" -Encoding utf8 -NoNewline
 
+
+
             - name: Upload Artifacts
+
               uses: actions/upload-artifact@v4
+
               with:
+
                 name: Release-Windows
+
                 path: |
+
                   VoidMusic_Installer_v${{ env.VERSION }}+${{github.run_number}}.exe
+
                   build-number.txt
+
                 if-no-files-found: error
+
                 overwrite: true
 
+
+
             - name: Create Release
+
               uses: ncipollo/release-action@v1
+
               with:
+
                 artifacts: |
+
                   VoidMusic_Installer_v${{ env.VERSION }}+${{github.run_number}}.exe
+
                   build-number.txt
+
                 tag: v${{ env.VERSION }}+${{github.run_number}}
+
                 token: ${{ secrets.GITHUB_TOKEN }}
+
                 prerelease: true
+
                 allowUpdates: true
+
                 omitBodyDuringUpdate: true
+
+
+
 
 
     # JOB 2: ANDROID
+
     build-android:
+
         name: Build Android
+
         runs-on: ubuntu-latest
+
         steps:
+
             - name: Checkout Repository
+
               uses: actions/checkout@v4
+
+
 
             - name: Create key.properties from GitHub secrets
+
               run: |
+
                 echo "keyAlias=${{ secrets.KEY_ALIAS }}" > android/key.properties
+
                 echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+
                 echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/key.properties
 
+
+
             - name: Decode keystore from GitHub secrets
+
               run: |
+
                 echo "${{ secrets.KEY_STORE }}" | base64 --decode > android/voidmusic.jks
 
+
+
             - name: Setup-Java
+
               uses: actions/setup-java@v4
+
               with:
+
                 distribution: 'oracle'
+
                 java-version: '17'
 
+
+
             - name: Setup Flutter
+
               uses: subosito/flutter-action@v2
+
               with:
+
                 flutter-version: '3.35.4'
+
                 channel: 'stable'
 
+
+
             - name: Install Dependencies
+
               run: flutter pub get
 
+
+
             - name: Extract version from pubspec.yaml
+
               run: |
+
                   VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+
+
             - name: Build Android APK
+
               run: flutter build apk --release --target-platform android-arm64 --build-number ${{github.run_number}}
 
+
+
             - name: Rename and move APK file
+
               run: |
+
                   mv build/app/outputs/flutter-apk/app-release.apk VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
 
+
+
             - name: Upload Artifacts
+
               uses: actions/upload-artifact@v4
+
               with:
+
                 name: Release-Android
+
                 path: VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
+
                 if-no-files-found: error
+
                 overwrite: true
 
+
+
             - name: Create Release
+
               uses: ncipollo/release-action@v1
+
               with:
+
                 artifacts: VoidMusic_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk
+
                 tag: v${{ env.VERSION }}+${{github.run_number}}
+
                 token: ${{ secrets.GITHUB_TOKEN }}
+
                 prerelease: true
+
                 allowUpdates: true
+
                 omitBodyDuringUpdate: true
 
+
+
     # JOB 3: LINUX
+
     build-linux:
+
         name: Build Linux
+
         runs-on: ubuntu-latest
+
         permissions:
+
           contents: write
+
         steps:
+
             - name: Checkout Repository
+
               uses: actions/checkout@v4
 
+
+
             - name: Setup Flutter
+
               uses: subosito/flutter-action@v2
+
               with:
+
                 flutter-version: '3.35.4'
+
                 channel: 'stable'
 
+
+
             - name: Install Linux Dependencies
+
               run: |
+
                 sudo apt-get update
+
                 sudo apt-get install -y clang cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
 
+
+
             - name: Install Dependencies
+
               run: flutter pub get
 
+
+
             - name: Extract version from pubspec.yaml
+
               run: |
+
                 VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+
                 echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+
+
             - name: Build Linux App
+
               run: flutter build linux --release --build-number ${{github.run_number}}
 
+
+
             - name: Find and compress Linux build
+
               run: |
+
                 echo "=== Searching for Linux build output ==="
+
                 
+
                 # Try to find bundle directory first
+
                 BUNDLE_DIR=$(find build/linux -type d -name "bundle" 2>/dev/null | head -1)
+
                 
+
                 if [ -n "$BUNDLE_DIR" ]; then
+
                   echo "Bundle directory found: $BUNDLE_DIR"
+
                   ARCHIVE="VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.tar.gz"
+
                   tar -czf "$ARCHIVE" -C "$BUNDLE_DIR" .
+
                   echo "Archive created: $ARCHIVE"
+
                   ls -lh "$ARCHIVE"
+
                 else
+
                   echo "No bundle directory found, trying alternative approach..."
+
                   
+
                   # List what's actually in build/linux
+
                   echo "=== build/linux contents ==="
+
                   find build/linux -type f 2>/dev/null | head -40
+
                   
+
                   # Try to find any executable or main binary
+
                   LINUX_EXE=$(find build/linux -type f -executable -o -name "void_music" 2>/dev/null | head -1)
+
                   
+
                   if [ -n "$LINUX_EXE" ]; then
+
                     echo "Found Linux executable: $LINUX_EXE"
+
                     # Get the directory containing the executable
+
                     EXE_DIR=$(dirname "$LINUX_EXE")
+
                     ARCHIVE="VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.tar.gz"
+
                     tar -czf "$ARCHIVE" -C "$EXE_DIR" .
+
                     echo "Archive created from executable directory: $ARCHIVE"
+
                     ls -lh "$ARCHIVE"
+
                   else
+
                     # Last resort: archive the entire build/linux directory
+
                     echo "No executable found, archiving entire build/linux directory"
+
                     if [ -d "build/linux" ]; then
+
                       ARCHIVE="VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.tar.gz"
+
                       tar -czf "$ARCHIVE" -C build/linux .
+
                       echo "Archive created from build/linux: $ARCHIVE"
+
                       ls -lh "$ARCHIVE"
+
                     else
+
                       echo "ERROR: build/linux directory does not exist"
+
                       exit 1
+
                     fi
+
                   fi
+
                 fi
 
+
+
             - name: Upload Artifact
+
               uses: actions/upload-artifact@v4
+
               with:
+
                 name: Release-Linux
+
                 path: VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.tar.gz
+
                 if-no-files-found: error
 
+
+
             - name: Publish Linux to Release
+
               uses: ncipollo/release-action@v1
+
               with:
+
                 artifacts: VoidMusic_v${{ env.VERSION }}+${{github.run_number}}.tar.gz
+
                 tag: v${{ env.VERSION }}+${{github.run_number}}
+
                 token: ${{ secrets.GITHUB_TOKEN }}
+
                 prerelease: true
+
                 allowUpdates: true
+
                 omitBodyDuringUpdate: true

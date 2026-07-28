@@ -337,14 +337,6 @@ class AppTheme {
         color: borderColor,
         width: borderWidth,
       ),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.4),
-          blurRadius: 24,
-          spreadRadius: 0,
-          offset: const Offset(0, 8),
-        ),
-      ],
     );
   }
 
@@ -360,14 +352,6 @@ class AppTheme {
         color: borderColor,
         width: borderWidth,
       ),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.4),
-          blurRadius: 24,
-          spreadRadius: 0,
-          offset: const Offset(0, 8),
-        ),
-      ],
     );
   }
 }

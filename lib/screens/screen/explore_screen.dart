@@ -20,6 +20,8 @@ import 'package:voidmusic/screens/widgets/more_bottom_sheet.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';
+import 'package:voidmusic/screens/widgets/source_badge.dart';
+import 'package:voidmusic/screens/widgets/square_card.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/screens/screen/home_views/notification_view.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_view.dart';
@@ -298,6 +300,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           return const SizedBox.shrink();
                         },
                       ),
+                      // ── Multi-source Song Suggestions ──
+                      // One horizontal row per loaded content-resolver plugin,
+                      // showing only Track items from that plugin's home sections.
+                      // Rows that yield zero tracks are hidden automatically.
+                      const _MultiSourceSongSuggestions(),
                       // Home sections from plugin
                       BlocBuilder<ContentBloc, ContentState>(
                         bloc: _homeContentBloc,
@@ -456,6 +463,314 @@ class _HomeSectionsList extends StatelessWidget {
                 },
         );
       },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Multi-Source Song Suggestions
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Renders one `_PluginSongSection` per loaded content-resolver plugin.
+/// Sections that yield zero tracks are silently omitted.
+// ─────────────────────────────────────────────────────────────────────────────
+// Multi-Source Song Suggestions
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Renders one `_PluginSongSection` per loaded content-resolver plugin.
+/// Sections that yield zero tracks are silently omitted.
+class _MultiSourceSongSuggestions extends StatelessWidget {
+  const _MultiSourceSongSuggestions();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PluginBloc, PluginState>(
+      builder: (context, pluginState) {
+        final resolvers = pluginState.loadedContentResolvers;
+        if (resolvers.isEmpty) return const SizedBox.shrink();
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: resolvers.map((plugin) {
+            return _PluginSongSection(
+              pluginId: plugin.manifest.id,
+              pluginName: plugin.manifest.name,
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+}
+
+/// Fetches single songs for [pluginId], and renders them in a horizontal scroll row
+/// styled like existing playlist cards.
+/// Returns [SizedBox.shrink] if the plugin produces no single tracks or errors out.
+class _PluginSongSection extends StatefulWidget {
+  final String pluginId;
+  final String pluginName;
+
+  const _PluginSongSection({
+    required this.pluginId,
+    required this.pluginName,
+  });
+
+  @override
+  State<_PluginSongSection> createState() => _PluginSongSectionState();
+}
+
+class _PluginSongSectionState extends State<_PluginSongSection> {
+  late final ContentBloc _bloc;
+  bool _attemptedPlaylistFetch = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = ContentBloc(pluginService: ServiceLocator.pluginService);
+    _bloc.add(GetHomeSections(pluginId: widget.pluginId));
+  }
+
+  @override
+  void dispose() {
+    _bloc.close();
+    super.dispose();
+  }
+
+  List<Track> _extractDirectTracks(ContentState state) {
+    final sections = state.homeSections ?? const [];
+    final result = <Track>[];
+    for (final section in sections) {
+      for (final item in section.items) {
+        item.when(
+          track: (t) => result.add(t),
+          album: (_) {},
+          artist: (_) {},
+          playlist: (_) {},
+        );
+      }
+    }
+    return result;
+  }
+
+  List<Track> _getTracks(ContentState state) {
+    final direct = _extractDirectTracks(state);
+    if (direct.isNotEmpty) return direct;
+    if (state.playlistDetails != null && state.playlistDetails!.tracks.items.isNotEmpty) {
+      return state.playlistDetails!.tracks.items;
+    }
+    return const [];
+  }
+
+  void _checkAndFetchSongs(ContentState state) {
+    if (_attemptedPlaylistFetch) return;
+    if (state.homeSectionsStatus != DetailStatus.loaded) return;
+
+    final directTracks = _extractDirectTracks(state);
+    if (directTracks.isNotEmpty) return;
+
+    final sections = state.homeSections ?? const [];
+    if (sections.isEmpty) return;
+
+    for (final section in sections) {
+      for (final item in section.items) {
+        String? targetPlaylistId;
+        item.when(
+          track: (_) {},
+          album: (_) {},
+          artist: (_) {},
+          playlist: (p) => targetPlaylistId = p.id,
+        );
+        if (targetPlaylistId != null) {
+          _attemptedPlaylistFetch = true;
+          _bloc.add(LoadPlaylistDetails(
+            pluginId: widget.pluginId,
+            playlistId: targetPlaylistId!,
+          ));
+          return;
+        }
+      }
+    }
+  }
+
+  String _formatSectionTitle(String pluginName) {
+    final nameLower = pluginName.toLowerCase();
+    if (nameLower.contains('song') || nameLower.contains('track') || nameLower.contains('hit')) {
+      return pluginName;
+    }
+    return '$pluginName Songs';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ContentBloc, ContentState>(
+      bloc: _bloc,
+      builder: (context, state) {
+        _checkAndFetchSongs(state);
+
+        // While initial home sections loading, show slim placeholder
+        if (state.homeSectionsStatus == DetailStatus.loading &&
+            (state.homeSections == null || state.homeSections!.isEmpty)) {
+          return _buildLoadingRow(context);
+        }
+
+        // Error or failed to get tracks — hide this source section entirely
+        if (state.homeSectionsStatus == DetailStatus.error) {
+          return const SizedBox.shrink();
+        }
+
+        final songs = _getTracks(state);
+        if (songs.isEmpty && state.playlistDetailStatus != DetailStatus.loading) {
+          return const SizedBox.shrink();
+        }
+        if (songs.isEmpty) {
+          return _buildLoadingRow(context);
+        }
+
+        final onSurface = Theme.of(context).colorScheme.onSurface;
+        final sectionTitle = _formatSectionTitle(widget.pluginName);
+
+        return Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Section header with source badge ──
+              Padding(
+                padding: const EdgeInsets.only(left: 20, bottom: 4),
+                child: Row(
+                  children: [
+                    SourceBadgeByPluginId(
+                      pluginId: widget.pluginId,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      sectionTitle,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: onSurface,
+                        fontFamily: 'Gilroy',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // ── Horizontal single track cards ──
+              SizedBox(
+                height: 220,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.only(left: 12),
+                  itemCount: songs.length,
+                  itemBuilder: (context, i) {
+                    final track = songs[i];
+                    return SquareImgCard(
+                      imgPath: track.thumbnail.url,
+                      fallbackImgPath: track.thumbnail.urlLow ?? track.thumbnail.url,
+                      title: track.title,
+                      subtitle: track.artists.map((a) => a.name).join(', '),
+                      isList: false,
+                      onTap: () {
+                        context
+                            .read<BloomeePlayerCubit>()
+                            .bloomeePlayer
+                            .loadPlaylist(
+                              Playlist(
+                                tracks: songs,
+                                title: sectionTitle,
+                              ),
+                              idx: i,
+                              doPlay: true,
+                            );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLoadingRow(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final shimmerColor = isDark
+        ? Colors.white.withValues(alpha: 0.06)
+        : Colors.black.withValues(alpha: 0.05);
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 20, bottom: 4),
+            child: Row(
+              children: [
+                SourceBadgeByPluginId(
+                  pluginId: widget.pluginId,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  widget.pluginName,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontFamily: 'Gilroy',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 220,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(left: 12),
+              itemCount: 5,
+              itemBuilder: (context, _) => Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        color: shimmerColor,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      width: 100,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: shimmerColor,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      width: 70,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: shimmerColor,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

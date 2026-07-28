@@ -154,12 +154,8 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
     final thumbUrl = song.thumbnail.urlLow ?? song.thumbnail.url;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final glassColor = isDark
-        ? Colors.white.withValues(alpha: 0.10)
-        : Colors.white.withValues(alpha: 0.60);
-    final glassBorder = isDark
-        ? Colors.white.withValues(alpha: 0.22)
-        : Colors.black.withValues(alpha: 0.08);
+    const glassColor = Colors.transparent;
+    const glassBorder = Colors.transparent;
 
     return GestureDetector(
       onTap: () {
@@ -175,27 +171,16 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(34),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-              child: Container(
-                height: _cardHeight,
-                decoration: BoxDecoration(
-                  // Liquid glass — layered translucency
-                  color: glassColor,
-                  borderRadius: BorderRadius.circular(34),
-                  border: Border.all(
-                    color: glassBorder,
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.12),
-                      blurRadius: 20,
-                      spreadRadius: 0,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
+            child: Container(
+              height: _cardHeight,
+              decoration: BoxDecoration(
+                color: glassColor,
+                borderRadius: BorderRadius.circular(34),
+                border: Border.all(
+                  color: glassBorder,
+                  width: 1.0,
                 ),
+              ),
                 child: Stack(
                   children: [
                     Padding(
@@ -235,7 +220,6 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                 ),
               ),
             ),
-          ),
         ),
       ),
     );
@@ -258,34 +242,20 @@ class _ControlsCapsule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final capsuleColor = isDark
-        ? Colors.white.withValues(alpha: 0.12)
-        : Colors.black.withValues(alpha: 0.06);
-    final capsuleBorder = isDark
-        ? Colors.white.withValues(alpha: 0.22)
-        : Colors.black.withValues(alpha: 0.10);
+    const capsuleColor = Colors.transparent;
+    const capsuleBorder = Colors.transparent;
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          decoration: BoxDecoration(
-            color: capsuleColor,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-              color: capsuleBorder,
-              width: 1.0,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.20 : 0.08),
-                blurRadius: 12,
-                spreadRadius: 0,
-                offset: const Offset(0, 4),
-              ),
-            ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        decoration: BoxDecoration(
+          color: capsuleColor,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: capsuleBorder,
+            width: 1.0,
           ),
+        ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -317,7 +287,6 @@ class _ControlsCapsule extends StatelessWidget {
               ),
             ],
           ),
-        ),
       ),
     );
   }
@@ -341,13 +310,6 @@ class _Artwork extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),

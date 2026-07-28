@@ -149,14 +149,6 @@ class _ThemeSegmentedControl extends StatelessWidget {
               color: glassBorder,
               width: 1.0,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
-                blurRadius: 12,
-                spreadRadius: 0,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

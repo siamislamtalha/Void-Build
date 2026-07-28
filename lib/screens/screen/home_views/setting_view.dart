@@ -190,16 +190,20 @@ class _SettingsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
-      decoration: AppTheme.liquidGlassDecoration(
-        borderRadius: 24,
-        glassColor: isDark
-            ? const Color(0x1A120B16)
-            : Colors.white.withValues(alpha: 0.65),
-        borderColor: isDark
-            ? const Color(0x2DFFFFFF)
-            : Colors.black.withValues(alpha: 0.08),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: isDark
+            ? const Color(0xFF161618)
+            : Colors.white,
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : colorScheme.onSurface.withValues(alpha: 0.08),
+          width: 1,
+        ),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),

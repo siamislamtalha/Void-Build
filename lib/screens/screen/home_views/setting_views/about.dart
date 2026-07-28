@@ -181,12 +181,6 @@ class About extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: getButtonGradient(context),
-                        boxShadow: [
-                          BoxShadow(
-                            color: primaryTextColor.withValues(alpha: 0.25),
-                            blurRadius: 10,
-                          ),
-                        ],
                       ),
                       child: const CircleAvatar(
                           backgroundColor: Colors.transparent, radius: 10),
@@ -273,13 +267,6 @@ class About extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: getButtonGradient(context),
             borderRadius: BorderRadius.circular(34.0),
-            boxShadow: [
-              BoxShadow(
-                color: primaryTextColor.withValues(alpha: 0.15),
-                blurRadius: 25,
-                offset: const Offset(0, 8),
-              ),
-            ],
           ),
           child: Material(
             color: Colors.transparent,

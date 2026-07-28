@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/services/player/stream_quality_selector.dart';
@@ -322,7 +322,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                       return Material(
                         color: AppTheme.accentColor(context).withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(12),
-                        elevation: 4,
+                        elevation: 0,
                         child: child,
                       );
                     },
