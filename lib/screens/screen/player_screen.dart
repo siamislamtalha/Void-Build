@@ -69,22 +69,25 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
     final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
     final musicPlayer = bloomeePlayerCubit.bloomeePlayer;
     final isMobile = ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final secondaryTextColor = isDark ? Default_Theme.primaryColor2 : const Color(0xFF66666E);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF000000),
+      backgroundColor: isDark ? const Color(0xFF000000) : AppTheme.lightBg,
       resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Default_Theme.primaryColor1,
+        foregroundColor: iconColor,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 32),
+          icon: Icon(Icons.keyboard_arrow_down_rounded, size: 32, color: iconColor),
           onPressed: () {
             if (!_upNextPanelController.collapse()) {
-              context.read<PlayerOverlayCubit>().hidePlayer();
+              context.read<PlayerOverlayCubit>().minimizePlayer();
             }
           },
         ),
@@ -101,14 +104,14 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
                 );
               }
             },
-            icon: const Icon(MingCute.list_check_3_line,
-                size: 22, color: Default_Theme.primaryColor1),
+            icon: Icon(MingCute.list_check_3_line,
+                size: 22, color: iconColor),
           ),
           IconButton(
             onPressed: () =>
                 showMoreBottomSheet(context, musicPlayer.currentMedia),
-            icon: const Icon(MingCute.more_2_fill,
-                size: 25, color: Default_Theme.primaryColor1),
+            icon: Icon(MingCute.more_2_fill,
+                size: 25, color: iconColor),
           )
         ],
         title: Column(
@@ -116,8 +119,8 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
             Text(
               l10n.playerEnjoyingFrom,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Default_Theme.primaryColor1,
+              style: TextStyle(
+                color: iconColor,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ).merge(Default_Theme.secondoryTextStyle),
@@ -128,8 +131,8 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
                 return Text(
                   snapshot.data ?? l10n.playerUnknownQueue,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Default_Theme.primaryColor2,
+                  style: TextStyle(
+                    color: secondaryTextColor,
                     fontSize: 12,
                   ).merge(Default_Theme.secondoryTextStyle),
                 );
@@ -318,6 +321,12 @@ class _SongInfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final subtitleColor = isDark
+        ? Colors.white.withValues(alpha: 0.7)
+        : const Color(0xFF66666E);
+
     return Row(
       children: [
         Expanded(
@@ -333,10 +342,10 @@ class _SongInfoRow extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style:
-                        Default_Theme.secondoryTextStyle.merge(const TextStyle(
+                        Default_Theme.secondoryTextStyle.merge(TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
-                      color: Default_Theme.primaryColor1,
+                      color: primaryTextColor,
                     )),
                   ),
                   const SizedBox(height: 4),
@@ -348,7 +357,7 @@ class _SongInfoRow extends StatelessWidget {
                     style: Default_Theme.secondoryTextStyle.merge(TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      color: Default_Theme.primaryColor1.withValues(alpha: 0.7),
+                      color: subtitleColor,
                     )),
                   ),
                 ],
@@ -417,13 +426,18 @@ class _DownloadButtonState extends State<_DownloadButton> {
   @override
   Widget build(BuildContext context) {
     if (!_isDownloaded) return const SizedBox.shrink();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark
+        ? Colors.white.withValues(alpha: 0.5)
+        : const Color(0xFF1C1C1E).withValues(alpha: 0.5);
+
     return Tooltip(
       message: AppLocalizations.of(context)!.tooltipAvailableOffline,
       child: IconButton(
         iconSize: 25,
         icon: Icon(
           Icons.offline_pin_rounded,
-          color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
+          color: iconColor,
         ),
         onPressed: () {},
       ),
@@ -521,6 +535,10 @@ class _PlayerProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final playerCubit = context.read<BloomeePlayerCubit>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final timeLabelColor = isDark
+        ? Default_Theme.primaryColor1.withValues(alpha: 0.7)
+        : const Color(0xFF66666E);
     return RepaintBoundary(
       child: StreamBuilder<ProgressBarStreams>(
         stream: playerCubit.progressStreams,
@@ -541,11 +559,13 @@ class _PlayerProgressBar extends StatelessWidget {
             timeLabelPadding: 5,
             timeLabelStyle: Default_Theme.secondoryTextStyle.merge(TextStyle(
               fontSize: 15,
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.7),
+              color: timeLabelColor,
             )),
             timeLabelLocation: TimeLabelLocation.above,
             inactiveTrackColor:
-                Default_Theme.primaryColor2.withValues(alpha: 0.1),
+                isDark
+                    ? Default_Theme.primaryColor2.withValues(alpha: 0.1)
+                    : const Color(0xFF1C1C1E).withValues(alpha: 0.1),
             animationDuration: const Duration(milliseconds: 200),
             animationCurve: Curves.easeOutCubic,
           );
@@ -571,28 +591,31 @@ class _PlayerControlsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Default_Theme.primaryColor1 : const Color(0xFF1C1C1E);
+    final accentIconColor = isDark ? Default_Theme.accentColor1 : AppTheme.accentColor(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildControlColumn(
           top: IconButton(
-            icon: const Icon(MingCute.alarm_1_line,
-                color: Default_Theme.primaryColor1, size: 28),
+            icon: Icon(MingCute.alarm_1_line,
+                color: iconColor, size: 28),
             onPressed: () => Navigator.push(
                 context, MaterialPageRoute(builder: (_) => const TimerView())),
           ),
-          bottom: const _LoopControl(),
+          bottom: _LoopControl(iconColor: iconColor, accentColor: accentIconColor),
         ),
         _buildControlColumn(
           top: IconButton(
-            icon: const Icon(MingCute.skip_previous_fill,
-                color: Default_Theme.primaryColor1, size: 35),
+            icon: Icon(MingCute.skip_previous_fill,
+                color: iconColor, size: 35),
             onPressed: musicPlayer.skipToPrevious,
           ),
           bottom: IconButton(
-            icon: const Icon(MingCute.align_center_line,
-                color: Default_Theme.primaryColor1, size: 24),
+            icon: Icon(MingCute.align_center_line,
+                color: iconColor, size: 24),
             onPressed: () {
               Navigator.of(context).push(PageRouteBuilder(
                 pageBuilder: (_, __, ___) => const FullscreenLyricsView(),
@@ -604,25 +627,25 @@ class _PlayerControlsRow extends StatelessWidget {
           ),
         ),
         _buildControlColumn(
-          top: const _PlayPauseButton(),
+          top: _PlayPauseButton(isDark: isDark),
           bottom: const SizedBox(height: 40),
         ),
         _buildControlColumn(
           top: IconButton(
-            icon: const Icon(MingCute.skip_forward_fill,
-                color: Default_Theme.primaryColor1, size: 35),
+            icon: Icon(MingCute.skip_forward_fill,
+                color: iconColor, size: 35),
             onPressed: musicPlayer.skipToNext,
           ),
           bottom: IconButton(
-            icon: const Icon(MingCute.settings_6_line,
-                color: Default_Theme.primaryColor1, size: 24),
+            icon: Icon(MingCute.settings_6_line,
+                color: iconColor, size: 24),
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const PlayerSettings())),
           ),
         ),
         _buildControlColumn(
-          top: const _ShuffleControl(),
-          bottom: const _ExternalLinkControl(),
+          top: _ShuffleControl(iconColor: iconColor, accentColor: accentIconColor),
+          bottom: _ExternalLinkControl(iconColor: iconColor),
         ),
       ],
     );
@@ -630,7 +653,9 @@ class _PlayerControlsRow extends StatelessWidget {
 }
 
 class _LoopControl extends StatelessWidget {
-  const _LoopControl();
+  final Color iconColor;
+  final Color accentColor;
+  const _LoopControl({required this.iconColor, required this.accentColor});
 
   @override
   Widget build(BuildContext context) {
@@ -651,9 +676,7 @@ class _LoopControl extends StatelessWidget {
                 : loopMode == LoopMode.one
                     ? MingCute.repeat_one_line
                     : MingCute.repeat_fill,
-            color: loopMode == LoopMode.off
-                ? Default_Theme.primaryColor1
-                : Default_Theme.accentColor1,
+            color: loopMode == LoopMode.off ? iconColor : accentColor,
             size: 24,
           ),
           onSelected: (value) {
@@ -669,7 +692,9 @@ class _LoopControl extends StatelessWidget {
 }
 
 class _ShuffleControl extends StatelessWidget {
-  const _ShuffleControl();
+  final Color iconColor;
+  final Color accentColor;
+  const _ShuffleControl({required this.iconColor, required this.accentColor});
 
   @override
   Widget build(BuildContext context) {
@@ -681,9 +706,7 @@ class _ShuffleControl extends StatelessWidget {
         return IconButton(
           icon: Icon(
             MingCute.shuffle_2_fill,
-            color: isShuffle
-                ? Default_Theme.accentColor1
-                : Default_Theme.primaryColor1,
+            color: isShuffle ? accentColor : iconColor,
             size: 28,
           ),
           onPressed: () => player.shuffle(!isShuffle),
@@ -694,14 +717,14 @@ class _ShuffleControl extends StatelessWidget {
 }
 
 class _ExternalLinkControl extends StatelessWidget {
-  const _ExternalLinkControl();
+  final Color iconColor;
+  const _ExternalLinkControl({required this.iconColor});
 
   @override
   Widget build(BuildContext context) {
     final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
     return IconButton(
-      icon: const Icon(MingCute.external_link_line,
-          color: Default_Theme.primaryColor1, size: 24),
+      icon: Icon(MingCute.external_link_line, color: iconColor, size: 24),
       onPressed: () async {
         final url = player.currentTrackInfo.url;
         if (url != null) {
@@ -716,27 +739,32 @@ class _ExternalLinkControl extends StatelessWidget {
 }
 
 class _PlayPauseButton extends StatelessWidget {
-  const _PlayPauseButton();
+  final bool isDark;
+  const _PlayPauseButton({required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     final musicPlayer = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    // In dark mode: white button with black icon (original).
+    // In light mode: dark button with white icon to match the theme inversion.
+    final buttonColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final iconColor = isDark ? Colors.black : Colors.white;
     return BlocBuilder<MiniPlayerCubit, MiniPlayerState>(
       builder: (context, state) {
         Widget child;
-        Color buttonColor = Colors.white;
+        Color activeButtonColor = buttonColor;
 
         if (state.isLoading || state.isResolving) {
-          child = const CircularProgressIndicator(
-              strokeWidth: 3, color: Colors.black);
-          buttonColor = Colors.white;
+          child = CircularProgressIndicator(
+              strokeWidth: 3, color: iconColor);
+          activeButtonColor = buttonColor;
         } else if (state.isCompleted) {
-          child = const Icon(FontAwesome.rotate_right_solid,
-              color: Colors.black, size: 32);
-          buttonColor = Colors.white;
+          child = Icon(FontAwesome.rotate_right_solid,
+              color: iconColor, size: 32);
+          activeButtonColor = buttonColor;
         } else if (state.hasError) {
-          child = const Icon(MingCute.warning_line,
-              color: Colors.black, size: 32);
+          child = Icon(MingCute.warning_line,
+              color: iconColor, size: 32);
         } else if (state.isVisible) {
           return PlayPauseButton(
             size: 70,
@@ -764,10 +792,12 @@ class _PlayPauseButton extends StatelessWidget {
             height: 70,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: buttonColor,
+              color: activeButtonColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.white.withValues(alpha: 0.25),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.25)
+                      : Colors.black.withValues(alpha: 0.15),
                   blurRadius: 16,
                   spreadRadius: 2,
                 )
@@ -836,6 +866,7 @@ class _AmbientImgShadowWidgetState extends State<AmbientImgShadowWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return RepaintBoundary(
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 500),
@@ -843,7 +874,7 @@ class _AmbientImgShadowWidgetState extends State<AmbientImgShadowWidget> {
           gradient: RadialGradient(
             colors: [
               (_cachedColor ?? const Color.fromARGB(255, 163, 44, 115))
-                  .withValues(alpha: 0.35),
+                  .withValues(alpha: isDark ? 0.35 : 0.20),
               Colors.transparent,
             ],
             center: Alignment.center,

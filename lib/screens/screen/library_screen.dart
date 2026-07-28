@@ -393,12 +393,8 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
     final titleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
 
-    final glassColor = isDark
-        ? Colors.white.withValues(alpha: 0.05)
-        : Colors.black.withValues(alpha: 0.05);
-    final glassBorder = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.08);
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
 
     return SliverAppBar(
       floating: true,
@@ -408,7 +404,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
       flexibleSpace: FlexibleSpaceBar(
         background: ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            filter: AppTheme.glassBlur,
             child: Container(
               decoration: BoxDecoration(
                 color: glassColor,

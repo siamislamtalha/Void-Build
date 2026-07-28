@@ -7,6 +7,13 @@ class PlayerOverlayCubit extends Cubit<bool> {
   /// Callback to collapse the UpNext panel, returns true if panel was expanded
   bool Function()? _collapseUpNextPanel;
 
+  /// Callback to navigate the shell to a given branch index.
+  void Function(int)? _navigateToBranch;
+
+  /// The navigation branch index that was active when the player was last
+  /// opened. Used by the down-arrow button to restore the previous page.
+  int? lastPageIndex;
+
   /// Register a callback to collapse the UpNext panel
   void registerUpNextPanelCollapse(bool Function() collapse) {
     _collapseUpNextPanel = collapse;
@@ -17,13 +24,36 @@ class PlayerOverlayCubit extends Cubit<bool> {
     _collapseUpNextPanel = null;
   }
 
+  /// Register a callback that navigates the shell to a branch index.
+  void registerNavigateToBranch(void Function(int) navigate) {
+    _navigateToBranch = navigate;
+  }
+
+  /// Unregister the navigation callback.
+  void unregisterNavigateToBranch() {
+    _navigateToBranch = null;
+  }
+
   /// Try to collapse the UpNext panel if it's expanded
   /// Returns true if the panel was collapsed, false otherwise
   bool collapseUpNextPanel() {
     return _collapseUpNextPanel?.call() ?? false;
   }
 
-  void showPlayer() => emit(true);
+  /// Navigate the shell back to the last page and hide the player.
+  void minimizePlayer() {
+    hidePlayer();
+    final idx = lastPageIndex;
+    if (idx != null) {
+      _navigateToBranch?.call(idx);
+    }
+  }
+
+  /// Show the player and optionally record which page the user came from.
+  void showPlayer({int? fromPageIndex}) {
+    if (fromPageIndex != null) lastPageIndex = fromPageIndex;
+    emit(true);
+  }
 
   void hidePlayer() => emit(false);
 

@@ -1,5 +1,4 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -366,22 +365,17 @@ class _FloatingSearchBarSliver extends StatelessWidget {
         onKeyEvent: handleKeyEvent,
         child: Builder(
           builder: (context) {
-            final isDark = Theme.of(context).brightness == Brightness.dark;
             final onSurface = Theme.of(context).colorScheme.onSurface;
             return ClipRRect(
               borderRadius: BorderRadius.circular(18),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                filter: AppTheme.glassBlur,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.05)
-                        : Colors.black.withValues(alpha: 0.05),
+                    color: AppTheme.glassColor(context),
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : Colors.black.withValues(alpha: 0.08),
+                      color: AppTheme.glassBorder(context),
                       width: 1,
                     ),
                   ),
@@ -583,15 +577,15 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(24),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                filter: AppTheme.glassBlur,
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   decoration: BoxDecoration(
-                    color: Default_Theme.primaryColor2.withValues(alpha: 0.04),
+                    color: AppTheme.glassColor(context),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.05), width: 1),
+                        color: AppTheme.glassBorder(context), width: 1),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

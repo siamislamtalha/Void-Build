@@ -12,8 +12,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
+import 'package:voidmusic/core/theme/app_theme.dart';
+
 class MiniPlayerWidget extends StatelessWidget {
-  const MiniPlayerWidget({Key? key}) : super(key: key);
+  /// The navigation branch index currently active in the shell.
+  /// Passed through to [PlayerOverlayCubit.showPlayer] so the down-arrow
+  /// button on the full-screen player can return the user to this page.
+  final int? currentPageIndex;
+  const MiniPlayerWidget({Key? key, this.currentPageIndex}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +45,11 @@ class MiniPlayerWidget extends StatelessWidget {
             );
           },
           child: state.isVisible
-              ? MiniPlayerCard(key: const ValueKey('mini_player'), state: state)
+              ? MiniPlayerCard(
+                  key: const ValueKey('mini_player'),
+                  state: state,
+                  currentPageIndex: currentPageIndex,
+                )
               : const SizedBox.shrink(key: ValueKey('empty')),
         );
       },
@@ -49,7 +59,8 @@ class MiniPlayerWidget extends StatelessWidget {
 
 class MiniPlayerCard extends StatefulWidget {
   final MiniPlayerState state;
-  const MiniPlayerCard({super.key, required this.state});
+  final int? currentPageIndex;
+  const MiniPlayerCard({super.key, required this.state, this.currentPageIndex});
 
   @override
   State<MiniPlayerCard> createState() => _MiniPlayerCardState();
@@ -143,7 +154,9 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
   void _onVerticalDragEnd(DragEndDetails details) {
     if ((details.primaryVelocity ?? 0) < -200) {
       HapticFeedback.lightImpact();
-      context.read<PlayerOverlayCubit>().showPlayer();
+      context.read<PlayerOverlayCubit>().showPlayer(
+            fromPageIndex: widget.currentPageIndex,
+          );
     }
   }
 
@@ -154,17 +167,15 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
     final thumbUrl = song.thumbnail.urlLow ?? song.thumbnail.url;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final glassColor = isDark
-        ? const Color(0xFF1C1C1E).withValues(alpha: 0.72)
-        : Colors.white.withValues(alpha: 0.82);
-    final glassBorder = isDark
-        ? Colors.white.withValues(alpha: 0.16)
-        : Colors.black.withValues(alpha: 0.08);
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
 
     return GestureDetector(
       onTap: () {
         HapticFeedback.selectionClick();
-        context.read<PlayerOverlayCubit>().showPlayer();
+        context.read<PlayerOverlayCubit>().showPlayer(
+              fromPageIndex: widget.currentPageIndex,
+            );
       },
       onHorizontalDragUpdate: _onHorizontalDragUpdate,
       onHorizontalDragEnd: _onHorizontalDragEnd,
@@ -173,25 +184,22 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
         offset: Offset(_dragOffset, 0),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-          // NOTE: We intentionally do NOT use BackdropFilter here.
-          // Screens like Explore, Library and Search create their own
-          // BackdropFilter layers in their sticky headers.  A nested
-          // BackdropFilter would composite against those intermediate layers
-          // (not the actual content behind it) and produce a solid opaque
-          // result.  A solid semi-transparent color gives a consistent,
-          // glass-like appearance on every single screen.
-          child: Container(
-            height: _cardHeight,
-            decoration: BoxDecoration(
-              color: glassColor,
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(
-                color: glassBorder,
-                width: 1.0,
-              ),
-            ),
-            child: Stack(
-              children: [
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: BackdropFilter(
+              filter: AppTheme.glassBlur,
+              child: Container(
+                height: _cardHeight,
+                decoration: BoxDecoration(
+                  color: glassColor,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: glassBorder,
+                    width: 1.0,
+                  ),
+                ),
+                child: Stack(
+                  children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 10, right: 6),
                   child: Row(
@@ -220,6 +228,8 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                         song: song,
                         isDark: isDark,
                       ),
+                      // ── Close Button ──
+                      _CloseButton(isDark: isDark),
                     ],
                   ),
                 ),
@@ -230,8 +240,10 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
           ),
         ),
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 }
 
 /// Glass capsule containing play/pause + skip controls (like the reference image)
@@ -532,6 +544,32 @@ class _ControlButton extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Icon(icon, size: size, color: iconColor),
+        ),
+      ),
+    );
+  }
+}
+
+class _CloseButton extends StatelessWidget {
+  final bool isDark;
+  const _CloseButton({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final iconColor = isDark
+        ? Colors.white.withValues(alpha: 0.55)
+        : const Color(0xFF1C1C1E).withValues(alpha: 0.45);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          context.read<MiniPlayerCubit>().dismiss();
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          child: Icon(Icons.close_rounded, size: 18, color: iconColor),
         ),
       ),
     );

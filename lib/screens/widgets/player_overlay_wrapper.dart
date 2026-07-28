@@ -19,54 +19,115 @@ class PlayerOverlayWrapper extends StatefulWidget {
 }
 
 class _PlayerOverlayWrapperState extends State<PlayerOverlayWrapper>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _fadeAnimation;
+    with TickerProviderStateMixin {
+  // ── Show controller ─────────────────────────────────────────────────────────
+  // Slightly longer with an elastic-style ease for a premium "spring up" feel.
+  late final AnimationController _showController;
+  late final Animation<Offset> _slideInAnimation;
+  late final Animation<double> _fadeInAnimation;
 
-  /// Track if the player has ever been shown so we can keep it mounted
+  // ── Dismiss controller ───────────────────────────────────────────────────────
+  // Shorter and snappier. Combines slide-down + scale-shrink + fade-out so the
+  // player feels like it "collapses" down toward the mini-player bar.
+  late final AnimationController _dismissController;
+  late final Animation<Offset> _slideOutAnimation;
+  late final Animation<double> _scaleOutAnimation;
+  late final Animation<double> _fadeOutAnimation;
+
+  /// Track if the player has ever been shown so we can keep it mounted.
   bool _hasBeenShown = false;
+
+  /// True while the dismiss animation is playing so we can gate visibility.
+  bool _isDismissing = false;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+
+    // ── Show animation ──────────────────────────────────────────────────────
+    _showController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 260),
     );
 
-    _slideAnimation = Tween<Offset>(
+    _slideInAnimation = Tween<Offset>(
       begin: const Offset(0.0, 1.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeInCubic,
+      parent: _showController,
+      // Slight overshoot feel — settles naturally like iOS player.
+      curve: const Cubic(0.22, 1.0, 0.36, 1.0),
     ));
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
+    _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _showController,
+        // Fade-in completes well before the slide finishes.
+        curve: const Interval(0.0, 0.55, curve: Curves.easeOut),
+      ),
+    );
+
+    // ── Dismiss animation ────────────────────────────────────────────────────
+    _dismissController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+
+    // Slide down with an acceleration curve (feels purposeful, not sluggish).
+    _slideOutAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0.0, 1.0),
     ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
+      parent: _dismissController,
+      curve: const Cubic(0.55, 0.0, 1.0, 0.45),
     ));
+
+    // Subtle vertical scale-down: player "shrinks inward" as it exits.
+    _scaleOutAnimation = Tween<double>(begin: 1.0, end: 0.94).animate(
+      CurvedAnimation(
+        parent: _dismissController,
+        curve: const Interval(0.0, 0.7, curve: Curves.easeInCubic),
+      ),
+    );
+
+    // Fade out accelerates toward the end for a crisp vanish.
+    _fadeOutAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _dismissController,
+        curve: const Interval(0.35, 1.0, curve: Curves.easeIn),
+      ),
+    );
+
+    _dismissController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        if (mounted) {
+          setState(() => _isDismissing = false);
+          _dismissController.reset();
+        }
+      }
+    });
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _showController.dispose();
+    _dismissController.dispose();
     super.dispose();
   }
 
   void _onPlayerVisibilityChanged(bool isVisible) {
     if (isVisible) {
       _hasBeenShown = true;
-      // Dismiss keyboard by unfocusing any active text field
+      _isDismissing = false;
+      // Dismiss animation resets before the show starts.
+      _dismissController.reset();
       FocusManager.instance.primaryFocus?.unfocus();
-      _animationController.forward();
+      _showController.forward(from: 0.0);
     } else {
-      _animationController.reverse();
+      // Play the premium dismiss animation.
+      setState(() => _isDismissing = true);
+      _showController.stop();
+      _dismissController.forward(from: 0.0);
     }
   }
 
@@ -78,14 +139,14 @@ class _PlayerOverlayWrapperState extends State<PlayerOverlayWrapper>
       },
       child: Stack(
         children: [
-          // Main content (always visible)
+          // Main content (always visible).
           widget.child,
 
-          // Player overlay - once shown, stays mounted for instant reopening
+          // Player overlay — once shown, stays mounted for instant reopening.
           BlocBuilder<PlayerOverlayCubit, bool>(
             buildWhen: (previous, current) {
-              // Only rebuild if we need to first mount the player
-              // Once mounted, it stays mounted
+              // Only rebuild to first-mount the player widget.
+              // After that, animations drive visibility — no rebuilds needed.
               return !_hasBeenShown && current;
             },
             builder: (context, isVisible) {
@@ -93,28 +154,47 @@ class _PlayerOverlayWrapperState extends State<PlayerOverlayWrapper>
                 return const SizedBox.shrink();
               }
 
-              // Mark that player has been shown
               if (isVisible && !_hasBeenShown) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) {
-                    setState(() {
-                      _hasBeenShown = true;
-                    });
-                  }
+                  if (mounted) setState(() => _hasBeenShown = true);
                 });
               }
 
               return AnimatedBuilder(
-                animation: _animationController,
+                animation: Listenable.merge([_showController, _dismissController]),
                 builder: (context, child) {
-                  return Visibility(
-                    visible: _animationController.value > 0,
-                    maintainState: true, // Keep state when hidden
-                    child: SlideTransition(
-                      position: _slideAnimation,
+                  // Visible while showing OR while dismissing.
+                  final isShowVisible = _showController.value > 0;
+                  final visible = isShowVisible || _isDismissing;
+
+                  // During dismiss: apply the collapse transform stack.
+                  // During show: apply the slide-in + fade-in.
+                  if (_isDismissing) {
+                    return Visibility(
+                      visible: visible,
+                      maintainState: true,
                       child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: child,
+                        opacity: _fadeOutAnimation,
+                        child: SlideTransition(
+                          position: _slideOutAnimation,
+                          child: ScaleTransition(
+                            scale: _scaleOutAnimation,
+                            alignment: Alignment.bottomCenter,
+                            child: child!,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return Visibility(
+                    visible: visible,
+                    maintainState: true,
+                    child: SlideTransition(
+                      position: _slideInAnimation,
+                      child: FadeTransition(
+                        opacity: _fadeInAnimation,
+                        child: child!,
                       ),
                     ),
                   );

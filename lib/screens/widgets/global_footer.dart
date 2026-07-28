@@ -4,17 +4,53 @@ import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
 import 'package:voidmusic/screens/widgets/player_overlay_wrapper.dart';
 import 'package:voidmusic/screens/widgets/mini_player_widget.dart';
-import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
 
-class GlobalFooter extends StatelessWidget {
+class GlobalFooter extends StatefulWidget {
   const GlobalFooter({super.key, required this.navigationShell});
   final StatefulNavigationShell navigationShell;
+
+  @override
+  State<GlobalFooter> createState() => _GlobalFooterState();
+}
+
+class _GlobalFooterState extends State<GlobalFooter> {
+  @override
+  void initState() {
+    super.initState();
+    // Register the shell-navigation callback so the full-screen player's
+    // down-arrow button can return the user to the last visited tab.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<PlayerOverlayCubit>().registerNavigateToBranch(
+          widget.navigationShell.goBranch,
+        );
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(GlobalFooter oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Re-register if the shell instance changes.
+    if (oldWidget.navigationShell != widget.navigationShell) {
+      context.read<PlayerOverlayCubit>().registerNavigateToBranch(
+        widget.navigationShell.goBranch,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    context.read<PlayerOverlayCubit>().unregisterNavigateToBranch();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +73,7 @@ class GlobalFooter extends StatelessWidget {
           }
 
           if (overlayC.state) {
-            overlayC.hidePlayer();
+            overlayC.minimizePlayer();
             return true;
           }
 
@@ -68,9 +104,7 @@ class GlobalFooter extends StatelessWidget {
                       : Brightness.dark,
             ),
             child: Scaffold(
-              // Keep fully transparent so the BackdropFilter blur in the mini player
-              // and nav bar can composite against whatever is painted below them.
-              backgroundColor: Colors.transparent,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               drawerScrimColor: Colors.transparent,
               // extendBody=true allows the body ScrollView to paint under the
               // floating footer so content scrolls behind the glassmorphic blur.
@@ -82,7 +116,7 @@ class GlobalFooter extends StatelessWidget {
                   // ── Main navigation body ──
                   _FooterAwareBody(
                     isMobile: isMobile,
-                    navigationShell: navigationShell,
+                    navigationShell: widget.navigationShell,
                   ),
                   // ── Floating footer overlay ──
                   // We skip SafeArea and instead manually add the device bottom
@@ -95,7 +129,7 @@ class GlobalFooter extends StatelessWidget {
                     bottom: 0,
                     child: _GlassFooterOverlay(
                       isMobile: isMobile,
-                      navigationShell: navigationShell,
+                      navigationShell: widget.navigationShell,
                     ),
                   ),
                 ],
@@ -119,12 +153,12 @@ class GlobalFooter extends StatelessWidget {
     if (overlayC.state && overlayC.collapseUpNextPanel()) return;
 
     if (overlayC.state) {
-      overlayC.hidePlayer();
+      overlayC.minimizePlayer();
       return;
     }
 
-    if (navigationShell.currentIndex != 0) {
-      navigationShell.goBranch(0);
+    if (widget.navigationShell.currentIndex != 0) {
+      widget.navigationShell.goBranch(0);
       return;
     }
 
@@ -238,7 +272,7 @@ class _GlassFooterOverlay extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const MiniPlayerWidget(),
+          MiniPlayerWidget(currentPageIndex: navigationShell.currentIndex),
           if (isMobile) const SizedBox(height: 6),
           if (isMobile)
             _FrostedNavBarArea(
@@ -347,37 +381,58 @@ class VerticalNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return NavigationRail(
-      backgroundColor: Colors.transparent,
-      destinations: [
-        NavigationRailDestination(
-            icon: const Icon(MingCute.home_4_fill), label: Text(l10n.navHome)),
-        NavigationRailDestination(
-            icon: const Icon(MingCute.book_5_fill),
-            label: Text(l10n.navLibrary)),
-        NavigationRailDestination(
-            icon: const Icon(MingCute.search_2_fill),
-            label: Text(l10n.navSearch)),
-        NavigationRailDestination(
-            icon: const Icon(MingCute.music_2_fill),
-            label: Text(l10n.navLocal)),
-        NavigationRailDestination(
-            icon: const Icon(MingCute.folder_download_fill),
-            label: Text(l10n.navOffline)),
-      ],
-      selectedIndex: navigationShell.currentIndex,
-      minWidth: 70,
-      onDestinationSelected: navigationShell.goBranch,
-      groupAlignment: 0.0,
-      unselectedIconTheme:
-          const IconThemeData(color: Default_Theme.primaryColor2),
-      indicatorColor: isDark
-          ? Colors.white.withValues(alpha: 0.2)
-          : const Color(0xFF1C1C1E).withValues(alpha: 0.08),
-      indicatorShape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(15)),
+    final activeColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final inactiveColor = isDark
+        ? const Color(0xFF8E8E93)
+        : const Color(0xFF66666E);
+
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      decoration: BoxDecoration(
+        color: glassColor,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: glassBorder,
+          width: 1.0,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: NavigationRail(
+          backgroundColor: Colors.transparent,
+          destinations: [
+            NavigationRailDestination(
+                icon: const Icon(MingCute.home_4_fill), label: Text(l10n.navHome)),
+            NavigationRailDestination(
+                icon: const Icon(MingCute.book_5_fill),
+                label: Text(l10n.navLibrary)),
+            NavigationRailDestination(
+                icon: const Icon(MingCute.search_2_fill),
+                label: Text(l10n.navSearch)),
+            NavigationRailDestination(
+                icon: const Icon(MingCute.music_2_fill),
+                label: Text(l10n.navLocal)),
+            NavigationRailDestination(
+                icon: const Icon(MingCute.folder_download_fill),
+                label: Text(l10n.navOffline)),
+          ],
+          selectedIndex: navigationShell.currentIndex,
+          minWidth: 70,
+          onDestinationSelected: navigationShell.goBranch,
+          groupAlignment: 0.0,
+          selectedIconTheme: IconThemeData(color: activeColor),
+          unselectedIconTheme: IconThemeData(color: inactiveColor),
+          indicatorColor: isDark
+              ? Colors.white.withValues(alpha: 0.2)
+              : const Color(0xFF1C1C1E).withValues(alpha: 0.08),
+          indicatorShape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15)),
+          ),
+        ),
       ),
     );
   }
@@ -393,14 +448,10 @@ class HorizontalNavBar extends StatelessWidget {
     final currentIndex = navigationShell.currentIndex;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final glassColor = isDark
-        ? const Color(0xFF1C1C1E).withValues(alpha: 0.72)
-        : Colors.white.withValues(alpha: 0.82);
-    final glassBorder = isDark
-        ? Colors.white.withValues(alpha: 0.16)
-        : Colors.black.withValues(alpha: 0.08);
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
 
-    const activeAccentColor = Color(0xFFFF5B79); // Coral pink accent from reference UI
+    final activeAccentColor = AppTheme.accentColor(context);
     final inactiveIconColor = isDark
         ? Colors.white.withValues(alpha: 0.85)
         : const Color(0xFF1C1C1E).withValues(alpha: 0.85);

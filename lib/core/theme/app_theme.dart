@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 /// Canonical app theme.
@@ -6,6 +7,22 @@ import 'package:flutter/material.dart';
 /// this file provides backward-compatible access for existing callers while
 /// imports are being migrated.
 class AppTheme {
+  // ── Glass & Blur Design System ──────────────────────────────────────────────
+  static ImageFilter get glassBlur => ImageFilter.blur(sigmaX: 20, sigmaY: 20);
+
+  static Color glassColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : Colors.black.withValues(alpha: 0.12);
+  }
+
+  static Color glassBorder(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark
+        ? Colors.white.withValues(alpha: 0.20)
+        : Colors.black.withValues(alpha: 0.16);
+  }
   // ── Text Styles ─────────────────────────────────────────────────────────────
   static const primaryTextStyle = TextStyle(
     fontFamily: "Gilroy",

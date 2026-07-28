@@ -93,10 +93,22 @@ class MiniPlayerCubit extends Cubit<MiniPlayerState> {
   final BloomeePlayerCubit _playerCubit;
   StreamSubscription? _sub;
 
+  /// When non-null, the mini player is force-hidden until a *different* track ID
+  /// is seen. Prevents the player from immediately re-appearing after dismissal.
+  String? _dismissedTrackId;
+
   MiniPlayerCubit({required BloomeePlayerCubit playerCubit})
       : _playerCubit = playerCubit,
         super(const MiniPlayerState.hidden()) {
     _listen();
+  }
+
+  /// Stops the player and hides the mini player.
+  /// The mini player will remain hidden until a new track starts playing.
+  void dismiss() {
+    _dismissedTrackId = state.track?.id;
+    _playerCubit.bloomeePlayer.stop();
+    emit(const MiniPlayerState.hidden());
   }
 
   void _listen() {
@@ -119,6 +131,15 @@ class MiniPlayerCubit extends Cubit<MiniPlayerState> {
       }
 
       final track = mediaItemToTrack(media);
+
+      // If the user dismissed this track, keep it hidden until a new track loads.
+      if (_dismissedTrackId != null && track.id == _dismissedTrackId) {
+        if (state.isVisible) emit(const MiniPlayerState.hidden());
+        return;
+      }
+
+      // A new track has arrived — clear the dismissed guard.
+      _dismissedTrackId = null;
 
       emit(MiniPlayerState(
         track: track,
