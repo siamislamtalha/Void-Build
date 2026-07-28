@@ -15,7 +15,7 @@
 
 ; Flutter's Windows release output folder, relative to THIS .iss file.
 ; Since this file lives in installer\, ".." points at the repo root.
-#define BuildDir "..\build\windows\x64\runner\Release"
+#define BuildDir SourcePath + "..\build\windows\x64\runner\Release"
 
 [Setup]
 AppId={{8E2B5C7B-0F2C-4A35-9B0F-9D4C8E9A1A1B}
@@ -26,7 +26,7 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={localappdata}\{#MyAppName}
-DisableDirPage=yes
+DisableDirPage=no
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 ; Output goes to installer\Output\ (absolute, using the .iss file's own directory)
@@ -51,7 +51,7 @@ RestartIfNeededByRun=no
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"; Flags: unchecked
+Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"
 
 [Files]
 ; Copy the entire Flutter Windows release output (EXE + DLLs + data folder)
