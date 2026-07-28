@@ -564,6 +564,7 @@ class _PluginSongSection extends StatefulWidget {
   final Set<String> seenTrackIds;
 
   const _PluginSongSection({
+    super.key,
     required this.pluginId,
     required this.pluginName,
     required this.seenTrackIds,
@@ -575,7 +576,6 @@ class _PluginSongSection extends StatefulWidget {
 
 class _PluginSongSectionState extends State<_PluginSongSection> {
   late final ContentBloc _bloc;
-  bool _attemptedPlaylistFetch = false;
   bool _attemptedMultiplePlaylists = false;
 
   @override
@@ -656,7 +656,6 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
           playlist: (p) => targetPlaylistId = p.id,
         );
         if (targetPlaylistId != null) {
-          _attemptedPlaylistFetch = true;
           playlistsToTry++;
           _bloc.add(LoadPlaylistDetails(
             pluginId: widget.pluginId,
@@ -774,6 +773,84 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
     );
   }
 
+  Widget _buildLoadingRow(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final shimmerColor = isDark
+        ? Colors.white.withValues(alpha: 0.06)
+        : Colors.black.withValues(alpha: 0.05);
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 20, bottom: 4),
+            child: Row(
+              children: [
+                SourceBadgeByPluginId(
+                  pluginId: widget.pluginId,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  widget.pluginName,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontFamily: 'Gilroy',
+                  ).merge(Default_Theme.secondoryTextStyle),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 220,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(left: 12),
+              itemCount: 5,
+              itemBuilder: (context, _) => Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        color: shimmerColor,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      width: 100,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: shimmerColor,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      width: 70,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: shimmerColor,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Fetches playlists for [pluginId], and renders them in a horizontal scroll row
@@ -785,6 +862,7 @@ class _PluginPlaylistSection extends StatefulWidget {
   final Set<String> seenPlaylistIds;
 
   const _PluginPlaylistSection({
+    super.key,
     required this.pluginId,
     required this.pluginName,
     required this.seenPlaylistIds,
@@ -810,9 +888,9 @@ class _PluginPlaylistSectionState extends State<_PluginPlaylistSection> {
     super.dispose();
   }
 
-  List<PlaylistItem> _extractPlaylists(ContentState state) {
+  List<PlaylistSummary> _extractPlaylists(ContentState state) {
     final sections = state.homeSections ?? const [];
-    final result = <PlaylistItem>[];
+    final result = <PlaylistSummary>[];
     for (final section in sections) {
       for (final item in section.items) {
         item.when(
@@ -940,86 +1018,6 @@ class _PluginPlaylistSectionState extends State<_PluginPlaylistSection> {
                 const SizedBox(width: 8),
                 Text(
                   '${widget.pluginName} Playlists',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontFamily: 'Gilroy',
-                  ).merge(Default_Theme.secondoryTextStyle),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 220,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.only(left: 12),
-              itemCount: 5,
-              itemBuilder: (context, _) => Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 150,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        color: shimmerColor,
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Container(
-                      width: 100,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: shimmerColor,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      width: 70,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: shimmerColor,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-  Widget _buildLoadingRow(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final shimmerColor = isDark
-        ? Colors.white.withValues(alpha: 0.06)
-        : Colors.black.withValues(alpha: 0.05);
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 20, bottom: 4),
-            child: Row(
-              children: [
-                SourceBadgeByPluginId(
-                  pluginId: widget.pluginId,
-                  size: 18,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  widget.pluginName,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

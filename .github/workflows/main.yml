@@ -184,9 +184,7 @@ jobs:
 
               env:
 
-                  CMAKE_GENERATOR: "Visual Studio 17 2022"
-
-                  CMAKE_GENERATOR_PLATFORM: "x64"
+                  CMAKE_GENERATOR: "Ninja"
 
                   CMAKE_GENERATOR_INSTANCE: ""
 
@@ -196,15 +194,13 @@ jobs:
 
               run: |
 
-                  $env:CMAKE_GENERATOR = "Visual Studio 17 2022"
-
-                  $env:CMAKE_GENERATOR_PLATFORM = "x64"
+                  $env:CMAKE_GENERATOR = "Ninja"
 
                   flutter clean
 
                   flutter pub get
 
-                  flutter build windows --release --no-tree-shake-icons --build-number ${{github.run_number}}
+                  flutter build windows --release --no-tree-shake-icons --build-number ${{github.run_number}} -DCMAKE_GENERATOR=Ninja
 
 
 
