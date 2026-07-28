@@ -86,9 +86,9 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
         leading: IconButton(
           icon: Icon(Icons.keyboard_arrow_down_rounded, size: 32, color: iconColor),
           onPressed: () {
-            if (!_upNextPanelController.collapse()) {
-              context.read<PlayerOverlayCubit>().minimizePlayer();
-            }
+            // Collapse Up Next panel if expanded, then always minimize the player.
+            _upNextPanelController.collapse();
+            context.read<PlayerOverlayCubit>().minimizePlayer();
           },
         ),
         actions: [

@@ -238,6 +238,17 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                 child: _buildSyncControls(),
               ),
             ),
+            // ── Persistent back arrow — always visible, never auto-hides ──
+            // Only interactive when controls are hidden (IgnorePointer when
+            // controls are showing so the top bar's arrow handles taps there).
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 4,
+              left: 4,
+              child: IgnorePointer(
+                ignoring: _showControls,
+                child: _buildPersistentBackArrow(context),
+              ),
+            ),
             UpNextPanel(
               controller: _upNextPanelController,
               peekHeight: 60,
@@ -294,6 +305,41 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildPersistentBackArrow(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+        },
+        borderRadius: BorderRadius.circular(24),
+        child: AnimatedOpacity(
+          opacity: _showControls ? 0.0 : 0.75,
+          duration: const Duration(milliseconds: 300),
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.35),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.12),
+                width: 1,
+              ),
+            ),
+            child: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Colors.white,
+              size: 32,
+            ),
+          ),
+        ),
+      ),
     );
   }
 

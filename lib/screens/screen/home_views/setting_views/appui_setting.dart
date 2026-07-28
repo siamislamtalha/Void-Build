@@ -128,6 +128,15 @@ class _AppUISettingsState extends State<AppUISettings> {
                       }
                     },
                   ),
+                  const SettingDivider(),
+                  SettingToggleTile(
+                    icon: MingCute.minimize_line,
+                    title: 'Stay in background when closed',
+                    subtitle: 'Minimize to system tray when closing while playing music',
+                    value: state.closeToTray,
+                    onChanged: (v) =>
+                        context.read<SettingsCubit>().setCloseToTray(v),
+                  ),
                 ],
               ),
               const SizedBox(height: 28),

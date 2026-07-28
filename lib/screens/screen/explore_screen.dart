@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:voidmusic/blocs/explore/cubit/explore_cubits.dart';
 import 'package:voidmusic/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
@@ -575,6 +574,7 @@ class _PluginSongSection extends StatefulWidget {
 class _PluginSongSectionState extends State<_PluginSongSection> {
   late final ContentBloc _bloc;
   bool _attemptedMultiplePlaylists = false;
+  List<Track>? _stableSongs;
 
   @override
   void initState() {
@@ -589,16 +589,16 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
     super.dispose();
   }
 
-  List<Track> _extractDirectTracks(ContentState state) {
+  List<Track> _computeTracks(ContentState state) {
     final sections = state.homeSections ?? const [];
-    final result = <Track>[];
+    final allTracks = <Track>[];
+
     for (final section in sections) {
       for (final item in section.items) {
         item.when(
           track: (t) {
-            // Deduplicate: only add if we haven't seen this track
             if (!widget.seenTrackIds.contains(t.id)) {
-              result.add(t);
+              allTracks.add(t);
               widget.seenTrackIds.add(t.id);
             }
           },
@@ -608,18 +608,9 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
         );
       }
     }
-    // Don't shuffle here - shuffle after combining with playlist tracks
-    return result;
-  }
 
-  List<Track> _getTracks(ContentState state) {
-    final direct = _extractDirectTracks(state);
-    
-    // Collect tracks from all loaded playlists
-    final allTracks = <Track>[];
-    allTracks.addAll(direct);
-    
-    if (state.playlistDetails != null && state.playlistDetails!.tracks.items.isNotEmpty) {
+    if (state.playlistDetails != null &&
+        state.playlistDetails!.tracks.items.isNotEmpty) {
       final playlistTracks = state.playlistDetails!.tracks.items;
       for (final track in playlistTracks) {
         if (!widget.seenTrackIds.contains(track.id)) {
@@ -628,8 +619,7 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
         }
       }
     }
-    
-    // Shuffle to mix direct tracks and playlist tracks
+
     allTracks.shuffle();
     return allTracks;
   }
@@ -641,10 +631,9 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
     final sections = state.homeSections ?? const [];
     if (sections.isEmpty) return;
 
-    // Try to find playlists with tracks - try multiple for richer content
     int playlistsToTry = 0;
     for (final section in sections) {
-      if (playlistsToTry >= 3) break; // Try up to 3 playlists per source for better variety
+      if (playlistsToTry >= 3) break;
       for (final item in section.items) {
         String? targetPlaylistId;
         item.when(
@@ -662,7 +651,7 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
         }
       }
     }
-    
+
     if (playlistsToTry > 0) {
       _attemptedMultiplePlaylists = true;
     }
@@ -670,7 +659,9 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
 
   String _formatSectionTitle(String pluginName) {
     final nameLower = pluginName.toLowerCase();
-    if (nameLower.contains('song') || nameLower.contains('track') || nameLower.contains('hit')) {
+    if (nameLower.contains('song') ||
+        nameLower.contains('track') ||
+        nameLower.contains('hit')) {
       return pluginName;
     }
     return '$pluginName Songs';
@@ -678,14 +669,23 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ContentBloc, ContentState>(
+    return BlocConsumer<ContentBloc, ContentState>(
       bloc: _bloc,
-      builder: (context, state) {
+      listener: (context, state) {
         _checkAndFetchSongs(state);
-
+        if (state.homeSectionsStatus == DetailStatus.loaded) {
+          final computed = _computeTracks(state);
+          if (computed.isNotEmpty && _stableSongs == null) {
+            setState(() {
+              _stableSongs = computed;
+            });
+          }
+        }
+      },
+      builder: (context, state) {
         // While initial home sections loading, show slim placeholder
         if (state.homeSectionsStatus == DetailStatus.loading &&
-            (state.homeSections == null || state.homeSections!.isEmpty)) {
+            (_stableSongs == null || _stableSongs!.isEmpty)) {
           return _buildLoadingRow(context);
         }
 
@@ -694,12 +694,18 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
           return const SizedBox.shrink();
         }
 
-        final songs = _getTracks(state);
-        if (songs.isEmpty && state.playlistDetailStatus != DetailStatus.loading) {
+        final songs = _stableSongs ?? _computeTracks(state);
+        if (songs.isEmpty &&
+            state.playlistDetailStatus != DetailStatus.loading) {
           return const SizedBox.shrink();
         }
         if (songs.isEmpty) {
           return _buildLoadingRow(context);
+        }
+
+        // Cache stable songs if not set yet
+        if (_stableSongs == null && songs.isNotEmpty) {
+          _stableSongs = songs;
         }
 
         final sectionTitle = _formatSectionTitle(widget.pluginName);

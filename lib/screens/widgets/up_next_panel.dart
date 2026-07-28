@@ -12,18 +12,6 @@ import 'song_tile.dart';
 import 'more_bottom_sheet.dart';
 
 class _UpNextStyles {
-  static final headerTextStyle = Default_Theme.secondoryTextStyleMedium.merge(
-    TextStyle(
-        color: Default_Theme.primaryColor2.withValues(alpha: 0.9),
-        fontSize: 14,
-        fontWeight: FontWeight.w600),
-  );
-  static final queueCountStyle = Default_Theme.secondoryTextStyleMedium.merge(
-    TextStyle(
-        color: Colors.white.withValues(alpha: 0.7),
-        fontSize: 13,
-        fontWeight: FontWeight.w500),
-  );
   static const panelBorderRadius =
       BorderRadius.vertical(top: Radius.circular(25));
   static const desktopBorderRadius = BorderRadius.all(Radius.circular(25));
@@ -229,6 +217,14 @@ class _PanelContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassColor = isDark
+        ? const Color(0xD50A040C)
+        : const Color(0xF2F0F0F3);
+    final borderColor = isDark
+        ? const Color(0x3BFFFFFF)
+        : const Color(0x20000000);
+
     return RepaintBoundary(
       child: Material(
         color: Colors.transparent,
@@ -239,8 +235,8 @@ class _PanelContent extends StatelessWidget {
             child: Container(
               decoration: AppTheme.liquidGlassDecoration(
                 borderRadius: 25,
-                glassColor: const Color(0xD50A040C),
-                borderColor: const Color(0x3BFFFFFF),
+                glassColor: glassColor,
+                borderColor: borderColor,
                 borderWidth: 0.5,
               ),
               child: Column(
@@ -307,21 +303,37 @@ class _CompactHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final iconColor = isDark
+        ? Default_Theme.primaryColor2.withValues(alpha: 0.8)
+        : const Color(0xFF66666E);
+    final arrowColor = isDark
+        ? Default_Theme.primaryColor2.withValues(alpha: 0.5)
+        : const Color(0xFF8E8E93);
+
     return Center(
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.queue_music_rounded,
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.8),
+              color: iconColor,
               size: 18),
           const SizedBox(width: 8),
-          Text(l10n.upNextTitle, style: _UpNextStyles.headerTextStyle),
+          Text(
+            l10n.upNextTitle,
+            style: Default_Theme.secondoryTextStyleMedium.copyWith(
+              color: titleColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(width: 6),
           AnimatedRotation(
             turns: isExpanded ? 0.5 : 0,
             duration: const Duration(milliseconds: 200),
             child: Icon(Icons.keyboard_arrow_up_rounded,
-                color: Default_Theme.primaryColor2.withValues(alpha: 0.5),
+                color: arrowColor,
                 size: 20),
           ),
         ],
@@ -337,6 +349,11 @@ class _QueueInfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final countColor = isDark
+        ? Colors.white.withValues(alpha: 0.7)
+        : const Color(0xFF66666E);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -345,8 +362,14 @@ class _QueueInfoRow extends StatelessWidget {
           StreamBuilder<List<MediaItem>>(
             stream: playerCubit.bloomeePlayer.queue,
             builder: (context, snapshot) {
-              return Text(l10n.upNextItemsInQueue(snapshot.data?.length ?? 0),
-                  style: _UpNextStyles.queueCountStyle);
+              return Text(
+                l10n.upNextItemsInQueue(snapshot.data?.length ?? 0),
+                style: Default_Theme.secondoryTextStyleMedium.copyWith(
+                  color: countColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              );
             },
           ),
           _ClearQueueButton(playerCubit: playerCubit),
@@ -364,15 +387,26 @@ class _ClearQueueButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark
+        ? Colors.white.withValues(alpha: 0.06)
+        : Colors.black.withValues(alpha: 0.05);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.18)
+        : Colors.black.withValues(alpha: 0.12);
+    final textColor = isDark
+        ? Default_Theme.primaryColor2.withValues(alpha: 0.75)
+        : const Color(0xFF66666E);
+
     return GestureDetector(
       onTap: () => playerCubit.bloomeePlayer.clearQueue(),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: bgColor,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.18),
+            color: borderColor,
             width: 1,
           ),
         ),
@@ -382,7 +416,7 @@ class _ClearQueueButton extends StatelessWidget {
             Icon(
               Icons.playlist_remove_rounded,
               size: 15,
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.75),
+              color: textColor,
             ),
             const SizedBox(width: 6),
             Text(
@@ -390,7 +424,7 @@ class _ClearQueueButton extends StatelessWidget {
               style: Default_Theme.secondoryTextStyleMedium.copyWith(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: Default_Theme.primaryColor2.withValues(alpha: 0.75),
+                color: textColor,
               ),
             ),
           ],
@@ -406,6 +440,14 @@ class _DesktopLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark
+        ? Colors.black.withValues(alpha: 0.7)
+        : const Color(0xF2F0F0F3);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.1)
+        : const Color(0x20000000);
+
     return RepaintBoundary(
       child: ClipRRect(
         borderRadius: _UpNextStyles.desktopBorderRadius,
@@ -413,9 +455,9 @@ class _DesktopLayout extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.7),
+              color: bgColor,
               border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.1), width: 0.5),
+                  color: borderColor, width: 0.5),
             ),
             child: Column(
               children: [
@@ -623,6 +665,13 @@ class _QueueItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final songModel = mediaItemToTrack(mediaItem);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final optionsIconColor = isDark
+        ? Default_Theme.primaryColor2.withValues(alpha: 0.65)
+        : const Color(0xFF66666E);
+    final dragIconColor = isDark
+        ? Default_Theme.primaryColor2.withValues(alpha: 0.4)
+        : const Color(0xFF8E8E93);
 
     Widget content = Dismissible(
       key: ValueKey('dismiss_${mediaItem.id}'),
@@ -655,7 +704,7 @@ class _QueueItem extends StatelessWidget {
                       minWidth: 36,
                       minHeight: 36,
                     ),
-                    color: Default_Theme.primaryColor2.withValues(alpha: 0.65),
+                    color: optionsIconColor,
                     icon: const Icon(Icons.more_horiz_rounded),
                     onPressed: () => showMoreBottomSheet(
                       context,
@@ -675,8 +724,7 @@ class _QueueItem extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                     child: Icon(Icons.drag_handle_rounded,
-                        color:
-                            Default_Theme.primaryColor2.withValues(alpha: 0.4),
+                        color: dragIconColor,
                         size: 20),
                   ),
                 ),

@@ -5,6 +5,7 @@ class SettingsState extends Equatable {
   final bool settingsReady; // true only after all settings loaded from DB
   final bool autoUpdateNotify;
   final bool autoSlideCharts;
+  final bool closeToTray;
   final String downPath;
   final String downQuality;
   final String strmQuality;
@@ -43,6 +44,7 @@ class SettingsState extends Equatable {
     required this.settingsReady,
     required this.autoUpdateNotify,
     required this.autoSlideCharts,
+    this.closeToTray = true,
     required this.downPath,
     required this.downQuality,
     required this.strmQuality,
@@ -76,6 +78,7 @@ class SettingsState extends Equatable {
     bool? settingsReady,
     bool? autoUpdateNotify,
     bool? autoSlideCharts,
+    bool? closeToTray,
     String? downPath,
     String? downQuality,
     String? strmQuality,
@@ -108,6 +111,7 @@ class SettingsState extends Equatable {
       settingsReady: settingsReady ?? this.settingsReady,
       autoUpdateNotify: autoUpdateNotify ?? this.autoUpdateNotify,
       autoSlideCharts: autoSlideCharts ?? this.autoSlideCharts,
+      closeToTray: closeToTray ?? this.closeToTray,
       downPath: downPath ?? this.downPath,
       downQuality: downQuality ?? this.downQuality,
       strmQuality: strmQuality ?? this.strmQuality,
@@ -158,6 +162,7 @@ class SettingsState extends Equatable {
         settingsReady,
         autoUpdateNotify,
         autoSlideCharts,
+        closeToTray,
         downPath,
         downQuality,
         strmQuality,
@@ -194,6 +199,7 @@ class SettingsInitial extends SettingsState {
           settingsReady: false,
           autoUpdateNotify: false,
           autoSlideCharts: true,
+          closeToTray: true,
           downPath: "",
           downQuality: "Medium",
           strmQuality: "High",

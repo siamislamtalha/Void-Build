@@ -181,6 +181,12 @@ class SettingsCubit extends Cubit<SettingsState> {
             defaultValue: 'system'),
         SettingKeys.themeMode,
       ),
+      // [29] closeToTray
+      _readSetting(
+        () => _settingsRepo.getSettingBool(SettingKeys.closeToTray,
+            defaultValue: true),
+        SettingKeys.closeToTray,
+      ),
     ]);
 
     // Normalize stream quality labels.
@@ -299,6 +305,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       settingsReady: true,
       autoUpdateNotify: (results[0] as bool?) ?? false,
       autoSlideCharts: (results[1] as bool?) ?? true,
+      closeToTray: (results[29] as bool?) ?? true,
       downPath: results[2] as String,
       downQuality: normalizedDownQ,
       strmQuality: normalizedStrmQ,
@@ -327,6 +334,11 @@ class SettingsCubit extends Cubit<SettingsState> {
       downloadPluginIds: downloadPluginIds,
       themeMode: (results[28] as String?) ?? 'system',
     ));
+  }
+
+  void setCloseToTray(bool value) async {
+    await _settingsRepo.putSettingBool(SettingKeys.closeToTray, value);
+    emit(state.copyWith(closeToTray: value));
   }
 
   Future<T?> _readSetting<T>(Future<T?> Function() read, String key) async {

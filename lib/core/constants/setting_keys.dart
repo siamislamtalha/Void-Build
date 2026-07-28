@@ -9,6 +9,7 @@ class SettingKeys {
   // ── App behaviour ───────────────────────────────────────────────────────────
   static const String autoUpdateNotify = "auto_update_notify";
   static const String autoSlideCharts = "auto_slide_charts";
+  static const String closeToTray = "closeToTray";
 
   // ── Theme ────────────────────────────────────────────────────────────────────
   /// Stored as: 'system' | 'light' | 'dark'. Defaults to 'system'.

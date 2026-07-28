@@ -126,7 +126,7 @@ class _PlayerOverlayWrapperState extends State<PlayerOverlayWrapper>
     } else {
       // Play the premium dismiss animation.
       setState(() => _isDismissing = true);
-      _showController.stop();
+      _showController.reset();
       _dismissController.forward(from: 0.0);
     }
   }
