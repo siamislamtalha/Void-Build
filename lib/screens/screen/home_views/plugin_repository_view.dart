@@ -7,6 +7,7 @@ import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/plugins/blocs/repository/plugin_repository_cubit.dart';
 import 'package:voidmusic/plugins/models/plugin_repository.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/screens/screen/home_views/repository_detail_screen.dart';
 
@@ -228,15 +229,20 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
                                   _RepoCard(repo: state.repositories[index]),
                             );
                           }
-                          return ListView.separated(
+                          return ListView.builder(
                             physics: const BouncingScrollPhysics(
                                 parent: AlwaysScrollableScrollPhysics()),
-                            itemCount: state.repositories.length,
-                            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(height: 12),
-                            itemBuilder: (context, index) =>
-                                _RepoCard(repo: state.repositories[index]),
+                            itemCount: state.repositories.length + 1,
+                            padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                            itemBuilder: (context, index) {
+                              if (index < state.repositories.length) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: _RepoCard(repo: state.repositories[index]),
+                                );
+                              }
+                              return const BottomSafeAreaSpacer();
+                            },
                           );
                         },
                       ),

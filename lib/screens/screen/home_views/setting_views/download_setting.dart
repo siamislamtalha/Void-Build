@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/services/player/stream_quality_selector.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
 import 'package:file_picker/file_picker.dart';
@@ -196,6 +197,7 @@ class _DownloadSettingsState extends State<DownloadSettings> {
                 ],
               ),
               const SizedBox(height: 40),
+              const BottomSafeAreaSpacer(),
             ],
           );
         },

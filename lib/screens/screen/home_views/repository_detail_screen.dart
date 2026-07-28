@@ -16,6 +16,7 @@ import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_event.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
 import 'package:voidmusic/plugins/utils/plugin_constants.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 
 enum _RemoteInstallPhase {
@@ -236,14 +237,20 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
                                 context, repo.plugins[index], state),
                           );
                         }
-                        return ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                        return ListView.builder(
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                           physics: const BouncingScrollPhysics(),
-                          itemCount: repo.plugins.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 12),
-                          itemBuilder: (context, index) => _buildPluginTile(
-                              context, repo.plugins[index], state),
+                          itemCount: repo.plugins.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index < repo.plugins.length) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: _buildPluginTile(
+                                    context, repo.plugins[index], state),
+                              );
+                            }
+                            return const BottomSafeAreaSpacer();
+                          },
                         );
                       },
                     );

@@ -154,8 +154,12 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
     final thumbUrl = song.thumbnail.urlLow ?? song.thumbnail.url;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    const glassColor = Colors.transparent;
-    const glassBorder = Colors.transparent;
+    final glassColor = isDark
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.black.withValues(alpha: 0.05);
+    final glassBorder = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.08);
 
     return GestureDetector(
       onTap: () {
@@ -171,17 +175,19 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(34),
-            child: Container(
-              height: _cardHeight,
-              decoration: BoxDecoration(
-                color: glassColor,
-                borderRadius: BorderRadius.circular(34),
-                border: Border.all(
-                  color: glassBorder,
-                  width: 1.0,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: Container(
+                height: _cardHeight,
+                decoration: BoxDecoration(
+                  color: glassColor,
+                  borderRadius: BorderRadius.circular(34),
+                  border: Border.all(
+                    color: glassBorder,
+                    width: 1.0,
+                  ),
                 ),
-              ),
-                child: Stack(
+                  child: Stack(
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(left: 10, right: 6),
@@ -220,6 +226,7 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                 ),
               ),
             ),
+          ),
         ),
       ),
     );
@@ -242,20 +249,26 @@ class _ControlsCapsule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const capsuleColor = Colors.transparent;
-    const capsuleBorder = Colors.transparent;
+    final capsuleColor = isDark
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.black.withValues(alpha: 0.05);
+    final capsuleBorder = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.08);
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-        decoration: BoxDecoration(
-          color: capsuleColor,
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-            color: capsuleBorder,
-            width: 1.0,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          decoration: BoxDecoration(
+            color: capsuleColor,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+              color: capsuleBorder,
+              width: 1.0,
+            ),
           ),
-        ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -287,6 +300,7 @@ class _ControlsCapsule extends StatelessWidget {
               ),
             ],
           ),
+        ),
       ),
     );
   }

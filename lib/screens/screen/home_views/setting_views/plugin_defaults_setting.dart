@@ -3,6 +3,7 @@ import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
 import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,6 +72,7 @@ class PluginDefaultsSettings extends StatelessWidget {
                   _buildSuggestionPluginSection(
                       context, l10n, settingsState, suggestionProviders),
                   const SizedBox(height: 40),
+                  const BottomSafeAreaSpacer(),
                 ],
               );
             },

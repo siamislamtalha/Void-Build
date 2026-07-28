@@ -5,6 +5,7 @@ import 'package:voidmusic/core/models/media_playlist_model.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/storage_setting.dart';
 import 'package:voidmusic/screens/widgets/more_bottom_sheet.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -53,25 +54,28 @@ class HistoryView extends StatelessWidget {
                     child: CircularProgressIndicator(),
                   )
                 : ListView.builder(
-                    itemCount: state.tracks.length,
+                    itemCount: state.tracks.length + 1,
                     shrinkWrap: true,
                     physics: const BouncingScrollPhysics(),
                     itemBuilder: (context, index) {
-                      return SongCardWidget(
-                        song: state.tracks[index],
-                        onTap: () {
-                          context
-                              .read<BloomeePlayerCubit>()
-                              .bloomeePlayer
-                              .loadPlaylist(
-                                  Playlist(
-                                      tracks: state.tracks, title: 'History'),
-                                  idx: index,
-                                  doPlay: true);
-                        },
-                        onOptionsTap: () =>
-                            showMoreBottomSheet(context, state.tracks[index]),
-                      );
+                      if (index < state.tracks.length) {
+                        return SongCardWidget(
+                          song: state.tracks[index],
+                          onTap: () {
+                            context
+                                .read<BloomeePlayerCubit>()
+                                .bloomeePlayer
+                                .loadPlaylist(
+                                    Playlist(
+                                        tracks: state.tracks, title: 'History'),
+                                    idx: index,
+                                    doPlay: true);
+                          },
+                          onOptionsTap: () =>
+                              showMoreBottomSheet(context, state.tracks[index]),
+                        );
+                      }
+                      return const BottomSafeAreaSpacer();
                     },
                   );
           },

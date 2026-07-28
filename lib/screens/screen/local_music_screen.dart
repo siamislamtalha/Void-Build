@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:ui';
 
 import 'package:voidmusic/blocs/local_music/cubit/local_music_cubit.dart';
 import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
@@ -518,6 +519,13 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
     final titleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
 
+    final glassColor = isDark
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.black.withValues(alpha: 0.05);
+    final glassBorder = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.08);
+
     return SliverAppBar(
       floating: true,
       pinned: false,
@@ -525,6 +533,24 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
       backgroundColor: Colors.transparent,
       automaticallyImplyLeading: false,
       titleSpacing: 16,
+      flexibleSpace: FlexibleSpaceBar(
+        background: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Container(
+              decoration: BoxDecoration(
+                color: glassColor,
+                border: Border(
+                  bottom: BorderSide(
+                    color: glassBorder,
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       title: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         child: _isSearch

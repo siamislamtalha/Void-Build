@@ -4,6 +4,7 @@ import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/screens/screen/library_views/cubit/current_playlist_cubit.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -153,10 +154,7 @@ class _PlaylistEditViewState extends State<PlaylistEditView> {
                 initialTracks: _localTracks,
                 onTracksReordered: _onTracksReordered,
               ),
-              SliverToBoxAdapter(
-                child: SizedBox(
-                    height: MediaQuery.of(context).padding.bottom + 24),
-              ),
+              const SliverBottomSafeAreaSpacer(),
             ],
           ),
         );

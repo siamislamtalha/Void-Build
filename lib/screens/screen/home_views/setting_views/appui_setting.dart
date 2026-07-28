@@ -8,6 +8,7 @@ import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:voidmusic/repository/LastFM/lastfmapi.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/theme_switch_tile.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
@@ -185,6 +186,7 @@ class _AppUISettingsState extends State<AppUISettings> {
                 },
               ),
               const SizedBox(height: 40),
+              const BottomSafeAreaSpacer(),
             ],
           );
         },

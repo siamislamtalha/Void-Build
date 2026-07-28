@@ -17,6 +17,7 @@ import 'package:voidmusic/screens/widgets/play_pause_widget.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/utils/load_image.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
@@ -373,6 +374,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                                 color: AppTheme.accentColor(context))),
                       ),
                     ),
+                  const SliverBottomSafeAreaSpacer(),
                 ],
               ),
             ),
@@ -441,6 +443,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                       color: AppTheme.accentColor(context))),
             ),
           ),
+        const SliverBottomSafeAreaSpacer(),
       ],
     );
   }

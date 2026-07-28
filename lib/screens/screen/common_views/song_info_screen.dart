@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:voidmusic/core/constants/route_paths.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
@@ -201,7 +202,7 @@ class _SongInfoScreenState extends State<SongInfoScreen> {
             _buildSongTitles(isCentered: true),
             const SizedBox(height: 24),
             _buildDetailsContent(context, isMobileView: true),
-            const SizedBox(height: 100), // Bottom padding
+            const BottomSafeAreaSpacer(),
           ],
         ),
       ),
@@ -237,7 +238,7 @@ class _SongInfoScreenState extends State<SongInfoScreen> {
                   _buildSongTitles(isCentered: false),
                   const SizedBox(height: 32),
                   _buildDetailsContent(context, isMobileView: false),
-                  const SizedBox(height: 80), // Bottom padding
+                  const BottomSafeAreaSpacer(),
                 ],
               ),
             ),

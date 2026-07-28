@@ -6,6 +6,7 @@ import 'package:voidmusic/plugins/blocs/plugin/plugin_event.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
 import 'package:voidmusic/screens/widgets/animated_list_item.dart';
 import 'package:voidmusic/screens/widgets/bloomee_ui_kit/bloomee_dialog.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/src/rust/api/plugin/manifest.dart';
@@ -335,45 +336,57 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth > 750) {
-          return GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            physics: const BouncingScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 400,
-              mainAxisExtent: 94,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-            ),
-            itemCount: plugins.length,
-            itemBuilder: (context, index) {
-              return AnimatedListItem(
-                key: ValueKey(plugins[index].manifest.id),
-                index: index,
-                child: _PluginCard(
-                  plugin: plugins[index],
-                  isLoaded: state.isPluginLoaded(plugins[index].manifest.id),
-                  operation: state.operationFor(plugins[index].manifest.id),
+          return Column(
+            children: [
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.only(left: 20, right: 20, top: 16),
+                  physics: const BouncingScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 400,
+                    mainAxisExtent: 94,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemCount: plugins.length,
+                  itemBuilder: (context, index) {
+                    return AnimatedListItem(
+                      key: ValueKey(plugins[index].manifest.id),
+                      index: index,
+                      child: _PluginCard(
+                        plugin: plugins[index],
+                        isLoaded: state.isPluginLoaded(plugins[index].manifest.id),
+                        operation: state.operationFor(plugins[index].manifest.id),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
+              ),
+              const BottomSafeAreaSpacer(),
+            ],
           );
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        return ListView.builder(
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 12),
           physics: const BouncingScrollPhysics(),
-          itemCount: plugins.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemCount: plugins.length + 1,
           itemBuilder: (context, index) {
-            return AnimatedListItem(
-              key: ValueKey(plugins[index].manifest.id),
-              index: index,
-              child: _PluginCard(
-                plugin: plugins[index],
-                isLoaded: state.isPluginLoaded(plugins[index].manifest.id),
-                operation: state.operationFor(plugins[index].manifest.id),
-              ),
-            );
+            if (index < plugins.length) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: AnimatedListItem(
+                  key: ValueKey(plugins[index].manifest.id),
+                  index: index,
+                  child: _PluginCard(
+                    plugin: plugins[index],
+                    isLoaded: state.isPluginLoaded(plugins[index].manifest.id),
+                    operation: state.operationFor(plugins[index].manifest.id),
+                  ),
+                ),
+              );
+            }
+            return const BottomSafeAreaSpacer();
           },
         );
       },

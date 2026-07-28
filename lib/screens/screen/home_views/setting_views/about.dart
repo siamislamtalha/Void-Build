@@ -3,6 +3,7 @@ import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'dart:ui';
 import 'dart:math';
 
@@ -99,6 +100,7 @@ class About extends StatelessWidget {
                     const SizedBox(height: 12),
                     _buildFooter(context, l10n),
                     const SizedBox(height: 12),
+                    const BottomSafeAreaSpacer(),
                   ],
                 ),
               ),

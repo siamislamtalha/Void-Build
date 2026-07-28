@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
@@ -257,9 +258,7 @@ class _GlassFooterOverlay extends StatelessWidget {
   }
 }
 
-/// The horizontal nav bar wrapped in a [BackdropFilter] that extends through
-/// the device bottom inset (home indicator / gesture bar) so no opaque black
-/// strip appears beneath it.
+/// The horizontal nav bar with no background - only individual pills on selected icons
 class _BlurredNavBarArea extends StatelessWidget {
   const _BlurredNavBarArea({
     required this.bottomInset,
@@ -271,15 +270,12 @@ class _BlurredNavBarArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRect(
-      child: Container(
-        color: Colors.transparent,
-        padding: EdgeInsets.only(
-          top: 0,
-          bottom: bottomInset + _kOuterBottomPadding,
-        ),
-        child: HorizontalNavBar(navigationShell: navigationShell),
+    return Padding(
+      padding: EdgeInsets.only(
+        top: 0,
+        bottom: bottomInset + _kOuterBottomPadding,
       ),
+      child: HorizontalNavBar(navigationShell: navigationShell),
     );
   }
 }
@@ -404,8 +400,12 @@ class HorizontalNavBar extends StatelessWidget {
     final currentIndex = navigationShell.currentIndex;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    const glassColor = Colors.transparent;
-    const glassBorder = Colors.transparent;
+    final glassColor = isDark
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.black.withValues(alpha: 0.05);
+    final glassBorder = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.08);
     final activeIconColor = isDark
         ? Colors.white
         : const Color(0xFF1C1C1E);
@@ -428,24 +428,25 @@ class HorizontalNavBar extends StatelessWidget {
 
     final isSearchSelected = currentIndex == 2;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        children: [
-          // ── Main Glass Capsule (Home, Library, Local, Offline) ──
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(36),
-              child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: glassColor,
-                    borderRadius: BorderRadius.circular(36),
-                    border: Border.all(
-                      color: glassBorder,
-                      width: 1.0,
-                    ),
-                  ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: glassColor,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: glassBorder,
+              width: 1.0,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                // ── Nav Items (Home, Library, Local, Offline) with pill on selected only ──
+                Expanded(
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -466,46 +467,44 @@ class HorizontalNavBar extends StatelessWidget {
                     }).toList(),
                   ),
                 ),
-              ),
-            ),
-          const SizedBox(width: 10),
+                const SizedBox(width: 10),
 
-          // ── Right Glass Search Circle Button (Branch 2) ──
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              navigationShell.goBranch(2);
-            },
-            behavior: HitTestBehavior.opaque,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSearchSelected
-                      ? (isDark
-                          ? Colors.white.withValues(alpha: 0.22)
-                          : Colors.black.withValues(alpha: 0.15))
-                      : glassColor,
-                  border: Border.all(
-                    color: isSearchSelected ? selectedCircleBorder : glassBorder,
-                    width: 1.0,
+                // ── Search Button (Branch 2) with pill when selected ──
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    navigationShell.goBranch(2);
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSearchSelected
+                          ? selectedCircleColor
+                          : Colors.transparent,
+                      border: isSearchSelected
+                          ? Border.all(
+                              color: selectedCircleBorder,
+                              width: 1.0,
+                            )
+                          : null,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        MingCute.search_2_line,
+                        size: 24,
+                        color: isSearchSelected ? activeIconColor : inactiveIconColor,
+                      ),
+                    ),
                   ),
                 ),
-                child: Center(
-                  child: Icon(
-                    MingCute.search_2_line,
-                    size: 24,
-                    color: isSearchSelected ? activeIconColor : inactiveIconColor,
-                  ),
-                ),
-              ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -533,6 +532,7 @@ class _NavItemButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,

@@ -4,6 +4,7 @@ import 'package:voidmusic/blocs/local_music/cubit/local_music_cubit.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/services/local_music_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -318,6 +319,7 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
           ],
 
           const SizedBox(height: 40),
+          const BottomSafeAreaSpacer(),
         ],
       ),
     );

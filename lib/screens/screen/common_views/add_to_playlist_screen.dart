@@ -3,6 +3,7 @@ import 'package:voidmusic/core/constants/setting_keys.dart';
 import 'package:voidmusic/core/models/media_playlist_model.dart';
 import 'package:voidmusic/screens/widgets/animated_list_item.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -273,16 +274,18 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
                                     padding: const EdgeInsets.only(
                                       left: 16,
                                       right: 16,
-                                      bottom: 100,
                                     ),
                                     physics: const BouncingScrollPhysics(),
-                                    itemCount: filteredPlaylists.length + 1,
+                                    itemCount: filteredPlaylists.length + 2,
                                     itemBuilder: (context, index) {
                                       if (index == 0) {
                                         return _CreatePlaylistTile(
                                           onTap: () =>
                                               createPlaylistDialog(context),
                                         );
+                                      }
+                                      if (index == filteredPlaylists.length + 1) {
+                                        return const BottomSafeAreaSpacer();
                                       }
 
                                       final playlist =

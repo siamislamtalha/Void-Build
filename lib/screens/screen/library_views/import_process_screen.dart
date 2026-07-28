@@ -12,6 +12,7 @@ import 'package:voidmusic/plugins/blocs/import/content_import_cubit.dart';
 import 'package:voidmusic/plugins/blocs/import/content_import_state.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/src/rust/api/plugin/models.dart';
 
@@ -326,6 +327,7 @@ class _UrlInputView extends StatelessWidget {
               ),
             ),
           ),
+          const BottomSafeAreaSpacer(),
         ],
       ),
     );
@@ -527,14 +529,18 @@ class _ResolvingView extends StatelessWidget {
         const SizedBox(height: 16),
         Expanded(
           child: ListView.separated(
-            padding: const EdgeInsets.only(bottom: 24),
-            itemCount: state.tracks.length,
+            padding: const EdgeInsets.only(bottom: 12),
+            itemCount: state.tracks.length + 1,
             separatorBuilder: (_, __) => Divider(
                 height: 1,
                 color: Default_Theme.primaryColor1.withValues(alpha: 0.05),
                 indent: 72),
-            itemBuilder: (context, index) =>
-                _ResolvingTrackTile(entry: state.tracks[index]),
+            itemBuilder: (context, index) {
+              if (index < state.tracks.length) {
+                return _ResolvingTrackTile(entry: state.tracks[index]);
+              }
+              return const BottomSafeAreaSpacer();
+            },
           ),
         ),
       ],
@@ -603,14 +609,19 @@ class _ReviewViewState extends State<_ReviewView> {
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            itemCount: s.tracks.length,
-            itemBuilder: (context, i) => _ReviewTrackTile(
-              key: ValueKey(i),
-              entry: s.tracks[i],
-              index: i,
-              isExpanded: _expanded[i] ?? false,
-              onToggle: () => _toggle(i),
-            ),
+            itemCount: s.tracks.length + 1,
+            itemBuilder: (context, i) {
+              if (i < s.tracks.length) {
+                return _ReviewTrackTile(
+                  key: ValueKey(i),
+                  entry: s.tracks[i],
+                  index: i,
+                  isExpanded: _expanded[i] ?? false,
+                  onToggle: () => _toggle(i),
+                );
+              }
+              return const BottomSafeAreaSpacer();
+            },
           ),
         ),
         Container(

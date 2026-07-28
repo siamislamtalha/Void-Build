@@ -5,6 +5,7 @@ import 'package:voidmusic/core/constants/route_paths.dart';
 import 'package:voidmusic/plugins/blocs/import/content_import_cubit.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/services/import_export_service.dart';
 import 'package:voidmusic/services/m3u_processor.dart';
@@ -86,6 +87,7 @@ class _ImportMediaFromPlatformsViewState
                     btnIcon: MingCute.playlist_2_line,
                     onClickFunc: () => _importM3UFile(context),
                   ),
+                  const BottomSafeAreaSpacer(),
                 ],
               );
             },

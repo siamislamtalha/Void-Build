@@ -495,21 +495,33 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                           AppLocalizations.localizationsDelegates,
                       supportedLocales: AppLocalizations.supportedLocales,
                       locale: locale,
-                      builder: (context, child) =>
-                          ResponsiveBreakpoints.builder(
-                        breakpoints: [
-                          const Breakpoint(start: 0, end: 450, name: MOBILE),
-                          const Breakpoint(start: 451, end: 800, name: TABLET),
-                          const Breakpoint(
-                              start: 801, end: 1920, name: DESKTOP),
-                          const Breakpoint(
-                              start: 1921, end: double.infinity, name: '4K'),
-                        ],
-                        child: GlobalEventListener(
-                          navigatorKey: GlobalRoutes.globalRouterKey,
-                          child: child!,
-                        ),
-                      ),
+                      builder: (context, child) {
+                        // Set system UI overlay style based on theme brightness
+                        final brightness = Theme.of(context).brightness;
+                        SystemChrome.setSystemUIOverlayStyle(
+                          SystemUiOverlayStyle(
+                            statusBarIconBrightness:
+                                brightness == Brightness.dark
+                                    ? Brightness.light
+                                    : Brightness.dark,
+                            statusBarBrightness: brightness,
+                          ),
+                        );
+                        return ResponsiveBreakpoints.builder(
+                          breakpoints: [
+                            const Breakpoint(start: 0, end: 450, name: MOBILE),
+                            const Breakpoint(start: 451, end: 800, name: TABLET),
+                            const Breakpoint(
+                                start: 801, end: 1920, name: DESKTOP),
+                            const Breakpoint(
+                                start: 1921, end: double.infinity, name: '4K'),
+                          ],
+                          child: GlobalEventListener(
+                            navigatorKey: GlobalRoutes.globalRouterKey,
+                            child: child!,
+                          ),
+                        );
+                      },
                       scaffoldMessengerKey: SnackbarService.messengerKey,
                       routerConfig: GlobalRoutes.globalRouter,
                       theme: Default_Theme().lightThemeData,

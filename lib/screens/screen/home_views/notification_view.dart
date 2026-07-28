@@ -1,5 +1,6 @@
 import 'package:voidmusic/blocs/notification/notification_cubit.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -53,11 +54,14 @@ class NotificationView extends StatelessWidget {
               );
             }
             return ListView.builder(
-              itemCount: state.notifications.length,
+              itemCount: state.notifications.length + 1,
               itemBuilder: (context, index) {
-                return NotificationTile(
-                  notification: state.notifications[index],
-                );
+                if (index < state.notifications.length) {
+                  return NotificationTile(
+                    notification: state.notifications[index],
+                  );
+                }
+                return const BottomSafeAreaSpacer();
               },
             );
           },

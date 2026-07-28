@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/services/storage_backup_service.dart';
 import 'package:file_picker/file_picker.dart';
@@ -259,6 +260,7 @@ class BackupSettings extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
+              const BottomSafeAreaSpacer(),
             ],
           );
         },

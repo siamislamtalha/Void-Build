@@ -9,6 +9,7 @@ import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
 import 'package:voidmusic/screens/widgets/more_bottom_sheet.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/utils/load_image.dart';
 import 'package:voidmusic/screens/widgets/play_pause_widget.dart';
 
@@ -233,26 +234,24 @@ class OfflineArtistDetailScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 120),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final song = songs[index];
-                          return SongCardWidget(
-                            index: index + 1,
-                            key: ValueKey('artist-detail-${song.id}'),
-                            song: song,
-                            onTap: () => _playFromList(context, index: index),
-                            onOptionsTap: () {
-                              showMoreBottomSheet(context, song);
-                            },
-                          );
-                        },
-                        childCount: songs.length,
-                      ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final song = songs[index];
+                        return SongCardWidget(
+                          index: index + 1,
+                          key: ValueKey('artist-detail-${song.id}'),
+                          song: song,
+                          onTap: () => _playFromList(context, index: index),
+                          onOptionsTap: () {
+                            showMoreBottomSheet(context, song);
+                          },
+                        );
+                      },
+                      childCount: songs.length,
                     ),
                   ),
+                  const SliverBottomSafeAreaSpacer(),
                 ],
               ),
             ],
@@ -525,26 +524,24 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 120),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final song = songs[index];
-                          return SongCardWidget(
-                            index: index + 1,
-                            key: ValueKey('album-detail-${song.id}'),
-                            song: song,
-                            onTap: () => _playFromList(context, index: index),
-                            onOptionsTap: () {
-                              showMoreBottomSheet(context, song);
-                            },
-                          );
-                        },
-                        childCount: songs.length,
-                      ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final song = songs[index];
+                        return SongCardWidget(
+                          index: index + 1,
+                          key: ValueKey('album-detail-${song.id}'),
+                          song: song,
+                          onTap: () => _playFromList(context, index: index),
+                          onOptionsTap: () {
+                            showMoreBottomSheet(context, song);
+                          },
+                        );
+                      },
+                      childCount: songs.length,
                     ),
                   ),
+                  const SliverBottomSafeAreaSpacer(),
                 ],
               ),
             ],

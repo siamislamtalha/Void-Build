@@ -22,6 +22,7 @@ import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';
 import 'package:voidmusic/screens/widgets/source_badge.dart';
 import 'package:voidmusic/screens/widgets/square_card.dart';
+import 'package:voidmusic/screens/screen/common_views/playlist_view.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/screens/screen/home_views/notification_view.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_view.dart';
@@ -300,11 +301,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           return const SizedBox.shrink();
                         },
                       ),
-                      // ── Multi-source Song Suggestions ──
-                      // One horizontal row per loaded content-resolver plugin,
-                      // showing only Track items from that plugin's home sections.
-                      // Rows that yield zero tracks are hidden automatically.
-                      const _MultiSourceSongSuggestions(),
                       // Home sections from plugin
                       BlocBuilder<ContentBloc, ContentState>(
                         bloc: _homeContentBloc,
@@ -410,6 +406,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           );
                         },
                       ),
+                      // ── Multi-source Song Suggestions ──
+                      // One horizontal row per loaded content-resolver plugin,
+                      // showing only Track items from that plugin's home sections.
+                      // Rows that yield zero tracks are hidden automatically.
+                      const _MultiSourceSongSuggestions(),
                     ],
                   ),
                 ),
@@ -417,7 +418,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ],
             ),
           ),
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: Colors.transparent,
         ),
       ),
     );
@@ -477,10 +478,33 @@ class _HomeSectionsList extends StatelessWidget {
 // Multi-Source Song Suggestions
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// Maps plugin ID to friendly source name
+String _getFriendlySourceName(String pluginId, String pluginName) {
+  final id = pluginId.toLowerCase();
+  if (id.contains('ytmusic') || id.contains('youtube_music') || id.contains('youtubemusic')) {
+    return 'YouTube Music';
+  } else if (id.contains('ytvideo') || id.contains('youtube')) {
+    return 'YouTube';
+  } else if (id.contains('spotify')) {
+    return 'Spotify';
+  } else if (id.contains('jiosaavn') || id.contains('jio')) {
+    return 'JioSaavn';
+  }
+  return pluginName;
+}
+
 /// Renders one `_PluginSongSection` per loaded content-resolver plugin.
 /// Sections that yield zero tracks are silently omitted.
-class _MultiSourceSongSuggestions extends StatelessWidget {
+class _MultiSourceSongSuggestions extends StatefulWidget {
   const _MultiSourceSongSuggestions();
+
+  @override
+  State<_MultiSourceSongSuggestions> createState() => _MultiSourceSongSuggestionsState();
+}
+
+class _MultiSourceSongSuggestionsState extends State<_MultiSourceSongSuggestions> {
+  final Set<String> _seenTrackIds = {};
+  final Set<String> _seenPlaylistIds = {};
 
   @override
   Widget build(BuildContext context) {
@@ -488,14 +512,43 @@ class _MultiSourceSongSuggestions extends StatelessWidget {
       builder: (context, pluginState) {
         final resolvers = pluginState.loadedContentResolvers;
         if (resolvers.isEmpty) return const SizedBox.shrink();
+        
+        // Separate playlist sections and song sections
+        final playlistSections = <Widget>[];
+        final songSections = <Widget>[];
+        
+        for (final plugin in resolvers) {
+          final pluginName = _getFriendlySourceName(plugin.manifest.id, plugin.manifest.name);
+          
+          // Add playlist section for this plugin
+          playlistSections.add(
+            _PluginPlaylistSection(
+              pluginId: plugin.manifest.id,
+              pluginName: pluginName,
+              seenPlaylistIds: _seenPlaylistIds,
+              key: ValueKey('playlist_${plugin.manifest.id}'),
+            ),
+          );
+          
+          // Add song section for this plugin
+          songSections.add(
+            _PluginSongSection(
+              pluginId: plugin.manifest.id,
+              pluginName: pluginName,
+              seenTrackIds: _seenTrackIds,
+              key: ValueKey('song_${plugin.manifest.id}'),
+            ),
+          );
+        }
+        
         return Column(
           mainAxisSize: MainAxisSize.min,
-          children: resolvers.map((plugin) {
-            return _PluginSongSection(
-              pluginId: plugin.manifest.id,
-              pluginName: plugin.manifest.name,
-            );
-          }).toList(),
+          children: [
+            // Playlist suggestions at top
+            ...playlistSections,
+            // Song suggestions below
+            ...songSections,
+          ],
         );
       },
     );
@@ -508,10 +561,12 @@ class _MultiSourceSongSuggestions extends StatelessWidget {
 class _PluginSongSection extends StatefulWidget {
   final String pluginId;
   final String pluginName;
+  final Set<String> seenTrackIds;
 
   const _PluginSongSection({
     required this.pluginId,
     required this.pluginName,
+    required this.seenTrackIds,
   });
 
   @override
@@ -521,6 +576,7 @@ class _PluginSongSection extends StatefulWidget {
 class _PluginSongSectionState extends State<_PluginSongSection> {
   late final ContentBloc _bloc;
   bool _attemptedPlaylistFetch = false;
+  bool _attemptedMultiplePlaylists = false;
 
   @override
   void initState() {
@@ -541,36 +597,56 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
     for (final section in sections) {
       for (final item in section.items) {
         item.when(
-          track: (t) => result.add(t),
+          track: (t) {
+            // Deduplicate: only add if we haven't seen this track
+            if (!widget.seenTrackIds.contains(t.id)) {
+              result.add(t);
+              widget.seenTrackIds.add(t.id);
+            }
+          },
           album: (_) {},
           artist: (_) {},
           playlist: (_) {},
         );
       }
     }
+    // Don't shuffle here - shuffle after combining with playlist tracks
     return result;
   }
 
   List<Track> _getTracks(ContentState state) {
     final direct = _extractDirectTracks(state);
-    if (direct.isNotEmpty) return direct;
+    
+    // Collect tracks from all loaded playlists
+    final allTracks = <Track>[];
+    allTracks.addAll(direct);
+    
     if (state.playlistDetails != null && state.playlistDetails!.tracks.items.isNotEmpty) {
-      return state.playlistDetails!.tracks.items;
+      final playlistTracks = state.playlistDetails!.tracks.items;
+      for (final track in playlistTracks) {
+        if (!widget.seenTrackIds.contains(track.id)) {
+          allTracks.add(track);
+          widget.seenTrackIds.add(track.id);
+        }
+      }
     }
-    return const [];
+    
+    // Shuffle to mix direct tracks and playlist tracks
+    allTracks.shuffle();
+    return allTracks;
   }
 
   void _checkAndFetchSongs(ContentState state) {
-    if (_attemptedPlaylistFetch) return;
+    if (_attemptedMultiplePlaylists) return;
     if (state.homeSectionsStatus != DetailStatus.loaded) return;
-
-    final directTracks = _extractDirectTracks(state);
-    if (directTracks.isNotEmpty) return;
 
     final sections = state.homeSections ?? const [];
     if (sections.isEmpty) return;
 
+    // Try to find playlists with tracks - try multiple for richer content
+    int playlistsToTry = 0;
     for (final section in sections) {
+      if (playlistsToTry >= 3) break; // Try up to 3 playlists per source for better variety
       for (final item in section.items) {
         String? targetPlaylistId;
         item.when(
@@ -581,13 +657,17 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
         );
         if (targetPlaylistId != null) {
           _attemptedPlaylistFetch = true;
+          playlistsToTry++;
           _bloc.add(LoadPlaylistDetails(
             pluginId: widget.pluginId,
             playlistId: targetPlaylistId!,
           ));
-          return;
         }
       }
+    }
+    
+    if (playlistsToTry > 0) {
+      _attemptedMultiplePlaylists = true;
     }
   }
 
@@ -625,7 +705,6 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
           return _buildLoadingRow(context);
         }
 
-        final onSurface = Theme.of(context).colorScheme.onSurface;
         final sectionTitle = _formatSectionTitle(widget.pluginName);
 
         return Padding(
@@ -649,9 +728,9 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: onSurface,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontFamily: 'Gilroy',
-                      ),
+                      ).merge(Default_Theme.secondoryTextStyle),
                     ),
                   ],
                 ),
@@ -662,7 +741,7 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.only(left: 12),
-                  itemCount: songs.length,
+                  itemCount: songs.length > 20 ? 20 : songs.length, // Limit to 20 for performance
                   itemBuilder: (context, i) {
                     final track = songs[i];
                     return SquareImgCard(
@@ -695,6 +774,230 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
     );
   }
 
+}
+
+/// Fetches playlists for [pluginId], and renders them in a horizontal scroll row
+/// styled like existing playlist cards.
+/// Returns [SizedBox.shrink] if the plugin produces no playlists or errors out.
+class _PluginPlaylistSection extends StatefulWidget {
+  final String pluginId;
+  final String pluginName;
+  final Set<String> seenPlaylistIds;
+
+  const _PluginPlaylistSection({
+    required this.pluginId,
+    required this.pluginName,
+    required this.seenPlaylistIds,
+  });
+
+  @override
+  State<_PluginPlaylistSection> createState() => _PluginPlaylistSectionState();
+}
+
+class _PluginPlaylistSectionState extends State<_PluginPlaylistSection> {
+  late final ContentBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = ContentBloc(pluginService: ServiceLocator.pluginService);
+    _bloc.add(GetHomeSections(pluginId: widget.pluginId));
+  }
+
+  @override
+  void dispose() {
+    _bloc.close();
+    super.dispose();
+  }
+
+  List<PlaylistItem> _extractPlaylists(ContentState state) {
+    final sections = state.homeSections ?? const [];
+    final result = <PlaylistItem>[];
+    for (final section in sections) {
+      for (final item in section.items) {
+        item.when(
+          track: (_) {},
+          album: (_) {},
+          artist: (_) {},
+          playlist: (p) {
+            // Deduplicate: only add if we haven't seen this playlist
+            if (!widget.seenPlaylistIds.contains(p.id)) {
+              result.add(p);
+              widget.seenPlaylistIds.add(p.id);
+            }
+          },
+        );
+      }
+    }
+    return result;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ContentBloc, ContentState>(
+      bloc: _bloc,
+      builder: (context, state) {
+        // While initial home sections loading, show slim placeholder
+        if (state.homeSectionsStatus == DetailStatus.loading &&
+            (state.homeSections == null || state.homeSections!.isEmpty)) {
+          return _buildPlaylistLoadingRow(context);
+        }
+
+        // Error or failed to get playlists — hide this source section entirely
+        if (state.homeSectionsStatus == DetailStatus.error) {
+          return const SizedBox.shrink();
+        }
+
+        final playlists = _extractPlaylists(state);
+        if (playlists.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Section header with source badge ──
+              Padding(
+                padding: const EdgeInsets.only(left: 20, bottom: 4),
+                child: Row(
+                  children: [
+                    SourceBadgeByPluginId(
+                      pluginId: widget.pluginId,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${widget.pluginName} Playlists',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontFamily: 'Gilroy',
+                      ).merge(Default_Theme.secondoryTextStyle),
+                    ),
+                  ],
+                ),
+              ),
+              // ── Horizontal playlist cards ──
+              SizedBox(
+                height: 220,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.only(left: 12),
+                  itemCount: playlists.length > 20 ? 20 : playlists.length,
+                  itemBuilder: (context, i) {
+                    final playlist = playlists[i];
+                    return SquareImgCard(
+                      imgPath: playlist.thumbnail.url,
+                      fallbackImgPath: playlist.thumbnail.url,
+                      title: playlist.title,
+                      subtitle: playlist.owner ?? '',
+                      isList: true,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => OnlPlaylistView(
+                              playlist: playlist,
+                              pluginId: widget.pluginId,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPlaylistLoadingRow(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final shimmerColor = isDark
+        ? Colors.white.withValues(alpha: 0.06)
+        : Colors.black.withValues(alpha: 0.05);
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 20, bottom: 4),
+            child: Row(
+              children: [
+                SourceBadgeByPluginId(
+                  pluginId: widget.pluginId,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '${widget.pluginName} Playlists',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontFamily: 'Gilroy',
+                  ).merge(Default_Theme.secondoryTextStyle),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 220,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(left: 12),
+              itemCount: 5,
+              itemBuilder: (context, _) => Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        color: shimmerColor,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      width: 100,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: shimmerColor,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      width: 70,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: shimmerColor,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
   Widget _buildLoadingRow(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final shimmerColor = isDark
@@ -722,7 +1025,7 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSurface,
                     fontFamily: 'Gilroy',
-                  ),
+                  ).merge(Default_Theme.secondoryTextStyle),
                 ),
               ],
             ),
@@ -806,15 +1109,15 @@ class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final glassColor = isDark
-        ? Colors.black.withValues(alpha: 0.45)
-        : Colors.white.withValues(alpha: 0.70);
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.black.withValues(alpha: 0.05);
     final glassBorder = isDark
-        ? Colors.white.withValues(alpha: 0.15)
+        ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.08);
 
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
         child: Container(
           decoration: BoxDecoration(
             color: glassColor,

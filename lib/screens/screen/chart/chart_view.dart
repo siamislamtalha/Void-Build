@@ -16,6 +16,7 @@ import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
 import 'package:voidmusic/core/di/service_locator.dart';
 import 'package:voidmusic/screens/widgets/chart_list_tile.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/services/meta_resolver/chart_item_resolver.dart';
 import 'package:voidmusic/services/meta_resolver/cross_plugin_resolver.dart';
@@ -427,35 +428,33 @@ class _ChartScreenBodyState extends State<_ChartScreenBody> {
                     chartTitle: widget.chartTitle,
                   ),
                 ),
-                SliverPadding(
-                  padding: const EdgeInsets.only(bottom: 100.0),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        // Skip rank 1 item since it's in the hero
-                        final chartItem = state.chartItems[index + 1];
-                        final playActionKey = _playActionKey(chartItem);
-                        final addActionKey = _addActionKey(chartItem);
-                        return ChartListTile(
-                          chartItem: chartItem,
-                          playStatus: _statusFor(playActionKey),
-                          addStatus: _statusFor(addActionKey),
-                          onTap: _statusFor(playActionKey) ==
-                                  ChartResolveActionStatus.resolving
-                              ? null
-                              : () => _resolveAndPlay(
-                                  context, chartItem, playActionKey),
-                          onAddTap: _statusFor(addActionKey) ==
-                                  ChartResolveActionStatus.resolving
-                              ? null
-                              : () => _resolveAndAdd(
-                                  context, chartItem, addActionKey),
-                        );
-                      },
-                      childCount: state.chartItems.length - 1,
-                    ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      // Skip rank 1 item since it's in the hero
+                      final chartItem = state.chartItems[index + 1];
+                      final playActionKey = _playActionKey(chartItem);
+                      final addActionKey = _addActionKey(chartItem);
+                      return ChartListTile(
+                        chartItem: chartItem,
+                        playStatus: _statusFor(playActionKey),
+                        addStatus: _statusFor(addActionKey),
+                        onTap: _statusFor(playActionKey) ==
+                                ChartResolveActionStatus.resolving
+                            ? null
+                            : () => _resolveAndPlay(
+                                context, chartItem, playActionKey),
+                        onAddTap: _statusFor(addActionKey) ==
+                                ChartResolveActionStatus.resolving
+                            ? null
+                            : () => _resolveAndAdd(
+                                context, chartItem, addActionKey),
+                      );
+                    },
+                    childCount: state.chartItems.length - 1,
                   ),
                 ),
+                const SliverBottomSafeAreaSpacer(),
               ],
             );
           },

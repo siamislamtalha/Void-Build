@@ -1,5 +1,6 @@
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/about.dart';
+import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -343,7 +344,7 @@ class ChangelogScreen extends StatelessWidget {
 
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 14.0),
-            itemCount: versionsToShow.length + 1, // Use the filtered list
+            itemCount: versionsToShow.length + 2, // Use the filtered list
             itemBuilder: (context, index) {
               if (index == 0) {
                 return Padding(
@@ -362,6 +363,9 @@ class ChangelogScreen extends StatelessWidget {
                             color: Colors.white)),
                   ),
                 );
+              }
+              if (index == versionsToShow.length + 1) {
+                return const BottomSafeAreaSpacer();
               }
               final versionIndex = index - 1;
               // Determine the latest stable version (first non-unreleased in original changelog)
