@@ -871,7 +871,7 @@ class _SuggestionsSliver extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 48),
                 child: Center(
                     child: CircularProgressIndicator(
-                        color: AppTheme.accentColor(context)))),
+                        color: AppTheme.accentColor(context)),
           );
         }
 
@@ -1271,7 +1271,7 @@ class _ContentSliver extends StatelessWidget {
                   hasScrollBody: false,
                   child: Center(
                       child: CircularProgressIndicator(
-                          color: AppTheme.accentColor(context))));
+                          color: AppTheme.accentColor(context));
             }
             if ((state.searchStatus == SearchStatus.loading ||
                     state.searchStatus == SearchStatus.loaded ||
@@ -1425,7 +1425,8 @@ class _SliverSearchResults extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 32),
                   child: Center(
                       child: CircularProgressIndicator(
-                          color: AppTheme.accentColor(context\)\)\)
+                          color: AppTheme.accentColor(context),
+                      ))))
         else
           const SliverPadding(padding: EdgeInsets.only(bottom: 30)),
       ],
@@ -1554,3 +1555,5 @@ class NebulaPainter extends CustomPainter {
   bool shouldRepaint(covariant NebulaPainter oldDelegate) =>
       oldDelegate.color1 != color1 || oldDelegate.color2 != color2;
 }
+
+
