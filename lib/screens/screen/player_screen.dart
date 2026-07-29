@@ -281,7 +281,7 @@ class CoverImageVolSlider extends StatelessWidget {
                   child: LoadImageCached(
                     imageUrl: highResUrl,
                     fallbackUrl: lowResUrl,
-                    fit: BoxFit.contain,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),

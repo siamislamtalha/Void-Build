@@ -730,7 +730,7 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                                           }
                                         },
                                       ),
-                                    )))
+                                    ))
                                 .toList(),
                           ),
                         ),
@@ -1425,7 +1425,7 @@ class _SliverSearchResults extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 32),
                   child: Center(
                       child: CircularProgressIndicator(
-                          color: AppTheme.accentColor(context)))))
+                          color: AppTheme.accentColor(context\)\)\)
         else
           const SliverPadding(padding: EdgeInsets.only(bottom: 30)),
       ],

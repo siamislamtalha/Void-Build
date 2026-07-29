@@ -395,7 +395,7 @@ class _PlaylistHeaderContent extends StatelessWidget {
           children: [
             _buildCover(),
             const SizedBox(height: 24),
-            _buildInfo(isCentered: true),
+            _buildInfo(context, isCentered: true),
             const SizedBox(height: 24),
             _buildActions(context, isCentered: true),
           ],
@@ -414,7 +414,7 @@ class _PlaylistHeaderContent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfo(isCentered: false),
+                _buildInfo(context, isCentered: false),
                 const SizedBox(height: 24),
                 _buildActions(context, isCentered: false),
               ],
@@ -461,7 +461,7 @@ class _PlaylistHeaderContent extends StatelessWidget {
     return heroTag == null ? cover : Hero(tag: heroTag!, child: cover);
   }
 
-  Widget _buildInfo({required bool isCentered}) {
+  Widget _buildInfo(BuildContext context, {required bool isCentered}) {
     return Column(
       crossAxisAlignment:
           isCentered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
