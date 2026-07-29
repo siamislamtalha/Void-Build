@@ -27,8 +27,8 @@ class CategoryLabel extends StatelessWidget {
             child: Text(
               category,
               style: Default_Theme.secondoryTextStyle.merge(
-                const TextStyle(
-                  color: Default_Theme.primaryColor1,
+                TextStyle(
+                  color: AppTheme.accentColor(context),
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),

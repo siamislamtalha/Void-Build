@@ -27,9 +27,9 @@ class PlayerSettings extends StatelessWidget {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_rounded,
-                color: Default_Theme.primaryColor1,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 24,
               ),
               onPressed: () => Navigator.pop(context),
@@ -116,6 +116,22 @@ class PlayerSettings extends StatelessWidget {
                     },
                   ),
                   const SettingDivider(),
+                  SettingToggleTile(
+                    icon: MingCute.repeat_line,
+                    title: 'Gapless Playback',
+                    subtitle: 'Seamless transitions between tracks',
+                    value: true,
+                    onChanged: (v) {},
+                  ),
+                  const SettingDivider(),
+                  SettingToggleTile(
+                    icon: MingCute.volume_fill,
+                    title: 'Audio Normalization',
+                    subtitle: 'Balance volume across tracks',
+                    value: false,
+                    onChanged: (v) {},
+                  ),
+                  const SettingDivider(),
                   SettingNavTile(
                     icon: Icons.equalizer_rounded,
                     title: l10n.playerSettingEqualizer,
@@ -131,6 +147,62 @@ class PlayerSettings extends StatelessWidget {
                       context,
                       MaterialPageRoute(builder: (_) => const EqualizerView()),
                     ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 28),
+
+              // ─── Audio ────────────────────────────────────────────────
+              const SettingSectionHeader(label: 'Audio'),
+              SettingCard(
+                children: [
+                  SettingNavTile(
+                    icon: MingCute.music_2_line,
+                    title: 'Audio Output',
+                    subtitle: 'Select output device',
+                    roundBottom: false,
+                    onTap: () {},
+                  ),
+                  const SettingDivider(),
+                  SettingNavTile(
+                    icon: MingCute.time_line,
+                    title: 'Buffer Size',
+                    subtitle: 'Adjust audio buffer',
+                    roundBottom: true,
+                    onTap: () {},
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 28),
+
+              // ─── Advanced ───────────────────────────────────────────────
+              const SettingSectionHeader(label: 'Advanced'),
+              SettingCard(
+                children: [
+                  SettingToggleTile(
+                    icon: MingCute.time_line,
+                    title: 'Skip Silence',
+                    subtitle: 'Remove silent parts from tracks',
+                    value: false,
+                    onChanged: (v) {},
+                  ),
+                  const SettingDivider(),
+                  SettingToggleTile(
+                    icon: MingCute.refresh_2_line,
+                    title: 'Replay Gain',
+                    subtitle: 'Normalize track loudness',
+                    value: false,
+                    onChanged: (v) {},
+                  ),
+                  const SettingDivider(),
+                  SettingNavTile(
+                    icon: MingCute.settings_6_line,
+                    title: 'Audio Engine Settings',
+                    subtitle: 'Advanced playback options',
+                    roundBottom: true,
+                    onTap: () {},
                   ),
                 ],
               ),
@@ -196,22 +268,24 @@ class _CrossfadeSliderState extends State<_CrossfadeSlider> {
                   children: [
                     Text(
                       l10n.playerSettingCrossfade,
-                      style: const TextStyle(
-                        color: Default_Theme.primaryColor2,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.2,
-                      ).merge(Default_Theme.secondoryTextStyleMedium),
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       description,
                       style: TextStyle(
-                        color:
-                            Default_Theme.primaryColor2.withValues(alpha: 0.5),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.5),
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
-                      ).merge(Default_Theme.secondoryTextStyle),
+                      ),
                     ),
                   ],
                 ),
@@ -225,7 +299,9 @@ class _CrossfadeSliderState extends State<_CrossfadeSlider> {
                         offLabel,
                         key: const ValueKey('off'),
                         style: TextStyle(
-                          color: Default_Theme.primaryColor2
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
                               .withValues(alpha: 0.4),
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -251,7 +327,7 @@ class _CrossfadeSliderState extends State<_CrossfadeSlider> {
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
               activeTrackColor: AppTheme.accentColor(context),
               inactiveTrackColor:
-                  Default_Theme.primaryColor2.withValues(alpha: 0.1),
+                  Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
               thumbColor: AppTheme.accentColor(context),
               overlayColor: AppTheme.accentColor(context).withValues(alpha: 0.15),
               tickMarkShape:
@@ -259,7 +335,7 @@ class _CrossfadeSliderState extends State<_CrossfadeSlider> {
               activeTickMarkColor:
                   Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
               inactiveTickMarkColor:
-                  Default_Theme.primaryColor2.withValues(alpha: 0.2),
+                  Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
             ),
             child: Slider(
               min: 0,
@@ -281,7 +357,7 @@ class _CrossfadeSliderState extends State<_CrossfadeSlider> {
                   style: TextStyle(
                     color: active
                         ? AppTheme.accentColor(context)
-                        : Default_Theme.primaryColor2.withValues(alpha: 0.3),
+                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                     fontSize: 11,
                     fontWeight: active ? FontWeight.w700 : FontWeight.w500,
                   ).merge(Default_Theme.secondoryTextStyle),

@@ -64,9 +64,9 @@ class _DownloadSettingsState extends State<DownloadSettings> {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_rounded,
-                color: Default_Theme.primaryColor1,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 24,
               ),
               onPressed: () => Navigator.pop(context),
@@ -118,9 +118,9 @@ class _DownloadSettingsState extends State<DownloadSettings> {
                       children: [
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               MingCute.plugin_line,
-                              color: Default_Theme.primaryColor1,
+                              color: Theme.of(context).colorScheme.onSurface,
                               size: 20,
                             ),
                             const SizedBox(width: 12),
@@ -130,8 +130,8 @@ class _DownloadSettingsState extends State<DownloadSettings> {
                                 children: [
                                   Text(
                                     'Download Method',
-                                    style: const TextStyle(
-                                      color: Default_Theme.primaryColor1,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                     ).merge(Default_Theme.secondoryTextStyleMedium),
@@ -140,7 +140,7 @@ class _DownloadSettingsState extends State<DownloadSettings> {
                                   Text(
                                     'Select plugin for downloading songs',
                                     style: TextStyle(
-                                      color: Default_Theme.primaryColor1.withValues(alpha: 0.6),
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                       fontSize: 12,
                                     ).merge(Default_Theme.secondoryTextStyle),
                                   ),
@@ -247,7 +247,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
     context.read<SettingsCubit>().setDownloadPluginIds(List.from(_selectedIds));
   }
 
-  Widget _getPluginIcon(String pluginId) {
+  Widget _getPluginIcon(String pluginId, BuildContext context) {
     String svgPath;
     Color? color;
     
@@ -265,7 +265,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
       color = null; // Already colored
     } else if (pluginId.contains('multi') || pluginId.contains('bloomfactory')) {
       svgPath = 'assets/icons/svg/multi-source.svg';
-      color = Default_Theme.primaryColor1; // Color the black SVG
+      color = Theme.of(context).colorScheme.onSurface; // Color the black SVG
     } else {
       return const SizedBox.shrink(); // No icon for unknown plugins
     }
@@ -296,7 +296,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
           child: Text(
             'Select multiple plugins (drag to reorder priority)',
             style: TextStyle(
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
               fontSize: 12,
               fontWeight: FontWeight.w400,
             ).merge(Default_Theme.secondoryTextStyle),
@@ -305,10 +305,10 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
         if (_selectedIds.isNotEmpty)
           Container(
             decoration: BoxDecoration(
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.04),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Default_Theme.primaryColor2.withValues(alpha: 0.06),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
               ),
             ),
             child: ClipRRect(
@@ -332,7 +332,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                   );
                 },
                 itemCount: _selectedIds.length,
-                onReorder: (oldIndex, newIndex) {
+                onReorderItem: (oldIndex, newIndex) {
                   setState(() {
                     final item = _selectedIds.removeAt(oldIndex);
                     _selectedIds.insert(newIndex, item);
@@ -367,7 +367,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                             ),
                           ),
                           const SizedBox(width: 14),
-                          _getPluginIcon(pluginId),
+                          _getPluginIcon(pluginId, context),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Column(
@@ -376,8 +376,8 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                               children: [
                                 Text(
                                   name,
-                                  style: const TextStyle(
-                                    color: Default_Theme.primaryColor1,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                   ).merge(Default_Theme.secondoryTextStyleMedium),
@@ -385,7 +385,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                                 Text(
                                   pluginId,
                                   style: TextStyle(
-                                    color: Default_Theme.primaryColor2.withValues(alpha: 0.45),
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
                                     fontSize: 11,
                                     fontWeight: FontWeight.w400,
                                   ).merge(Default_Theme.secondoryTextStyle),
@@ -396,7 +396,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                           Icon(
                             MingCute.menu_line,
                             size: 20,
-                            color: Default_Theme.primaryColor2.withValues(alpha: 0.22),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35),
                           ),
                         ],
                       ),
@@ -419,13 +419,13 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                   CheckboxListTile(
                     title: Row(
                       children: [
-                        _getPluginIcon(plugin.manifest.id),
+                        _getPluginIcon(plugin.manifest.id, context),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             plugin.name,
-                            style: const TextStyle(
-                              color: Default_Theme.primaryColor1,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ).merge(Default_Theme.secondoryTextStyleMedium),
@@ -436,7 +436,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                     subtitle: Text(
                       plugin.manifest.id,
                       style: TextStyle(
-                        color: Default_Theme.primaryColor2.withValues(alpha: 0.45),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
                         fontSize: 11,
                         fontWeight: FontWeight.w400,
                       ).merge(Default_Theme.secondoryTextStyle),
@@ -444,7 +444,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                     value: isSelected,
                     onChanged: (_) => _togglePlugin(plugin.manifest.id),
                     activeColor: AppTheme.accentColor(context),
-                    checkColor: Colors.white,
+                    checkColor: Theme.of(context).scaffoldBackgroundColor,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 4,

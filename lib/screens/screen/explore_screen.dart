@@ -1,5 +1,8 @@
 import 'dart:developer';
+import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/blocs/explore/cubit/explore_cubits.dart';
 import 'package:voidmusic/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:voidmusic/blocs/lastdotfm/lastdotfm_cubit.dart';
@@ -45,15 +48,22 @@ class _ExploreScreenState extends State<ExploreScreen> {
   bool isUpdateChecked = false;
   late final ContentBloc _homeContentBloc;
   Future<List<Track>> lFMData = Future.value(const []);
+  final ValueNotifier<double> _scrollOffsetNotifier = ValueNotifier<double>(0.0);
 
   @override
   void initState() {
     super.initState();
     _homeContentBloc = ContentBloc(pluginService: ServiceLocator.pluginService);
-    _tryLoadHomeSections();
+    // Use addPostFrameCallback so context.read is safe, and so we always
+    // try to load home sections even if settings+plugins were already ready
+    // before this screen was built (e.g. navigating back to home screen).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _tryLoadHomeSections();
+    });
   }
 
   /// Only loads home sections when both settings are ready and plugins are loaded.
+  /// Loads immediately with the best available plugin — no waiting for preferred.
   void _tryLoadHomeSections() {
     final settingsState = context.read<SettingsCubit>().state;
     if (!settingsState.settingsReady) return;
@@ -61,20 +71,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final pluginState = context.read<PluginBloc>().state;
     final contentResolvers = pluginState.loadedContentResolvers;
     if (contentResolvers.isEmpty) return;
-
-    final preferredIds = settingsState.homePluginIds;
-    // If the user's preferred plugins are installed but not yet loaded, wait for them.
-    // This prevents flashing the wrong plugin's home page on startup.
-    if (preferredIds.isNotEmpty) {
-      final firstPreferred = preferredIds.first;
-      final isAlreadyLoaded =
-          contentResolvers.any((p) => p.manifest.id == firstPreferred);
-      if (!isAlreadyLoaded) {
-        final isInstalled = pluginState.availablePlugins
-            .any((p) => p.manifest.id == firstPreferred);
-        if (isInstalled) return; // Preferred plugin is loading — wait for it
-      }
-    }
 
     final pluginId = _effectiveHomePluginId(contentResolvers);
 
@@ -100,6 +96,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   void dispose() {
+    _scrollOffsetNotifier.dispose();
     _homeContentBloc.close();
     super.dispose();
   }
@@ -181,11 +178,20 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 GetHomeSections(pluginId: pluginId, bypassCache: true),
               );
             },
-            child: CustomScrollView(
-              shrinkWrap: true,
-              physics: const ClampingScrollPhysics(),
-              slivers: [
-                const CustomDiscoverBar(),
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                if (notification.depth == 0) {
+                  _scrollOffsetNotifier.value = notification.metrics.pixels;
+                }
+                return false;
+              },
+              child: CustomScrollView(
+                shrinkWrap: true,
+                physics: const ClampingScrollPhysics(),
+                slivers: [
+                  CustomDiscoverBar(
+                    scrollOffsetNotifier: _scrollOffsetNotifier,
+                  ),
                 SliverList(
                   delegate: SliverChildListDelegate(
                     [
@@ -418,6 +424,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
             ),
           ),
         ),
+      ),
     );
   }
 }
@@ -728,12 +735,14 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
                     const SizedBox(width: 8),
                     Text(
                       sectionTitle,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontFamily: 'Gilroy',
-                      ).merge(Default_Theme.secondoryTextStyle),
+                      style: Default_Theme.secondoryTextStyle.merge(
+                        TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.accentColor(context),
+                          fontFamily: 'Gilroy',
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -799,12 +808,14 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
                 const SizedBox(width: 8),
                 Text(
                   widget.pluginName,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontFamily: 'Gilroy',
-                  ).merge(Default_Theme.secondoryTextStyle),
+                  style: Default_Theme.secondoryTextStyle.merge(
+                    TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.accentColor(context),
+                      fontFamily: 'Gilroy',
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -953,12 +964,14 @@ class _PluginPlaylistSectionState extends State<_PluginPlaylistSection> {
                     const SizedBox(width: 8),
                     Text(
                       '${widget.pluginName} Playlists',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontFamily: 'Gilroy',
-                      ).merge(Default_Theme.secondoryTextStyle),
+                      style: Default_Theme.secondoryTextStyle.merge(
+                        TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.accentColor(context),
+                          fontFamily: 'Gilroy',
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -1022,12 +1035,14 @@ class _PluginPlaylistSectionState extends State<_PluginPlaylistSection> {
                 const SizedBox(width: 8),
                 Text(
                   '${widget.pluginName} Playlists',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontFamily: 'Gilroy',
-                  ).merge(Default_Theme.secondoryTextStyle),
+                  style: Default_Theme.secondoryTextStyle.merge(
+                    TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.accentColor(context),
+                      fontFamily: 'Gilroy',
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1081,18 +1096,29 @@ class _PluginPlaylistSectionState extends State<_PluginPlaylistSection> {
 }
 
 class CustomDiscoverBar extends StatelessWidget {
-  const CustomDiscoverBar({super.key});
+  final ValueNotifier<double> scrollOffsetNotifier;
+
+  const CustomDiscoverBar({
+    super.key,
+    required this.scrollOffsetNotifier,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SliverPersistentHeader(
       floating: true,
-      delegate: _DiscoverBarDelegate(),
+      delegate: _DiscoverBarDelegate(
+        scrollOffsetNotifier: scrollOffsetNotifier,
+      ),
     );
   }
 }
 
 class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
+  final ValueNotifier<double> scrollOffsetNotifier;
+
+  _DiscoverBarDelegate({required this.scrollOffsetNotifier});
+
   static const double _minH = 76;
   static const double _maxH = 76;
 
@@ -1103,25 +1129,37 @@ class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => _maxH;
 
   @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
-      false;
+  bool shouldRebuild(covariant _DiscoverBarDelegate oldDelegate) =>
+      oldDelegate.scrollOffsetNotifier != scrollOffsetNotifier;
 
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final glassColor = AppTheme.glassColor(context);
-    final glassBorder = AppTheme.glassBorder(context);
+    return ValueListenableBuilder<double>(
+      valueListenable: scrollOffsetNotifier,
+      builder: (context, offset, child) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final bgBase = Theme.of(context).scaffoldBackgroundColor;
+        final glassColor = AppTheme.glassColor(context);
+        final glassBorder = AppTheme.glassBorder(context);
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: AppTheme.glassBlur,
-        child: Container(
+        final isDesktop = ResponsiveBreakpoints.of(context).isDesktop ||
+            kIsWeb ||
+            Platform.isWindows ||
+            Platform.isLinux ||
+            Platform.isMacOS;
+
+        final progress = isDesktop ? 1.0 : (offset / 40.0).clamp(0.0, 1.0);
+        final bgColor = Color.lerp(bgBase, glassColor, progress)!;
+        final borderColor = Color.lerp(Colors.transparent, glassBorder, progress)!;
+        final blurSigma = 20.0 * progress;
+
+        Widget barContent = Container(
           decoration: BoxDecoration(
-            color: glassColor,
+            color: bgColor,
             border: Border(
               bottom: BorderSide(
-                color: glassBorder,
+                color: borderColor,
                 width: 1.0,
               ),
             ),
@@ -1153,8 +1191,19 @@ class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
               ),
             ),
           ),
-        ),
-      ),
+        );
+
+        if (blurSigma > 0) {
+          return ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+              child: barContent,
+            ),
+          );
+        }
+
+        return ClipRect(child: barContent);
+      },
     );
   }
 }

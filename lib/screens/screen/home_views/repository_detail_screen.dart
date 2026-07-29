@@ -292,10 +292,10 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Default_Theme.primaryColor1.withValues(alpha: 0.025),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.025),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: Default_Theme.primaryColor1.withValues(alpha: 0.05)),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -315,7 +315,7 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
                         child: Text(
                           remotePlugin.name,
                           style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.95),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               letterSpacing: -0.2),
@@ -385,7 +385,7 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
         imageBuilder: (context, imageProvider) => Container(
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.04)),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
               image: DecorationImage(image: imageProvider, fit: BoxFit.cover)),
         ),
         placeholder: (_, __) => _defaultIcon(),
@@ -486,15 +486,15 @@ class _MetaChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: Default_Theme.primaryColor1.withValues(alpha: 0.06),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-            color: Default_Theme.primaryColor1.withValues(alpha: 0.05)),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
       ),
       child: Text(
         label,
         style: TextStyle(
-            color: Default_Theme.primaryColor1.withValues(alpha: 0.7),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             fontSize: 11,
             fontWeight: FontWeight.w600),
       ),
@@ -522,13 +522,13 @@ class _AestheticButton extends StatelessWidget {
   Widget build(BuildContext context) {
     // If subdued (like "Installed"), we make it look recessed and greyed out
     final bgColor = isSubdued
-        ? Default_Theme.primaryColor1.withValues(alpha: 0.04)
+        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04)
         : color.withValues(alpha: 0.15);
     final borderColor = isSubdued
-        ? Default_Theme.primaryColor1.withValues(alpha: 0.08)
+        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
         : color.withValues(alpha: 0.3);
     final textColor =
-        isSubdued ? Default_Theme.primaryColor1.withValues(alpha: 0.5) : color;
+        isSubdued ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4) : color;
 
     return Material(
       color: Colors.transparent,

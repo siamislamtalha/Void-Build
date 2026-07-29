@@ -28,9 +28,9 @@ class PluginDefaultsSettings extends StatelessWidget {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_rounded,
-                color: Default_Theme.primaryColor1,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 24,
               ),
               onPressed: () => Navigator.pop(context),
@@ -88,6 +88,18 @@ class PluginDefaultsSettings extends StatelessWidget {
     SettingsState state,
     List<PluginInfo> resolvers,
   ) {
+    // Initialize all plugins as selected if no selection exists
+    final selectedIds = state.homePluginIds.isEmpty && resolvers.isNotEmpty
+        ? resolvers.map((r) => r.manifest.id).toList()
+        : state.homePluginIds;
+
+    // Persist the default selection if it was just initialized
+    if (state.homePluginIds.isEmpty && resolvers.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<SettingsCubit>().setHomePluginIds(selectedIds);
+      });
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -106,7 +118,7 @@ class PluginDefaultsSettings extends StatelessWidget {
                       child: Text(
                         l10n.pluginDefaultsNoResolver,
                         style: TextStyle(
-                          color: Default_Theme.primaryColor2
+                          color: Theme.of(context).colorScheme.onSurface
                               .withValues(alpha: 0.5),
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
@@ -121,7 +133,7 @@ class PluginDefaultsSettings extends StatelessWidget {
         else
           _MultiPluginSelector(
             plugins: resolvers,
-            selectedIds: state.homePluginIds,
+            selectedIds: selectedIds,
             title: l10n.pluginDefaultsDiscoverHeader,
             onSelectionChanged: (ids) {
               context.read<SettingsCubit>().setHomePluginIds(ids);
@@ -155,7 +167,7 @@ class PluginDefaultsSettings extends StatelessWidget {
                       child: Text(
                         l10n.pluginDefaultsNoPriority,
                         style: TextStyle(
-                          color: Default_Theme.primaryColor2
+                          color: Theme.of(context).colorScheme.onSurface
                               .withValues(alpha: 0.5),
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
@@ -181,6 +193,13 @@ class PluginDefaultsSettings extends StatelessWidget {
       ...loadedIds.where((id) => !storedPriority.contains(id)),
     ];
 
+    // Persist the default priority if it was just initialized (no stored priority)
+    if (storedPriority.isEmpty && resolvers.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<SettingsCubit>().setResolverPriority(ordered);
+      });
+    }
+
     final nameMap = {
       for (final r in resolvers) r.manifest.id: r.name,
     };
@@ -194,7 +213,7 @@ class PluginDefaultsSettings extends StatelessWidget {
           child: Text(
             l10n.pluginDefaultsPriorityDesc,
             style: TextStyle(
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               fontSize: 12,
               fontWeight: FontWeight.w400,
             ).merge(Default_Theme.secondoryTextStyle),
@@ -235,7 +254,7 @@ class PluginDefaultsSettings extends StatelessWidget {
                       child: Text(
                         l10n.pluginDefaultsLyricsNone,
                         style: TextStyle(
-                          color: Default_Theme.primaryColor2
+                          color: Theme.of(context).colorScheme.onSurface
                               .withValues(alpha: 0.5),
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
@@ -258,6 +277,13 @@ class PluginDefaultsSettings extends StatelessWidget {
       ...loadedIds.where((id) => !storedPriority.contains(id)),
     ];
 
+    // Persist the default priority if it was just initialized (no stored priority)
+    if (storedPriority.isEmpty && lyricsProviders.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<SettingsCubit>().setLyricsPriority(ordered);
+      });
+    }
+
     final nameMap = {
       for (final p in lyricsProviders) p.manifest.id: p.name,
     };
@@ -271,7 +297,7 @@ class PluginDefaultsSettings extends StatelessWidget {
           child: Text(
             l10n.pluginDefaultsLyricsDesc,
             style: TextStyle(
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               fontSize: 12,
               fontWeight: FontWeight.w400,
             ).merge(Default_Theme.secondoryTextStyle),
@@ -294,6 +320,18 @@ class PluginDefaultsSettings extends StatelessWidget {
     SettingsState state,
     List<PluginInfo> suggestionProviders,
   ) {
+    // Initialize all suggestion plugins as selected if no selection exists
+    final selectedIds = state.suggestionPluginIds.isEmpty && suggestionProviders.isNotEmpty
+        ? suggestionProviders.map((p) => p.manifest.id).toList()
+        : state.suggestionPluginIds;
+
+    // Persist the default selection if it was just initialized
+    if (state.suggestionPluginIds.isEmpty && suggestionProviders.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<SettingsCubit>().setSuggestionPluginIds(selectedIds);
+      });
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -312,7 +350,7 @@ class PluginDefaultsSettings extends StatelessWidget {
                       child: Text(
                         l10n.pluginDefaultsSuggestionsNone,
                         style: TextStyle(
-                          color: Default_Theme.primaryColor2
+                          color: Theme.of(context).colorScheme.onSurface
                               .withValues(alpha: 0.5),
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
@@ -327,7 +365,7 @@ class PluginDefaultsSettings extends StatelessWidget {
         else
           _MultiPluginSelector(
             plugins: suggestionProviders,
-            selectedIds: state.suggestionPluginIds,
+            selectedIds: selectedIds,
             title: l10n.pluginDefaultsSuggestionsHeader,
             onSelectionChanged: (ids) {
               context.read<SettingsCubit>().setSuggestionPluginIds(ids);
@@ -374,10 +412,10 @@ class _ResolverPriorityListState extends State<_ResolverPriorityList> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Default_Theme.primaryColor2.withValues(alpha: 0.04),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Default_Theme.primaryColor2.withValues(alpha: 0.06),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
         ),
       ),
       child: ClipRRect(
@@ -401,11 +439,8 @@ class _ResolverPriorityListState extends State<_ResolverPriorityList> {
             );
           },
           itemCount: _items.length,
-          onReorder: (oldIndex, newIndex) {
+          onReorderItem: (oldIndex, newIndex) {
             setState(() {
-              if (oldIndex < newIndex) {
-                newIndex -= 1;
-              }
               final item = _items.removeAt(oldIndex);
               _items.insert(newIndex, item);
             });
@@ -441,7 +476,7 @@ class _PriorityTile extends StatelessWidget {
     required this.pluginId,
   });
 
-  static Widget _getPluginIcon(String pluginId) {
+  Widget _getPluginIcon(String pluginId, BuildContext context) {
     String svgPath;
     Color? color;
     
@@ -459,7 +494,7 @@ class _PriorityTile extends StatelessWidget {
       color = null;
     } else if (pluginId.contains('multi') || pluginId.contains('bloomfactory')) {
       svgPath = 'assets/icons/svg/multi-source.svg';
-      color = Default_Theme.primaryColor1;
+      color = Theme.of(context).colorScheme.onSurface;
     } else {
       return const SizedBox.shrink();
     }
@@ -500,7 +535,7 @@ class _PriorityTile extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-          _getPluginIcon(pluginId),
+          _getPluginIcon(pluginId, context),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -509,8 +544,8 @@ class _PriorityTile extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
-                    color: Default_Theme.primaryColor1,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ).merge(Default_Theme.secondoryTextStyleMedium),
@@ -518,7 +553,7 @@ class _PriorityTile extends StatelessWidget {
                 Text(
                   pluginId,
                   style: TextStyle(
-                    color: Default_Theme.primaryColor2.withValues(alpha: 0.45),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
                     fontSize: 11,
                     fontWeight: FontWeight.w400,
                   ).merge(Default_Theme.secondoryTextStyle),
@@ -529,7 +564,7 @@ class _PriorityTile extends StatelessWidget {
           Icon(
             MingCute.menu_line,
             size: 20,
-            color: Default_Theme.primaryColor2.withValues(alpha: 0.22),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35),
           ),
         ],
       ),
@@ -582,7 +617,7 @@ class _MultiPluginSelectorState extends State<_MultiPluginSelector> {
     widget.onSelectionChanged(List.from(_selectedIds));
   }
 
-  Widget _getPluginIcon(String pluginId) {
+  Widget _getPluginIcon(String pluginId, BuildContext context) {
     String svgPath;
     Color? color;
     
@@ -600,7 +635,7 @@ class _MultiPluginSelectorState extends State<_MultiPluginSelector> {
       color = null; // Already colored
     } else if (pluginId.contains('multi') || pluginId.contains('bloomfactory')) {
       svgPath = 'assets/icons/svg/multi-source.svg';
-      color = Default_Theme.primaryColor1; // Color the black SVG
+      color = Theme.of(context).colorScheme.onSurface;
     } else {
       return const SizedBox.shrink(); // No icon for unknown plugins
     }
@@ -631,7 +666,7 @@ class _MultiPluginSelectorState extends State<_MultiPluginSelector> {
           child: Text(
             'Select multiple plugins (drag to reorder priority)',
             style: TextStyle(
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
               fontSize: 12,
               fontWeight: FontWeight.w400,
             ).merge(Default_Theme.secondoryTextStyle),
@@ -660,13 +695,13 @@ class _MultiPluginSelectorState extends State<_MultiPluginSelector> {
                   CheckboxListTile(
                     title: Row(
                       children: [
-                        _getPluginIcon(plugin.manifest.id),
+                        _getPluginIcon(plugin.manifest.id, context),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             plugin.name,
-                            style: const TextStyle(
-                              color: Default_Theme.primaryColor1,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ).merge(Default_Theme.secondoryTextStyleMedium),
@@ -677,7 +712,7 @@ class _MultiPluginSelectorState extends State<_MultiPluginSelector> {
                     subtitle: Text(
                       plugin.manifest.id,
                       style: TextStyle(
-                        color: Default_Theme.primaryColor2.withValues(alpha: 0.45),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
                         fontSize: 11,
                         fontWeight: FontWeight.w400,
                       ).merge(Default_Theme.secondoryTextStyle),
@@ -685,7 +720,7 @@ class _MultiPluginSelectorState extends State<_MultiPluginSelector> {
                     value: isSelected,
                     onChanged: (_) => _togglePlugin(plugin.manifest.id),
                     activeColor: AppTheme.accentColor(context),
-                    checkColor: Colors.white,
+                    checkColor: Theme.of(context).scaffoldBackgroundColor,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 4,

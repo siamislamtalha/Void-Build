@@ -139,13 +139,13 @@ class SettingsCubit extends Cubit<SettingsState> {
             defaultValue: EqSourceValues.builtin),
         SettingKeys.eqSource,
       ),
-      // [22] homePluginIds
+      // [22] homePluginIds - default to empty, will be populated with all plugins on first load
       _readSetting(
         () => _settingsRepo.getSettingStr(SettingKeys.homePluginIds,
             defaultValue: '[]'),
         SettingKeys.homePluginIds,
       ),
-      // [23] searchPluginIds
+      // [23] searchPluginIds - default to empty, will be populated with all plugins on first load
       _readSetting(
         () => _settingsRepo.getSettingStr(SettingKeys.searchPluginIds,
             defaultValue: '[]'),

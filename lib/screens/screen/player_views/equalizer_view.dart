@@ -285,20 +285,20 @@ class _EqualizerViewState extends State<EqualizerView>
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded,
-              color: Colors.white, size: 22),
+          icon: Icon(Icons.arrow_back_rounded,
+              color: Theme.of(context).colorScheme.onSurface, size: 22),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(l10n.eqTitle,
-            style: const TextStyle(
-                color: Colors.white,
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.w700)),
         actions: [
           if (isBuiltinMode)
             IconButton(
               icon: Icon(Icons.refresh_rounded,
-                  color: Colors.white.withValues(alpha: 0.8), size: 22),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), size: 22),
               onPressed: _resetEQ,
             ),
           const SizedBox(width: 8),
@@ -325,10 +325,10 @@ class _EqualizerViewState extends State<EqualizerView>
                     child: Container(
                       decoration: BoxDecoration(
                         color:
-                            Default_Theme.primaryColor1.withValues(alpha: 0.04),
+                            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                            color: Default_Theme.primaryColor1
+                            color: Theme.of(context).colorScheme.onSurface
                                 .withValues(alpha: 0.05)),
                       ),
                       padding: const EdgeInsets.symmetric(
@@ -381,7 +381,7 @@ class _EqualizerViewState extends State<EqualizerView>
                                     child: Text(
                                       'In-app EQ is disabled. Configure your device EQ in:\nSettings → Sound & Vibration → Equalizer',
                                       style: TextStyle(
-                                          color: Colors.white
+                                          color: Theme.of(context).colorScheme.onSurface
                                               .withValues(alpha: 0.7),
                                           fontSize: 12,
                                           height: 1.5),
@@ -407,11 +407,11 @@ class _EqualizerViewState extends State<EqualizerView>
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Default_Theme.primaryColor1
+                          color: Theme.of(context).colorScheme.onSurface
                               .withValues(alpha: 0.04),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                              color: Default_Theme.primaryColor1
+                              color: Theme.of(context).colorScheme.onSurface
                                   .withValues(alpha: 0.05)),
                         ),
                         padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
@@ -422,7 +422,7 @@ class _EqualizerViewState extends State<EqualizerView>
                               children: [
                                 Text(l10n.eqTitle,
                                     style: TextStyle(
-                                        color: Colors.white
+                                        color: Theme.of(context).colorScheme.onSurface
                                             .withValues(alpha: 0.95),
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600)),
@@ -474,6 +474,8 @@ class _EqualizerViewState extends State<EqualizerView>
                                               minGain: _minGain,
                                               maxGain: _maxGain,
                                               accentColor: accent,
+                                              labelColor: Theme.of(context).colorScheme.onSurface,
+                                              bgCircleColor: Theme.of(context).scaffoldBackgroundColor,
                                               animValue: _curveAnim.value,
                                               frequencies: bands
                                                   .map((b) => _freqLabel(
@@ -508,7 +510,7 @@ class _EqualizerViewState extends State<EqualizerView>
       padding: const EdgeInsets.only(left: 20, bottom: 12),
       child: Text(title,
           style: TextStyle(
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.55),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
               fontSize: 12,
               fontWeight: FontWeight.w600,
               letterSpacing: 1.2)),
@@ -516,6 +518,7 @@ class _EqualizerViewState extends State<EqualizerView>
   }
 
   Widget _buildPresetTabs(Color accent) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return SizedBox(
       height: 36,
       child: ListView.separated(
@@ -539,20 +542,18 @@ class _EqualizerViewState extends State<EqualizerView>
                 decoration: BoxDecoration(
                   color: isActive
                       ? accent.withValues(alpha: 0.15)
-                      : Default_Theme.primaryColor1.withValues(alpha: 0.04),
+                      : onSurface.withValues(alpha: 0.04),
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
                       color: isActive
                           ? accent.withValues(alpha: 0.5)
-                          : Default_Theme.primaryColor1
-                              .withValues(alpha: 0.05)),
+                          : onSurface.withValues(alpha: 0.05)),
                 ),
                 child: Text(name,
                     style: TextStyle(
                         color: isActive
                             ? accent
-                            : Default_Theme.primaryColor1
-                                .withValues(alpha: 0.75),
+                            : onSurface.withValues(alpha: 0.75),
                         fontSize: 13,
                         fontWeight:
                             isActive ? FontWeight.w700 : FontWeight.w500)),
@@ -583,6 +584,7 @@ class _EqSourceOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -591,12 +593,12 @@ class _EqSourceOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? accent.withValues(alpha: 0.15)
-              : Colors.white.withValues(alpha: 0.04),
+              : onSurface.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
                 ? accent.withValues(alpha: 0.5)
-                : Colors.white.withValues(alpha: 0.08),
+                : onSurface.withValues(alpha: 0.08),
           ),
         ),
         child: Column(
@@ -613,7 +615,7 @@ class _EqSourceOption extends StatelessWidget {
                     border: Border.all(
                       color: isSelected
                           ? accent
-                          : Colors.white.withValues(alpha: 0.3),
+                          : onSurface.withValues(alpha: 0.3),
                       width: isSelected ? 4 : 1.5,
                     ),
                   ),
@@ -624,7 +626,7 @@ class _EqSourceOption extends StatelessWidget {
                   style: TextStyle(
                     color: isSelected
                         ? accent
-                        : Colors.white.withValues(alpha: 0.8),
+                        : onSurface.withValues(alpha: 0.8),
                     fontSize: 13,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   ),
@@ -635,7 +637,7 @@ class _EqSourceOption extends StatelessWidget {
             Text(
               subtitle,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.45),
+                color: onSurface.withValues(alpha: 0.45),
                 fontSize: 11,
               ),
             ),
@@ -657,6 +659,8 @@ class _InteractiveEQPainter extends CustomPainter {
   final double minGain;
   final double maxGain;
   final Color accentColor;
+  final Color labelColor;
+  final Color bgCircleColor;
   final double animValue;
   final List<String> frequencies;
   final int? draggingIndex;
@@ -667,6 +671,8 @@ class _InteractiveEQPainter extends CustomPainter {
     required this.minGain,
     required this.maxGain,
     required this.accentColor,
+    required this.labelColor,
+    required this.bgCircleColor,
     required this.animValue,
     required this.frequencies,
     this.draggingIndex,
@@ -685,7 +691,7 @@ class _InteractiveEQPainter extends CustomPainter {
     final zeroY = topPad + availableHeight / 2;
 
     canvas.drawLine(Offset(0, zeroY), Offset(w, zeroY),
-        Paint()..color = Colors.white.withValues(alpha: 0.08));
+        Paint()..color = labelColor.withValues(alpha: 0.08));
 
     final points = <Offset>[];
     for (var i = 0; i < N; i++) {
@@ -735,7 +741,7 @@ class _InteractiveEQPainter extends CustomPainter {
     for (var i = 0; i < N; i++) {
       final isDragging = i == draggingIndex;
       canvas.drawCircle(points[i], isDragging ? 10.0 : 8.5,
-          Paint()..color = Default_Theme.themeColor);
+          Paint()..color = bgCircleColor);
       canvas.drawCircle(
           points[i],
           isDragging ? 8.0 : 6.5,
@@ -751,7 +757,7 @@ class _InteractiveEQPainter extends CustomPainter {
           text: TextSpan(
               text: frequencies[i],
               style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: labelColor.withValues(alpha: 0.55),
                   fontSize: 10.5,
                   fontWeight: FontWeight.w600)),
           textDirection: TextDirection.ltr)

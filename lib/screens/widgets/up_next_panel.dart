@@ -220,7 +220,7 @@ class _PanelContent extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final glassColor = isDark
         ? const Color(0xD50A040C)
-        : const Color(0xF2F0F0F3);
+        : const Color(0xFFFAFAFD);
     final borderColor = isDark
         ? const Color(0x3BFFFFFF)
         : const Color(0x20000000);
@@ -304,13 +304,13 @@ class _CompactHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final titleColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
     final iconColor = isDark
         ? Default_Theme.primaryColor2.withValues(alpha: 0.8)
-        : const Color(0xFF66666E);
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
     final arrowColor = isDark
         ? Default_Theme.primaryColor2.withValues(alpha: 0.5)
-        : const Color(0xFF8E8E93);
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4);
 
     return Center(
       child: Row(
@@ -352,7 +352,7 @@ class _QueueInfoRow extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final countColor = isDark
         ? Colors.white.withValues(alpha: 0.7)
-        : const Color(0xFF66666E);
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -390,13 +390,13 @@ class _ClearQueueButton extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark
         ? Colors.white.withValues(alpha: 0.06)
-        : Colors.black.withValues(alpha: 0.05);
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05);
     final borderColor = isDark
         ? Colors.white.withValues(alpha: 0.18)
-        : Colors.black.withValues(alpha: 0.12);
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
     final textColor = isDark
         ? Default_Theme.primaryColor2.withValues(alpha: 0.75)
-        : const Color(0xFF66666E);
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
 
     return GestureDetector(
       onTap: () => playerCubit.bloomeePlayer.clearQueue(),
@@ -443,10 +443,10 @@ class _DesktopLayout extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark
         ? Colors.black.withValues(alpha: 0.7)
-        : const Color(0xF2F0F0F3);
+        : Theme.of(context).colorScheme.surface.withValues(alpha: 0.95);
     final borderColor = isDark
         ? Colors.white.withValues(alpha: 0.1)
-        : const Color(0x20000000);
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
 
     return RepaintBoundary(
       child: ClipRRect(
@@ -547,7 +547,7 @@ class _DesktopSongListState extends State<_DesktopSongList> {
               scrollController: _scrollController,
               physics: const BouncingScrollPhysics(),
               itemCount: uniqueQueue.length,
-              onReorder: (oldIndex, newIndex) => widget.playerCubit.bloomeePlayer.moveQueueItem(oldIndex, newIndex),
+              onReorderItem: (oldIndex, newIndex) => widget.playerCubit.bloomeePlayer.moveQueueItem(oldIndex, newIndex),
               buildDefaultDragHandles: false,
               itemBuilder: (context, index) {
                 return _QueueItem(
@@ -630,7 +630,7 @@ class _SongListSliverState extends State<_SongListSliver> {
 
             return SliverReorderableList(
               itemCount: uniqueQueue.length,
-              onReorder: (oldIndex, newIndex) => widget.playerCubit.bloomeePlayer.moveQueueItem(oldIndex, newIndex),
+              onReorderItem: (oldIndex, newIndex) => widget.playerCubit.bloomeePlayer.moveQueueItem(oldIndex, newIndex),
               itemBuilder: (context, index) {
                 return _QueueItem(
                   key: ValueKey('mobile_${uniqueQueue[index].id}'),
@@ -668,10 +668,10 @@ class _QueueItem extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final optionsIconColor = isDark
         ? Default_Theme.primaryColor2.withValues(alpha: 0.65)
-        : const Color(0xFF66666E);
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
     final dragIconColor = isDark
         ? Default_Theme.primaryColor2.withValues(alpha: 0.4)
-        : const Color(0xFF8E8E93);
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4);
 
     Widget content = Dismissible(
       key: ValueKey('dismiss_${mediaItem.id}'),

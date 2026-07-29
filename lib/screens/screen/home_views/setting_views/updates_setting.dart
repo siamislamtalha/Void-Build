@@ -1,4 +1,4 @@
-﻿import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
+import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/check_update_view.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
@@ -25,9 +25,9 @@ class UpdatesSettings extends StatelessWidget {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_rounded,
-                color: Default_Theme.primaryColor1,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 24,
               ),
               onPressed: () => Navigator.pop(context),

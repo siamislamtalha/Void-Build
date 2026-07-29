@@ -43,7 +43,7 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
           side: BorderSide(
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.08)),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
         ),
         titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
         contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
@@ -82,29 +82,29 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
                 decoration: InputDecoration(
                   hintText: 'https://...',
                   hintStyle: TextStyle(
-                      color: Default_Theme.primaryColor1.withValues(alpha: 0.3),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                       fontSize: 14),
                   filled: true,
                   fillColor:
-                      Default_Theme.primaryColor1.withValues(alpha: 0.04),
+                      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                        color: Default_Theme.primaryColor1
-                            .withValues(alpha: 0.08)),
+                        color: Theme.of(context).colorScheme.onSurface
+                            .withValues(alpha: 0.12)),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                        color: Default_Theme.primaryColor1
-                            .withValues(alpha: 0.08)),
+                        color: Theme.of(context).colorScheme.onSurface
+                            .withValues(alpha: 0.12)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
                         color:
-                            Default_Theme.primaryColor1.withValues(alpha: 0.2),
+                            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                         width: 1),
                   ),
                 ),
@@ -151,7 +151,7 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
                         Text(
                           l10n.pluginRepositoryTitle,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             letterSpacing: -0.2,
@@ -204,7 +204,7 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
                     return RefreshIndicator(
                       color: AppTheme.accentColor(context),
                       backgroundColor:
-                          Default_Theme.primaryColor1.withValues(alpha: 0.1),
+                          Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                       onRefresh: () async => await context
                           .read<PluginRepositoryCubit>()
                           .loadRepositories(),
@@ -274,10 +274,10 @@ class _RepoCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Default_Theme.primaryColor1.withValues(alpha: 0.025),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.025),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: Default_Theme.primaryColor1.withValues(alpha: 0.06)),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -289,8 +289,8 @@ class _RepoCard extends StatelessWidget {
                 MaterialPageRoute(
                     builder: (context) =>
                         RepositoryDetailScreen(repository: repo))),
-            splashColor: Default_Theme.primaryColor1.withValues(alpha: 0.06),
-            highlightColor: Default_Theme.primaryColor1.withValues(alpha: 0.04),
+            splashColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+            highlightColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -322,7 +322,7 @@ class _RepoCard extends StatelessWidget {
                             Text(
                               repo.name,
                               style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.95),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: -0.2),
@@ -347,8 +347,7 @@ class _RepoCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       // Explicit Navigation Chevron
                       Icon(MingCute.right_line,
-                          color: Default_Theme.primaryColor2
-                              .withValues(alpha: 0.4),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                           size: 20),
                     ],
                   ),
@@ -357,7 +356,7 @@ class _RepoCard extends StatelessWidget {
 
                   // Row 2: Copiable URL Box
                   Material(
-                    color: Default_Theme.primaryColor1.withValues(alpha: 0.04),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
                     borderRadius: BorderRadius.circular(10),
                     child: InkWell(
                       onTap: () async {
@@ -368,29 +367,27 @@ class _RepoCard extends StatelessWidget {
                       },
                       borderRadius: BorderRadius.circular(10),
                       splashColor:
-                          Default_Theme.primaryColor1.withValues(alpha: 0.08),
+                          Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 8),
                         decoration: BoxDecoration(
                           border: Border.all(
-                              color: Default_Theme.primaryColor1
-                                  .withValues(alpha: 0.05)),
+                              color: Theme.of(context).colorScheme.onSurface
+                                  .withValues(alpha: 0.08)),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
                           children: [
                             Icon(MingCute.copy_2_line,
                                 size: 14,
-                                color: Default_Theme.primaryColor2
-                                    .withValues(alpha: 0.7)),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 repo.url,
                                 style: TextStyle(
-                                  color: Default_Theme.primaryColor2
-                                      .withValues(alpha: 0.8),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -482,21 +479,21 @@ class _Badge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Default_Theme.primaryColor1.withValues(alpha: 0.05),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-            color: Default_Theme.primaryColor1.withValues(alpha: 0.03)),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon,
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
               size: 11),
           const SizedBox(width: 4),
           Text(label,
               style: TextStyle(
-                  color: Default_Theme.primaryColor1.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
                   fontSize: 11,
                   fontWeight: FontWeight.w600)),
         ],

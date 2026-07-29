@@ -178,8 +178,9 @@ class SongCardWidget extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                color: Default_Theme.primaryColor2
-                                    .withValues(alpha: 0.65),
+                                color: isDark
+                                    ? Default_Theme.primaryColor2.withValues(alpha: 0.65)
+                                    : const Color(0xFF66666E),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -192,8 +193,9 @@ class SongCardWidget extends StatelessWidget {
                                   child: TrackMetadataLinks(
                                     track: song,
                                     style: TextStyle(
-                                      color: Default_Theme.primaryColor2
-                                          .withValues(alpha: 0.65),
+                                      color: isDark
+                                          ? Default_Theme.primaryColor2.withValues(alpha: 0.65)
+                                          : const Color(0xFF66666E),
                                       fontSize: 13,
                                       fontWeight: FontWeight.w400,
                                     ),

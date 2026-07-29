@@ -214,15 +214,13 @@ class BackupSettings extends StatelessWidget {
                       final proceed = await showDialog<bool>(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          backgroundColor:
-                              const Color.fromARGB(255, 24, 24, 24),
-                          surfaceTintColor:
-                              const Color.fromARGB(255, 24, 24, 24),
+                          backgroundColor: Theme.of(ctx).dialogTheme.backgroundColor ?? Theme.of(ctx).colorScheme.surface,
+                          surfaceTintColor: Colors.transparent,
                           title: Text(
                             l10n.storageResetConfirmTitle,
                             style: Default_Theme.secondoryTextStyle.merge(
-                              const TextStyle(
-                                  color: Colors.white,
+                              TextStyle(
+                                  color: Theme.of(ctx).colorScheme.onSurface,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             ),
@@ -230,8 +228,8 @@ class BackupSettings extends StatelessWidget {
                           content: Text(
                             l10n.storageResetConfirmMessage,
                             style: Default_Theme.secondoryTextStyle.merge(
-                              const TextStyle(
-                                  color: Colors.white, fontSize: 14),
+                              TextStyle(
+                                  color: Theme.of(ctx).colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 14),
                             ),
                           ),
                           actions: [
@@ -239,7 +237,7 @@ class BackupSettings extends StatelessWidget {
                               onPressed: () => Navigator.of(ctx).pop(false),
                               child: Text(l10n.buttonCancel,
                                   style: Default_Theme.secondoryTextStyle.merge(
-                                      const TextStyle(color: Colors.white))),
+                                      TextStyle(color: Theme.of(ctx).colorScheme.onSurface))),
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
@@ -273,27 +271,28 @@ class _BackupLocationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return AlertDialog(
-      backgroundColor: const Color.fromARGB(255, 24, 24, 24),
-      surfaceTintColor: const Color.fromARGB(255, 24, 24, 24),
+      backgroundColor: Theme.of(context).dialogTheme.backgroundColor ?? Theme.of(context).colorScheme.surface,
+      surfaceTintColor: Colors.transparent,
       title: Text(
         l10n.storageLocationDialogTitle,
         style: Default_Theme.secondoryTextStyle.merge(
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            TextStyle(color: onSurface, fontWeight: FontWeight.bold)),
       ),
       content: Text(
         Platform.isAndroid
             ? l10n.storageLocationAndroid
             : l10n.storageLocationOther,
         style: Default_Theme.secondoryTextStyle
-            .merge(const TextStyle(color: Colors.white, fontSize: 14)),
+            .merge(TextStyle(color: onSurface.withValues(alpha: 0.8), fontSize: 14)),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.buttonOk,
-              style: Default_Theme.secondoryTextStyle.merge(const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold))),
+              style: Default_Theme.secondoryTextStyle.merge(TextStyle(
+                  color: onSurface, fontWeight: FontWeight.bold))),
         ),
       ],
     );
@@ -302,6 +301,7 @@ class _BackupLocationDialog extends StatelessWidget {
 
 Future<void> _onRestoreTap(BuildContext context) async {
   final l10n = AppLocalizations.of(context)!;
+  final onSurface = Theme.of(context).colorScheme.onSurface;
   try {
     // 1) Ask user to pick a file (using FileType.any so that custom extensions like .isar / .db are not grayed out on Android)
     final result = await FilePicker.platform.pickFiles(
@@ -352,10 +352,10 @@ Future<void> _onRestoreTap(BuildContext context) async {
           }
 
           return AlertDialog(
-            backgroundColor: const Color.fromARGB(255, 24, 24, 24),
+            backgroundColor: Theme.of(ctx2).dialogTheme.backgroundColor ?? Theme.of(ctx2).colorScheme.surface,
             title: Text(l10n.storageRestoreOptionsTitle,
                 style: Default_Theme.secondoryTextStyle
-                    .merge(const TextStyle(color: Colors.white))),
+                    .merge(TextStyle(color: onSurface))),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -363,7 +363,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
                   Text(
                     l10n.storageRestoreOptionsDesc,
                     style: Default_Theme.secondoryTextStyle.merge(
-                        const TextStyle(color: Colors.white70, fontSize: 13)),
+                        TextStyle(color: onSurface.withValues(alpha: 0.7), fontSize: 13)),
                   ),
                   const SizedBox(height: 12),
                   CheckboxListTile(
@@ -371,12 +371,12 @@ Future<void> _onRestoreTap(BuildContext context) async {
                     onChanged: toggleSelectAll,
                     title: Text(l10n.storageRestoreSelectAll,
                         style: Default_Theme.secondoryTextStyle
-                            .merge(const TextStyle(color: Colors.white))),
+                            .merge(TextStyle(color: onSurface))),
                     controlAffinity: ListTileControlAffinity.leading,
                     activeColor: AppTheme.accentColor(context),
-                    checkColor: Colors.white,
+                    checkColor: Theme.of(ctx2).scaffoldBackgroundColor,
                   ),
-                  const Divider(color: Colors.white12),
+                  Divider(color: onSurface.withValues(alpha: 0.12)),
                   CheckboxListTile(
                     value: mediaItems,
                     onChanged: (v) {
@@ -385,10 +385,10 @@ Future<void> _onRestoreTap(BuildContext context) async {
                     },
                     title: Text(l10n.storageRestoreMediaItems,
                         style: Default_Theme.secondoryTextStyle
-                            .merge(const TextStyle(color: Colors.white))),
+                            .merge(TextStyle(color: onSurface))),
                     controlAffinity: ListTileControlAffinity.leading,
                     activeColor: AppTheme.accentColor(context),
-                    checkColor: Colors.white,
+                    checkColor: Theme.of(ctx2).scaffoldBackgroundColor,
                   ),
                   CheckboxListTile(
                     value: searchHistory,
@@ -398,10 +398,10 @@ Future<void> _onRestoreTap(BuildContext context) async {
                     },
                     title: Text(l10n.storageRestoreSearchHistory,
                         style: Default_Theme.secondoryTextStyle
-                            .merge(const TextStyle(color: Colors.white))),
+                            .merge(TextStyle(color: onSurface))),
                     controlAffinity: ListTileControlAffinity.leading,
                     activeColor: AppTheme.accentColor(context),
-                    checkColor: Colors.white,
+                    checkColor: Theme.of(ctx2).scaffoldBackgroundColor,
                   ),
                 ],
               ),
@@ -411,7 +411,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
                 onPressed: () => Navigator.of(ctx2).pop(null),
                 child: Text(l10n.buttonCancel,
                     style: Default_Theme.secondoryTextStyle
-                        .merge(const TextStyle(color: Colors.white))),
+                        .merge(TextStyle(color: onSurface))),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -425,7 +425,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
                 },
                 child: Text(l10n.storageRestoreContinue,
                     style: Default_Theme.secondoryTextStyle
-                        .merge(const TextStyle(color: Colors.white))),
+                        .merge(TextStyle(color: Theme.of(ctx2).scaffoldBackgroundColor))),
               ),
             ],
           );
@@ -442,10 +442,10 @@ Future<void> _onRestoreTap(BuildContext context) async {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          backgroundColor: const Color.fromARGB(255, 24, 24, 24),
+          backgroundColor: Theme.of(ctx).dialogTheme.backgroundColor ?? Theme.of(ctx).colorScheme.surface,
           title: Text(l10n.storageRestoreConfirmTitle,
-              style: Default_Theme.secondoryTextStyle.merge(const TextStyle(
-                  color: Colors.white,
+              style: Default_Theme.secondoryTextStyle.merge(TextStyle(
+                  color: onSurface,
                   fontSize: 18,
                   fontWeight: FontWeight.bold))),
           content: Text(
@@ -454,14 +454,14 @@ Future<void> _onRestoreTap(BuildContext context) async {
             "${options.restoreSearchHistory ? "${l10n.storageRestoreHistoryBullet}\n" : ""}"
             "\n${l10n.storageRestoreConfirmSuffix}",
             style: Default_Theme.secondoryTextStyle
-                .merge(const TextStyle(color: Colors.white70, fontSize: 14)),
+                .merge(TextStyle(color: onSurface.withValues(alpha: 0.7), fontSize: 14)),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
               child: Text(l10n.storageRestoreNo,
                   style: Default_Theme.secondoryTextStyle
-                      .merge(const TextStyle(color: Colors.white))),
+                      .merge(TextStyle(color: onSurface))),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -469,7 +469,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
               onPressed: () => Navigator.of(ctx).pop(true),
               child: Text(l10n.storageRestoreYes,
                   style: Default_Theme.secondoryTextStyle
-                      .merge(const TextStyle(color: Colors.white))),
+                      .merge(TextStyle(color: Theme.of(ctx).scaffoldBackgroundColor))),
             ),
           ],
         );
@@ -492,7 +492,7 @@ Future<void> _onRestoreTap(BuildContext context) async {
         return PopScope(
           canPop: false,
           child: AlertDialog(
-            backgroundColor: const Color.fromARGB(255, 24, 24, 24),
+            backgroundColor: Theme.of(ctx).scaffoldBackgroundColor,
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -501,8 +501,9 @@ Future<void> _onRestoreTap(BuildContext context) async {
                 Text(
                   l10n.storageRestoring,
                   textAlign: TextAlign.center,
-                  style: Default_Theme.secondoryTextStyle
-                      .merge(const TextStyle(color: Colors.white)),
+                  style: TextStyle(
+                    color: Theme.of(ctx).colorScheme.onSurface,
+                  ).merge(Default_Theme.secondoryTextStyle),
                 ),
               ],
             ),
@@ -636,17 +637,18 @@ Future<void> _showResultDialog(
   required List<String> errors,
 }) async {
   final l10n = AppLocalizations.of(context)!;
+  final onSurface = Theme.of(context).colorScheme.onSurface;
   await showDialog(
     context: context,
     builder: (ctx) {
       return AlertDialog(
-        backgroundColor: const Color.fromARGB(255, 24, 24, 24),
+        backgroundColor: Theme.of(ctx).dialogTheme.backgroundColor ?? Theme.of(ctx).colorScheme.surface,
         title: Text(
           success
               ? l10n.storageRestoreCompleted
               : l10n.storageRestoreFailedTitle,
-          style: Default_Theme.secondoryTextStyle.merge(const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold)),
+          style: Default_Theme.secondoryTextStyle.merge(TextStyle(
+              color: onSurface, fontWeight: FontWeight.bold)),
         ),
         content: SingleChildScrollView(
           child: Column(
@@ -657,7 +659,7 @@ Future<void> _showResultDialog(
                     ? l10n.storageRestoreSuccessMessage
                     : l10n.storageRestoreFailedMessage,
                 style: Default_Theme.secondoryTextStyle
-                    .merge(const TextStyle(color: Colors.white)),
+                    .merge(TextStyle(color: onSurface)),
               ),
               const SizedBox(height: 12),
               if (!success && errors.isNotEmpty)
@@ -666,21 +668,21 @@ Future<void> _showResultDialog(
                       child: Text(
                         "- $e",
                         style: Default_Theme.secondoryTextStyle.merge(
-                            const TextStyle(
-                                color: Colors.white70, fontSize: 13)),
+                            TextStyle(
+                                color: onSurface.withValues(alpha: 0.7), fontSize: 13)),
                       ),
                     )),
               if (!success && errors.isEmpty)
                 Text(
                   l10n.storageRestoreUnknownError,
                   style: Default_Theme.secondoryTextStyle
-                      .merge(const TextStyle(color: Colors.white70)),
+                      .merge(TextStyle(color: onSurface.withValues(alpha: 0.7))),
                 ),
               const SizedBox(height: 8),
               Text(
                 l10n.storageRestoreRestartHint,
                 style: Default_Theme.secondoryTextStyle.merge(
-                    const TextStyle(color: Colors.white54, fontSize: 12)),
+                    TextStyle(color: onSurface.withValues(alpha: 0.5), fontSize: 12)),
               ),
             ],
           ),
@@ -692,8 +694,8 @@ Future<void> _showResultDialog(
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               l10n.buttonOk,
-              style: Default_Theme.secondoryTextStyle.merge(const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold)),
+              style: Default_Theme.secondoryTextStyle.merge(TextStyle(
+                  color: Theme.of(ctx).scaffoldBackgroundColor, fontWeight: FontWeight.bold)),
             ),
           ),
         ],

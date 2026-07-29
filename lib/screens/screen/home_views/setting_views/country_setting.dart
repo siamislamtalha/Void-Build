@@ -3,7 +3,6 @@ import 'package:voidmusic/l10n/language_options.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:flutter/material.dart';
-import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -41,7 +40,7 @@ class CountrySettings extends StatelessWidget {
             color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
-          ).merge(Default_Theme.secondoryTextStyle),
+          ),
         ),
       ),
       body: BlocBuilder<SettingsCubit, SettingsState>(

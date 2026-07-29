@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -65,7 +66,13 @@ class SharedUrlResolverService {
                 ContentResolverCommand.getTrackDetails(id: videoId),
               ),
             )
-            .timeout(const Duration(seconds: 10));
+            .timeout(
+              const Duration(seconds: 15),
+              onTimeout: () {
+                log('Shared URL resolver timeout for: $url', name: 'SharedUrlResolver');
+                throw TimeoutException('Request timed out');
+              },
+            );
 
         if (response is PluginResponse_TrackDetails) {
           return SharedUrlResolveResult(

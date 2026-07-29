@@ -153,6 +153,14 @@ class PluginBloc extends Bloc<PluginEvent, PluginState> {
         for (final plugin in available) plugin.manifest.id: plugin,
       };
 
+      // On first launch (empty auto-load list), enable ALL installed plugins by default.
+      if (_preferredAutoLoadIds.isEmpty && available.isNotEmpty) {
+        final allIds = available.map((p) => p.manifest.id).toSet();
+        await _persistAutoLoadSafe(allIds);
+        log('First launch: auto-enabling all ${allIds.length} installed plugin(s)',
+            name: 'PluginBloc');
+      }
+
       final missingAutoLoad = _preferredAutoLoadIds
           .where((id) => !loaded.contains(id))
           .map((id) {

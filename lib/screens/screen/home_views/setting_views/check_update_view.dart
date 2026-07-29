@@ -13,8 +13,8 @@ class CheckUpdateView extends StatelessWidget {
         centerTitle: true,
         title: Text(
           l10n.updateCheckTitle,
-          style: const TextStyle(
-                  color: Default_Theme.primaryColor1,
+          style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 20,
                   fontWeight: FontWeight.bold)
               .merge(Default_Theme.secondoryTextStyle),
@@ -38,7 +38,9 @@ class CheckUpdateView extends StatelessWidget {
               child: Text(
                 "We're cooking up something amazing in the void! 🚀 Please be patient while we prepare the next update. Good things take time, and we promise it'll be worth the wait! ⏳✨",
                 style: TextStyle(
-                        color: Default_Theme.primaryColor1
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
                             .withValues(alpha: 0.8),
                         fontSize: 16)
                     .merge(Default_Theme.tertiaryTextStyle),
@@ -49,7 +51,9 @@ class CheckUpdateView extends StatelessWidget {
             Text(
               "Stay tuned, music lover! 🎵",
               style: TextStyle(
-                      color: Default_Theme.primaryColor2
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
                           .withValues(alpha: 0.6),
                       fontSize: 14)
                   .merge(Default_Theme.tertiaryTextStyle),

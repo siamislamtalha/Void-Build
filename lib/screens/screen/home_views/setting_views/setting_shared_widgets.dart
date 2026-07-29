@@ -820,7 +820,7 @@ class _DropdownBottomSheet<T> extends StatelessWidget {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: Default_Theme.primaryColor2.withValues(alpha: 0.15),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -831,7 +831,7 @@ class _DropdownBottomSheet<T> extends StatelessWidget {
               child: Text(
                 title.toUpperCase(),
                 style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                  color: Default_Theme.primaryColor2.withValues(alpha: 0.45),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.5,

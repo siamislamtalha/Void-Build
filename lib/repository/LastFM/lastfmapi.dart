@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -166,7 +167,13 @@ class LastFmAPI {
     params['format'] = 'json';
 
     try {
-      await http.post(Uri.parse(apiUrl), body: params);
+      await http.post(Uri.parse(apiUrl), body: params).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          log('updateNowPlaying timeout', name: 'LastFM API');
+          throw TimeoutException('Request timed out');
+        },
+      );
     } catch (e) {
       log('updateNowPlaying failed: $e', name: 'LastFM API');
     }
@@ -192,7 +199,13 @@ class LastFmAPI {
 
     params['api_sig'] = generateApiSig(params, apiSecret!);
     params['format'] = 'json';
-    final response = await http.post(Uri.parse(apiUrl), body: params);
+    final response = await http.post(Uri.parse(apiUrl), body: params).timeout(
+      const Duration(seconds: 15),
+      onTimeout: () {
+        log('scrobble timeout', name: 'LastFM API');
+        throw TimeoutException('Request timed out');
+      },
+    );
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = jsonDecode(response.body);
@@ -231,7 +244,13 @@ class LastFmAPI {
 
     try {
       final response =
-          await http.get(Uri.http('ws.audioscrobbler.com', '/2.0/', params));
+          await http.get(Uri.http('ws.audioscrobbler.com', '/2.0/', params)).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          log('fetchRequestToken timeout', name: 'LastFM API');
+          throw TimeoutException('Request timed out');
+        },
+      );
       Map<String, dynamic> responseData = jsonDecode(response.body);
 
       if (responseData.containsKey('token')) {
@@ -292,7 +311,13 @@ class LastFmAPI {
       throw Exception("LastFM API not initialized.");
     }
     final url = "$userStation$username${userStationEndpoints['recommended']}";
-    final response = await http.get(Uri.parse(url));
+    final response = await http.get(Uri.parse(url)).timeout(
+      const Duration(seconds: 15),
+      onTimeout: () {
+        log('getUserRecommendedList timeout', name: 'LastFM API');
+        throw TimeoutException('Request timed out');
+      },
+    );
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
@@ -305,7 +330,13 @@ class LastFmAPI {
       throw Exception("LastFM API not initialized.");
     }
     final url = "$userStation$username${userStationEndpoints['mix']}";
-    final response = await http.get(Uri.parse(url));
+    final response = await http.get(Uri.parse(url)).timeout(
+      const Duration(seconds: 15),
+      onTimeout: () {
+        log('getUserMixList timeout', name: 'LastFM API');
+        throw TimeoutException('Request timed out');
+      },
+    );
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
@@ -318,7 +349,13 @@ class LastFmAPI {
       throw Exception("LastFM API not initialized.");
     }
     final url = "$userStation$username${userStationEndpoints['library']}";
-    final response = await http.get(Uri.parse(url));
+    final response = await http.get(Uri.parse(url)).timeout(
+      const Duration(seconds: 15),
+      onTimeout: () {
+        log('getUserLibraryList timeout', name: 'LastFM API');
+        throw TimeoutException('Request timed out');
+      },
+    );
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {

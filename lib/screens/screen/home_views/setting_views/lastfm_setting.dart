@@ -1,4 +1,4 @@
-﻿import 'dart:developer';
+import 'dart:developer';
 
 import 'package:voidmusic/blocs/lastdotfm/lastdotfm_cubit.dart';
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
@@ -77,9 +77,9 @@ class _LastDotFMState extends State<LastDotFM> {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_rounded,
-                color: Default_Theme.primaryColor1,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 24,
               ),
               onPressed: () => Navigator.pop(context),
@@ -164,7 +164,7 @@ class _LastDotFMState extends State<LastDotFM> {
                                       ? Default_Theme.successColor
                                       : lfmState is LastdotfmFailed
                                           ? Colors.red.withValues(alpha: 0.8)
-                                          : Default_Theme.primaryColor2
+                                          : Theme.of(context).colorScheme.onSurface
                                               .withValues(alpha: 0.5),
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
@@ -275,16 +275,19 @@ class _AuthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final activeColor = destructive ? Colors.red : AppTheme.accentColor(context);
+    final buttonTextColor = destructive
+        ? Colors.white
+        : (isDark ? Colors.black : Colors.white);
 
     return ElevatedButton(
       onPressed: enabled ? onPressed : null,
       style: ElevatedButton.styleFrom(
         backgroundColor: activeColor,
         disabledBackgroundColor: activeColor.withValues(alpha: 0.3),
-        foregroundColor: Default_Theme.primaryColor2,
-        disabledForegroundColor:
-            Default_Theme.primaryColor2.withValues(alpha: 0.4),
+        foregroundColor: buttonTextColor,
+        disabledForegroundColor: buttonTextColor.withValues(alpha: 0.4),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         elevation: 0,

@@ -24,9 +24,9 @@ class HistoryView extends StatelessWidget {
           centerTitle: true,
           actions: [
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 MingCute.settings_1_line,
-                color: Default_Theme.primaryColor1,
+                color: AppTheme.accentColor(context),
               ),
               onPressed: () {
                 Navigator.push(
@@ -40,11 +40,13 @@ class HistoryView extends StatelessWidget {
           ],
           title: Text(
             l10n.recentsTitle,
-            style: const TextStyle(
-                    color: Default_Theme.primaryColor1,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold)
-                .merge(Default_Theme.secondoryTextStyle),
+            style: Default_Theme.secondoryTextStyle.merge(
+              TextStyle(
+                color: AppTheme.accentColor(context),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
         body: BlocBuilder<HistoryCubit, HistoryState>(
@@ -85,7 +87,8 @@ class HistoryView extends StatelessWidget {
   }
 
   ListTile settingListTile(
-      {required String title,
+      BuildContext context, {
+      required String title,
       required String subtitle,
       required IconData icon,
       VoidCallback? onTap}) {
@@ -93,19 +96,25 @@ class HistoryView extends StatelessWidget {
       leading: Icon(
         icon,
         size: 30,
-        color: Default_Theme.primaryColor1,
+        color: AppTheme.accentColor(context),
       ),
       title: Text(
         title,
-        style: const TextStyle(color: Default_Theme.primaryColor1, fontSize: 17)
-            .merge(Default_Theme.secondoryTextStyleMedium),
+        style: Default_Theme.secondoryTextStyleMedium.merge(
+          TextStyle(
+            color: AppTheme.accentColor(context),
+            fontSize: 17,
+          ),
+        ),
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(
-                color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
-                fontSize: 12.5)
-            .merge(Default_Theme.secondoryTextStyleMedium),
+        style: Default_Theme.secondoryTextStyleMedium.merge(
+          TextStyle(
+            color: AppTheme.secondaryTextColor(context),
+            fontSize: 12.5,
+          ),
+        ),
       ),
       onTap: () {
         if (onTap != null) {

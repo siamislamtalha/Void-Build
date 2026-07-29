@@ -236,11 +236,15 @@ class _SearchScreenState extends State<SearchScreen> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           resizeToAvoidBottomInset: false,
           body: Stack(
+            fit: StackFit.expand,
             children: [
               // Extracted Background Painter
-              _NebulaBackground(contentBloc: _contentBloc),
+              Positioned.fill(
+                child: _NebulaBackground(contentBloc: _contentBloc),
+              ),
 
               SafeArea(
+                bottom: false,
                 child: ValueListenableBuilder<bool>(
                   valueListenable: _isSuggestionPanelOpenNotifier,
                   builder: (context, isSuggestionPanelOpen, _) {
@@ -1443,7 +1447,7 @@ class _NebulaBackground extends StatelessWidget {
           duration: const Duration(milliseconds: 1500),
           curve: Curves.easeOutCubic,
           width: double.infinity,
-          height: MediaQuery.of(context).size.height * 0.75,
+          height: double.infinity,
           child: CustomPaint(
               painter: NebulaPainter(
                   color1: colors[0].withValues(alpha: 0.18),

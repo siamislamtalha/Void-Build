@@ -108,11 +108,13 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
             child: Text(
               widget.section.title,
               textAlign: TextAlign.start,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
-              ).merge(Default_Theme.secondoryTextStyle),
+              style: Default_Theme.secondoryTextStyle.merge(
+                TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.accentColor(context),
+                ),
+              ),
             ),
           ),
           SizedBox(

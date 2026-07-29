@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/core/di/service_locator.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
@@ -9,6 +10,9 @@ import 'package:voidmusic/screens/widgets/bloomee_ui_kit/bloomee_dialog.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
+import 'package:voidmusic/services/plugin/plugin_load_state_service.dart';
+import 'package:voidmusic/services/db/dao/settings_dao.dart';
+import 'package:voidmusic/services/db/db_provider.dart';
 import 'package:voidmusic/src/rust/api/plugin/manifest.dart';
 import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
 import 'package:voidmusic/src/rust/api/plugin/types.dart';
@@ -149,8 +153,8 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
       ),
       title: Text(
         l10n.pluginManagerTitle,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
           fontSize: 20,
           fontWeight: FontWeight.w700,
           letterSpacing: -0.5,
@@ -167,11 +171,11 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
               height: 46,
               margin: const EdgeInsets.only(bottom: 12, left: 20, right: 20),
               decoration: BoxDecoration(
-                color: Default_Theme.primaryColor1.withValues(alpha: 0.05),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 borderRadius:
                     BorderRadius.circular(14), // Perfect concentric math
                 border: Border.all(
-                    color: Default_Theme.primaryColor1.withValues(alpha: 0.04),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                     width: 1),
               ),
               child: TabBar(
@@ -179,14 +183,14 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicatorPadding: const EdgeInsets.all(4),
                 indicator: BoxDecoration(
-                  color: Default_Theme.primaryColor1.withValues(alpha: 0.12),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(
                       10), // 14 (outer) - 4 (padding) = 10 (inner)
                   border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.05), width: 1),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08), width: 1),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.12),
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.black.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
                       blurRadius: 4,
                       offset: const Offset(0, 2), // Subtle lift effect
                     ),
@@ -194,9 +198,9 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
                 ),
                 splashFactory: NoSplash.splashFactory,
                 overlayColor: WidgetStateProperty.all(Colors.transparent),
-                labelColor: Colors.white,
+                labelColor: Theme.of(context).colorScheme.onSurface,
                 unselectedLabelColor:
-                    Default_Theme.primaryColor2.withValues(alpha: 0.65),
+                    Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 labelStyle: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -227,8 +231,8 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
             }
             return IconButton(
               tooltip: l10n.pluginManagerTooltipRefresh,
-              icon: const Icon(MingCute.refresh_2_line,
-                  color: Default_Theme.primaryColor1, size: 22),
+              icon: Icon(MingCute.refresh_2_line,
+                  color: Theme.of(context).colorScheme.onSurface, size: 22),
               onPressed: () =>
                   context.read<PluginBloc>().add(const RefreshPlugins()),
             );
@@ -271,7 +275,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
                 borderRadius: BorderRadius.circular(16),
                 splashColor: Colors.transparent,
                 highlightColor:
-                    Default_Theme.primaryColor1.withValues(alpha: 0.05),
+                    Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -279,12 +283,12 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppTheme.accentColor(context).withValues(alpha: 0.15)
-                        : Default_Theme.primaryColor1.withValues(alpha: 0.04),
+                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isSelected
                           ? AppTheme.accentColor(context).withValues(alpha: 0.5)
-                          : Default_Theme.primaryColor1.withValues(alpha: 0.05),
+                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                       width: 1.2,
                     ),
                   ),
@@ -293,7 +297,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
                     style: TextStyle(
                       color: isSelected
                           ? AppTheme.accentColor(context)
-                          : Default_Theme.primaryColor1.withValues(alpha: 0.7),
+                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       fontSize: 13,
                       fontWeight:
                           isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -319,12 +323,12 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
           children: [
             Icon(MingCute.ghost_line,
                 size: 48,
-                color: Default_Theme.primaryColor1.withValues(alpha: 0.2)),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
             const SizedBox(height: 16),
             Text(
               l10n.pluginManagerNoMatch,
               style: TextStyle(
-                  color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   fontSize: 15,
                   fontWeight: FontWeight.w500),
             ),
@@ -444,17 +448,17 @@ class _PluginCard extends StatelessWidget {
       child: InkWell(
         onTap: isDeleting ? null : () => _showPluginDetails(context),
         borderRadius: BorderRadius.circular(16),
-        highlightColor: Default_Theme.primaryColor1.withValues(alpha: 0.05),
-        splashColor: Default_Theme.primaryColor1.withValues(alpha: 0.04),
+        highlightColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+        splashColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: Default_Theme.primaryColor1.withValues(alpha: 0.03),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isLoaded
                   ? AppTheme.accentColor(context).withValues(alpha: 0.2)
-                  : Default_Theme.primaryColor1.withValues(alpha: 0.05),
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
               width: 1,
             ),
           ),
@@ -466,7 +470,7 @@ class _PluginCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isLoaded
                       ? AppTheme.accentColor(context).withValues(alpha: 0.15)
-                      : Default_Theme.primaryColor1.withValues(alpha: 0.05),
+                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isLoaded
@@ -498,7 +502,7 @@ class _PluginCard extends StatelessWidget {
                           child: Text(
                             manifest.name,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.95),
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               letterSpacing: -0.2,
@@ -523,7 +527,7 @@ class _PluginCard extends StatelessWidget {
                       '${manifest.publisher.name} • v${manifest.version}',
                       style: TextStyle(
                         color:
-                            Default_Theme.primaryColor2.withValues(alpha: 0.7),
+                            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -692,11 +696,11 @@ class _CustomSwitchState extends State<_CustomSwitch> {
             borderRadius: BorderRadius.circular(14),
             color: _localValue
                 ? AppTheme.accentColor(context).withValues(alpha: 0.15)
-                : Default_Theme.primaryColor1.withValues(alpha: 0.05),
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
             border: Border.all(
               color: _localValue
                   ? AppTheme.accentColor(context).withValues(alpha: 0.5)
-                  : Default_Theme.primaryColor1.withValues(alpha: 0.15),
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18),
               width: 1.5,
             ),
           ),
@@ -714,7 +718,7 @@ class _CustomSwitchState extends State<_CustomSwitch> {
                 borderRadius: BorderRadius.circular(10),
                 color: _localValue
                     ? AppTheme.accentColor(context)
-                    : Default_Theme.primaryColor1.withValues(alpha: 0.4),
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35),
               ),
               child: widget.isLoading
                   ? Center(
@@ -725,7 +729,7 @@ class _CustomSwitchState extends State<_CustomSwitch> {
                               strokeWidth: 2,
                               color: _localValue
                                   ? Default_Theme.themeColor
-                                  : Default_Theme.primaryColor1)))
+                                  : Theme.of(context).colorScheme.onSurface)))
                   : const SizedBox.shrink(),
             ),
           ),
@@ -737,15 +741,50 @@ class _CustomSwitchState extends State<_CustomSwitch> {
 
 // ─── Professional, Clean Bottom Sheet ──────────────────────────────────────
 
-class _PluginDetailSheet extends StatelessWidget {
+class _PluginDetailSheet extends StatefulWidget {
   final PluginInfo plugin;
 
   const _PluginDetailSheet({required this.plugin});
 
   @override
+  State<_PluginDetailSheet> createState() => _PluginDetailSheetState();
+}
+
+class _PluginDetailSheetState extends State<_PluginDetailSheet> {
+  final _loadStateService =
+      PluginLoadStateService(SettingsDAO(DBProvider.db));
+  bool? _autoStart;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAutoStart();
+  }
+
+  Future<void> _loadAutoStart() async {
+    final ids = await _loadStateService.readAutoLoadPluginIds();
+    if (mounted) {
+      setState(() {
+        _autoStart = ids.contains(widget.plugin.manifest.id);
+      });
+    }
+  }
+
+  Future<void> _setAutoStart(bool value) async {
+    setState(() => _autoStart = value);
+    if (value) {
+      await _loadStateService
+          .addAutoLoadPluginIds([widget.plugin.manifest.id]);
+    } else {
+      await _loadStateService
+          .removeAutoLoadPluginIds([widget.plugin.manifest.id]);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final manifest = plugin.manifest;
-    final l10n = AppLocalizations.of(context)!;
+    final manifest = widget.plugin.manifest;
+    final pluginType = widget.plugin.pluginType;
 
     return BlocBuilder<PluginBloc, PluginState>(
       builder: (context, state) {
@@ -754,266 +793,291 @@ class _PluginDetailSheet extends StatelessWidget {
         final operating = operation != null;
         final deleting = operation == PluginOperation.deleting;
 
-        return Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            border: Border(
-                top: BorderSide(
-                    color: Default_Theme.primaryColor1.withValues(alpha: 0.08),
-                    width: 1)),
-          ),
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 48,
-                  height: 5,
-                  margin: const EdgeInsets.only(bottom: 24),
-                  decoration: BoxDecoration(
-                    color: Default_Theme.primaryColor1.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: isLoaded
-                          ? AppTheme.accentColor(context).withValues(alpha: 0.15)
-                          : Default_Theme.primaryColor1.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: isLoaded
-                            ? AppTheme.accentColor(context).withValues(alpha: 0.5)
-                            : Colors.transparent,
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Center(
-                      child: _PluginCard._pluginAvatar(
-                        context: context,
-                        manifest: manifest,
-                        type: plugin.pluginType,
-                        isLoaded: isLoaded,
-                        iconSize: 28,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          manifest.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Text(
-                              manifest.publisher.name,
-                              style: TextStyle(
-                                  color: Default_Theme.primaryColor2
-                                      .withValues(alpha: 0.8),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            const SizedBox(width: 10),
-                            _StatusBadge(isLoaded: isLoaded),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              if (manifest.description.isNotEmpty) ...[
-                Text(
-                  manifest.description,
-                  style: TextStyle(
-                      color: Default_Theme.primaryColor1.withValues(alpha: 0.8),
-                      fontSize: 14,
-                      height: 1.5,
-                      fontWeight: FontWeight.w400),
-                ),
-                const SizedBox(height: 24),
-              ],
-              Container(
-                decoration: BoxDecoration(
-                  color: Default_Theme.primaryColor1.withValues(alpha: 0.04),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
+        return SingleChildScrollView(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(28)),
+              border: Border(
+                  top: BorderSide(
                       color:
-                          Default_Theme.primaryColor1.withValues(alpha: 0.05)),
+                          Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+                      width: 1)),
+            ),
+            padding: EdgeInsets.fromLTRB(
+                24, 12, 24, MediaQuery.of(context).viewInsets.bottom + 40),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Handle ──
+                Center(
+                  child: Container(
+                    width: 48,
+                    height: 5,
+                    margin: const EdgeInsets.only(bottom: 24),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
-                child: Column(
+                // ── Header: icon + name + publisher ──
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _DetailRow(
-                        label: l10n.pluginManagerDetailVersion,
-                        value: manifest.version),
-                    const _DetailDivider(),
-                    _DetailRow(
-                        label: l10n.pluginManagerDetailType,
-                        value: _PluginCard._pluginTypeLabel(
-                            plugin.pluginType, l10n)),
-                    if (manifest.publisher.name.isNotEmpty) ...[
-                      const _DetailDivider(),
-                      _DetailRow(
-                          label: l10n.pluginManagerDetailPublisher,
-                          value: manifest.publisher.name),
-                    ],
-                    if (manifest.lastUpdated != null &&
-                        manifest.lastUpdated!.isNotEmpty) ...[
-                      const _DetailDivider(),
-                      _DetailRow(
-                          label: l10n.pluginManagerDetailLastUpdated,
-                          value: _formatDate(manifest.lastUpdated!)),
-                    ],
-                    if (manifest.createdAt != null &&
-                        manifest.createdAt!.isNotEmpty) ...[
-                      const _DetailDivider(),
-                      _DetailRow(
-                          label: l10n.pluginManagerDetailCreated,
-                          value: _formatDate(manifest.createdAt!)),
-                    ],
-                    if (manifest.homepage.isNotEmpty) ...[
-                      const _DetailDivider(),
-                      _DetailRow(
-                          label: l10n.pluginManagerDetailHomepage,
-                          value: manifest.homepage),
-                    ],
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: isLoaded
+                            ? AppTheme.accentColor(context)
+                                .withValues(alpha: 0.15)
+                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: isLoaded
+                              ? AppTheme.accentColor(context)
+                                  .withValues(alpha: 0.5)
+                              : Colors.transparent,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Center(
+                        child: _PluginCard._pluginAvatar(
+                          context: context,
+                          manifest: manifest,
+                          type: pluginType,
+                          isLoaded: isLoaded,
+                          iconSize: 28,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            manifest.name,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Text(
+                                manifest.publisher.name,
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.55),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(width: 10),
+                              _StatusBadge(isLoaded: isLoaded),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 36),
-              Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: operating
-                            ? null
-                            : () {
-                                final bloc = context.read<PluginBloc>();
-                                if (isLoaded) {
-                                  bloc.add(UnloadPlugin(
-                                      pluginId: manifest.id,
-                                      pluginType: plugin.pluginType));
-                                } else {
-                                  bloc.add(LoadPlugin(
-                                      pluginId: manifest.id,
-                                      pluginType: plugin.pluginType));
-                                }
-                              },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isLoaded
-                              ? Colors.transparent
-                              : AppTheme.accentColor(context)
-                                  .withValues(alpha: 0.15),
-                          foregroundColor: isLoaded
-                              ? Default_Theme.primaryColor1
-                              : AppTheme.accentColor(context),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            side: BorderSide(
-                              color: isLoaded
-                                  ? Default_Theme.primaryColor1
-                                      .withValues(alpha: 0.2)
-                                  : AppTheme.accentColor(context)
-                                      .withValues(alpha: 0.5),
-                              width: 1.5,
+                const SizedBox(height: 20),
+
+                // ── Description ──
+                if (manifest.description.isNotEmpty) ...[
+                  Text(
+                    manifest.description,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
+                        fontSize: 14,
+                        height: 1.5,
+                        fontWeight: FontWeight.w400),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+
+                // ── Info Card ──
+                Container(
+                  decoration: BoxDecoration(
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.onSurface
+                            .withValues(alpha: 0.06)),
+                  ),
+                  child: Column(
+                    children: [
+                      _DetailRow(
+                          label: 'Version', value: manifest.version),
+                      const _DetailDivider(),
+                      _DetailRow(
+                          label: 'Type',
+                          value: _PluginCard._pluginTypeLabel(
+                              pluginType, AppLocalizations.of(context)!)),
+                      if (manifest.publisher.name.isNotEmpty) ...[
+                        const _DetailDivider(),
+                        _DetailRow(
+                            label: 'Publisher',
+                            value: manifest.publisher.name),
+                      ],
+                      if (manifest.lastUpdated != null &&
+                          manifest.lastUpdated!.isNotEmpty) ...[
+                        const _DetailDivider(),
+                        _DetailRow(
+                            label: 'Last Updated',
+                            value: _formatDate(manifest.lastUpdated!)),
+                      ],
+                      if (manifest.createdAt != null &&
+                          manifest.createdAt!.isNotEmpty) ...[
+                        const _DetailDivider(),
+                        _DetailRow(
+                            label: 'Created',
+                            value: _formatDate(manifest.createdAt!)),
+                      ],
+                      if (manifest.homepage.isNotEmpty) ...[
+                        const _DetailDivider(),
+                        _DetailRow(
+                            label: 'Homepage', value: manifest.homepage),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // ── Plugin Settings Card ──
+                _PluginSettingsCard(
+                  plugin: widget.plugin,
+                  isLoaded: isLoaded,
+                  autoStart: _autoStart ?? false,
+                  onAutoStartChanged: _setAutoStart,
+                ),
+                const SizedBox(height: 24),
+
+                // ── Action Buttons ──
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: operating
+                              ? null
+                              : () {
+                                  final bloc = context.read<PluginBloc>();
+                                  if (isLoaded) {
+                                    bloc.add(UnloadPlugin(
+                                        pluginId: manifest.id,
+                                        pluginType: pluginType));
+                                  } else {
+                                    bloc.add(LoadPlugin(
+                                        pluginId: manifest.id,
+                                        pluginType: pluginType));
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isLoaded
+                                ? Colors.transparent
+                                : AppTheme.accentColor(context)
+                                    .withValues(alpha: 0.15),
+                            foregroundColor: isLoaded
+                                ? Theme.of(context).colorScheme.onSurface
+                                : AppTheme.accentColor(context),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              side: BorderSide(
+                                color: isLoaded
+                                    ? Theme.of(context).colorScheme.onSurface
+                                        .withValues(alpha: 0.2)
+                                    : AppTheme.accentColor(context)
+                                        .withValues(alpha: 0.5),
+                                width: 1.5,
+                              ),
                             ),
                           ),
+                          child: operating
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: isLoaded
+                                          ? AppTheme.accentColor(context)
+                                          : Theme.of(context).colorScheme.onSurface))
+                              : Text(
+                                  deleting
+                                      ? 'Deleting…'
+                                      : isLoaded
+                                          ? 'Disable Plugin'
+                                          : 'Enable Plugin',
+                                  style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700),
+                                ),
                         ),
-                        child: operating
-                            ? SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: isLoaded
-                                        ? Colors.red
-                                        : isLoaded
-                                            ? Default_Theme.primaryColor1
-                                            : AppTheme.accentColor(context)))
-                            : Text(
-                                deleting
-                                    ? l10n.pluginManagerDeleting
-                                    : isLoaded
-                                        ? l10n.pluginManagerUnloadPlugin
-                                        : l10n.pluginManagerEnablePlugin,
-                                style: const TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.w700),
-                              ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  if (manifest.keysRequired.isNotEmpty) ...[
+                    const SizedBox(width: 12),
+                    if (manifest.keysRequired.isNotEmpty) ...[
+                      SizedBox(
+                        height: 52,
+                        width: 52,
+                        child: IconButton(
+                          onPressed: () =>
+                              _showKeysDialog(context, manifest),
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppTheme.accentColor(context)
+                                .withValues(alpha: 0.15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              side: BorderSide(
+                                  color: AppTheme.accentColor(context)
+                                      .withValues(alpha: 0.5),
+                                  width: 1.5),
+                            ),
+                          ),
+                          icon: Icon(Icons.key_rounded,
+                              color: AppTheme.accentColor(context), size: 22),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                    ],
                     SizedBox(
                       height: 52,
                       width: 52,
                       child: IconButton(
-                        onPressed: () => _showKeysDialog(context, manifest),
+                        onPressed: operating
+                            ? null
+                            : () => _confirmDelete(
+                                context, manifest.id, manifest.name),
                         style: IconButton.styleFrom(
-                          backgroundColor: AppTheme.accentColor(context)
-                              .withValues(alpha: 0.15),
+                          backgroundColor: Colors.red.withValues(alpha: 0.15),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                             side: BorderSide(
-                                color: AppTheme.accentColor(context)
-                                    .withValues(alpha: 0.5),
+                                color: Colors.red.withValues(alpha: 0.5),
                                 width: 1.5),
                           ),
                         ),
-                        icon: Icon(Icons.key_rounded,
-                            color: AppTheme.accentColor(context), size: 22),
+                        icon: const Icon(MingCute.delete_2_line,
+                            color: Colors.red, size: 22),
                       ),
                     ),
-                    const SizedBox(width: 12),
                   ],
-                  SizedBox(
-                    height: 52,
-                    width: 52,
-                    child: IconButton(
-                      onPressed: operating
-                          ? null
-                          : () => _confirmDelete(
-                              context, manifest.id, manifest.name),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.red.withValues(alpha: 0.15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          side: BorderSide(
-                              color: Colors.red.withValues(alpha: 0.5),
-                              width: 1.5),
-                        ),
-                      ),
-                      icon: const Icon(MingCute.delete_2_line,
-                          color: Colors.red, size: 22),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -1036,12 +1100,12 @@ class _PluginDetailSheet extends StatelessWidget {
           l10n.pluginManagerDeleteAction,
           isDestructive: true,
           onPressed: () {
-            if (plugin.manifest.keysRequired.isNotEmpty) {
+            if (widget.plugin.manifest.keysRequired.isNotEmpty) {
               _confirmStorageCleanup(context, bloc, pluginId, pluginName);
             } else {
               if (context.mounted) Navigator.of(context).pop();
               bloc.add(DeletePlugin(
-                  pluginId: pluginId, pluginType: plugin.pluginType));
+                  pluginId: pluginId, pluginType: widget.plugin.pluginType));
             }
           },
         ),
@@ -1064,7 +1128,7 @@ class _PluginDetailSheet extends StatelessWidget {
             if (context.mounted) Navigator.of(context).pop();
             bloc.add(DeletePlugin(
                 pluginId: pluginId,
-                pluginType: plugin.pluginType,
+                pluginType: widget.plugin.pluginType,
                 cleanStorage: false));
           },
         ),
@@ -1075,7 +1139,7 @@ class _PluginDetailSheet extends StatelessWidget {
             if (context.mounted) Navigator.of(context).pop();
             bloc.add(DeletePlugin(
                 pluginId: pluginId,
-                pluginType: plugin.pluginType,
+                pluginType: widget.plugin.pluginType,
                 cleanStorage: true));
           },
         ),
@@ -1091,6 +1155,595 @@ class _PluginDetailSheet extends StatelessWidget {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => _ApiKeysDialogContent(manifest: manifest),
+    );
+  }
+}
+
+// ─── Rich Plugin Settings Card ───────────────────────────────────────────────
+
+class _PluginSettingsCard extends StatefulWidget {
+  final PluginInfo plugin;
+  final bool isLoaded;
+  final bool autoStart;
+  final Future<void> Function(bool) onAutoStartChanged;
+
+  const _PluginSettingsCard({
+    required this.plugin,
+    required this.isLoaded,
+    required this.autoStart,
+    required this.onAutoStartChanged,
+  });
+
+  @override
+  State<_PluginSettingsCard> createState() => _PluginSettingsCardState();
+}
+
+class _PluginSettingsCardState extends State<_PluginSettingsCard> {
+  late bool _autoStart;
+
+  @override
+  void initState() {
+    super.initState();
+    _autoStart = widget.autoStart;
+  }
+
+  @override
+  void didUpdateWidget(covariant _PluginSettingsCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.autoStart != widget.autoStart) {
+      _autoStart = widget.autoStart;
+    }
+  }
+
+  bool get _isContentResolver =>
+      widget.plugin.pluginType == PluginType.contentResolver;
+  bool get _isLyricsProvider =>
+      widget.plugin.pluginType == PluginType.lyricsProvider;
+  bool get _isSuggestionProvider =>
+      widget.plugin.pluginType == PluginType.searchSuggestionProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    final pluginId = widget.plugin.manifest.id;
+
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, settings) {
+        final isHome = settings.homePluginIds.contains(pluginId);
+        final isSearch = settings.searchPluginIds.contains(pluginId);
+        final isDownload = settings.downloadPluginIds.contains(pluginId);
+        final resolverPriority = settings.resolverPriority;
+        final lyricsPriority = settings.lyricsPriority;
+        final suggestionPriority = settings.suggestionPluginIds;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Section Header
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    Icon(MingCute.settings_3_line,
+                        size: 16,
+                        color: AppTheme.accentColor(context)
+                            .withValues(alpha: 0.9)),
+                    const SizedBox(width: 8),
+                    Text(
+                      'PLUGIN SETTINGS',
+                      style: TextStyle(
+                        color: AppTheme.accentColor(context)
+                            .withValues(alpha: 0.9),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(height: 1, thickness: 1, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
+
+              // ── Auto Start ──
+              _SettingsTile(
+                icon: MingCute.power_line,
+                title: 'Auto Start on Launch',
+                subtitle: 'Automatically load this plugin when the app starts',
+                trailing: _SettingsSwitch(
+                  value: _autoStart,
+                  onChangedAsync: (val) async {
+                    setState(() => _autoStart = val);
+                    await widget.onAutoStartChanged(val);
+                  },
+                ),
+              ),
+
+              // ── Content Resolver Settings ──
+              if (_isContentResolver) ...[
+                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+
+                // Use as Home Plugin
+                _SettingsTile(
+                  icon: MingCute.home_4_line,
+                  title: 'Use as Home Plugin',
+                  subtitle: 'Show this plugin\'s playlists on the Discover page',
+                  trailing: _SettingsSwitch(
+                    value: isHome,
+                    onChanged: (val) {
+                      final cubit = context.read<SettingsCubit>();
+                      final current =
+                          List<String>.from(settings.homePluginIds);
+                      if (val) {
+                        if (!current.contains(pluginId)) {
+                          current.insert(0, pluginId);
+                        }
+                      } else {
+                        current.remove(pluginId);
+                      }
+                      cubit.setHomePluginIds(current);
+                    },
+                  ),
+                ),
+
+                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+
+                // Use as Search Plugin
+                _SettingsTile(
+                  icon: MingCute.search_line,
+                  title: 'Use as Search Plugin',
+                  subtitle: 'Include this plugin as a source in search',
+                  trailing: _SettingsSwitch(
+                    value: isSearch,
+                    onChanged: (val) {
+                      final cubit = context.read<SettingsCubit>();
+                      final current =
+                          List<String>.from(settings.searchPluginIds);
+                      if (val) {
+                        if (!current.contains(pluginId)) {
+                          current.add(pluginId);
+                        }
+                      } else {
+                        current.remove(pluginId);
+                      }
+                      cubit.setSearchPluginIds(current);
+                    },
+                  ),
+                ),
+
+                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+
+                // Use for Downloads
+                _SettingsTile(
+                  icon: MingCute.download_2_line,
+                  title: 'Use for Downloads',
+                  subtitle: 'Use this plugin for resolving download streams',
+                  trailing: _SettingsSwitch(
+                    value: isDownload,
+                    onChanged: (val) {
+                      final cubit = context.read<SettingsCubit>();
+                      final current =
+                          List<String>.from(settings.downloadPluginIds);
+                      if (val) {
+                        if (!current.contains(pluginId)) {
+                          current.add(pluginId);
+                        }
+                      } else {
+                        current.remove(pluginId);
+                      }
+                      cubit.setDownloadPluginIds(current);
+                    },
+                  ),
+                ),
+
+                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+
+                // Resolver Priority
+                _SettingsPriorityTile(
+                  icon: MingCute.list_ordered_line,
+                  title: 'Resolver Priority',
+                  subtitle: 'Position in content resolver order',
+                  pluginId: pluginId,
+                  priorityList: resolverPriority,
+                  onMoveUp: () {
+                    final list = List<String>.from(resolverPriority);
+                    final idx = list.indexOf(pluginId);
+                    if (idx > 0) {
+                      list.removeAt(idx);
+                      list.insert(idx - 1, pluginId);
+                      context.read<SettingsCubit>().setResolverPriority(list);
+                    }
+                  },
+                  onMoveDown: () {
+                    final list = List<String>.from(resolverPriority);
+                    final idx = list.indexOf(pluginId);
+                    if (idx >= 0 && idx < list.length - 1) {
+                      list.removeAt(idx);
+                      list.insert(idx + 1, pluginId);
+                      context.read<SettingsCubit>().setResolverPriority(list);
+                    }
+                  },
+                ),
+              ],
+
+              // ── Lyrics Provider Settings ──
+              if (_isLyricsProvider) ...[
+                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+                _SettingsPriorityTile(
+                  icon: MingCute.align_center_line,
+                  title: 'Lyrics Priority',
+                  subtitle: 'Position in lyrics resolver order',
+                  pluginId: pluginId,
+                  priorityList: lyricsPriority,
+                  onMoveUp: () {
+                    final list = List<String>.from(lyricsPriority);
+                    final idx = list.indexOf(pluginId);
+                    if (idx > 0) {
+                      list.removeAt(idx);
+                      list.insert(idx - 1, pluginId);
+                      context.read<SettingsCubit>().setLyricsPriority(list);
+                    }
+                  },
+                  onMoveDown: () {
+                    final list = List<String>.from(lyricsPriority);
+                    final idx = list.indexOf(pluginId);
+                    if (idx >= 0 && idx < list.length - 1) {
+                      list.removeAt(idx);
+                      list.insert(idx + 1, pluginId);
+                      context.read<SettingsCubit>().setLyricsPriority(list);
+                    }
+                  },
+                ),
+              ],
+
+              // ── Suggestion Provider Settings ──
+              if (_isSuggestionProvider) ...[
+                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+                _SettingsPriorityTile(
+                  icon: MingCute.search_3_line,
+                  title: 'Suggestion Priority',
+                  subtitle: 'Position in search suggestion order',
+                  pluginId: pluginId,
+                  priorityList: suggestionPriority,
+                  onMoveUp: () {
+                    final list = List<String>.from(suggestionPriority);
+                    final idx = list.indexOf(pluginId);
+                    if (idx > 0) {
+                      list.removeAt(idx);
+                      list.insert(idx - 1, pluginId);
+                      context
+                          .read<SettingsCubit>()
+                          .setSuggestionPluginIds(list);
+                    }
+                  },
+                  onMoveDown: () {
+                    final list = List<String>.from(suggestionPriority);
+                    final idx = list.indexOf(pluginId);
+                    if (idx >= 0 && idx < list.length - 1) {
+                      list.removeAt(idx);
+                      list.insert(idx + 1, pluginId);
+                      context
+                          .read<SettingsCubit>()
+                          .setSuggestionPluginIds(list);
+                    }
+                  },
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ─── Settings Tile ────────────────────────────────────────────────────────────
+
+class _SettingsTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget trailing;
+
+  const _SettingsTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon,
+                size: 18,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          trailing,
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Priority Tile ────────────────────────────────────────────────────────────
+
+class _SettingsPriorityTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String pluginId;
+  final List<String> priorityList;
+  final VoidCallback onMoveUp;
+  final VoidCallback onMoveDown;
+
+  const _SettingsPriorityTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.pluginId,
+    required this.priorityList,
+    required this.onMoveUp,
+    required this.onMoveDown,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final idx = priorityList.indexOf(pluginId);
+    final position = idx >= 0 ? idx + 1 : null;
+    final total = priorityList.length;
+    final canMoveUp = idx > 0;
+    final canMoveDown = idx >= 0 && idx < total - 1;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon,
+                size: 18,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (position != null)
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: AppTheme.accentColor(context).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                    color: AppTheme.accentColor(context).withValues(alpha: 0.4)),
+              ),
+              child: Text(
+                '#$position of $total',
+                style: TextStyle(
+                  color: AppTheme.accentColor(context),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            )
+          else
+            Text(
+              'Not set',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                fontSize: 12,
+              ),
+            ),
+          const SizedBox(width: 8),
+          Column(
+            children: [
+              _PriorityArrow(
+                icon: MingCute.up_line,
+                enabled: canMoveUp,
+                onTap: onMoveUp,
+              ),
+              const SizedBox(height: 2),
+              _PriorityArrow(
+                icon: MingCute.down_line,
+                enabled: canMoveDown,
+                onTap: onMoveDown,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PriorityArrow extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  const _PriorityArrow({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: enabled ? onTap : null,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 150),
+        opacity: enabled ? 1.0 : 0.25,
+        child: Container(
+          width: 28,
+          height: 26,
+          decoration: BoxDecoration(
+            color: enabled
+                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Icon(icon,
+              size: 14,
+              color: enabled
+                  ? Theme.of(context).colorScheme.onSurface
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Settings Switch ──────────────────────────────────────────────────────────
+
+class _SettingsSwitch extends StatefulWidget {
+  final bool value;
+  final Future<void> Function(bool)? onChangedAsync;
+  final void Function(bool)? onChanged;
+
+  const _SettingsSwitch({
+    required this.value,
+    this.onChangedAsync,
+    this.onChanged,
+  });
+
+  @override
+  State<_SettingsSwitch> createState() => _SettingsSwitchState();
+}
+
+class _SettingsSwitchState extends State<_SettingsSwitch> {
+  late bool _local;
+
+  @override
+  void initState() {
+    super.initState();
+    _local = widget.value;
+  }
+
+  @override
+  void didUpdateWidget(covariant _SettingsSwitch oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value) _local = widget.value;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        final next = !_local;
+        setState(() => _local = next);
+        if (widget.onChangedAsync != null) {
+          await widget.onChangedAsync!(next);
+        }
+        if (widget.onChanged != null) {
+          widget.onChanged!(next);
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+        width: 46,
+        height: 26,
+        padding: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(13),
+          color: _local
+              ? AppTheme.accentColor(context).withValues(alpha: 0.15)
+              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+          border: Border.all(
+            color: _local
+                ? AppTheme.accentColor(context).withValues(alpha: 0.5)
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18),
+            width: 1.4,
+          ),
+        ),
+        child: AnimatedAlign(
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeOutCubic,
+          alignment: _local ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(9),
+              color: _local
+                  ? AppTheme.accentColor(context)
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -1167,15 +1820,15 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
                   width: 48,
                   height: 5,
                   decoration: BoxDecoration(
-                      color: Default_Theme.primaryColor1.withValues(alpha: 0.2),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10)),
                 ),
               ),
               const SizedBox(height: 24),
               Text(
                 l10n.pluginManagerApiKeysTitle,
-                style: const TextStyle(
-                    color: Colors.white,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 20,
                     fontWeight: FontWeight.bold),
               ),
@@ -1198,33 +1851,28 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
                       TextField(
                         controller: _controllers[entry.key],
                         obscureText: req.isSecret,
-                        style: const TextStyle(
-                            color: Colors.white,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 15,
                             fontWeight: FontWeight.w500),
                         decoration: InputDecoration(
                           labelText: keyLabel,
                           hintText: req.defaultValue ?? entry.key,
                           filled: true,
-                          fillColor: Default_Theme.primaryColor1
-                              .withValues(alpha: 0.04),
+                          fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
                           labelStyle: TextStyle(
-                              color: Default_Theme.primaryColor1
-                                  .withValues(alpha: 0.6)),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                           hintStyle: TextStyle(
-                              color: Default_Theme.primaryColor1
-                                  .withValues(alpha: 0.3)),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                           suffixIcon: req.isSecret
                               ? Icon(MingCute.eye_close_line,
-                                  color: Default_Theme.primaryColor1
-                                      .withValues(alpha: 0.4),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                                   size: 20)
                               : null,
                           enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide(
-                                  color: Default_Theme.primaryColor1
-                                      .withValues(alpha: 0.08))),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12))),
                           focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide(
@@ -1238,8 +1886,7 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
                           child: Text(
                             req.description,
                             style: TextStyle(
-                                color: Default_Theme.primaryColor1
-                                    .withValues(alpha: 0.5),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w400),
                           ),
@@ -1310,10 +1957,10 @@ class _InlineOperationIndicator extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-          color: Default_Theme.primaryColor1.withValues(alpha: 0.05),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.08))),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08))),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1325,7 +1972,7 @@ class _InlineOperationIndicator extends StatelessWidget {
           const SizedBox(width: 8),
           Text(label,
               style: TextStyle(
-                  color: Default_Theme.primaryColor1.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   fontSize: 12,
                   fontWeight: FontWeight.w600)),
         ],
@@ -1348,7 +1995,7 @@ class _StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: isLoaded
             ? AppTheme.accentColor(context).withValues(alpha: 0.15)
-            : Default_Theme.primaryColor1.withValues(alpha: 0.08),
+            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
             color: isLoaded
@@ -1363,7 +2010,7 @@ class _StatusBadge extends StatelessWidget {
         style: TextStyle(
             color: isLoaded
                 ? AppTheme.accentColor(context)
-                : Default_Theme.primaryColor1.withValues(alpha: 0.6),
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
             fontSize: 11,
             fontWeight: FontWeight.w700),
       ),
@@ -1394,12 +2041,12 @@ class _DetailRow extends StatelessWidget {
         children: [
           Text(label,
               style: TextStyle(
-                  color: Default_Theme.primaryColor2.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
                   fontSize: 14,
                   fontWeight: FontWeight.w500)),
           Text(value,
-              style: const TextStyle(
-                  color: Colors.white,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.w600)),
         ],
@@ -1415,6 +2062,6 @@ class _DetailDivider extends StatelessWidget {
     return Divider(
         height: 1,
         thickness: 1,
-        color: Default_Theme.primaryColor1.withValues(alpha: 0.05));
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06));
   }
 }

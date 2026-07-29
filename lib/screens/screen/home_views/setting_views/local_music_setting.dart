@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:voidmusic/blocs/local_music/cubit/local_music_cubit.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
@@ -94,9 +94,9 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_rounded,
-                color: Default_Theme.primaryColor1,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 24,
               ),
               onPressed: () => Navigator.pop(context),
@@ -146,9 +146,9 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                   borderRadius:
                       const BorderRadius.vertical(bottom: Radius.circular(20)),
                   highlightColor:
-                      Default_Theme.primaryColor2.withValues(alpha: 0.05),
+                      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                   splashColor:
-                      Default_Theme.primaryColor2.withValues(alpha: 0.05),
+                      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 16),
@@ -166,8 +166,8 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                             children: [
                               Text(
                                 l10n.localMusicScanNow,
-                                style: const TextStyle(
-                                  color: Default_Theme.primaryColor2,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: -0.2,
@@ -179,7 +179,7 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                                     ? l10n.localSettingScanInProgress
                                     : l10n.localSettingScanNowSubtitle,
                                 style: TextStyle(
-                                  color: Default_Theme.primaryColor2
+                                  color: Theme.of(context).colorScheme.onSurface
                                       .withValues(alpha: 0.5),
                                   fontSize: 13,
                                 ),
@@ -218,7 +218,7 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                       l10n.localSettingNoFolders,
                       style: TextStyle(
                         color:
-                            Default_Theme.primaryColor2.withValues(alpha: 0.5),
+                            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                         fontSize: 13,
                       ),
                     ),
@@ -243,8 +243,8 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                                 children: [
                                   Text(
                                     p.basename(folder),
-                                    style: const TextStyle(
-                                      color: Default_Theme.primaryColor2,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -253,8 +253,8 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                                   Text(
                                     folder,
                                     style: TextStyle(
-                                      color: Default_Theme.primaryColor2
-                                          .withValues(alpha: 0.45),
+                                      color: Theme.of(context).colorScheme.onSurface
+                                          .withValues(alpha: 0.5),
                                       fontSize: 12,
                                     ),
                                     maxLines: 1,
@@ -267,7 +267,7 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                               icon: Icon(
                                 Icons.remove_circle_outline,
                                 size: 20,
-                                color: Default_Theme.primaryColor2
+                                color: Theme.of(context).colorScheme.onSurface
                                     .withValues(alpha: 0.6),
                               ),
                               onPressed: () => _removeFolder(folder),
@@ -287,9 +287,9 @@ class _LocalMusicSettingsState extends State<LocalMusicSettings> {
                     borderRadius: const BorderRadius.vertical(
                         bottom: Radius.circular(20)),
                     highlightColor:
-                        Default_Theme.primaryColor2.withValues(alpha: 0.05),
+                        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                     splashColor:
-                        Default_Theme.primaryColor2.withValues(alpha: 0.05),
+                        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 16),

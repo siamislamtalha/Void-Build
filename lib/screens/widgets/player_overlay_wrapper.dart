@@ -103,6 +103,7 @@ class _PlayerOverlayWrapperState extends State<PlayerOverlayWrapper>
         if (mounted) {
           setState(() => _isDismissing = false);
           _dismissController.reset();
+          context.read<PlayerOverlayCubit>().onDismissAnimationComplete();
         }
       }
     });

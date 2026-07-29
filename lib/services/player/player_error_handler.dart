@@ -42,11 +42,11 @@ class RetryConfig {
   final Duration maxDelay;
 
   const RetryConfig({
-    this.maxRetriesPerTrack = 3,
-    this.maxConsecutiveTrackFailures = 4,
-    this.initialDelay = const Duration(seconds: 1),
-    this.backoffMultiplier = 2.0,
-    this.maxDelay = const Duration(seconds: 10),
+    this.maxRetriesPerTrack = 5,
+    this.maxConsecutiveTrackFailures = 6,
+    this.initialDelay = const Duration(milliseconds: 800),
+    this.backoffMultiplier = 1.8,
+    this.maxDelay = const Duration(seconds: 15),
   });
 }
 

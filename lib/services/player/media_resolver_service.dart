@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:voidmusic/core/events/global_event_bus.dart';
@@ -98,12 +99,23 @@ class MediaResolverService {
 
     PluginResponse response;
     try {
-      response = await _pluginService.execute(
-        pluginId: parts.pluginId,
-        request: PluginRequest.contentResolver(
-          ContentResolverCommand.getStreams(id: parts.localId),
+      response = await _pluginService
+          .execute(
+            pluginId: parts.pluginId,
+            request: PluginRequest.contentResolver(
+              ContentResolverCommand.getStreams(id: parts.localId),
+            ),
+          )
+          .timeout(const Duration(seconds: 12));
+    } on TimeoutException catch (e) {
+      log('Stream resolution timeout for "${track.title}": $e', name: 'MediaResolverService');
+      GlobalEventBus.instance.emitError(
+        AppError.pluginError(
+          pluginId: parts.pluginId,
+          message: 'Stream resolution timed out. Please check your network connection.',
         ),
       );
+      rethrow;
     } on PluginException catch (e) {
       if (e is PluginNotLoadedException) {
         GlobalEventBus.instance.emitError(
