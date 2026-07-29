@@ -647,7 +647,7 @@ class _ListOfPlaylists extends StatelessWidget {
       itemExtent: 80,
       itemCount: playlists.length,
       proxyDecorator: _proxyDecorator,
-      onReorderItem: (oldIndex, newIndex) {
+      onReorder: (oldIndex, newIndex) {
         context.read<LibraryItemsCubit>().reorderLibrary(oldIndex, newIndex);
       },
     );
