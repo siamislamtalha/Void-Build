@@ -868,10 +868,13 @@ class _SuggestionsSliver extends StatelessWidget {
         if (state is SearchSuggestionLoading) {
           return SliverToBoxAdapter(
             child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 48),
-                child: Center(
-                    child: CircularProgressIndicator(
-                        color: AppTheme.accentColor(context)),
+              padding: const EdgeInsets.symmetric(vertical: 48),
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: AppTheme.accentColor(context),
+                ),
+              ),
+            ),
           );
         }
 
@@ -1268,10 +1271,13 @@ class _ContentSliver extends StatelessWidget {
 
             if (state.searchStatus == SearchStatus.loading && !hasResults) {
               return SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Center(
-                      child: CircularProgressIndicator(
-                          color: AppTheme.accentColor(context));
+                hasScrollBody: false,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: AppTheme.accentColor(context),
+                  ),
+                ),
+              );
             }
             if ((state.searchStatus == SearchStatus.loading ||
                     state.searchStatus == SearchStatus.loaded ||
