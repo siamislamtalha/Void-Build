@@ -587,8 +587,8 @@ class _ArtistHeaderContent extends StatelessWidget {
         Text(
           title,
           textAlign: isCentered ? TextAlign.center : TextAlign.left,
-          style: const TextStyle(
-            color: Default_Theme.primaryColor1,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 34,
             fontWeight: FontWeight.w800,
             letterSpacing: -1,
@@ -600,7 +600,7 @@ class _ArtistHeaderContent extends StatelessWidget {
           Text(
             meta.join(' • '),
             style: TextStyle(
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               fontSize: 15,
               fontWeight: FontWeight.w500,
             ).merge(Default_Theme.secondoryTextStyle),
@@ -613,7 +613,7 @@ class _ArtistHeaderContent extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             textAlign: isCentered ? TextAlign.center : TextAlign.left,
             style: TextStyle(
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               fontSize: 14,
               height: 1.4,
             ).merge(Default_Theme.secondoryTextStyle),
@@ -676,7 +676,7 @@ class _ArtistHeaderContent extends StatelessWidget {
               isSaved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
           color: isSaved
               ? AppTheme.accentColor(context)
-              : Default_Theme.primaryColor1,
+              : Theme.of(context).colorScheme.onSurface,
           isActive: isSaved,
           tooltip: isSaved ? 'Remove from Library' : 'Save to Library',
           onTap: onToggleSave,
@@ -684,7 +684,7 @@ class _ArtistHeaderContent extends StatelessWidget {
         if (url != null)
           _PremiumCircularButton(
             icon: MingCute.external_link_line,
-            color: Default_Theme.primaryColor1,
+            color: Theme.of(context).colorScheme.onSurface,
             isActive: false,
             tooltip: 'Open Original Link',
             onTap: () {
@@ -728,11 +728,11 @@ class _PremiumCircularButton extends StatelessWidget {
               shape: BoxShape.circle,
               color: isActive
                   ? AppTheme.accentColor(context).withValues(alpha: 0.15)
-                  : Default_Theme.primaryColor1.withValues(alpha: 0.05),
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
               border: Border.all(
                 color: isActive
                     ? AppTheme.accentColor(context).withValues(alpha: 0.5)
-                    : Default_Theme.primaryColor1.withValues(alpha: 0.15),
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
                 width: 1.5,
               ),
             ),
@@ -768,10 +768,10 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
             constraints: const BoxConstraints(maxWidth: 400),
             margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             decoration: BoxDecoration(
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Default_Theme.primaryColor1.withValues(alpha: 0.05),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 width: 1,
               ),
             ),

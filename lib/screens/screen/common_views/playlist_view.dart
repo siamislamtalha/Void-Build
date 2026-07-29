@@ -469,8 +469,8 @@ class _PlaylistHeaderContent extends StatelessWidget {
         Text(
           title,
           textAlign: isCentered ? TextAlign.center : TextAlign.left,
-          style: const TextStyle(
-            color: Default_Theme.primaryColor1,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 28,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.5,
@@ -483,7 +483,7 @@ class _PlaylistHeaderContent extends StatelessWidget {
             meta.join(' • '),
             textAlign: isCentered ? TextAlign.center : TextAlign.left,
             style: TextStyle(
-                    color: Default_Theme.primaryColor1.withValues(alpha: 0.7),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     fontSize: 15,
                     fontWeight: FontWeight.w600)
                 .merge(Default_Theme.secondoryTextStyle),
@@ -496,7 +496,7 @@ class _PlaylistHeaderContent extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             textAlign: isCentered ? TextAlign.center : TextAlign.left,
             style: TextStyle(
-                    color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                     fontSize: 14,
                     height: 1.4)
                 .merge(Default_Theme.secondoryTextStyle),
@@ -556,27 +556,27 @@ class _PremiumPlayButton extends StatelessWidget {
       child: InkWell(
         onTap: isEmpty ? null : onTap,
         borderRadius: BorderRadius.circular(30),
-        splashColor: Colors.white.withValues(alpha: 0.2),
+        splashColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
         child: Container(
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 28),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
-            color: Colors.white.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
             border: Border.all(color: Theme.of(context).colorScheme.onSurface, width: 1.5),
           ),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(MingCute.play_fill,
-                  size: 20, color: Colors.white),
-              SizedBox(width: 8),
+                  size: 20, color: Theme.of(context).colorScheme.onSurface),
+              const SizedBox(width: 8),
               Text('Play',
                   style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white)),
+                      color: Theme.of(context).colorScheme.onSurface)),
             ],
           ),
         ),
@@ -613,10 +613,10 @@ class _PremiumCircularButton extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isActive
-                  ? Colors.white.withValues(alpha: 0.2)
-                  : Colors.white.withValues(alpha: 0.05),
+                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                 width: 1.5,
               ),
             ),

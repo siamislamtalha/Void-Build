@@ -76,18 +76,40 @@ class _SearchScreenState extends State<SearchScreen> {
 
     final pluginState = context.read<PluginBloc>().state;
     final resolvers = pluginState.loadedContentResolvers;
-    if (resolvers.isNotEmpty) {
+    
+    // Filter out universal-downloader and reorder with priority
+    final filteredResolvers = resolvers.where((r) => 
+      !r.manifest.id.toLowerCase().contains('universal')).toList();
+    
+    // Custom priority order: ytmusic > ytvideo > multi-source > others
+    final priorityOrder = [
+      (r) => r.manifest.id.toLowerCase().contains('ytmusic') || 
+             r.manifest.id.toLowerCase().contains('youtube_music'),
+      (r) => r.manifest.id.toLowerCase().contains('ytvideo') || 
+             r.manifest.id.toLowerCase().contains('youtube'),
+      (r) => r.manifest.id.toLowerCase().contains('multi') || 
+             r.manifest.id.toLowerCase().contains('bloomfactory'),
+    ];
+    
+    final orderedResolvers = [
+      ...filteredResolvers.where(priorityOrder[0]),
+      ...filteredResolvers.where(priorityOrder[1]),
+      ...filteredResolvers.where(priorityOrder[2]),
+      ...filteredResolvers.where((r) => !priorityOrder.any((p) => p(r))),
+    ];
+    
+    if (orderedResolvers.isNotEmpty) {
       final persistedIds = context.read<SettingsCubit>().state.searchPluginIds;
       String activeId;
       if (persistedIds.isNotEmpty) {
         final hasPersistedPlugin = persistedIds.any((id) =>
-            resolvers.any((p) => p.manifest.id == id));
+            orderedResolvers.any((p) => p.manifest.id == id));
         activeId = hasPersistedPlugin
             ? persistedIds.firstWhere((id) =>
-                resolvers.any((p) => p.manifest.id == id))
-            : resolvers.first.manifest.id;
+                orderedResolvers.any((p) => p.manifest.id == id))
+            : orderedResolvers.first.manifest.id;
       } else {
-        activeId = resolvers.first.manifest.id;
+        activeId = orderedResolvers.first.manifest.id;
       }
 
       _activePluginIdNotifier.value = activeId;
@@ -211,17 +233,39 @@ class _SearchScreenState extends State<SearchScreen> {
           _activePluginIdNotifier.value == null,
       listener: (context, pluginState) {
         final resolvers = pluginState.loadedContentResolvers;
+        
+        // Filter out universal-downloader and reorder with priority
+        final filteredResolvers = resolvers.where((r) => 
+          !r.manifest.id.toLowerCase().contains('universal')).toList();
+        
+        // Custom priority order: ytmusic > ytvideo > multi-source > others
+        final priorityOrder = [
+          (r) => r.manifest.id.toLowerCase().contains('ytmusic') || 
+                 r.manifest.id.toLowerCase().contains('youtube_music'),
+          (r) => r.manifest.id.toLowerCase().contains('ytvideo') || 
+                 r.manifest.id.toLowerCase().contains('youtube'),
+          (r) => r.manifest.id.toLowerCase().contains('multi') || 
+                 r.manifest.id.toLowerCase().contains('bloomfactory'),
+        ];
+        
+        final orderedResolvers = [
+          ...filteredResolvers.where(priorityOrder[0]),
+          ...filteredResolvers.where(priorityOrder[1]),
+          ...filteredResolvers.where(priorityOrder[2]),
+          ...filteredResolvers.where((r) => !priorityOrder.any((p) => p(r))),
+        ];
+        
         final persistedIds = context.read<SettingsCubit>().state.searchPluginIds;
         String activeId;
         if (persistedIds.isNotEmpty) {
           final hasPersistedPlugin = persistedIds.any((id) =>
-              resolvers.any((p) => p.manifest.id == id));
+              orderedResolvers.any((p) => p.manifest.id == id));
           activeId = hasPersistedPlugin
               ? persistedIds.firstWhere((id) =>
-                  resolvers.any((p) => p.manifest.id == id))
-              : resolvers.first.manifest.id;
+                  orderedResolvers.any((p) => p.manifest.id == id))
+              : orderedResolvers.first.manifest.id;
         } else {
-          activeId = resolvers.first.manifest.id;
+          activeId = orderedResolvers.first.manifest.id;
         }
 
         _activePluginIdNotifier.value = activeId;
@@ -575,6 +619,27 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
             prev.loadedContentResolvers != curr.loadedContentResolvers,
         builder: (context, pluginState) {
           final resolvers = pluginState.loadedContentResolvers;
+          
+          // Filter out universal-downloader and reorder with priority
+          final filteredResolvers = resolvers.where((r) => 
+            !r.manifest.id.toLowerCase().contains('universal')).toList();
+          
+          // Custom priority order: ytmusic > ytvideo > multi-source > others
+          final priorityOrder = [
+            (r) => r.manifest.id.toLowerCase().contains('ytmusic') || 
+                   r.manifest.id.toLowerCase().contains('youtube_music'),
+            (r) => r.manifest.id.toLowerCase().contains('ytvideo') || 
+                   r.manifest.id.toLowerCase().contains('youtube'),
+            (r) => r.manifest.id.toLowerCase().contains('multi') || 
+                   r.manifest.id.toLowerCase().contains('bloomfactory'),
+          ];
+          
+          final orderedResolvers = [
+            ...filteredResolvers.where(priorityOrder[0]),
+            ...filteredResolvers.where(priorityOrder[1]),
+            ...filteredResolvers.where(priorityOrder[2]),
+            ...filteredResolvers.where((r) => !priorityOrder.any((p) => p(r))),
+          ];
 
           return Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -617,7 +682,7 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      if (resolvers.isEmpty)
+                      if (orderedResolvers.isEmpty)
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
@@ -635,7 +700,7 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                           physics: const BouncingScrollPhysics(),
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Row(
-                            children: resolvers
+                            children: orderedResolvers
                                 .map((plugin) => Padding(
                                       padding: const EdgeInsets.only(right: 10),
                                       child: _PluginChip(
@@ -665,7 +730,7 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                                           }
                                         },
                                       ),
-                                    ))
+                                    )))
                                 .toList(),
                           ),
                         ),

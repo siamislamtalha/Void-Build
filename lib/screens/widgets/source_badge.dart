@@ -9,11 +9,13 @@ String? _svgPathForPluginId(String pluginId) {
   if (id.contains('ytvideo') || id == 'youtube') {
     return 'svg/youtube.svg';
   } else if (id.contains('ytmusic') || id.contains('youtube_music') || id.contains('youtubemusic')) {
-    return 'svg/youtube_music.svg';
+    return 'svg/Youtube Music.svg';
   } else if (id.contains('spotify')) {
     return 'svg/spotify.svg';
   } else if (id.contains('jiosaavn') || id.contains('jio')) {
     return 'svg/jiosaavn.svg';
+  } else if (id.contains('multi') || id.contains('bloomfactory')) {
+    return 'svg/multi-source.svg';
   }
   return null;
 }
@@ -46,14 +48,24 @@ class SourceBadge extends StatelessWidget {
     if (svgPath == null) return const SizedBox.shrink();
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final isMultiSource = parts.pluginId.toLowerCase().contains('multi') || 
+                         parts.pluginId.toLowerCase().contains('bloomfactory');
+    
+    // Multi-source SVG is black, so color it dynamically
+    // Other SVGs are already colored
+    Color? iconColor;
+    if (isMultiSource) {
+      iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    }
 
     return SvgPicture.asset(
       svgPath,
       width: size,
       height: size,
       fit: BoxFit.contain,
-      colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+      colorFilter: iconColor != null 
+          ? ColorFilter.mode(iconColor, BlendMode.srcIn)
+          : null,
     );
   }
 }
@@ -75,14 +87,24 @@ class SourceBadgeByPluginId extends StatelessWidget {
     if (svgPath == null) return const SizedBox.shrink();
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final isMultiSource = pluginId.toLowerCase().contains('multi') || 
+                         pluginId.toLowerCase().contains('bloomfactory');
+    
+    // Multi-source SVG is black, so color it dynamically
+    // Other SVGs are already colored
+    Color? iconColor;
+    if (isMultiSource) {
+      iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    }
 
     return SvgPicture.asset(
       svgPath,
       width: size,
       height: size,
       fit: BoxFit.contain,
-      colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+      colorFilter: iconColor != null 
+          ? ColorFilter.mode(iconColor, BlendMode.srcIn)
+          : null,
     );
   }
 }

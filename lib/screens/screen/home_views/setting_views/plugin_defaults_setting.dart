@@ -88,13 +88,13 @@ class PluginDefaultsSettings extends StatelessWidget {
     SettingsState state,
     List<PluginInfo> resolvers,
   ) {
-    // Initialize all plugins as selected if no selection exists
-    final selectedIds = state.homePluginIds.isEmpty && resolvers.isNotEmpty
+    // Always select all plugins
+    final selectedIds = resolvers.isNotEmpty
         ? resolvers.map((r) => r.manifest.id).toList()
         : state.homePluginIds;
 
-    // Persist the default selection if it was just initialized
-    if (state.homePluginIds.isEmpty && resolvers.isNotEmpty) {
+    // Always persist all plugins as selected
+    if (resolvers.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<SettingsCubit>().setHomePluginIds(selectedIds);
       });
@@ -193,8 +193,8 @@ class PluginDefaultsSettings extends StatelessWidget {
       ...loadedIds.where((id) => !storedPriority.contains(id)),
     ];
 
-    // Persist the default priority if it was just initialized (no stored priority)
-    if (storedPriority.isEmpty && resolvers.isNotEmpty) {
+    // Always persist all plugins in priority order
+    if (resolvers.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<SettingsCubit>().setResolverPriority(ordered);
       });
@@ -277,8 +277,8 @@ class PluginDefaultsSettings extends StatelessWidget {
       ...loadedIds.where((id) => !storedPriority.contains(id)),
     ];
 
-    // Persist the default priority if it was just initialized (no stored priority)
-    if (storedPriority.isEmpty && lyricsProviders.isNotEmpty) {
+    // Always persist all lyrics providers in priority order
+    if (lyricsProviders.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<SettingsCubit>().setLyricsPriority(ordered);
       });
@@ -320,13 +320,13 @@ class PluginDefaultsSettings extends StatelessWidget {
     SettingsState state,
     List<PluginInfo> suggestionProviders,
   ) {
-    // Initialize all suggestion plugins as selected if no selection exists
-    final selectedIds = state.suggestionPluginIds.isEmpty && suggestionProviders.isNotEmpty
+    // Always select all suggestion plugins
+    final selectedIds = suggestionProviders.isNotEmpty
         ? suggestionProviders.map((p) => p.manifest.id).toList()
         : state.suggestionPluginIds;
 
-    // Persist the default selection if it was just initialized
-    if (state.suggestionPluginIds.isEmpty && suggestionProviders.isNotEmpty) {
+    // Always persist all suggestion plugins as selected
+    if (suggestionProviders.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<SettingsCubit>().setSuggestionPluginIds(selectedIds);
       });
