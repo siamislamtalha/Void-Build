@@ -705,12 +705,22 @@ class _MultiSourceSongSuggestionsState extends State<_MultiSourceSongSuggestions
           ...filteredResolvers.where((r) => priorityOrder[2](r)),
           ...filteredResolvers.where((r) => !priorityOrder.any((p) => p(r))),
         ];
-        
+
+        // Remove duplicates based on manifest id
+        final uniqueResolvers = <PluginInfo>[];
+        final seenIds = <String>{};
+        for (final resolver in orderedResolvers) {
+          if (!seenIds.contains(resolver.manifest.id)) {
+            seenIds.add(resolver.manifest.id);
+            uniqueResolvers.add(resolver);
+          }
+        }
+
         // Separate playlist sections and song sections
         final playlistSections = <Widget>[];
         final songSections = <Widget>[];
-        
-        for (final plugin in orderedResolvers) {
+
+        for (final plugin in uniqueResolvers) {
           final pluginName = _getFriendlySourceName(plugin.manifest.id, plugin.manifest.name);
           
           // Add playlist section for this plugin

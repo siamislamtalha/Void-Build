@@ -294,19 +294,10 @@ class _GlassFooterOverlay extends StatelessWidget {
 
     // Desktop: mini player in footer connected to sidebar (like old code)
     // Footer spans full width and is visually connected to sidebar like header
-    final glassColor = AppTheme.glassColor(context);
-    final glassBorder = AppTheme.glassBorder(context);
-
     return Container(
       width: double.infinity,
       padding: EdgeInsets.only(
         bottom: bottomInset + _kOuterBottomPadding,
-      ),
-      decoration: BoxDecoration(
-        color: glassColor,
-        border: Border(
-          top: BorderSide(color: glassBorder, width: 1.0),
-        ),
       ),
       child: Row(
         children: [

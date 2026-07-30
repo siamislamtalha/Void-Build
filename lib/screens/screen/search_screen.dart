@@ -96,19 +96,29 @@ class _SearchScreenState extends State<SearchScreen> {
       ...filteredResolvers.where((r) => priorityOrder[2](r)),
       ...filteredResolvers.where((r) => !priorityOrder.any((p) => p(r))),
     ];
+
+    // Remove duplicates based on manifest id
+    final uniqueResolvers = <PluginInfo>[];
+    final seenIds = <String>{};
+    for (final resolver in orderedResolvers) {
+      if (!seenIds.contains(resolver.manifest.id)) {
+        seenIds.add(resolver.manifest.id);
+        uniqueResolvers.add(resolver);
+      }
+    }
     
-    if (orderedResolvers.isNotEmpty) {
+    if (uniqueResolvers.isNotEmpty) {
       final persistedIds = context.read<SettingsCubit>().state.searchPluginIds;
       String activeId;
       if (persistedIds.isNotEmpty) {
         final hasPersistedPlugin = persistedIds.any((id) =>
-            orderedResolvers.any((p) => p.manifest.id == id));
+            uniqueResolvers.any((p) => p.manifest.id == id));
         activeId = hasPersistedPlugin
             ? persistedIds.firstWhere((id) =>
-                orderedResolvers.any((p) => p.manifest.id == id))
-            : orderedResolvers.first.manifest.id;
+                uniqueResolvers.any((p) => p.manifest.id == id))
+            : uniqueResolvers.first.manifest.id;
       } else {
-        activeId = orderedResolvers.first.manifest.id;
+        activeId = uniqueResolvers.first.manifest.id;
       }
 
       _activePluginIdNotifier.value = activeId;
@@ -253,18 +263,28 @@ class _SearchScreenState extends State<SearchScreen> {
           ...filteredResolvers.where(priorityOrder[2]),
           ...filteredResolvers.where((r) => !priorityOrder.any((p) => p(r))),
         ];
-        
+
+        // Remove duplicates based on manifest id
+        final uniqueResolvers = <PluginInfo>[];
+        final seenIds = <String>{};
+        for (final resolver in orderedResolvers) {
+          if (!seenIds.contains(resolver.manifest.id)) {
+            seenIds.add(resolver.manifest.id);
+            uniqueResolvers.add(resolver);
+          }
+        }
+
         final persistedIds = context.read<SettingsCubit>().state.searchPluginIds;
         String activeId;
         if (persistedIds.isNotEmpty) {
           final hasPersistedPlugin = persistedIds.any((id) =>
-              orderedResolvers.any((p) => p.manifest.id == id));
+              uniqueResolvers.any((p) => p.manifest.id == id));
           activeId = hasPersistedPlugin
               ? persistedIds.firstWhere((id) =>
-                  orderedResolvers.any((p) => p.manifest.id == id))
-              : orderedResolvers.first.manifest.id;
+                  uniqueResolvers.any((p) => p.manifest.id == id))
+              : uniqueResolvers.first.manifest.id;
         } else {
-          activeId = orderedResolvers.first.manifest.id;
+          activeId = uniqueResolvers.first.manifest.id;
         }
 
         _activePluginIdNotifier.value = activeId;
@@ -640,6 +660,16 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
             ...filteredResolvers.where((r) => !priorityOrder.any((p) => p(r))),
           ];
 
+          // Remove duplicates based on manifest id
+          final uniqueResolvers = <PluginInfo>[];
+          final seenIds = <String>{};
+          for (final resolver in orderedResolvers) {
+            if (!seenIds.contains(resolver.manifest.id)) {
+              seenIds.add(resolver.manifest.id);
+              uniqueResolvers.add(resolver);
+            }
+          }
+
           return Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: ClipRRect(
@@ -681,7 +711,7 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      if (orderedResolvers.isEmpty)
+                      if (uniqueResolvers.isEmpty)
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
@@ -699,7 +729,7 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                           physics: const BouncingScrollPhysics(),
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Row(
-                            children: orderedResolvers
+                            children: uniqueResolvers
                                 .map((plugin) => Padding(
                                       padding: const EdgeInsets.only(right: 10),
                                       child: _PluginChip(
