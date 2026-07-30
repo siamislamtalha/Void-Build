@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:ui';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/blocs/lyrics/lyrics_cubit.dart';
 import 'package:voidmusic/core/constants/setting_keys.dart';
 import 'package:voidmusic/core/di/service_locator.dart';
@@ -288,7 +288,7 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
 
   String _targetMediaId() {
     final current =
-        context.read<BloomeePlayerCubit>().bloomeePlayer.currentTrackInfo.id;
+        context.read<VoidMusicPlayerCubit>().voidMusicPlayer.currentTrackInfo.id;
     return current.isNotEmpty ? current : widget.mediaID;
   }
 
@@ -542,8 +542,8 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
 
   String _targetMediaId() {
     final current = widget.parentContext
-        .read<BloomeePlayerCubit>()
-        .bloomeePlayer
+        .read<VoidMusicPlayerCubit>()
+        .voidMusicPlayer
         .currentTrackInfo
         .id;
     return current.isNotEmpty ? current : widget.mediaID;

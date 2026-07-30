@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/plugins/blocs/import/content_import_cubit.dart';
 import 'package:voidmusic/plugins/blocs/import/content_import_state.dart';
 import 'package:voidmusic/core/models/media_playlist_model.dart';
@@ -371,7 +371,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                 if (playlist != null && context.mounted) {
                   final songIdx =
                       playlist.tracks.indexWhere((s) => s.id == result.song.id);
-                  context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+                  context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loadPlaylist(
                         playlist,
                         idx: songIdx >= 0 ? songIdx : 0,
                         doPlay: true,

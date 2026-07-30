@@ -567,13 +567,12 @@
   "importSongsTitle": "गाने इम्पोर्ट करें",
   "importNoPluginsLoaded": "कोई इम्पोर्टर प्लगइन मौजूद नहीं है।\nबाहरी जगहों से प्लेलिस्ट लाने के लिए पहले कोई इम्पोर्टर प्लगइन इंस्टॉल करें।",
   "importVoidMusicFiles": "Void Music फ़ाइलें इम्पोर्ट करें",
-  "importBloomeeFiles": "Void Music फ़ाइलें इम्पोर्ट करें",
   "importM3UFiles": "M3U प्लेलिस्ट इम्पोर्ट करें",
   "importM3UNameDialogTitle": "प्लेलिस्ट का नाम",
   "importM3UNameHint": "इस प्लेलिस्ट का कोई नाम रखें",
   "importM3UNoTracks": "इस M3U फ़ाइल में कोई भी सही ट्रैक नहीं मिला।",
   "importNoteTitle": "नोट",
-  "importNoteMessage": "आप केवल Bloomee द्वारा बनाई गई फ़ाइलें ही इम्पोर्ट कर सकते हैं।\nयदि आपकी फ़ाइल किसी और जगह की है, तो वह काम नहीं करेगी। क्या आप फिर भी आगे बढ़ना चाहते हैं?",
+  "importNoteMessage": "आप केवल Void Music द्वारा बनाई गई फ़ाइलें ही इम्पोर्ट कर सकते हैं।\nयदि आपकी फ़ाइल किसी और जगह की है, तो वह काम नहीं करेगी। क्या आप फिर भी आगे बढ़ना चाहते हैं?",
   "importTitle": "इम्पोर्ट करें",
   "importCheckingUrl": "URL की जाँच हो रही है...",
   "importFetchingTracks": "गाने लाए जा रहे हैं...",
@@ -705,7 +704,7 @@
 
   "snackbarOpeningAlbumPage": "मूल एल्बम का पेज खोला जा रहा है।",
 
-  "updateAvailableBody": "Bloomee🌸 का नया वर्शन आ गया है!\n\nवर्शन: {ver}+{build}",
+  "updateAvailableBody": "Void Music🌸 का नया वर्शन आ गया है!\n\nवर्शन: {ver}+{build}",
   "@updateAvailableBody": { "placeholders": { "ver": { "type": "String" }, "build": { "type": "String" } } },
 
   "pluginSnackbarInstalled": "प्लगइन \"{id}\" सफलतापूर्वक इंस्टॉल हो गया",
@@ -715,11 +714,11 @@
   "pluginSnackbarDeleted": "प्लगइन \"{id}\" सफलतापूर्वक हटा दिया गया",
   "@pluginSnackbarDeleted": { "placeholders": { "id": { "type": "String" } } },
 
-  "pluginBootstrapTitle": "Bloomee को तैयार किया जा रहा है",
+  "pluginBootstrapTitle": "Void Music को तैयार किया जा रहा है",
   "pluginBootstrapProgress": "नया प्लगइन इंजन सेट हो रहा है... {percent}%",
   "@pluginBootstrapProgress": { "placeholders": { "percent": { "type": "int" } } },
   "pluginBootstrapHint": "ऐसा सिर्फ़ पहली बार होता है।",
   "pluginBootstrapErrorTitle": "इंटरनेट कनेक्शन धीमा है",
-  "pluginBootstrapErrorBody": "कुछ प्लगइन्स इंस्टॉल नहीं हो सके। आप फिर भी Bloomee का उपयोग कर सकते हैं — ऐप दोबारा खुलने पर इन्हें इंस्टॉल करने की कोशिश की जाएगी।",
+  "pluginBootstrapErrorBody": "कुछ प्लगइन्स इंस्टॉल नहीं हो सके। आप फिर भी Void Music का उपयोग कर सकते हैं — ऐप दोबारा खुलने पर इन्हें इंस्टॉल करने की कोशिश की जाएगी।",
   "pluginBootstrapContinue": "फिर भी आगे बढ़ें"
 }

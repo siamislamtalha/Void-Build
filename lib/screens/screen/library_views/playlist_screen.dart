@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/models/media_playlist_model.dart';
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/screens/screen/library_views/cubit/current_playlist_cubit.dart';
@@ -102,7 +102,7 @@ class _PlaylistViewState extends State<PlaylistView> {
     if (!mounted || fullPlaylist.tracks.isEmpty) return;
     if (!context.mounted) return;
 
-    context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+    context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loadPlaylist(
           Playlist(tracks: fullPlaylist.tracks, title: fullPlaylist.title),
           idx: index ?? 0,
           doPlay: true,
@@ -210,8 +210,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                 shape: BoxShape.circle,
                 border: Border.all(color: borderColor),
               ),
-              child: Icon(Icons.arrow_back_rounded,
-                  color: iconColor, size: 20),
+              child: Icon(Icons.arrow_back_rounded, color: iconColor, size: 20),
             ),
             onPressed: () => Navigator.of(context).pop(),
           ),
@@ -601,14 +600,14 @@ class _PlaylistViewState extends State<PlaylistView> {
           // Big Center Play Button
           StreamBuilder<String>(
               stream:
-                  context.watch<BloomeePlayerCubit>().bloomeePlayer.queueTitle,
+                  context.watch<VoidMusicPlayerCubit>().voidMusicPlayer.queueTitle,
               builder: (context, snapshot) {
                 final isCurrent =
                     snapshot.hasData && snapshot.data == state.playlist.title;
                 return StreamBuilder<bool>(
                     stream: context
-                        .read<BloomeePlayerCubit>()
-                        .bloomeePlayer
+                        .read<VoidMusicPlayerCubit>()
+                        .voidMusicPlayer
                         .engine
                         .playingStream,
                     builder: (context, playingSnapshot) {
@@ -632,13 +631,13 @@ class _PlaylistViewState extends State<PlaylistView> {
                               ? () {}
                               : () => isCurrent
                                   ? context
-                                      .read<BloomeePlayerCubit>()
-                                      .bloomeePlayer
+                                      .read<VoidMusicPlayerCubit>()
+                                      .voidMusicPlayer
                                       .play()
                                   : _playFromPlaylist(context, state),
                           onPause: () => context
-                              .read<BloomeePlayerCubit>()
-                              .bloomeePlayer
+                              .read<VoidMusicPlayerCubit>()
+                              .voidMusicPlayer
                               .pause(),
                         ),
                       );

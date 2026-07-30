@@ -54,7 +54,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 //     // normalize unknowns to win for SourceForge naming
 //     platform = 'win';
 //   }
-//   const url = 'https://sourceforge.net/projects/bloomee/best_release.json';
+//   const url = 'https://sourceforge.net/projects/voidmusic/best_release.json';
 //   final userAgent = {
 //     'win':
 //         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
@@ -161,7 +161,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 // Future<Map<String, dynamic>> githubUpdate(
 //     {Duration timeout = const Duration(seconds: 6)}) async {
 //   final url =
-//       'https://api.github.com/repos/HemantKArya/BloomeeTunes/releases/latest';
+//       'https://api.github.com/repos/siamislamtalha/Void-Build/releases/latest';
 //   PackageInfo packageInfo = await PackageInfo.fromPlatform();
 //   try {
 //     final response = await http.get(Uri.parse(url)).timeout(timeout);
@@ -271,7 +271,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 // Future<String?> fetchChangelog(
 //     {Duration timeout = const Duration(seconds: 6)}) async {
 //   const changelogUrl =
-//       'https://hemantkarya.github.io/BloomeeTunes/CHANGELOG.md';
+//       'https://siamislamtalha.github.io/Void-Music/CHANGELOG.md';
 //   try {
 //     final response = await http.get(Uri.parse(changelogUrl)).timeout(timeout);
 //     if (response.statusCode == 200) {

@@ -350,7 +350,7 @@
   "storageResetButton": "Restablecer",
   "storageResetSuccess": "La aplicación ha sido restablecida.",
   "storageLocationDialogTitle": "Ubicación de copia",
-  "storageLocationAndroid": "Las copias se guardan en:\n\n1. Directorio de Descargas\n2. Android/data/ls.bloomee.musicplayer/data\n\nCopia el archivo desde cualquiera de esas rutas.",
+  "storageLocationAndroid": "Las copias se guardan en:\n\n1. Directorio de Descargas\n2. Android/data/ls.voidmusic.musicplayer/data\n\nCopia el archivo desde cualquiera de esas rutas.",
   "storageLocationOther": "Las copias se guardan en la carpeta de Descargas.",
   "storageRestoreOptionsTitle": "Opciones de restauración",
   "storageRestoreOptionsDesc": "Elige qué quieres restaurar. Desmarca lo que NO quieras importar.",
@@ -567,7 +567,6 @@
   "importSongsTitle": "Importar canciones",
   "importNoPluginsLoaded": "No hay plugins importadores cargados.\nInstala uno para importar desde servicios externos.",
   "importVoidMusicFiles": "Importar archivos Void Music",
-  "importBloomeeFiles": "Importar archivos de Void Music",
   "importM3UFiles": "Importar lista M3U",
   "importM3UNameDialogTitle": "Nombre de la lista",
   "importM3UNameHint": "Ponle un nombre a esta lista",
@@ -705,7 +704,7 @@
 
   "snackbarOpeningAlbumPage": "Abriendo página original del álbum.",
 
-  "updateAvailableBody": "¡Nueva versión de Bloomee🌸 disponible!\n\nVersión: {ver}+{build}",
+  "updateAvailableBody": "¡Nueva versión de Void Music🌸 disponible!\n\nVersión: {ver}+{build}",
   "@updateAvailableBody": { "placeholders": { "ver": { "type": "String" }, "build": { "type": "String" } } },
 
   "pluginSnackbarInstalled": "Plugin \"{id}\" instalado con éxito",
@@ -715,11 +714,11 @@
   "pluginSnackbarDeleted": "Plugin \"{id}\" eliminado con éxito",
   "@pluginSnackbarDeleted": { "placeholders": { "id": { "type": "String" } } },
 
-  "pluginBootstrapTitle": "Configurando Bloomee",
+  "pluginBootstrapTitle": "Configurando Void Music",
   "pluginBootstrapProgress": "Configurando nuevo motor de plugins... {percent}%",
   "@pluginBootstrapProgress": { "placeholders": { "percent": { "type": "int" } } },
   "pluginBootstrapHint": "Esto solo sucede una vez.",
   "pluginBootstrapErrorTitle": "Conexión lenta",
-  "pluginBootstrapErrorBody": "No se instalaron algunos plugins. Puedes usar Bloomee, se reintentará en el próximo inicio.",
+  "pluginBootstrapErrorBody": "No se instalaron algunos plugins. Puedes usar Void Music, se reintentará en el próximo inicio.",
   "pluginBootstrapContinue": "Continuar de todos modos"
 }

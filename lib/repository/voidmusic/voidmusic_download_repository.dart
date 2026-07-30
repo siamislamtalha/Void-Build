@@ -3,10 +3,10 @@ import 'package:voidmusic/services/db/global_db.dart';
 import 'package:voidmusic/services/db/dao/download_dao.dart';
 
 /// Repository for download operations — wraps [DownloadDAO].
-class DownloadRepository {
+class VoidMusicDownloadRepository {
   final DownloadDAO _downloadDao;
 
-  const DownloadRepository(this._downloadDao);
+  const VoidMusicDownloadRepository(this._downloadDao);
 
   Future<void> saveDownload({
     required String fileName,

@@ -12,7 +12,7 @@ import 'package:path/path.dart' as path;
 import 'package:voidmusic/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/core/constants/setting_keys.dart';
-import 'package:voidmusic/repository/bloomee/download_repository.dart';
+import 'package:voidmusic/repository/voidmusic/voidmusic_download_repository.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/services/db/global_db.dart';
 import 'package:voidmusic/services/db/dao/settings_dao.dart';
@@ -26,7 +26,7 @@ part 'downloader_state.dart';
 class DownloaderCubit extends Cubit<DownloaderState> {
   final ConnectivityCubit connectivityCubit;
   final LibraryItemsCubit libraryItemsCubit;
-  final DownloadRepository _downloadRepo;
+  final VoidMusicDownloadRepository _downloadRepo;
   final SettingsDAO _settingsDao;
   final PluginService _pluginService;
   final RustDownloadService _downloadService = RustDownloadService();
@@ -47,7 +47,7 @@ class DownloaderCubit extends Cubit<DownloaderState> {
   DownloaderCubit({
     required this.connectivityCubit,
     required this.libraryItemsCubit,
-    required DownloadRepository downloadRepo,
+    required VoidMusicDownloadRepository downloadRepo,
     required SettingsDAO settingsDao,
     required PluginService pluginService,
   })  : _downloadRepo = downloadRepo,
@@ -184,7 +184,7 @@ class DownloaderCubit extends Cubit<DownloaderState> {
     await _downloadService.initialize(
       pluginManager: _pluginService.manager,
       stateDir: path.join(supportDirectory.path, 'download_manager'),
-      tempDir: path.join(tempDirectory.path, 'bloomee_downloads'),
+      tempDir: path.join(tempDirectory.path, 'voidmusic_downloads'),
     );
 
     _downloadSubscription ??= _downloadService.events.listen(

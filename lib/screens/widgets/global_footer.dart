@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/services.dart';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
 import 'package:voidmusic/screens/widgets/player_overlay_wrapper.dart';
@@ -12,7 +11,6 @@ import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
-import 'package:voidmusic/utils/load_image.dart';
 
 class GlobalFooter extends StatefulWidget {
   const GlobalFooter({super.key, required this.navigationShell});
@@ -58,7 +56,6 @@ class _GlobalFooterState extends State<GlobalFooter> {
   Widget build(BuildContext context) {
     context.watch<PlayerOverlayCubit>();
     final isMobile = ResponsiveBreakpoints.of(context).isMobile;
-    final isDesktop = ResponsiveBreakpoints.of(context).isDesktop;
 
     return PlayerOverlayWrapper(
       child: BackButtonListener(
@@ -273,7 +270,6 @@ class _GlassFooterOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     // Bottom inset = device home indicator / gesture bar height.
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
-    final isDesktop = ResponsiveBreakpoints.of(context).isDesktop;
 
     if (isMobile) {
       return Padding(
@@ -302,7 +298,7 @@ class _GlassFooterOverlay extends StatelessWidget {
       child: Row(
         children: [
           // Spacer for sidebar width (keeps footer connected to sidebar visually)
-          SizedBox(width: _kDesktopSidebarWidth + 4),
+          const SizedBox(width: _kDesktopSidebarWidth + 4),
           // Mini player content
           Expanded(
             child: Padding(

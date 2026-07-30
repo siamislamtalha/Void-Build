@@ -328,7 +328,7 @@ class ImportExportService {
       // Build a legacy-shaped JSON map for the M3U converter.
       final Map<String, dynamic> playlistMap = {
         '_meta': {
-          'generated_by': 'Bloomee - Open Source Music Streaming Application',
+          'generated_by': 'Void Music - Open Source Music Streaming Application',
           'version':
               'v${packageInfo.version}+${int.parse(packageInfo.buildNumber) % 1000}',
           'exportedAt': DateTime.now().toIso8601String(),

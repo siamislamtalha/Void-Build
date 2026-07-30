@@ -1,14 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-part of 'bloomee_player_cubit.dart';
+part of 'voidmusic_player_cubit.dart';
 
-class BloomeePlayerState {
+class VoidMusicPlayerState {
   bool isReady;
   bool showLyrics;
-  BloomeePlayerState({required this.isReady, this.showLyrics = false});
+  VoidMusicPlayerState({required this.isReady, this.showLyrics = false});
 }
 
-final class BloomeePlayerInitial extends BloomeePlayerState {
-  BloomeePlayerInitial() : super(isReady: false);
+final class VoidMusicPlayerInitial extends VoidMusicPlayerState {
+  VoidMusicPlayerInitial() : super(isReady: false);
 }
 
 /// Simplified progress bar data using only [Duration] values,

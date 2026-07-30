@@ -166,7 +166,7 @@ class _SettingToggleTileState extends State<SettingToggleTile> {
             ),
           ),
           const SizedBox(width: 12),
-          BloomeeSwitch(
+          VoidMusicSwitch(
             value: _currentValue,
             onChanged: () {
               final newValue = !_currentValue;

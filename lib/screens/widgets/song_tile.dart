@@ -9,7 +9,7 @@ import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:voidmusic/screens/screen/common_views/song_info_screen.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/blocs/downloader/cubit/downloader_cubit.dart';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/models/exported.dart' hide MediaItem;
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/screens/widgets/media_metadata_links.dart';
@@ -54,10 +54,10 @@ class SongCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final playerCubit = context.read<BloomeePlayerCubit>();
+    final playerCubit = context.read<VoidMusicPlayerCubit>();
 
     return StreamBuilder<MediaItem?>(
-      stream: playerCubit.bloomeePlayer.mediaItem,
+      stream: playerCubit.voidMusicPlayer.mediaItem,
       builder: (context, snapshot) {
         final isPlaying = snapshot.data?.id == song.id;
         final l10n = AppLocalizations.of(context)!;
@@ -259,7 +259,7 @@ class SongCardWidget extends StatelessWidget {
                             iconColor: Colors.redAccent.withValues(alpha: 0.9),
                             onTap: () {
                               try {
-                                if (playerCubit.bloomeePlayer.currentMedia.id !=
+                                if (playerCubit.voidMusicPlayer.currentMedia.id !=
                                     song.id) {
                                   context
                                       .read<DownloaderCubit>()

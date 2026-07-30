@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:voidmusic/blocs/lyrics/lyrics_cubit.dart';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
 import 'package:voidmusic/screens/screen/player_views/lyrics_search.dart';
 import 'package:voidmusic/screens/widgets/media_metadata_links.dart';
@@ -45,8 +45,8 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
     _startHideControlsTimer();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-    final playerCubit = context.read<BloomeePlayerCubit>();
-    _currentTrackId = playerCubit.bloomeePlayer.currentTrackInfo.id;
+    final playerCubit = context.read<VoidMusicPlayerCubit>();
+    _currentTrackId = playerCubit.voidMusicPlayer.currentTrackInfo.id;
 
     _loadPersistedOffset();
   }
@@ -105,7 +105,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
 
   void _stopOffsetChange() => _holdTimer?.cancel();
 
-  void _openSettingsMenu(LyricsState state, BloomeePlayerCubit playerCubit) {
+  void _openSettingsMenu(LyricsState state, VoidMusicPlayerCubit playerCubit) {
     _hideControlsTimer?.cancel();
     showModalBottomSheet(
       context: context,
@@ -127,7 +127,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
+    final voidMusicPlayerCubit = context.read<VoidMusicPlayerCubit>();
     final isDesktop = MediaQuery.of(context).size.width > 600;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -139,7 +139,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
         behavior: HitTestBehavior.translucent,
         child: Stack(
           children: [
-            _buildBackground(bloomeePlayerCubit),
+            _buildBackground(voidMusicPlayerCubit),
             Container(color: isDark ? Colors.black.withValues(alpha: 0.4) : Colors.black.withValues(alpha: 0.1)),
             Positioned.fill(
               child: BlocBuilder<LyricsCubit, LyricsState>(
@@ -210,7 +210,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
               right: 0,
               child: GestureDetector(
                 onTap: () {},
-                child: _buildTopBar(bloomeePlayerCubit, isDesktop),
+                child: _buildTopBar(voidMusicPlayerCubit, isDesktop),
               ),
             ),
             AnimatedPositioned(
@@ -221,7 +221,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
               right: 0,
               child: GestureDetector(
                 onTap: () {},
-                child: _buildBottomControls(bloomeePlayerCubit, isDesktop),
+                child: _buildBottomControls(voidMusicPlayerCubit, isDesktop),
               ),
             ),
             AnimatedPositioned(
@@ -262,11 +262,11 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
     );
   }
 
-  Widget _buildBackground(BloomeePlayerCubit bloomeePlayerCubit) {
+  Widget _buildBackground(VoidMusicPlayerCubit voidMusicPlayerCubit) {
     return StreamBuilder<MediaItem?>(
-      stream: bloomeePlayerCubit.bloomeePlayer.mediaItem,
+      stream: voidMusicPlayerCubit.voidMusicPlayer.mediaItem,
       builder: (context, snapshot) {
-        final currentTrack = bloomeePlayerCubit.bloomeePlayer.currentTrackInfo;
+        final currentTrack = voidMusicPlayerCubit.voidMusicPlayer.currentTrackInfo;
         final artworkUrl =
             currentTrack.thumbnail.urlLow ?? currentTrack.thumbnail.url;
 
@@ -333,7 +333,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                 width: 1,
               ),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.keyboard_arrow_down_rounded,
               color: Colors.white,
               size: 32,
@@ -344,7 +344,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
     );
   }
 
-  Widget _buildTopBar(BloomeePlayerCubit bloomeePlayerCubit, bool isDesktop) {
+  Widget _buildTopBar(VoidMusicPlayerCubit voidMusicPlayerCubit, bool isDesktop) {
     return Container(
       padding: EdgeInsets.fromLTRB(
           16, MediaQuery.of(context).padding.top + 16, 16, 40),
@@ -363,16 +363,16 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
             children: [
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(Icons.keyboard_arrow_down_rounded,
+                icon: const Icon(Icons.keyboard_arrow_down_rounded,
                     color: Colors.white, size: 32),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: StreamBuilder<MediaItem?>(
-                  stream: bloomeePlayerCubit.bloomeePlayer.mediaItem,
+                  stream: voidMusicPlayerCubit.voidMusicPlayer.mediaItem,
                   builder: (context, snapshot) {
                     final currentTrack =
-                        bloomeePlayerCubit.bloomeePlayer.currentTrackInfo;
+                        voidMusicPlayerCubit.voidMusicPlayer.currentTrackInfo;
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -410,7 +410,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                 builder: (context, state) {
                   return IconButton(
                     onPressed: () =>
-                        _openSettingsMenu(state, bloomeePlayerCubit),
+                        _openSettingsMenu(state, voidMusicPlayerCubit),
                     icon: const Icon(MingCute.more_2_fill,
                         color: Colors.white, size: 28),
                   );
@@ -530,9 +530,9 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
   }
 
   Widget _buildBottomControls(
-      BloomeePlayerCubit bloomeePlayerCubit, bool isDesktop) {
+      VoidMusicPlayerCubit voidMusicPlayerCubit, bool isDesktop) {
     final l10n = AppLocalizations.of(context)!;
-    final musicPlayer = bloomeePlayerCubit.bloomeePlayer;
+    final musicPlayer = voidMusicPlayerCubit.voidMusicPlayer;
     final paddingBottom = MediaQuery.of(context).padding.bottom;
 
     return Container(
@@ -556,7 +556,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                 children: [
                   IconButton(
                     onPressed: () => musicPlayer.skipToPrevious(),
-                    icon: Icon(MingCute.skip_previous_fill,
+                    icon: const Icon(MingCute.skip_previous_fill,
                         color: Colors.white),
                     iconSize: isDesktop ? 40 : 36,
                   ),
@@ -574,7 +574,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                   const SizedBox(width: 32),
                   IconButton(
                     onPressed: () => musicPlayer.skipToNext(),
-                    icon: Icon(MingCute.skip_forward_fill,
+                    icon: const Icon(MingCute.skip_forward_fill,
                         color: Colors.white),
                     iconSize: isDesktop ? 40 : 36,
                   ),
@@ -696,7 +696,7 @@ class _FullscreenSyncedLyricsState extends State<FullscreenSyncedLyrics> {
   }
 
   void _forceSyncRecalculation() {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer.engine;
+    final player = context.read<VoidMusicPlayerCubit>().voidMusicPlayer.engine;
     final adjustedPosition = player.position + widget.lyricOffset;
     widget.positionNotifier.value = adjustedPosition;
 
@@ -708,8 +708,8 @@ class _FullscreenSyncedLyricsState extends State<FullscreenSyncedLyrics> {
   }
 
   void _setupPositionListener() {
-    final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
-    final posStream = bloomeePlayerCubit.bloomeePlayer.engine.positionStream;
+    final voidMusicPlayerCubit = context.read<VoidMusicPlayerCubit>();
+    final posStream = voidMusicPlayerCubit.voidMusicPlayer.engine.positionStream;
 
     _positionSubscription = posStream.listen((rawPosition) {
       if (!mounted) return;
@@ -823,8 +823,8 @@ class _FullscreenSyncedLyricsState extends State<FullscreenSyncedLyrics> {
               onTap: () {
                 widget.onInteraction?.call();
                 context
-                    .read<BloomeePlayerCubit>()
-                    .bloomeePlayer
+                    .read<VoidMusicPlayerCubit>()
+                    .voidMusicPlayer
                     .seek(lyric.start - widget.lyricOffset);
               },
               child: _KaraokeLyricLine(

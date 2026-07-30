@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/core/constants/sentinel_values.dart';
 import 'package:voidmusic/repository/LastFM/lastfmapi.dart';
@@ -20,7 +20,7 @@ part 'lastdotfm_state.dart';
 class LastdotfmCubit extends Cubit<LastdotfmState> {
   LastFmAPI lastFmAPI = LastFmAPI();
   StreamSubscription? _progressSub;
-  BloomeePlayerCubit playerCubit;
+  VoidMusicPlayerCubit playerCubit;
   final CacheDAO _cacheDao;
   final SettingsDAO _settingsDao;
   final PluginService _pluginService;
@@ -68,7 +68,7 @@ class LastdotfmCubit extends Cubit<LastdotfmState> {
   }
 
   void _onProgressTick() {
-    final player = playerCubit.bloomeePlayer;
+    final player = playerCubit.voidMusicPlayer;
     final current = player.currentMedia;
     final isPlaying = player.engine.playing;
 

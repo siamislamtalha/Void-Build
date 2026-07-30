@@ -4,10 +4,10 @@ import 'package:voidmusic/services/db/dao/settings_dao.dart';
 /// Repository for application settings (string and boolean key-value pairs).
 ///
 /// Wraps [SettingsDAO] and provides a clean interface for cubits.
-class SettingsRepository {
+class VoidMusicSettingsRepository {
   final SettingsDAO _settingsDao;
 
-  const SettingsRepository(this._settingsDao);
+  const VoidMusicSettingsRepository(this._settingsDao);
 
   // --------------- String settings ---------------
 

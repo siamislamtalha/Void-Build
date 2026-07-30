@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/core/constants/setting_keys.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
@@ -71,14 +71,14 @@ class _EqualizerViewState extends State<EqualizerView>
   bool _isGraphInteractive = false;
 
   // FIX L-01: Reactive subscriptions so the view stays in sync with engine state
-  // changes from external code (settings restore, revive, Bloomee settings page).
+  // changes from external code (settings restore, revive, Void Music settings page).
   StreamSubscription? _eqEnabledSub;
   StreamSubscription? _eqGainsSub;
 
   @override
   void initState() {
     super.initState();
-    _engine = context.read<BloomeePlayerCubit>().bloomeePlayer.engine;
+    _engine = context.read<VoidMusicPlayerCubit>().voidMusicPlayer.engine;
     _settingsCubit = context.read<SettingsCubit>();
 
     _eqSource = _settingsCubit.state.eqSource;
@@ -285,8 +285,7 @@ class _EqualizerViewState extends State<EqualizerView>
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded,
-              color: Theme.of(context).colorScheme.onSurface, size: 22),
+          icon: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 22),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(l10n.eqTitle,
@@ -426,7 +425,7 @@ class _EqualizerViewState extends State<EqualizerView>
                                             .withValues(alpha: 0.95),
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600)),
-                                BloomeeSwitch(
+                                VoidMusicSwitch(
                                   value: isEnabled,
                                   onChanged: () {
                                     _engine.setEqualizerEnabled(!isEnabled);

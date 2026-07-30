@@ -4,7 +4,7 @@ import 'package:voidmusic/utils/load_image.dart';
 
 Future<PaletteGenerator> getPalleteFromImage(String url) async {
   ImageProvider<Object> placeHolder =
-      const AssetImage("assets/icons/bloomee_new_logo_c.png");
+      const AssetImage("assets/icons/voidmusic_new_logo_c.png");
 
   try {
     return await PaletteGenerator.fromImageProvider(

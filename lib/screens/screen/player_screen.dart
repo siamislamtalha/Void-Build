@@ -12,7 +12,7 @@ import 'package:voidmusic/screens/widgets/volume_slider.dart';
 import 'package:voidmusic/screens/widgets/media_metadata_links.dart';
 import 'package:voidmusic/screens/screen/player_views/segments_sheet.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/player_setting.dart';
-import 'package:voidmusic/services/bloomee_player.dart';
+import 'package:voidmusic/services/voidmusic_player.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,7 +27,7 @@ import 'package:voidmusic/utils/load_image.dart';
 import 'package:voidmusic/utils/pallete_generator.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../blocs/media_player/bloomee_player_cubit.dart';
+import '../../blocs/media_player/voidmusic_player_cubit.dart';
 import '../../blocs/mini_player/mini_player_cubit.dart';
 import 'player_views/fullscreen_lyrics_view.dart';
 
@@ -66,8 +66,8 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
-    final musicPlayer = bloomeePlayerCubit.bloomeePlayer;
+    final voidMusicPlayerCubit = context.read<VoidMusicPlayerCubit>();
+    final musicPlayer = voidMusicPlayerCubit.voidMusicPlayer;
     final isMobile = ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final iconColor = Theme.of(context).colorScheme.onSurface;
@@ -205,7 +205,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
 }
 
 class _PlayerUI extends StatelessWidget {
-  final BloomeeMusicPlayer musicPlayer;
+  final VoidMusicPlayer musicPlayer;
   final TabController tabController;
 
   const _PlayerUI({
@@ -261,14 +261,14 @@ class CoverImageVolSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
+    final voidMusicPlayerCubit = context.read<VoidMusicPlayerCubit>();
 
     return VolumeDragController(
       child: StreamBuilder<MediaItem?>(
-        stream: bloomeePlayerCubit.bloomeePlayer.mediaItem,
+        stream: voidMusicPlayerCubit.voidMusicPlayer.mediaItem,
         builder: (context, snapshot) {
           final currentTrack =
-              bloomeePlayerCubit.bloomeePlayer.currentTrackInfo;
+              voidMusicPlayerCubit.voidMusicPlayer.currentTrackInfo;
           final highResUrl =
               currentTrack.thumbnail.urlHigh ?? currentTrack.thumbnail.url;
           final lowResUrl =
@@ -297,7 +297,7 @@ class CoverImageVolSlider extends StatelessWidget {
 }
 
 class PlayerCtrlWidgets extends StatelessWidget {
-  final BloomeeMusicPlayer musicPlayer;
+  final VoidMusicPlayer musicPlayer;
   const PlayerCtrlWidgets({super.key, required this.musicPlayer});
 
   @override
@@ -323,7 +323,7 @@ class _SongInfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<VoidMusicPlayerCubit>().voidMusicPlayer;
     final primaryTextColor = Theme.of(context).colorScheme.onSurface;
     final subtitleColor = Theme.of(context).brightness == Brightness.dark
         ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)
@@ -393,7 +393,7 @@ class _DownloadButtonState extends State<_DownloadButton> {
   @override
   void initState() {
     super.initState();
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<VoidMusicPlayerCubit>().voidMusicPlayer;
     _mediaSub = player.mediaItem.listen((mi) {
       if (mi?.id != _lastTrackId) {
         _lastTrackId = mi?.id;
@@ -461,7 +461,7 @@ class _LikeButtonState extends State<_LikeButton> {
   @override
   void initState() {
     super.initState();
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<VoidMusicPlayerCubit>().voidMusicPlayer;
     _mediaSub = player.mediaItem.listen((mi) {
       if (mi?.id != _lastTrackId) {
         _lastTrackId = mi?.id;
@@ -494,7 +494,7 @@ class _LikeButtonState extends State<_LikeButton> {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<VoidMusicPlayerCubit>().voidMusicPlayer;
     final l10n = AppLocalizations.of(context)!;
 
     return StreamBuilder<bool>(
@@ -533,7 +533,7 @@ class _PlayerProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final playerCubit = context.read<BloomeePlayerCubit>();
+    final playerCubit = context.read<VoidMusicPlayerCubit>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final timeLabelColor = isDark
         ? Default_Theme.primaryColor1.withValues(alpha: 0.7)
@@ -547,7 +547,7 @@ class _PlayerProgressBar extends StatelessWidget {
             progress: data?.position ?? Duration.zero,
             total: data?.duration ?? Duration.zero,
             buffered: data?.buffered ?? Duration.zero,
-            onSeek: playerCubit.bloomeePlayer.seek,
+            onSeek: playerCubit.voidMusicPlayer.seek,
             isPlaying: data?.isPlaying ?? false,
             activeAccentColor: Default_Theme.accentColor1,
             inactiveAccentColor: AppTheme.accentColor(context),
@@ -575,7 +575,7 @@ class _PlayerProgressBar extends StatelessWidget {
 }
 
 class _PlayerControlsRow extends StatelessWidget {
-  final BloomeeMusicPlayer musicPlayer;
+  final VoidMusicPlayer musicPlayer;
   const _PlayerControlsRow({required this.musicPlayer});
 
   Widget _buildControlColumn({required Widget top, required Widget bottom}) {
@@ -659,7 +659,7 @@ class _LoopControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<LoopMode>(
-      stream: context.read<BloomeePlayerCubit>().bloomeePlayer.loopMode,
+      stream: context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loopMode,
       builder: (context, snapshot) {
         final loopMode = snapshot.data ?? LoopMode.off;
         final l10n = AppLocalizations.of(context)!;
@@ -679,7 +679,7 @@ class _LoopControl extends StatelessWidget {
             size: 24,
           ),
           onSelected: (value) {
-            final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+            final player = context.read<VoidMusicPlayerCubit>().voidMusicPlayer;
             if (value == 0) player.setLoopMode(LoopMode.off);
             if (value == 1) player.setLoopMode(LoopMode.one);
             if (value == 2) player.setLoopMode(LoopMode.all);
@@ -697,7 +697,7 @@ class _ShuffleControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<VoidMusicPlayerCubit>().voidMusicPlayer;
     return StreamBuilder<bool>(
       stream: player.shuffleMode,
       builder: (context, snapshot) {
@@ -721,7 +721,7 @@ class _ExternalLinkControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<VoidMusicPlayerCubit>().voidMusicPlayer;
     return IconButton(
       icon: Icon(MingCute.external_link_line, color: iconColor, size: 24),
       onPressed: () async {
@@ -743,7 +743,7 @@ class _PlayPauseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final musicPlayer = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final musicPlayer = context.read<VoidMusicPlayerCubit>().voidMusicPlayer;
     // In dark mode: white button with black icon (original).
     // In light mode: dark button with white icon to match the theme inversion.
     final buttonColor = Theme.of(context).colorScheme.onSurface;
@@ -829,7 +829,7 @@ class _AmbientImgShadowWidgetState extends State<AmbientImgShadowWidget> {
   @override
   void initState() {
     super.initState();
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<VoidMusicPlayerCubit>().voidMusicPlayer;
     _mediaSub = player.mediaItem.listen((mi) {
       final artUri = mi?.artUri?.toString();
       if (artUri != _lastArtUri) {

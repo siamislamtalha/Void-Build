@@ -39,7 +39,7 @@ class DiscordService {
           DiscordPresence(
               details: track.title,
               state: isPlaying ? "Playing・$artistStr" : "Paused・$artistStr",
-              largeImageKey: "bloomeetunes_logo",
+              largeImageKey: "voidmusic_logo",
               largeImageText: "Void Music",
               startTimeStamp: _startTimeStamp),
         );

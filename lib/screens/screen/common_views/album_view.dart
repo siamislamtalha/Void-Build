@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:ui';
 
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/di/service_locator.dart';
 import 'package:voidmusic/core/events/global_event_bus.dart';
 import 'package:voidmusic/core/models/exported.dart';
@@ -160,8 +160,7 @@ class _AlbumViewState extends State<AlbumView> {
                 border: Border.all(
                     color: Default_Theme.primaryColor1.withValues(alpha: 0.15)),
               ),
-              child: const Icon(Icons.arrow_back_rounded,
-                  color: Default_Theme.primaryColor1, size: 20),
+              child: const Icon(Icons.arrow_back_rounded, color: Default_Theme.primaryColor1, size: 20),
             ),
             onPressed: () => Navigator.pop(context),
           ),
@@ -303,8 +302,8 @@ class _AlbumViewState extends State<AlbumView> {
                               showSinglePlay: true,
                             ),
                             onTap: () => context
-                                .read<BloomeePlayerCubit>()
-                                .bloomeePlayer
+                                .read<VoidMusicPlayerCubit>()
+                                .voidMusicPlayer
                                 .loadPlaylist(
                                   Playlist(
                                       tracks: tracks,
@@ -537,7 +536,7 @@ class _AlbumHeaderContent extends StatelessWidget {
         _PremiumPlayButton(
           isEmpty: tracks.isEmpty,
           onTap: () =>
-              context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+              context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loadPlaylist(
                     Playlist(tracks: tracks, title: title),
                     doPlay: true,
                     idx: 0,

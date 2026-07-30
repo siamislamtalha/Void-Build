@@ -1,11 +1,11 @@
-import 'package:voidmusic/services/bloomee_player.dart';
+import 'package:voidmusic/services/voidmusic_player.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 
 /// Initializes the audio session and player.
 ///
-/// ## Why configure() is called HERE (not in BloomeeMusicPlayer's constructor)
+/// ## Why configure() is called HERE (not in VoidMusicPlayer's constructor)
 ///
 /// Dart constructors cannot `await`. If AudioSession.configure() is called
 /// inside the player constructor (fire-and-forget), there is a race window
@@ -14,7 +14,7 @@ import 'package:audio_session/audio_session.dart';
 /// attributes → AUDIOFOCUS_REQUEST_FAILED on Xiaomi MIUI / Samsung OneUI.
 ///
 /// Calling configure() here, before AudioService.init(), eliminates the race:
-/// the session is fully configured before any BloomeeMusicPlayer method can run.
+/// the session is fully configured before any VoidMusicPlayer method can run.
 Future<void> setupAudioSession() async {
   final session = await AudioSession.instance;
   await session.configure(AudioSessionConfiguration(
@@ -38,7 +38,7 @@ Future<void> setupAudioSession() async {
   ));
 }
 
-/// Singleton that creates and owns the [BloomeeMusicPlayer] instance.
+/// Singleton that creates and owns the [VoidMusicPlayer] instance.
 ///
 /// Using a [Completer] (not a busy-wait while loop) to serialize concurrent
 /// initialization calls. The old pattern with `while (_isInitializing)`
@@ -49,12 +49,12 @@ class PlayerInitializer {
   factory PlayerInitializer() => _instance;
   PlayerInitializer._internal();
 
-  BloomeeMusicPlayer? _player;
+  VoidMusicPlayer? _player;
   // Completer is set during init, removed when done. Any callers that arrive
   // while init is in progress simply await the same future.
-  Future<BloomeeMusicPlayer>? _initFuture;
+  Future<VoidMusicPlayer>? _initFuture;
 
-  Future<BloomeeMusicPlayer> getBloomeeMusicPlayer() async {
+  Future<VoidMusicPlayer> getVoidMusicPlayer() async {
     // 1. Already initialized and healthy — fast path.
     final p = _player;
     if (p != null) {
@@ -75,11 +75,11 @@ class PlayerInitializer {
     }
   }
 
-  Future<BloomeeMusicPlayer> _initializeInternal() async {
+  Future<VoidMusicPlayer> _initializeInternal() async {
     final player = await AudioService.init(
-      builder: () => BloomeeMusicPlayer(),
+      builder: () => VoidMusicPlayer(),
       config: const AudioServiceConfig(
-        androidNotificationChannelId: 'com.BloomeePlayer.notification.status',
+        androidNotificationChannelId: 'com.VoidMusicPlayer.notification.status',
         androidNotificationChannelName: 'Void Music',
         androidNotificationIcon: 'mipmap/ic_launcher',
         androidResumeOnClick: true,

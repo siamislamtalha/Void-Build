@@ -1,5 +1,23 @@
-import 'package:voidmusic/core/models/exported.dart';
-import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
+// ignore_for_file: unnecessary_const
+
+/// Model for playlist suggestions
+class PlaylistSuggestion {
+  final String title;
+  final String description;
+  final String searchQuery;
+  final String icon;
+  final String category;
+  final String? preferredPlugin;
+
+  const PlaylistSuggestion({
+    required this.title,
+    required this.description,
+    required this.searchQuery,
+    required this.icon,
+    required this.category,
+    this.preferredPlugin,
+  });
+}
 
 /// Service providing curated playlist suggestions for different regions/genres
 /// All playlists are available to all countries - no geo-restrictions
@@ -7,23 +25,23 @@ class PlaylistSuggestionsService {
   /// Get curated playlist suggestions based on region/genre
   /// Returns a list of playlist search queries that can be used with any plugin
   static List<PlaylistSuggestion> getSuggestions() {
-    return [
+    return const [
       // Indian Music (previously IN-only, now global)
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Indian Music',
         description: 'Top Bollywood and Indian regional hits',
         searchQuery: 'Indian music hits',
         icon: 'IN',
         category: 'Regional',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Bollywood Classics',
         description: 'Timeless Bollywood songs',
         searchQuery: 'Bollywood classics',
         icon: 'BF',
         category: 'Regional',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Punjabi Hits',
         description: 'Latest Punjabi chartbusters',
         searchQuery: 'Punjabi hits 2024',
@@ -32,21 +50,21 @@ class PlaylistSuggestionsService {
       ),
       
       // USA Music (previously US-only, now global)
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'USA Top 100',
         description: 'Billboard Hot 100 hits',
         searchQuery: 'USA top 100 hits',
         icon: 'US',
         category: 'Charts',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Hip Hop Hits',
         description: 'Trending hip hop and rap',
         searchQuery: 'hip hop hits 2024',
         icon: 'HH',
         category: 'Genre',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Country Music',
         description: 'Best country songs',
         searchQuery: 'country music hits',
@@ -55,14 +73,14 @@ class PlaylistSuggestionsService {
       ),
       
       // Bangladesh Music (previously BD-only, now global)
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Bangla Hits',
         description: 'Top Bengali songs',
         searchQuery: 'Bangla music hits',
         icon: 'BD',
         category: 'Regional',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Bangladeshi Pop',
         description: 'Popular Bangladeshi pop music',
         searchQuery: 'Bangladeshi pop songs',
@@ -71,14 +89,14 @@ class PlaylistSuggestionsService {
       ),
       
       // UK Music (previously UK-only, now global)
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'UK Top 40',
         description: 'Official UK chart hits',
         searchQuery: 'UK top 40 songs',
         icon: 'UK',
         category: 'Charts',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'British Pop',
         description: 'Best of British pop',
         searchQuery: 'British pop hits',
@@ -87,42 +105,42 @@ class PlaylistSuggestionsService {
       ),
       
       // Genre-based suggestions (global)
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'K-Pop',
         description: 'Korean pop music',
         searchQuery: 'K-pop hits 2024',
         icon: 'KP',
         category: 'Genre',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Latin Music',
         description: 'Top Latin and Spanish hits',
         searchQuery: 'Latin music hits',
         icon: 'LM',
         category: 'Genre',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Electronic Dance',
         description: 'EDM and dance music',
         searchQuery: 'EDM dance hits',
         icon: 'ED',
         category: 'Genre',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Rock Classics',
         description: 'Legendary rock songs',
         searchQuery: 'rock classics playlist',
         icon: 'RC',
         category: 'Genre',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Jazz & Blues',
         description: 'Smooth jazz and blues',
         searchQuery: 'jazz blues playlist',
         icon: 'JB',
         category: 'Genre',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Classical Music',
         description: 'Classical masterpieces',
         searchQuery: 'classical music essentials',
@@ -131,35 +149,35 @@ class PlaylistSuggestionsService {
       ),
       
       // Mood-based suggestions (global)
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Workout Music',
         description: 'High-energy workout tracks',
         searchQuery: 'workout music playlist',
         icon: 'WO',
         category: 'Mood',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Chill Vibes',
         description: 'Relaxing chill music',
         searchQuery: 'chill vibes playlist',
         icon: 'CV',
         category: 'Mood',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Focus & Study',
         description: 'Concentration-enhancing music',
         searchQuery: 'focus study music',
         icon: 'FS',
         category: 'Mood',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Party Hits',
         description: 'Ultimate party anthems',
         searchQuery: 'party hits playlist',
         icon: 'PH',
         category: 'Mood',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Romantic Ballads',
         description: 'Love songs and ballads',
         searchQuery: 'romantic love songs',
@@ -168,7 +186,7 @@ class PlaylistSuggestionsService {
       ),
       
       // Spotify-specific suggestions (when Spotify plugin is available)
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Spotify Today\'s Top Hits',
         description: 'Most streamed tracks on Spotify',
         searchQuery: 'Today\'s Top Hits',
@@ -176,7 +194,7 @@ class PlaylistSuggestionsService {
         category: 'Spotify',
         preferredPlugin: 'spotify',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Spotify RapCaviar',
         description: 'Hip hop playlist from Spotify',
         searchQuery: 'RapCaviar',
@@ -186,7 +204,7 @@ class PlaylistSuggestionsService {
       ),
       
       // JioSaavn-specific suggestions (when JioSaavn plugin is available)
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'JioSaavn Trending',
         description: 'Trending on JioSaavn',
         searchQuery: 'trending',
@@ -194,7 +212,7 @@ class PlaylistSuggestionsService {
         category: 'JioSaavn',
         preferredPlugin: 'jiosaavn',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'JioSaavn Top 50',
         description: 'Top 50 tracks on JioSaavn',
         searchQuery: 'top 50',
@@ -204,7 +222,7 @@ class PlaylistSuggestionsService {
       ),
       
       // Multi-source suggestions (aggregated from multiple sources)
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Multi-Source Trending',
         description: 'Trending across all platforms',
         searchQuery: 'trending hits',
@@ -212,7 +230,7 @@ class PlaylistSuggestionsService {
         category: 'Multi',
         preferredPlugin: 'multi',
       ),
-      PlaylistSuggestion(
+      const PlaylistSuggestion(
         title: 'Global Top 100',
         description: 'Top 100 across all sources',
         searchQuery: 'top 100 global',
@@ -321,22 +339,4 @@ class PlaylistSuggestionsService {
       ...otherCountrySuggestions,
     ];
   }
-}
-
-class PlaylistSuggestion {
-  final String title;
-  final String description;
-  final String searchQuery;
-  final String icon;
-  final String category;
-  final String? preferredPlugin;
-  
-  PlaylistSuggestion({
-    required this.title,
-    required this.description,
-    required this.searchQuery,
-    required this.icon,
-    required this.category,
-    this.preferredPlugin,
-  });
 }

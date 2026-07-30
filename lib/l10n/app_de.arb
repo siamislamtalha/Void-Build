@@ -350,7 +350,7 @@
   "storageResetButton": "Zurücksetzen",
   "storageResetSuccess": "App wurde in den Standardzustand zurückgesetzt.",
   "storageLocationDialogTitle": "Backup-Speicherort",
-  "storageLocationAndroid": "Sicherungen befinden sich in:\n\n1. Downloads-Verzeichnis\n2. Android/data/ls.bloomee.musicplayer/data\n\nKopiere die Datei von einem dieser Orte.",
+  "storageLocationAndroid": "Sicherungen befinden sich in:\n\n1. Downloads-Verzeichnis\n2. Android/data/ls.voidmusic.musicplayer/data\n\nKopiere die Datei von einem dieser Orte.",
   "storageLocationOther": "Sicherungen werden im Downloads-Verzeichnis gespeichert.",
   "storageRestoreOptionsTitle": "Wiederherstellungsoptionen",
   "storageRestoreOptionsDesc": "Wähle die Daten zur Wiederherstellung. Deaktiviere Elemente, die NICHT importiert werden sollen.",
@@ -567,7 +567,6 @@
   "importSongsTitle": "Songs importieren",
   "importNoPluginsLoaded": "Keine Importer-Plugins geladen.\nInstalliere ein Plugin, um Playlists externer Dienste zu importieren.",
   "importVoidMusicFiles": "Void Music-Dateien importieren",
-  "importBloomeeFiles": "Void Music-Dateien importieren",
   "importM3UFiles": "M3U-Playlist importieren",
   "importM3UNameDialogTitle": "Playlist-Name",
   "importM3UNameHint": "Gib einen Namen für diese Playlist ein",
@@ -705,7 +704,7 @@
 
   "snackbarOpeningAlbumPage": "Originale Album-Seite wird geöffnet.",
 
-  "updateAvailableBody": "Neue Version von Bloomee🌸 verfügbar!\n\nVersion: {ver}+{build}",
+  "updateAvailableBody": "Neue Version von Void Music🌸 verfügbar!\n\nVersion: {ver}+{build}",
   "@updateAvailableBody": { "placeholders": { "ver": { "type": "String" }, "build": { "type": "String" } } },
 
   "pluginSnackbarInstalled": "Plugin „{id}“ erfolgreich installiert",
@@ -715,11 +714,11 @@
   "pluginSnackbarDeleted": "Plugin „{id}“ erfolgreich gelöscht",
   "@pluginSnackbarDeleted": { "placeholders": { "id": { "type": "String" } } },
 
-  "pluginBootstrapTitle": "Bloomee wird eingerichtet",
+  "pluginBootstrapTitle": "Void Music wird eingerichtet",
   "pluginBootstrapProgress": "Neues Plugin-System wird konfiguriert... {percent}%",
   "@pluginBootstrapProgress": { "placeholders": { "percent": { "type": "int" } } },
   "pluginBootstrapHint": "Dies passiert nur einmal.",
   "pluginBootstrapErrorTitle": "Verbindung zu langsam",
-  "pluginBootstrapErrorBody": "Einige Plugins konnten nicht installiert werden. Du kannst Bloomee dennoch nutzen – Plugins werden beim nächsten Start erneut versucht.",
+  "pluginBootstrapErrorBody": "Einige Plugins konnten nicht installiert werden. Du kannst Void Music dennoch nutzen – Plugins werden beim nächsten Start erneut versucht.",
   "pluginBootstrapContinue": "Trotzdem fortfahren"
 }

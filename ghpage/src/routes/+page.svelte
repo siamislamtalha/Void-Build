@@ -188,7 +188,7 @@
 		</section>
 
 		<section id="section-2" class="content-section {active === 2 ? 'active' : ''}" aria-hidden={active !== 1}>
-			<!-- <h2>🌟 Why Choose Bloomee?</h2> -->
+			<!-- <h2>🌟 Why Choose Void Music?</h2> -->
 			<FeaturesCarousel />
 		</section>
 

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:voidmusic/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/constants/route_paths.dart';
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/core/models/media_playlist_model.dart';
@@ -230,7 +230,7 @@ class _ChartScreenBodyState extends State<_ChartScreenBody> {
       return;
     }
 
-    context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+    context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loadPlaylist(
           Playlist(tracks: [track], title: widget.chartTitle),
           doPlay: true,
         );

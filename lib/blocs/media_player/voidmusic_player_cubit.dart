@@ -1,29 +1,29 @@
-import 'package:voidmusic/services/bloomee_player.dart';
+import 'package:voidmusic/services/voidmusic_player.dart';
 import 'package:bloc/bloc.dart';
 import 'package:rxdart/rxdart.dart';
-part 'bloomee_player_state.dart';
+part 'voidmusic_player_state.dart';
 
-class BloomeePlayerCubit extends Cubit<BloomeePlayerState> {
-  final BloomeeMusicPlayer bloomeePlayer;
+class VoidMusicPlayerCubit extends Cubit<VoidMusicPlayerState> {
+  final VoidMusicPlayer voidMusicPlayer;
   late ValueStream<ProgressBarStreams> progressStreams;
 
-  BloomeePlayerCubit(this.bloomeePlayer)
-      : super(BloomeePlayerState(isReady: true)) {
-    bloomeePlayer.syncPublicState();
+  VoidMusicPlayerCubit(this.voidMusicPlayer)
+      : super(VoidMusicPlayerState(isReady: true)) {
+    voidMusicPlayer.syncPublicState();
     _setupProgressStreams();
   }
 
   void switchShowLyrics({bool? value}) {
-    emit(BloomeePlayerState(
+    emit(VoidMusicPlayerState(
         isReady: true, showLyrics: value ?? !state.showLyrics));
   }
 
   void _setupProgressStreams() {
     progressStreams = Rx.combineLatest4<Duration, Duration, Duration, bool, ProgressBarStreams>(
-      Rx.defer(() => bloomeePlayer.engine.positionStream, reusable: true),
-      Rx.defer(() => bloomeePlayer.engine.durationStream, reusable: true),
-      Rx.defer(() => bloomeePlayer.engine.bufferedStream, reusable: true),
-      Rx.defer(() => bloomeePlayer.engine.playingStream, reusable: true),
+      Rx.defer(() => voidMusicPlayer.engine.positionStream, reusable: true),
+      Rx.defer(() => voidMusicPlayer.engine.durationStream, reusable: true),
+      Rx.defer(() => voidMusicPlayer.engine.bufferedStream, reusable: true),
+      Rx.defer(() => voidMusicPlayer.engine.playingStream, reusable: true),
       (Duration position, Duration duration, Duration buffered, bool playing) =>
           ProgressBarStreams(
         position: position,

@@ -6,7 +6,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/blocs/explore/cubit/explore_cubits.dart';
 import 'package:voidmusic/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:voidmusic/blocs/lastdotfm/lastdotfm_cubit.dart';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/blocs/notification/notification_cubit.dart';
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/core/di/service_locator.dart';
@@ -230,8 +230,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                         song: e,
                                         onTap: () {
                                           context
-                                              .read<BloomeePlayerCubit>()
-                                              .bloomeePlayer
+                                              .read<VoidMusicPlayerCubit>()
+                                              .voidMusicPlayer
                                               .loadPlaylist(
                                                 Playlist(
                                                   tracks: state.tracks,
@@ -275,8 +275,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                           song: e,
                                           onTap: () {
                                             context
-                                                .read<BloomeePlayerCubit>()
-                                                .bloomeePlayer
+                                                .read<VoidMusicPlayerCubit>()
+                                                .voidMusicPlayer
                                                 .loadPlaylist(
                                                   Playlist(
                                                     tracks: snapshot.data!,
@@ -413,7 +413,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         },
                       ),
                       // Playlist Suggestions (New App List - shown after Old App List)
-                      _PlaylistSuggestionsSection(),
+                      const _PlaylistSuggestionsSection(),
                       // ── Multi-source Song Suggestions (New App List - shown after Playlist Suggestions)
                       // One horizontal row per loaded content-resolver plugin,
                       // showing only Track items from that plugin's home sections.
@@ -964,8 +964,8 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
                       isList: false,
                       onTap: () {
                         context
-                            .read<BloomeePlayerCubit>()
-                            .bloomeePlayer
+                            .read<VoidMusicPlayerCubit>()
+                            .voidMusicPlayer
                             .loadPlaylist(
                               Playlist(
                                 tracks: songs,
@@ -1332,7 +1332,6 @@ class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
     return ValueListenableBuilder<double>(
       valueListenable: scrollOffsetNotifier,
       builder: (context, offset, child) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
         final bgBase = Theme.of(context).scaffoldBackgroundColor;
         final glassColor = AppTheme.glassColor(context);
         final glassBorder = AppTheme.glassBorder(context);

@@ -193,7 +193,7 @@ class PluginService {
     String? policyCountryCode,
   }) async {
     try {
-      final packedManifest = await _readPackedManifest(packedFilePath);
+      await _readPackedManifest(packedFilePath);
       var countryCode =
           CountryInfoService.normalizeCountryCode(policyCountryCode);
       if (countryCode.isEmpty) {
@@ -203,13 +203,11 @@ class PluginService {
       }
 
       // Country restrictions removed - all plugins available to all countries
-      // if (packedManifest.countryAllowlist.isNotEmpty &&
-      //     (countryCode.isEmpty ||
-      //         !packedManifest.countryAllowlist.contains(countryCode))) {
+      // if (false) {
       //   throw PluginCountryRestrictedException(
-      //     pluginId: packedManifest.pluginId,
+      //     pluginId: 'unknown',
       //     countryCode: countryCode,
-      //     allowlist: packedManifest.countryAllowlist,
+      //     allowlist: const [],
       //   );
       // }
 
@@ -231,7 +229,7 @@ class PluginService {
       //   throw PluginCountryRestrictedException(
       //     pluginId: result.pluginId,
       //     countryCode: countryCode,
-      //     allowlist: packedManifest.countryAllowlist,
+      //     allowlist: const [],
       //   );
       // }
 

@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui' show lerpDouble;
 
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/screens/widgets/media_metadata_links.dart';
@@ -137,7 +137,7 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
 
   void _onHorizontalDragEnd(DragEndDetails details) {
     final velocity = details.primaryVelocity ?? 0;
-    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final player = context.read<VoidMusicPlayerCubit>().voidMusicPlayer;
 
     if (_dragOffset < -_swipeThreshold || velocity < -600) {
       HapticFeedback.mediumImpact();
@@ -294,8 +294,8 @@ class _ControlsCapsule extends StatelessWidget {
                 onPressed: () {
                   HapticFeedback.lightImpact();
                   context
-                      .read<BloomeePlayerCubit>()
-                      .bloomeePlayer
+                      .read<VoidMusicPlayerCubit>()
+                      .voidMusicPlayer
                       .skipToPrevious();
                 },
               ),
@@ -307,8 +307,8 @@ class _ControlsCapsule extends StatelessWidget {
               onPressed: () {
                 HapticFeedback.lightImpact();
                 context
-                    .read<BloomeePlayerCubit>()
-                    .bloomeePlayer
+                    .read<VoidMusicPlayerCubit>()
+                    .voidMusicPlayer
                     .skipToNext();
               },
             ),
@@ -498,7 +498,7 @@ class _PlayPauseButton extends StatelessWidget {
         isDark: isDark,
         onPressed: () {
           HapticFeedback.mediumImpact();
-          context.read<BloomeePlayerCubit>().bloomeePlayer.rewind();
+          context.read<VoidMusicPlayerCubit>().voidMusicPlayer.rewind();
         },
       );
     }
@@ -510,8 +510,8 @@ class _PlayPauseButton extends StatelessWidget {
       onPressed: () {
         HapticFeedback.lightImpact();
         state.isPlaying
-            ? context.read<BloomeePlayerCubit>().bloomeePlayer.pause()
-            : context.read<BloomeePlayerCubit>().bloomeePlayer.play();
+            ? context.read<VoidMusicPlayerCubit>().voidMusicPlayer.pause()
+            : context.read<VoidMusicPlayerCubit>().voidMusicPlayer.play();
       },
     );
   }
@@ -587,7 +587,7 @@ class _GlowingProgressBar extends StatelessWidget {
       right: 0,
       height: 3,
       child: StreamBuilder<ProgressBarStreams>(
-        stream: context.watch<BloomeePlayerCubit>().progressStreams,
+        stream: context.watch<VoidMusicPlayerCubit>().progressStreams,
         builder: (context, snapshot) {
           double fraction = 0;
           if (snapshot.hasData && snapshot.data!.duration != Duration.zero) {

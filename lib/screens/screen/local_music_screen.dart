@@ -1,12 +1,12 @@
 import 'dart:developer';
 
 import 'package:voidmusic/blocs/local_music/cubit/local_music_cubit.dart';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/core/models/media_playlist_model.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
-import 'package:voidmusic/screens/widgets/bloomee_ui_kit/bloomee_dialog.dart';
+import 'package:voidmusic/screens/widgets/voidmusic_ui_kit/voidmusic_dialog.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/more_bottom_sheet.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
@@ -287,8 +287,8 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                   icon: MingCute.shuffle_line,
                   label: AppLocalizations.of(context)!.localMusicShuffle,
                   onTap: () => context
-                      .read<BloomeePlayerCubit>()
-                      .bloomeePlayer
+                      .read<VoidMusicPlayerCubit>()
+                      .voidMusicPlayer
                       .loadPlaylist(
                         Playlist(tracks: displayedTracks, title: 'Local Music'),
                         doPlay: true,
@@ -300,8 +300,8 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                   icon: MingCute.play_fill,
                   label: AppLocalizations.of(context)!.localMusicPlayAll,
                   onTap: () => context
-                      .read<BloomeePlayerCubit>()
-                      .bloomeePlayer
+                      .read<VoidMusicPlayerCubit>()
+                      .voidMusicPlayer
                       .loadPlaylist(
                         Playlist(tracks: displayedTracks, title: 'Local Music'),
                         doPlay: true,
@@ -383,7 +383,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                 song: track,
                 showOptions: true,
                 onTap: () {
-                  context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+                  context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loadPlaylist(
                         Playlist(tracks: displayedTracks, title: 'Local Music'),
                         idx: index,
                         doPlay: true,
@@ -665,7 +665,7 @@ class _DeleteConfirmDialogState extends State<_DeleteConfirmDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return BloomeeDialogSurface(
+    return VoidMusicDialogSurface(
       title: AppLocalizations.of(context)!.dialogDeleteTrack,
       subtitle: AppLocalizations.of(context)!
           .dialogDeleteTrackMessage(widget.trackTitle),

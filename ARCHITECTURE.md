@@ -167,7 +167,7 @@ UI never holds `PlaylistTypeDB`. All enum mapping happens inside DAO calls withi
 
 | Bloc/Cubit | Location | Purpose |
 |---|---|---|
-| `BloomeePlayerCubit` | `blocs/media_player/` | Wraps `BloomeeMusicPlayer`; exposes player state |
+| `VoidMusicPlayerCubit` | `blocs/media_player/` | Wraps `VoidMusicPlayer`; exposes player state |
 | `MiniPlayerCubit` | `blocs/mini_player/` | Playback status for the mini-player overlay |
 | `LibraryItemsCubit` | `blocs/library/` | Library list with save/remove operations |
 | `DownloaderCubit` | `blocs/downloader/` | Offline download queue |
@@ -247,7 +247,7 @@ Application-lifetime singletons registered in `ServiceLocator` (`get_it`).
 
 | Service | Purpose |
 |---|---|
-| `BloomeeMusicPlayer` | Core audio engine wrapping `audio_service` |
+| `VoidMusicPlayer` | Core audio engine wrapping `audio_service` |
 | `PluginService` | WASM plugin runtime (load/unload/call) |
 | `PluginCacheRepository` | Plugin response cache (L1 + L2) |
 | `EqualizerService` | 10-band parametric EQ via FFmpeg |

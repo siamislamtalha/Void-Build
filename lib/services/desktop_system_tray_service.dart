@@ -2,7 +2,7 @@ import 'dart:io' as io;
 import 'package:flutter/foundation.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 
@@ -13,7 +13,7 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
   factory DesktopSystemTrayService() => _instance;
   DesktopSystemTrayService._internal();
 
-  BloomeePlayerCubit? _playerCubit;
+  VoidMusicPlayerCubit? _playerCubit;
   MiniPlayerCubit? _miniPlayerCubit;
   SettingsCubit? _settingsCubit;
   bool _initialized = false;
@@ -23,7 +23,7 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
       (io.Platform.isWindows || io.Platform.isLinux || io.Platform.isMacOS);
 
   Future<void> init({
-    required BloomeePlayerCubit playerCubit,
+    required VoidMusicPlayerCubit playerCubit,
     required MiniPlayerCubit miniPlayerCubit,
     required SettingsCubit settingsCubit,
   }) async {
@@ -49,8 +49,8 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
   Future<void> _initSystemTray() async {
     try {
       final String iconPath = io.Platform.isWindows
-          ? 'assets/icons/BloomeeLogoFG.png'
-          : 'assets/icons/bloomee_new_logo_c.png';
+          ? 'assets/icons/VoidMusicLogoFG.png'
+          : 'assets/icons/voidmusic_new_logo_c.png';
 
       await trayManager.setIcon(iconPath);
       await trayManager.setToolTip('Void Music');
@@ -115,7 +115,7 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
         await _showWindow();
         break;
       case 'play_pause':
-        final player = _playerCubit?.bloomeePlayer;
+        final player = _playerCubit?.voidMusicPlayer;
         if (player != null) {
           if (_miniPlayerCubit?.state.isPlaying ?? false) {
             player.pause();
@@ -125,7 +125,7 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
         }
         break;
       case 'next_track':
-        _playerCubit?.bloomeePlayer.skipToNext();
+        _playerCubit?.voidMusicPlayer.skipToNext();
         break;
       case 'exit_app':
         await windowManager.destroy();

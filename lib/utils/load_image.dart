@@ -82,7 +82,7 @@ Widget _buildLocalFileImage({
 ImageProvider<Object> getImageProviderSync(
   String? imageUrl, {
   String? fallbackUrl,
-  String placeholderUrl = "assets/icons/bloomee_new_logo_c.png",
+  String placeholderUrl = "assets/icons/voidmusic_new_logo_c.png",
 }) {
   final primaryFile = _resolveLocalImageFile(imageUrl);
   if (primaryFile != null) return FileImage(primaryFile);
@@ -115,7 +115,7 @@ class LoadImageCached extends StatefulWidget {
   const LoadImageCached({
     Key? key,
     required this.imageUrl,
-    this.placeholderUrl = "assets/icons/bloomee_new_logo_c.png",
+    this.placeholderUrl = "assets/icons/voidmusic_new_logo_c.png",
     this.fit = BoxFit.cover,
     this.fallbackUrl,
     this.width,
@@ -131,7 +131,7 @@ class LoadImageCached extends StatefulWidget {
     Key? key,
     required String imageUrl,
     String? fallbackUrl,
-    String placeholderUrl = "assets/icons/bloomee_new_logo_c.png",
+    String placeholderUrl = "assets/icons/voidmusic_new_logo_c.png",
     BoxFit fit = BoxFit.cover,
     BorderRadius? borderRadius,
     int? maxMemCacheWidth,
@@ -284,7 +284,7 @@ class _LoadImageCachedState extends State<LoadImageCached> {
 // Async ImageProvider resolver (unchanged API)
 Future<ImageProvider> getImageProvider(
   String imageUrl, {
-  String placeholderUrl = "assets/icons/bloomee_new_logo_c.png",
+  String placeholderUrl = "assets/icons/voidmusic_new_logo_c.png",
 }) async {
   final localFile = _resolveLocalImageFile(imageUrl);
   if (localFile != null) return FileImage(localFile);

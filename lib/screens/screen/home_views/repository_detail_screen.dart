@@ -145,8 +145,7 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded,
-              color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(

@@ -30,8 +30,7 @@ class CountrySettings extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(

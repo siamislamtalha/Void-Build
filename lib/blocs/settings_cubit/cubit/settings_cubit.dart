@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:voidmusic/core/constants/setting_keys.dart';
 import 'package:voidmusic/core/constants/cache_keys.dart';
-import 'package:voidmusic/repository/bloomee/settings_repository.dart';
+import 'package:voidmusic/repository/voidmusic/voidmusic_settings_repository.dart';
 import 'package:voidmusic/services/player/stream_quality_selector.dart';
 import 'package:voidmusic/services/db/db_provider.dart';
 import 'package:voidmusic/utils/country_info.dart';
@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 part 'settings_state.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {
-  final SettingsRepository _settingsRepo;
+  final VoidMusicSettingsRepository _settingsRepo;
 
   SettingsCubit(this._settingsRepo) : super(SettingsInitial()) {
     _initSettings();

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:audio_service/audio_service.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/models/exported.dart' hide MediaItem;
 import 'package:voidmusic/core/adapters/track_adapter.dart';
 import 'package:voidmusic/services/player/player_engine.dart';
@@ -90,14 +90,14 @@ class MiniPlayerState extends Equatable {
 /// - **Minimal state machine**: One [MiniPlayerState] with boolean flags
 ///   instead of a sealed class hierarchy with 5+ subtypes.
 class MiniPlayerCubit extends Cubit<MiniPlayerState> {
-  final BloomeePlayerCubit _playerCubit;
+  final VoidMusicPlayerCubit _playerCubit;
   StreamSubscription? _sub;
 
   /// When non-null, the mini player is force-hidden until a *different* track ID
   /// is seen. Prevents the player from immediately re-appearing after dismissal.
   String? _dismissedTrackId;
 
-  MiniPlayerCubit({required BloomeePlayerCubit playerCubit})
+  MiniPlayerCubit({required VoidMusicPlayerCubit playerCubit})
       : _playerCubit = playerCubit,
         super(const MiniPlayerState.hidden()) {
     _listen();
@@ -107,19 +107,19 @@ class MiniPlayerCubit extends Cubit<MiniPlayerState> {
   /// The mini player will remain hidden until a new track starts playing.
   void dismiss() {
     _dismissedTrackId = state.track?.id;
-    _playerCubit.bloomeePlayer.stop();
+    _playerCubit.voidMusicPlayer.stop();
     emit(const MiniPlayerState.hidden());
   }
 
   void _listen() {
     _sub = Rx.combineLatest4<MediaItem?, EngineState, bool, bool,
         (MediaItem?, EngineState, bool, bool)>(
-      _playerCubit.bloomeePlayer.mediaItem,
-      Rx.defer(() => _playerCubit.bloomeePlayer.engine.stateStream,
+      _playerCubit.voidMusicPlayer.mediaItem,
+      Rx.defer(() => _playerCubit.voidMusicPlayer.engine.stateStream,
           reusable: true),
-      Rx.defer(() => _playerCubit.bloomeePlayer.engine.playingStream,
+      Rx.defer(() => _playerCubit.voidMusicPlayer.engine.playingStream,
           reusable: true),
-      _playerCubit.bloomeePlayer.isResolving,
+      _playerCubit.voidMusicPlayer.isResolving,
       (media, engineState, playing, resolving) =>
           (media, engineState, playing, resolving),
     ).listen((record) {

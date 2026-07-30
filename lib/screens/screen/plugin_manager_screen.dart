@@ -6,7 +6,7 @@ import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_event.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_state.dart';
 import 'package:voidmusic/screens/widgets/animated_list_item.dart';
-import 'package:voidmusic/screens/widgets/bloomee_ui_kit/bloomee_dialog.dart';
+import 'package:voidmusic/screens/widgets/voidmusic_ui_kit/voidmusic_dialog.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
@@ -145,8 +145,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
         padding: const EdgeInsets.only(left: 12.0),
         child: Center(
           child: IconButton(
-            icon: Icon(Icons.arrow_back_rounded,
-                color: Theme.of(context).colorScheme.onSurface, size: 24),
+            icon: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 24),
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -1089,14 +1088,14 @@ class _PluginDetailSheetState extends State<_PluginDetailSheet> {
     final bloc = context.read<PluginBloc>();
     final l10n = AppLocalizations.of(context)!;
 
-    showBloomeeDialog(
+    showVoidMusicDialog(
       context: context,
       title: l10n.pluginManagerDeleteTitle,
       subtitle: l10n.pluginManagerDeleteMessage(pluginName),
       icon: Icons.delete_outline_rounded,
       actions: [
-        BloomeeDialogAction.text(l10n.pluginManagerCancel),
-        BloomeeDialogAction.filled(
+        VoidMusicDialogAction.text(l10n.pluginManagerCancel),
+        VoidMusicDialogAction.filled(
           l10n.pluginManagerDeleteAction,
           isDestructive: true,
           onPressed: () {
@@ -1116,13 +1115,13 @@ class _PluginDetailSheetState extends State<_PluginDetailSheet> {
   void _confirmStorageCleanup(BuildContext context, PluginBloc bloc,
       String pluginId, String pluginName) {
     final l10n = AppLocalizations.of(context)!;
-    showBloomeeDialog(
+    showVoidMusicDialog(
       context: context,
       title: l10n.pluginManagerDeleteStorageTitle,
       subtitle: l10n.pluginManagerDeleteStorageMessage(pluginName),
       icon: Icons.storage_outlined,
       actions: [
-        BloomeeDialogAction.text(
+        VoidMusicDialogAction.text(
           l10n.pluginManagerDeleteStorageKeep,
           onPressed: () {
             if (context.mounted) Navigator.of(context).pop();
@@ -1132,7 +1131,7 @@ class _PluginDetailSheetState extends State<_PluginDetailSheet> {
                 cleanStorage: false));
           },
         ),
-        BloomeeDialogAction.filled(
+        VoidMusicDialogAction.filled(
           l10n.pluginManagerDeleteStorageRemove,
           isDestructive: true,
           onPressed: () {

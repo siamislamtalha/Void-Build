@@ -1,4 +1,4 @@
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:voidmusic/blocs/library/cubit/library_items_cubit.dart';
 import 'package:voidmusic/core/models/media_playlist_model.dart';
@@ -167,7 +167,7 @@ class _OfflineScreenState extends State<OfflineScreen> {
                     icon: MingCute.shuffle_line,
                     label: 'Shuffle',
                     onTap: () {
-                      context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+                      context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loadPlaylist(
                             Playlist(tracks: _filteredSongs, title: "Offline Songs"),
                             doPlay: true,
                             shuffling: true,
@@ -179,7 +179,7 @@ class _OfflineScreenState extends State<OfflineScreen> {
                     icon: MingCute.play_fill,
                     label: 'Play All',
                     onTap: () {
-                      context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+                      context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loadPlaylist(
                             Playlist(tracks: _filteredSongs, title: "Offline Songs"),
                             doPlay: true,
                           );
@@ -203,7 +203,7 @@ class _OfflineScreenState extends State<OfflineScreen> {
                         SnackbarService.showMessage(l10n.offlineOpenFailed);
                         return;
                       }
-                      context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+                      context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loadPlaylist(
                             Playlist(tracks: state.downloaded, title: "Offline"),
                             idx: selectedIndex,
                             doPlay: true,

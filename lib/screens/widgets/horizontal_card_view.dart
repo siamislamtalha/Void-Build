@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/core/models/media_playlist_model.dart';
 import 'package:voidmusic/core/events/global_event_bus.dart';
@@ -185,7 +185,7 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
         }
         if (tracks.isEmpty) return;
         final idx = tracks.indexWhere((t) => t.id == track.id);
-        context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+        context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loadPlaylist(
               Playlist(tracks: tracks, title: widget.section.title),
               idx: idx >= 0 ? idx : 0,
               doPlay: true,

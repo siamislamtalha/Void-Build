@@ -567,7 +567,7 @@
   "importSongsTitle": "Import Songs",
   "importNoPluginsLoaded": "No content-importer plugins loaded.\nInstall an importer plugin to import playlists from external services.",
   "importVoidMusicFiles": "Import Void Music Files",
-  "importBloomeeFiles": "Import Bloomee Files",
+  "importVoidMusicFiles": "Import Void Music Files",
     "importM3UFiles": "Import M3U Playlist",
     "importM3UNameDialogTitle": "Playlist Name",
     "importM3UNameHint": "Enter a name for this playlist",
@@ -705,7 +705,7 @@
 
   "snackbarOpeningAlbumPage": "Opening original album page.",
 
-  "updateAvailableBody": "New Version of Bloomee🌸 is now available!\n\nVersion: {ver}+{build}",
+  "updateAvailableBody": "New Version of Void Music🌸 is now available!\n\nVersion: {ver}+{build}",
   "@updateAvailableBody": { "placeholders": { "ver": { "type": "String" }, "build": { "type": "String" } } },
 
   "pluginSnackbarInstalled": "Plugin \"{id}\" installed successfully",
@@ -715,11 +715,11 @@
   "pluginSnackbarDeleted": "Plugin \"{id}\" deleted successfully",
   "@pluginSnackbarDeleted": { "placeholders": { "id": { "type": "String" } } },
 
-  "pluginBootstrapTitle": "Setting up Bloomee",
+  "pluginBootstrapTitle": "Setting up Void Music",
   "pluginBootstrapProgress": "Setting up new plugin engine... {percent}%",
   "@pluginBootstrapProgress": { "placeholders": { "percent": { "type": "int" } } },
   "pluginBootstrapHint": "This only happens once.",
   "pluginBootstrapErrorTitle": "Connection too slow",
-  "pluginBootstrapErrorBody": "Some plugins could not be installed. You can still use Bloomee — plugins will be retried on next launch.",
+  "pluginBootstrapErrorBody": "Some plugins could not be installed. You can still use Void Music — plugins will be retried on next launch.",
   "pluginBootstrapContinue": "Continue Anyway"
 }

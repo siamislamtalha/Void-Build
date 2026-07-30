@@ -6,7 +6,7 @@ import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/core/models/media_playlist_model.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/screens/widgets/more_bottom_sheet.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
@@ -25,7 +25,7 @@ class OfflineArtistDetailScreen extends StatelessWidget {
 
   void _playFromList(BuildContext context, {int? index, bool shuffle = false}) {
     if (songs.isEmpty) return;
-    context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+    context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loadPlaylist(
           Playlist(
             tracks: songs,
             title: artistName,
@@ -193,11 +193,11 @@ class OfflineArtistDetailScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 24),
                               StreamBuilder<String>(
-                                stream: context.read<BloomeePlayerCubit>().bloomeePlayer.queueTitle,
+                                stream: context.read<VoidMusicPlayerCubit>().voidMusicPlayer.queueTitle,
                                 builder: (context, snapshot) {
                                   final isCurrent = snapshot.hasData && snapshot.data == artistName;
                                   return StreamBuilder<bool>(
-                                    stream: context.read<BloomeePlayerCubit>().bloomeePlayer.engine.playingStream,
+                                    stream: context.read<VoidMusicPlayerCubit>().voidMusicPlayer.engine.playingStream,
                                     builder: (context, playingSnapshot) {
                                       final isPlaying = isCurrent && (playingSnapshot.data ?? false);
                                       return Container(
@@ -216,12 +216,12 @@ class OfflineArtistDetailScreen extends StatelessWidget {
                                           size: 56,
                                           onPlay: () {
                                             if (isCurrent) {
-                                              context.read<BloomeePlayerCubit>().bloomeePlayer.play();
+                                              context.read<VoidMusicPlayerCubit>().voidMusicPlayer.play();
                                             } else {
                                               _playFromList(context);
                                             }
                                           },
-                                          onPause: () => context.read<BloomeePlayerCubit>().bloomeePlayer.pause(),
+                                          onPause: () => context.read<VoidMusicPlayerCubit>().voidMusicPlayer.pause(),
                                         ),
                                       );
                                     },
@@ -303,7 +303,7 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
 
   void _playFromList(BuildContext context, {int? index, bool shuffle = false}) {
     if (songs.isEmpty) return;
-    context.read<BloomeePlayerCubit>().bloomeePlayer.loadPlaylist(
+    context.read<VoidMusicPlayerCubit>().voidMusicPlayer.loadPlaylist(
           Playlist(
             tracks: songs,
             title: albumName,
@@ -483,11 +483,11 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 24),
                               StreamBuilder<String>(
-                                stream: context.read<BloomeePlayerCubit>().bloomeePlayer.queueTitle,
+                                stream: context.read<VoidMusicPlayerCubit>().voidMusicPlayer.queueTitle,
                                 builder: (context, snapshot) {
                                   final isCurrent = snapshot.hasData && snapshot.data == albumName;
                                   return StreamBuilder<bool>(
-                                    stream: context.read<BloomeePlayerCubit>().bloomeePlayer.engine.playingStream,
+                                    stream: context.read<VoidMusicPlayerCubit>().voidMusicPlayer.engine.playingStream,
                                     builder: (context, playingSnapshot) {
                                       final isPlaying = isCurrent && (playingSnapshot.data ?? false);
                                       return Container(
@@ -506,12 +506,12 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
                                           size: 56,
                                           onPlay: () {
                                             if (isCurrent) {
-                                              context.read<BloomeePlayerCubit>().bloomeePlayer.play();
+                                              context.read<VoidMusicPlayerCubit>().voidMusicPlayer.play();
                                             } else {
                                               _playFromList(context);
                                             }
                                           },
-                                          onPause: () => context.read<BloomeePlayerCubit>().bloomeePlayer.pause(),
+                                          onPause: () => context.read<VoidMusicPlayerCubit>().voidMusicPlayer.pause(),
                                         ),
                                       );
                                     },

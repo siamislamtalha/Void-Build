@@ -47,7 +47,6 @@ class SourceBadge extends StatelessWidget {
     final svgPath = _svgPathForPluginId(parts.pluginId);
     if (svgPath == null) return const SizedBox.shrink();
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isMultiSource = parts.pluginId.toLowerCase().contains('multi') || 
                          parts.pluginId.toLowerCase().contains('bloomfactory');
     
@@ -86,7 +85,6 @@ class SourceBadgeByPluginId extends StatelessWidget {
     final svgPath = _svgPathForPluginId(pluginId);
     if (svgPath == null) return const SizedBox.shrink();
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isMultiSource = pluginId.toLowerCase().contains('multi') || 
                          pluginId.toLowerCase().contains('bloomfactory');
     

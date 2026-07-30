@@ -328,21 +328,21 @@ class DownloadingCardWidget extends StatelessWidget {
           Icons.arrow_downward,
           color: Theme.of(context).colorScheme.onSurface,
           size: 20,
-          key: ValueKey('downloading'),
+          key: const ValueKey('downloading'),
         );
       case DownloadState.paused:
-        return Icon(
+        return const Icon(
           Icons.pause_circle_outline,
           color: Colors.amber,
           size: 20,
-          key: const ValueKey('paused'),
+          key: ValueKey('paused'),
         );
       case DownloadState.retrying:
-        return Icon(
+        return const Icon(
           Icons.refresh,
           color: Colors.orangeAccent,
           size: 20,
-          key: const ValueKey('retrying'),
+          key: ValueKey('retrying'),
         );
       case DownloadState.cancelled:
         return const Icon(

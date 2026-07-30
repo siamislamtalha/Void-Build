@@ -7,10 +7,10 @@ import 'package:voidmusic/core/constants/cache_keys.dart';
 /// Orchestrates [LastFmAPI] (pure HTTP client) with [SettingsDAO]
 /// for session/credential persistence. The API client itself has no
 /// DB dependencies — this repository handles the persistence bridge.
-class ScrobbleRepository {
+class VoidMusicScrobbleRepository {
   final SettingsDAO _settingsDao;
 
-  const ScrobbleRepository(this._settingsDao);
+  const VoidMusicScrobbleRepository(this._settingsDao);
 
   // --------------- Session management ---------------
 

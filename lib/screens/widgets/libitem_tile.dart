@@ -1,5 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/utils/load_image.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
@@ -47,8 +47,8 @@ class LibItemCard extends StatelessWidget {
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: StreamBuilder<String>(
         stream: context
-            .watch<BloomeePlayerCubit>()
-            .bloomeePlayer
+            .watch<VoidMusicPlayerCubit>()
+            .voidMusicPlayer
             .queueTitle,
         builder: (context, snapshot) {
           final isPlaying = snapshot.hasData && snapshot.data == title;

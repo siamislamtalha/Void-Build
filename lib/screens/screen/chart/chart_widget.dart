@@ -20,7 +20,6 @@ class ChartWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMobile = ResponsiveBreakpoints.of(context).isMobile;
     final isTablet = ResponsiveBreakpoints.of(context).isTablet;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final artwork = chart.thumbnail;
     final thumbnailUrl = artwork?.urlHigh ?? artwork?.url ?? artwork?.urlLow;
@@ -94,7 +93,6 @@ class _ChartPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       color: Default_Theme.primaryColor2.withValues(alpha: 0.08),
       child: Center(

@@ -1,7 +1,7 @@
 import 'package:voidmusic/core/di/service_locator.dart';
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/plugins/utils/media_id.dart';
-import 'package:voidmusic/services/bloomee_player.dart';
+import 'package:voidmusic/services/voidmusic_player.dart';
 import 'package:voidmusic/services/db/dao/track_dao.dart';
 import 'package:voidmusic/services/db/db_provider.dart';
 import 'package:voidmusic/src/rust/api/plugin/commands.dart';
@@ -28,7 +28,7 @@ class SongMetadataRefreshService {
 
   static Future<SongMetadataRefreshResult> refreshTrack(
     Track track, {
-    BloomeeMusicPlayer? player,
+    VoidMusicPlayer? player,
   }) async {
     final parts = tryParseMediaId(track.id);
     if (parts == null) {

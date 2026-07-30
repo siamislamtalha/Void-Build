@@ -3,57 +3,57 @@ import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/utils/load_image.dart';
 import 'package:flutter/material.dart';
 
-/// Bloomee-branded dialog surface.
+/// Void Music-branded dialog surface.
 ///
 /// Uses the app's dark palette with a subtle frosted-glass look.
 /// All app dialogs, alerts, confirmation sheets, and popups should use this
 /// as their root surface so the UI feels cohesive.
 ///
 /// ```dart
-/// showBloomeeDialog(
+/// showVoidMusicDialog(
 ///   context: context,
 ///   title: 'Delete track?',
 ///   subtitle: 'This cannot be undone.',
 ///   actions: [
-///     BloomeeDialogAction.text('Cancel'),
-///     BloomeeDialogAction.filled('Delete', isDestructive: true, onPressed: () {}),
+///     VoidMusicDialogAction.text('Cancel'),
+///     VoidMusicDialogAction.filled('Delete', isDestructive: true, onPressed: () {}),
 ///   ],
 /// );
 /// ```
-class BloomeeDialogAction {
+class VoidMusicDialogAction {
   final String label;
   final VoidCallback? onPressed;
   final bool isDestructive;
   final bool isFilled;
 
-  const BloomeeDialogAction.text(
+  const VoidMusicDialogAction.text(
     this.label, {
     this.onPressed,
     this.isDestructive = false,
   }) : isFilled = false;
 
-  const BloomeeDialogAction.filled(
+  const VoidMusicDialogAction.filled(
     this.label, {
     this.onPressed,
     this.isDestructive = false,
   }) : isFilled = true;
 }
 
-/// Display the standard Bloomee dialog.
-Future<T?> showBloomeeDialog<T>({
+/// Display the standard Void Music dialog.
+Future<T?> showVoidMusicDialog<T>({
   required BuildContext context,
   required String title,
   String? subtitle,
   Widget? body,
   IconData? icon,
-  List<BloomeeDialogAction>? actions,
+  List<VoidMusicDialogAction>? actions,
   bool barrierDismissible = true,
 }) {
   return showDialog<T>(
     context: context,
     barrierDismissible: barrierDismissible,
     barrierColor: Colors.black54,
-    builder: (_) => BloomeeDialogSurface(
+    builder: (_) => VoidMusicDialogSurface(
       title: title,
       subtitle: subtitle,
       body: body,
@@ -67,14 +67,14 @@ Future<T?> showBloomeeDialog<T>({
 
 /// The dialog surface widget. Can be used directly as a dialog builder return
 /// value for dialogs that manage their own state (e.g., Smart Replace).
-class BloomeeDialogSurface extends StatelessWidget {
+class VoidMusicDialogSurface extends StatelessWidget {
   final String title;
   final String? subtitle;
   final Widget? body;
   final IconData? icon;
-  final List<BloomeeDialogAction>? actions;
+  final List<VoidMusicDialogAction>? actions;
 
-  const BloomeeDialogSurface({
+  const VoidMusicDialogSurface({
     super.key,
     required this.title,
     this.subtitle,
@@ -84,13 +84,16 @@ class BloomeeDialogSurface extends StatelessWidget {
   });
 
   @override
-  @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context).size;
     final maxW = mq.width > 560 ? 480.0 : mq.width * 0.9;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final glassColor = isDark ? const Color(0xF5161618) : const Color(0xF5F2F2F5);
-    final borderColor = isDark ? const Color(0x3BFFFFFF) : const Color(0xFFE5E5EA);
+    final glassColor = isDark 
+        ? const Color(0xF5161618) 
+        : Theme.of(context).colorScheme.surface.withValues(alpha: 0.96);
+    final borderColor = isDark 
+        ? const Color(0x3BFFFFFF) 
+        : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2);
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -198,7 +201,7 @@ class BloomeeDialogSurface extends StatelessWidget {
     );
   }
 
-  Widget _buildAction(BuildContext context, BloomeeDialogAction action) {
+  Widget _buildAction(BuildContext context, VoidMusicDialogAction action) {
     final accent = AppTheme.accentColor(context);
     final color = action.isDestructive
         ? Theme.of(context).colorScheme.error
@@ -243,8 +246,8 @@ class BloomeeDialogSurface extends StatelessWidget {
   }
 }
 
-/// A Bloomee-styled list-tile for use inside dialog bodies.
-class BloomeeDialogTile extends StatelessWidget {
+/// A Void Music-styled list-tile for use inside dialog bodies.
+class VoidMusicDialogTile extends StatelessWidget {
   final String title;
   final String? subtitle;
   final String? imageUrl;
@@ -253,7 +256,7 @@ class BloomeeDialogTile extends StatelessWidget {
   final VoidCallback? onTap;
   final bool selected;
 
-  const BloomeeDialogTile({
+  const VoidMusicDialogTile({
     super.key,
     required this.title,
     this.subtitle,
@@ -371,11 +374,11 @@ class BloomeeDialogTile extends StatelessWidget {
 }
 
 /// A small pill badge (e.g., "Best match", "79%").
-class BloomeeDialogBadge extends StatelessWidget {
+class VoidMusicDialogBadge extends StatelessWidget {
   final String label;
   final Color? color;
 
-  const BloomeeDialogBadge(this.label, {super.key, this.color});
+  const VoidMusicDialogBadge(this.label, {super.key, this.color});
 
   @override
   Widget build(BuildContext context) {

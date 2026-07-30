@@ -27,8 +27,7 @@ class BackupSettings extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -106,8 +105,8 @@ class BackupSettings extends StatelessWidget {
                                   SharePlus.instance
                                       .share(ShareParams(
                                     files: [XFile(value)],
-                                    text: 'Bloomee backup file',
-                                    subject: 'Bloomee Backup',
+                                    text: 'Void Music backup file',
+                                    subject: 'Void Music Backup',
                                   ))
                                       .catchError((e) {
                                     SnackbarService.showMessage(
@@ -609,7 +608,7 @@ Future<String?> _savePickedFileToInternalDir(PlatformFile picked) async {
     final docs = await getApplicationDocumentsDirectory();
     final safeName = picked.name.replaceAll(RegExp(r'[^A-Za-z0-9_.-]'), '_');
     final filename =
-        'bloomee_restore_${DateTime.now().millisecondsSinceEpoch}_$safeName';
+        'voidmusic_restore_${DateTime.now().millisecondsSinceEpoch}_$safeName';
     final dest = File('${docs.path}/$filename');
 
     if (picked.bytes != null) {

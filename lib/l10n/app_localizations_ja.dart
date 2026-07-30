@@ -967,7 +967,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get storageLocationAndroid =>
-      'バックアップは以下に保存されます:\n\n1. ダウンロードフォルダー\n2. Android/data/ls.bloomee.musicplayer/data\n\nここからファイルをコピーしてください。';
+      'バックアップは以下に保存されます:\n\n1. ダウンロードフォルダー\n2. Android/data/ls.voidmusic.musicplayer/data\n\nここからファイルをコピーしてください。';
 
   @override
   String get storageLocationOther => 'バックアップはダウンロードフォルダーに保存されます。';
@@ -1533,9 +1533,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importVoidMusicFiles => 'Void Music ファイルをインポート';
 
   @override
-  String get importBloomeeFiles => 'Void Music ファイルをインポート';
-
-  @override
   String get importM3UFiles => 'M3U プレイリストをインポート';
 
   @override
@@ -1857,7 +1854,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Bloomee🌸 の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
+    return 'Void Music🌸 の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
   }
 
   @override
@@ -1876,7 +1873,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Bloomee をセットアップ中';
+  String get pluginBootstrapTitle => 'Void Music をセットアップ中';
 
   @override
   String pluginBootstrapProgress(int percent) {

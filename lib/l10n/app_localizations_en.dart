@@ -1628,9 +1628,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importVoidMusicFiles => 'Import Void Music Files';
 
   @override
-  String get importBloomeeFiles => 'Import Bloomee Files';
-
-  @override
   String get importM3UFiles => 'Import M3U Playlist';
 
   @override
@@ -1977,7 +1974,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'New Version of Bloomee🌸 is now available!\n\nVersion: $ver+$build';
+    return 'New Version of Void Music🌸 is now available!\n\nVersion: $ver+$build';
   }
 
   @override
@@ -1996,7 +1993,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Setting up Bloomee';
+  String get pluginBootstrapTitle => 'Setting up Void Music';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -2011,7 +2008,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      'Some plugins could not be installed. You can still use Bloomee — plugins will be retried on next launch.';
+      'Some plugins could not be installed. You can still use Void Music — plugins will be retried on next launch.';
 
   @override
   String get pluginBootstrapContinue => 'Continue Anyway';

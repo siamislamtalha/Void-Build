@@ -26,7 +26,7 @@ class GlobalEventsCubit extends Cubit<GlobalEventsState> {
   //   //     emit(UpdateAvailable(
   //   //       newVersion: updates["newVer"],
   //   //       newBuild: updates["newBuild"],
-  //   //       downloadUrl: "https://bloomee.sourceforge.io/",
+  //   //       downloadUrl: "https://voidmusic.sourceforge.io/",
   //   //     ));
   //   //   }
   //   // }

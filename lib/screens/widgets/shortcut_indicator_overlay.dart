@@ -167,7 +167,6 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
   }
 
   Widget _buildIcon(ShortcutIndicatorType type) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     IconData icon = MingCute.check_circle_fill;
     Color color = Theme.of(context).colorScheme.onSurface;
 

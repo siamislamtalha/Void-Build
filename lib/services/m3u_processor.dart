@@ -120,7 +120,7 @@ Map<String, dynamic> parseM3UToJson(String m3uContent) {
     for (final line in lines) {
       if (line.isEmpty) continue;
 
-      // Handle custom meta tags
+      // Handle custom meta tags (backward compatibility with old Bloomee naming)
       if (line.startsWith('#VOIDMUSIC-GENERATED_BY:') || line.startsWith('#BLOOMEE-GENERATED_BY:')) {
         meta['generated_by'] = line.split(':').last.trim();
       } else if (line.startsWith('#VOIDMUSIC-VERSION:') || line.startsWith('#BLOOMEE-VERSION:')) {

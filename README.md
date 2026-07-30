@@ -1,15 +1,13 @@
 <div align="center">
 
-<img src="./assets/docs/bloomeetunes_new_banner.png" alt="Void Music Banner" width="100%">
-
 # 🌸 Void Music 
 
 **A unified local and plugin-first streaming music player built with Flutter & Rust.**
 
-<p align="center"><img src=https://img.shields.io/sourceforge/dt/bloomee?style=for-the-badge&logoSize=auto&label=DOWNLOADS(SF)
- /> <a href="https://github.com/HemantKArya/BloomeeTunes/releases/latest"><img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/HemantKArya/BloomeeTunes/total?style=for-the-badge&label=DOWNLOADS(GH)" >
-<img alt="GitHub Release" src="https://img.shields.io/github/v/release/HemantKArya/BloomeeTunes?display_name=release&style=for-the-badge&color=f01d7c" ></a>
-<img alt="GitHub License" src="https://img.shields.io/github/license/HemantKArya/BloomeeTunes?style=for-the-badge&color=1881cc" > <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/HemantKArya/BloomeeTunes/checkout.yml?style=for-the-badge" > <br><img src=https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white > <img src=https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white /> <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black"/>
+<p align="center"><img src=https://img.shields.io/sourceforge/dt/voidmusic?style=for-the-badge&logoSize=auto&label=DOWNLOADS(SF)
+ /> <a href="https://github.com/siamislamtalha/Void-Build/releases/latest"><img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/siamislamtalha/Void-Build/total?style=for-the-badge&label=DOWNLOADS(GH)" >
+<img alt="GitHub Release" src="https://img.shields.io/github/v/release/siamislamtalha/Void-Build?display_name=release&style=for-the-badge&color=f01d7c" ></a>
+<img alt="GitHub License" src="https://img.shields.io/github/license/siamislamtalha/Void-Build?style=for-the-badge&color=1881cc" > <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/siamislamtalha/Void-Build/checkout.yml?style=for-the-badge" > <br><img src=https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white > <img src=https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white /> <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black"/>
 </p>
 
 
@@ -27,7 +25,6 @@
   <p float="left">
     <img src="./assets/docs/playerview.png" width="48%" />
     <img src="./assets/docs/lyricsview1.png" width="48%" />
-<img src="./assets/docs/banner2BloomeScrnShot.png" width="90%"/>
   </p>
 </div>
 
@@ -35,7 +32,7 @@
 > ⚠️ **SECURITY WARNING: BEWARE OF FAKE WEBSITES!** ⚠️    
 > Due to the app's popularity, several unofficial websites claim to be the "official" Void Music site. The ONLY official websites maintained by me are:
 > 
-> - https://bloomeex.org
+> - https://voidmusic.org
 > - https://siamislamtalha.github.io/Void-Music/
 >
 > These two URLs are the only official and safe sites for Void Music. Do not trust other websites claiming to be official — unofficial sites may distribute modified APKs or malware. I am **not responsible** for any damage, privacy loss, or issues caused by downloading the app from third-party sources.
@@ -77,11 +74,11 @@
 <h4 align="center">Available for Android, Windows & Linux (Dev) 😍</h4>
 
 <p align="center">
-  <a href="https://github.com/HemantKArya/BloomeeTunes/releases/latest">
+  <a href="https://github.com/siamislamtalha/Void-Build/releases/latest">
     <img src="https://img.shields.io/badge/GitHub_Releases-100000?style=for-the-badge&logo=github&logoColor=white" height="40"/>
   </a>
   &nbsp;
-  <a href="https://sourceforge.net/projects/bloomee/files/latest/download">
+  <a href="https://sourceforge.net/projects/voidmusic/files/latest/download">
     <img alt="Download Void Music" src="https://a.fsdn.com/con/app/sf-download-button" height="40">
   </a>
 </p>

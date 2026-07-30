@@ -8,7 +8,7 @@
 	}
 	
 	function handleGithubClick() {
-		window.open('https://github.com/HemantKArya/BloomeeTunes', '_blank');
+		window.open('https://github.com/siamislamtalha/Void-Build', '_blank');
 	}
 </script>
 

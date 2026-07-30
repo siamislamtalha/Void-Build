@@ -1,5 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
@@ -110,8 +110,8 @@ class PlayerSetting extends StatelessWidget {
                     onChanged: (v) {
                       context.read<SettingsCubit>().setCrossfadeDuration(v);
                       context
-                          .read<BloomeePlayerCubit>()
-                          .bloomeePlayer
+                          .read<VoidMusicPlayerCubit>()
+                          .voidMusicPlayer
                           .setCrossfadeDuration(Duration(seconds: v));
                     },
                   ),

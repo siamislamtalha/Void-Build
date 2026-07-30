@@ -5,10 +5,10 @@ import 'package:voidmusic/services/db/dao/notification_dao.dart';
 ///
 /// Wraps [NotificationDAO] and provides a clean interface
 /// for creating, querying, and observing notifications.
-class NotificationRepository {
+class VoidMusicNotificationRepository {
   final NotificationDAO _notificationDao;
 
-  const NotificationRepository(this._notificationDao);
+  const VoidMusicNotificationRepository(this._notificationDao);
 
   Future<void> addNotification({
     required String title,

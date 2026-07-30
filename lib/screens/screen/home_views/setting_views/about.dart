@@ -88,24 +88,26 @@ class About extends StatelessWidget {
                   const BoxConstraints(maxWidth: 480), // Responsive constraint
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Spacer(),
-                    _buildCompanyCard(context, primaryTextColor, cardBgColor),
-                    const SizedBox(height: 20),
-                    _buildInfoCard(context, l10n, primaryTextColor, cardBgColor),
-                    const SizedBox(height: 50),
-                    _buildSupportSection(context, l10n, primaryTextColor),
-                    const Spacer(),
-                    // Footer moved to bottom of screen
-                    const SizedBox(height: 12),
-                    _buildFooter(context, l10n),
-                    const SizedBox(height: 8),
-                    _buildTasniaFooter(context, primaryTextColor),
-                    const SizedBox(height: 12),
-                    const BottomSafeAreaSpacer(),
-                  ],
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 80),
+                      _buildCompanyCard(context, primaryTextColor, cardBgColor),
+                      const SizedBox(height: 20),
+                      _buildInfoCard(context, l10n, primaryTextColor, cardBgColor),
+                      const SizedBox(height: 50),
+                      _buildSupportSection(context, l10n, primaryTextColor),
+                      const SizedBox(height: 80),
+                      // Footer moved to bottom of screen
+                      const SizedBox(height: 12),
+                      _buildFooter(context, l10n),
+                      const SizedBox(height: 8),
+                      _buildTasniaFooter(context, primaryTextColor),
+                      const SizedBox(height: 12),
+                      const BottomSafeAreaSpacer(),
+                    ],
+                  ),
                 ),
               ),
             ),

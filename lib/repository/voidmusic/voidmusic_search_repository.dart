@@ -6,10 +6,10 @@ import 'package:voidmusic/services/db/dao/search_history_dao.dart';
 /// Wraps [SearchHistoryDAO]. API-level search is handled by resolver plugins;
 /// this repository handles
 /// the cross-cutting concerns of search history and suggestion ranking.
-class SearchRepository {
+class VoidMusicSearchRepository {
   final SearchHistoryDAO _searchHistoryDao;
 
-  const SearchRepository(this._searchHistoryDao);
+  const VoidMusicSearchRepository(this._searchHistoryDao);
 
   // --------------- Search history ---------------
 

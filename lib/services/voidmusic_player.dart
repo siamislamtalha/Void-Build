@@ -50,7 +50,7 @@ import 'package:rxdart/rxdart.dart';
 /// ## Concurrency
 /// All play/resolve operations use [CancelableCompleter] / [CancelableOperation]
 /// so that rapid track skipping never leaves orphaned network requests.
-class BloomeeMusicPlayer extends BaseAudioHandler
+class VoidMusicPlayer extends BaseAudioHandler
     with SeekHandler, QueueHandler {
   late PlayerEngine engine;
 
@@ -119,7 +119,7 @@ class BloomeeMusicPlayer extends BaseAudioHandler
 
   // ─── Constructor ───────────────────────────────────────────────────────────
 
-  BloomeeMusicPlayer() {
+  VoidMusicPlayer() {
     _initEngine();
     _initModules();
     _initSubscriptions();
@@ -147,7 +147,7 @@ class BloomeeMusicPlayer extends BaseAudioHandler
         }
       }
     } catch (e) {
-      log('Session restore failed: $e', name: 'BloomeeMusicPlayer');
+      log('Session restore failed: $e', name: 'VoidMusicPlayer');
     }
   }
 
@@ -245,7 +245,7 @@ class BloomeeMusicPlayer extends BaseAudioHandler
     _activateAudioSession().then((granted) {
       if (granted && !_isDisposed) engine.play();
     }).catchError((Object e) {
-      log('Resume after interruption failed: $e', name: 'BloomeeMusicPlayer');
+      log('Resume after interruption failed: $e', name: 'VoidMusicPlayer');
     });
   }
 
@@ -261,7 +261,7 @@ class BloomeeMusicPlayer extends BaseAudioHandler
       _audioSession = session;
       return await session.setActive(true);
     } catch (e) {
-      log('setActive(true) failed: $e', name: 'BloomeeMusicPlayer');
+      log('setActive(true) failed: $e', name: 'VoidMusicPlayer');
       return false;
     }
   }
@@ -304,7 +304,7 @@ class BloomeeMusicPlayer extends BaseAudioHandler
       final eqOn = await dao.getSettingBool(SettingKeys.eqEnabled) ?? false;
       await engine.setEqualizerEnabled(eqOn);
     } catch (e) {
-      log('restoreEngineSettings failed: $e', name: 'BloomeeMusicPlayer');
+      log('restoreEngineSettings failed: $e', name: 'VoidMusicPlayer');
     }
   }
 
@@ -377,7 +377,7 @@ class BloomeeMusicPlayer extends BaseAudioHandler
     _completionSub = engine.completionStream.listen((_) => _onTrackCompleted());
 
     _errorSub = engine.errorStream.listen((error) {
-      log('Engine error: $error', name: 'BloomeeMusicPlayer');
+      log('Engine error: $error', name: 'VoidMusicPlayer');
       final track = _queueManager.currentTrack;
       if (track != null) {
         _errorHandler.handleError(PlayerErrorType.playbackError, error, track);
@@ -566,7 +566,7 @@ class BloomeeMusicPlayer extends BaseAudioHandler
     final prev = _playCompleter;
     final completer = CancelableCompleter<void>(
       onCancel: () => log('Track load cancelled: ${track.title}',
-          name: 'BloomeeMusicPlayer'),
+          name: 'VoidMusicPlayer'),
     );
     _playCompleter = completer;
     prev?.operation.cancel();
@@ -671,7 +671,7 @@ class BloomeeMusicPlayer extends BaseAudioHandler
       isResolving.add(false);
       if (!alive()) return;
       log('Play failed: ${track.title}: $e',
-          name: 'BloomeeMusicPlayer', stackTrace: stack);
+          name: 'VoidMusicPlayer', stackTrace: stack);
       _errorHandler.handleError(
           _errorHandler.categorizeError(e), e.toString(), resolvedTrack, e);
       complete();
@@ -821,7 +821,7 @@ class BloomeeMusicPlayer extends BaseAudioHandler
   /// underlying audio service (e.g. memory pressure, OEM task killers).
   Future<void> revive() async {
     if (!_isDisposed && isPlayerHealthy) return;
-    log('Reviving BloomeeMusicPlayer...', name: 'BloomeeMusicPlayer');
+    log('Reviving VoidMusicPlayer...', name: 'VoidMusicPlayer');
 
     // Save position before engine teardown (M-12).
     try {

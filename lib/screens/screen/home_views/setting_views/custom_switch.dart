@@ -3,21 +3,21 @@
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
-class BloomeeSwitch extends StatefulWidget {
+class VoidMusicSwitch extends StatefulWidget {
   final bool value;
   final VoidCallback onChanged;
 
-  const BloomeeSwitch({
+  const VoidMusicSwitch({
     super.key,
     required this.value,
     required this.onChanged,
   });
 
   @override
-  State<BloomeeSwitch> createState() => _BloomeeSwitchState();
+  State<VoidMusicSwitch> createState() => _VoidMusicSwitchState();
 }
 
-class _BloomeeSwitchState extends State<BloomeeSwitch> {
+class _VoidMusicSwitchState extends State<VoidMusicSwitch> {
   late bool _localValue;
 
   @override
@@ -27,7 +27,7 @@ class _BloomeeSwitchState extends State<BloomeeSwitch> {
   }
 
   @override
-  void didUpdateWidget(covariant BloomeeSwitch oldWidget) {
+  void didUpdateWidget(covariant VoidMusicSwitch oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Sync with external state when the parent rebuilds with a new value.
     if (oldWidget.value != widget.value) {

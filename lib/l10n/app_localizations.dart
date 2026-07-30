@@ -2976,12 +2976,6 @@ abstract class AppLocalizations {
   /// **'Import Void Music Files'**
   String get importVoidMusicFiles;
 
-  /// No description provided for @importBloomeeFiles.
-  ///
-  /// In en, this message translates to:
-  /// **'Import Bloomee Files'**
-  String get importBloomeeFiles;
-
   /// No description provided for @importM3UFiles.
   ///
   /// In en, this message translates to:
@@ -3555,7 +3549,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateAvailableBody.
   ///
   /// In en, this message translates to:
-  /// **'New Version of Bloomee🌸 is now available!\n\nVersion: {ver}+{build}'**
+  /// **'New Version of Void Music🌸 is now available!\n\nVersion: {ver}+{build}'**
   String updateAvailableBody(String ver, String build);
 
   /// No description provided for @pluginSnackbarInstalled.
@@ -3579,7 +3573,7 @@ abstract class AppLocalizations {
   /// No description provided for @pluginBootstrapTitle.
   ///
   /// In en, this message translates to:
-  /// **'Setting up Bloomee'**
+  /// **'Setting up Void Music'**
   String get pluginBootstrapTitle;
 
   /// No description provided for @pluginBootstrapProgress.
@@ -3603,7 +3597,7 @@ abstract class AppLocalizations {
   /// No description provided for @pluginBootstrapErrorBody.
   ///
   /// In en, this message translates to:
-  /// **'Some plugins could not be installed. You can still use Bloomee — plugins will be retried on next launch.'**
+  /// **'Some plugins could not be installed. You can still use Void Music — plugins will be retried on next launch.'**
   String get pluginBootstrapErrorBody;
 
   /// No description provided for @pluginBootstrapContinue.

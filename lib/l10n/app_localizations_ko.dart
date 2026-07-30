@@ -1535,9 +1535,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get importVoidMusicFiles => 'Void Music 파일 가져오기';
 
   @override
-  String get importBloomeeFiles => 'Void Music 파일 가져오기';
-
-  @override
   String get importM3UFiles => 'M3U 플레이리스트 가져오기';
 
   @override
@@ -1878,7 +1875,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Bloomee 설정 중';
+  String get pluginBootstrapTitle => 'Void Music 설정 중';
 
   @override
   String pluginBootstrapProgress(int percent) {

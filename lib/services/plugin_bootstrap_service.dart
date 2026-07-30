@@ -5,7 +5,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:voidmusic/core/constants/setting_keys.dart';
-import 'package:voidmusic/plugins/errors/plugin_exceptions.dart';
 import 'package:voidmusic/plugins/models/plugin_repository.dart';
 import 'package:voidmusic/plugins/utils/plugin_constants.dart';
 import 'package:voidmusic/plugins/services/plugin_repository_service.dart';
@@ -211,7 +210,6 @@ class PluginBootstrapService {
         bootstrapTargetIds.add(plugin.id);
 
         bool installed = false;
-        bool skippedByCountry = false;
         String? errorType;
         String? reason;
         String? lastError;
@@ -241,9 +239,6 @@ class PluginBootstrapService {
               reason = 'Installation returned status ${result.status.name}';
               lastError = result.error != null ? ' — ${result.error}' : '';
             }
-          } on PluginCountryRestrictedException {
-            skippedByCountry = true;
-            break;
           } catch (e) {
             final errorStr = e.toString();
             if (errorStr.contains('HTTP')) {

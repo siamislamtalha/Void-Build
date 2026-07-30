@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/adapters/track_adapter.dart';
 import 'package:voidmusic/core/constants/setting_keys.dart';
 import 'package:voidmusic/core/models/exported.dart' hide Lyrics;
@@ -30,7 +30,7 @@ class LyricsCubit extends Cubit<LyricsState> {
   int _requestSerial = 0;
 
   LyricsCubit(
-    BloomeePlayerCubit playerCubit, {
+    VoidMusicPlayerCubit playerCubit, {
     required LyricsDAO lyricsDao,
     required SettingsDAO settingsDao,
     required PluginService pluginService,
@@ -44,7 +44,7 @@ class LyricsCubit extends Cubit<LyricsState> {
         ),
         super(LyricsInitial()) {
     _mediaItemSubscription =
-        playerCubit.bloomeePlayer.mediaItem.stream.listen((item) {
+        playerCubit.voidMusicPlayer.mediaItem.stream.listen((item) {
       if (item != null) {
         getLyrics(mediaItemToTrack(item));
       }

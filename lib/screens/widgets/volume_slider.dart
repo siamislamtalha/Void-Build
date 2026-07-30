@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:voidmusic/blocs/media_player/bloomee_player_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +35,8 @@ class VolumeDragControllerState extends State<VolumeDragController> {
 
   void volumeStrm() {
     _volumeSubscription = context
-        .read<BloomeePlayerCubit>()
-        .bloomeePlayer
+        .read<VoidMusicPlayerCubit>()
+        .voidMusicPlayer
         .engine
         .volumeStream
         .listen((event) {
@@ -50,7 +50,7 @@ class VolumeDragControllerState extends State<VolumeDragController> {
     setState(() {
       _volume = volume;
     });
-    context.read<BloomeePlayerCubit>().bloomeePlayer.engine.setVolume(volume);
+    context.read<VoidMusicPlayerCubit>().voidMusicPlayer.engine.setVolume(volume);
   }
 
   void _onDragStart(DragStartDetails details) {

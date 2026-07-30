@@ -567,7 +567,6 @@
   "importSongsTitle": "곡 가져오기",
   "importNoPluginsLoaded": "가져오기 플러그인이 없습니다. 외부 플레이리스트를 가져오려면 플러그인을 설치하세요.",
   "importVoidMusicFiles": "Void Music 파일 가져오기",
-  "importBloomeeFiles": "Void Music 파일 가져오기",
   "importM3UFiles": "M3U 플레이리스트 가져오기",
   "importM3UNameDialogTitle": "플레이리스트 이름",
   "importM3UNameHint": "이름을 입력하세요",
@@ -715,7 +714,7 @@
   "pluginSnackbarDeleted": "플러그인 \"{id}\" 삭제됨",
   "@pluginSnackbarDeleted": { "placeholders": { "id": { "type": "String" } } },
 
-  "pluginBootstrapTitle": "Bloomee 설정 중",
+  "pluginBootstrapTitle": "Void Music 설정 중",
   "pluginBootstrapProgress": "플러그인 엔진 설정 중... {percent}%",
   "@pluginBootstrapProgress": { "placeholders": { "percent": { "type": "int" } } },
   "pluginBootstrapHint": "이 과정은 처음 한 번만 진행됩니다.",
