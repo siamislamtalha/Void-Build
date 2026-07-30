@@ -89,7 +89,7 @@ class SettingsView extends StatelessWidget {
                         AppLocalizations.of(context)!.settingsPlayerSubtitle,
                     icon: MingCute.airpods_fill,
                     iconColor: AppTheme.accentColor(context),
-                    onTap: () => _navigate(context, const PlayerSettings()),
+                    onTap: () => _navigate(context, const PlayerSetting()),
                   ),
                   _SettingsTile(
                     title: AppLocalizations.of(context)!.settingsDownloads,
