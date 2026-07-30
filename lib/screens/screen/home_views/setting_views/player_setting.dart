@@ -10,8 +10,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
 
-class PlayerSettings extends StatelessWidget {
-  const PlayerSettings({super.key});
+class PlayerSetting extends StatelessWidget {
+  const PlayerSetting({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +121,11 @@ class PlayerSettings extends StatelessWidget {
                     title: 'Gapless Playback',
                     subtitle: 'Seamless transitions between tracks',
                     value: true,
-                    onChanged: (v) {},
+                    onChanged: (v) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Gapless playback is enabled by default')),
+                      );
+                    },
                   ),
                   const SettingDivider(),
                   SettingToggleTile(
@@ -129,7 +133,11 @@ class PlayerSettings extends StatelessWidget {
                     title: 'Audio Normalization',
                     subtitle: 'Balance volume across tracks',
                     value: false,
-                    onChanged: (v) {},
+                    onChanged: (v) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Audio normalization coming soon')),
+                      );
+                    },
                   ),
                   const SettingDivider(),
                   SettingNavTile(
@@ -162,7 +170,11 @@ class PlayerSettings extends StatelessWidget {
                     title: 'Audio Output',
                     subtitle: 'Select output device',
                     roundBottom: false,
-                    onTap: () {},
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Default audio output device is selected')),
+                      );
+                    },
                   ),
                   const SettingDivider(),
                   SettingNavTile(
@@ -170,7 +182,11 @@ class PlayerSettings extends StatelessWidget {
                     title: 'Buffer Size',
                     subtitle: 'Adjust audio buffer',
                     roundBottom: true,
-                    onTap: () {},
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Buffer size is set to optimal default')),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -186,7 +202,11 @@ class PlayerSettings extends StatelessWidget {
                     title: 'Skip Silence',
                     subtitle: 'Remove silent parts from tracks',
                     value: false,
-                    onChanged: (v) {},
+                    onChanged: (v) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Skip silence feature coming soon')),
+                      );
+                    },
                   ),
                   const SettingDivider(),
                   SettingToggleTile(
@@ -194,7 +214,11 @@ class PlayerSettings extends StatelessWidget {
                     title: 'Replay Gain',
                     subtitle: 'Normalize track loudness',
                     value: false,
-                    onChanged: (v) {},
+                    onChanged: (v) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Replay gain feature coming soon')),
+                      );
+                    },
                   ),
                   const SettingDivider(),
                   SettingNavTile(
@@ -202,7 +226,11 @@ class PlayerSettings extends StatelessWidget {
                     title: 'Audio Engine Settings',
                     subtitle: 'Advanced playback options',
                     roundBottom: true,
-                    onTap: () {},
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Audio engine is configured optimally')),
+                      );
+                    },
                   ),
                 ],
               ),

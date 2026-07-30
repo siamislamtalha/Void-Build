@@ -11,7 +11,7 @@ import 'package:voidmusic/screens/widgets/up_next_panel.dart';
 import 'package:voidmusic/screens/widgets/volume_slider.dart';
 import 'package:voidmusic/screens/widgets/media_metadata_links.dart';
 import 'package:voidmusic/screens/screen/player_views/segments_sheet.dart';
-import 'package:voidmusic/screens/screen/player_views/equalizer_view.dart';
+import 'package:voidmusic/screens/screen/home_views/setting_views/player_setting.dart';
 import 'package:voidmusic/services/bloomee_player.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
@@ -639,7 +639,7 @@ class _PlayerControlsRow extends StatelessWidget {
             icon: Icon(MingCute.settings_6_line,
                 color: iconColor, size: 24),
             onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const EqualizerView())),
+                MaterialPageRoute(builder: (_) => const PlayerSetting())),
           ),
         ),
         _buildControlColumn(

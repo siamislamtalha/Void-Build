@@ -92,6 +92,8 @@ class About extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Spacer(),
+                    _buildCompanyCard(context, primaryTextColor, cardBgColor),
+                    const SizedBox(height: 20),
                     _buildInfoCard(context, l10n, primaryTextColor, cardBgColor),
                     const SizedBox(height: 50),
                     _buildSupportSection(context, l10n, primaryTextColor),
@@ -99,6 +101,8 @@ class About extends StatelessWidget {
                     // Footer moved to bottom of screen
                     const SizedBox(height: 12),
                     _buildFooter(context, l10n),
+                    const SizedBox(height: 8),
+                    _buildTasniaFooter(context, primaryTextColor),
                     const SizedBox(height: 12),
                     const BottomSafeAreaSpacer(),
                   ],
@@ -318,6 +322,91 @@ class About extends StatelessWidget {
               color: secondaryTextColor, fontSize: 14, fontFamily: 'Gilroy'),
         ),
       ],
+    );
+  }
+
+  Widget _buildCompanyCard(BuildContext context, Color primaryTextColor, Color cardBgColor) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final secondaryTextColor = isDark ? const Color(0xFF8E8E93) : const Color(0xFF66666E);
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.12) : const Color(0xFFE5E5EA);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28.0),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          decoration: BoxDecoration(
+            color: cardBgColor,
+            borderRadius: BorderRadius.circular(28.0),
+            border: Border.all(color: borderColor),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ShaderMask(
+                    blendMode: BlendMode.srcIn,
+                    shaderCallback: (bounds) => getTitleGradient(context).createShader(
+                      Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                    ),
+                    child: const Text(
+                      'Void Music',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Gilroy',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'A product of SilentCode.CO',
+                style: TextStyle(
+                    fontSize: 14,
+                    color: secondaryTextColor,
+                    fontFamily: 'Gilroy'),
+              ),
+              const SizedBox(height: 20),
+              Wrap(
+                alignment: WrapAlignment.center,
+                runAlignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                runSpacing: 12.0,
+                spacing: 12.0,
+                children: [
+                  _InfoPill(
+                      icon: FontAwesome.github,
+                      text: 'SilentCode-CO',
+                      tooltip: 'GitHub',
+                      onTap: () {
+                        launchUrl(Uri.parse('https://github.com/SilentCode-CO'),
+                            mode: LaunchMode.externalApplication);
+                      }),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTasniaFooter(BuildContext context, Color primaryTextColor) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final secondaryTextColor = isDark ? const Color(0xFF8E8E93) : const Color(0xFF66666E);
+
+    return Text(
+      'CoFounder and developer of Silent Code - Tasnia Tanzim',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+          color: secondaryTextColor.withValues(alpha: 0.7),
+          fontSize: 11,
+          fontFamily: 'Gilroy'),
     );
   }
 

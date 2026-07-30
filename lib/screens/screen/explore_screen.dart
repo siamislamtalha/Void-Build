@@ -25,6 +25,7 @@ import 'package:voidmusic/screens/widgets/song_tile.dart';
 import 'package:voidmusic/screens/widgets/source_badge.dart';
 import 'package:voidmusic/screens/widgets/square_card.dart';
 import 'package:voidmusic/screens/screen/common_views/playlist_view.dart';
+import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/screens/screen/home_views/notification_view.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_view.dart';
