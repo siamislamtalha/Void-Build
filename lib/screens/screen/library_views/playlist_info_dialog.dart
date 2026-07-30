@@ -72,19 +72,19 @@ Future<dynamic> showPlaylistInfo(
   Color? fgColor,
 }) {
   final isDark = Theme.of(context).brightness == Brightness.dark;
-  bgColor = bgColor ?? (isDark ? const Color.fromARGB(255, 15, 0, 19) : Theme.of(context).colorScheme.surface);
-  fgColor = fgColor ?? (isDark ? Default_Theme.primaryColor1 : const Color(0xFF1C1C1E));
+  final resolvedBgColor = bgColor ?? (isDark ? const Color.fromARGB(255, 15, 0, 19) : Theme.of(context).colorScheme.surface);
+  final resolvedFgColor = fgColor ?? (isDark ? Default_Theme.primaryColor1 : const Color(0xFF1C1C1E));
   
-  bgColor = bgColor == Colors.black ? const Color.fromARGB(255, 15, 0, 19) : bgColor;
-  fgColor = fgColor == Colors.white ? Default_Theme.primaryColor1 : fgColor;
+  final finalBgColor = resolvedBgColor == Colors.black ? const Color.fromARGB(255, 15, 0, 19) : resolvedBgColor;
+  final finalFgColor = resolvedFgColor == Colors.white ? Default_Theme.primaryColor1 : resolvedFgColor;
   return showDialog(
     context: context,
     useSafeArea: true,
     barrierDismissible: true,
     builder: (context) {
       return Dialog(
-          backgroundColor: bgColor,
-          shadowColor: bgColor,
+          backgroundColor: finalBgColor,
+          shadowColor: finalBgColor,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),
             child: Padding(
@@ -98,7 +98,7 @@ Future<dynamic> showPlaylistInfo(
                         state.playlist.title,
                         style: Default_Theme.secondoryTextStyle.merge(
                           TextStyle(
-                              color: fgColor,
+                              color: finalFgColor,
                               fontSize: 16,
                               fontFamily: 'NotoSans',
                               fontWeight: FontWeight.bold),
@@ -109,7 +109,7 @@ Future<dynamic> showPlaylistInfo(
                       title: "Playlist Length",
                       subtitle: state.playlist.tracks.length.toString(),
                       icon: MingCute.playlist_2_line,
-                      fg: fgColor,
+                      fg: finalFgColor,
                     ),
                     InfoTile(
                       title: "Artists",
@@ -119,14 +119,14 @@ Future<dynamic> showPlaylistInfo(
                               .join(', ')
                           : getArtists(state.playlist.tracks),
                       icon: MingCute.group_fill,
-                      fg: fgColor,
+                      fg: finalFgColor,
                     ),
                     state.playlist.description != null
                         ? InfoTile(
                             title: "Description",
                             subtitle: state.playlist.description!,
                             icon: MingCute.document_2_line,
-                            fg: fgColor,
+                            fg: finalFgColor,
                           )
                         : const SizedBox.shrink(),
                     state.playlist.updatedAt != null
@@ -136,7 +136,7 @@ Future<dynamic> showPlaylistInfo(
                                 state.playlist.updatedAt?.toIso8601String() ??
                                     "",
                             icon: MingCute.history_line,
-                            fg: fgColor,
+                            fg: finalFgColor,
                           )
                         : const SizedBox.shrink(),
                     state.playlist.permaURL != null
@@ -144,7 +144,7 @@ Future<dynamic> showPlaylistInfo(
                             title: "Original URL",
                             subtitle: state.playlist.permaURL!,
                             icon: MingCute.external_link_line,
-                            fg: fgColor,
+                            fg: finalFgColor,
                             onTap: () {
                               Clipboard.setData(ClipboardData(
                                   text: state.playlist.permaURL!));
