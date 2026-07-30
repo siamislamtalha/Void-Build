@@ -29,7 +29,6 @@ import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
 import 'package:voidmusic/src/rust/api/plugin/models.dart' as plugin_models;
 import 'package:voidmusic/screens/widgets/source_badge.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
-import 'package:voidmusic/services/playlist_suggestions_service.dart';
 
 class SearchScreen extends StatefulWidget {
   final String searchQuery;
@@ -333,14 +332,6 @@ class _SearchScreenState extends State<SearchScreen> {
                             contentBloc: _contentBloc,
                             onPluginChanged: _triggerSearch,
                             textEditingController: _textEditingController,
-                          ),
-                        // Show playlist suggestions when search is empty
-                        if (!isSuggestionPanelOpen && _textEditingController.text.isEmpty)
-                          _PlaylistSuggestionsSliver(
-                            onSuggestionTap: (query) {
-                              _textEditingController.text = query;
-                              _doSearch(query);
-                            },
                           ),
                         if (isSuggestionPanelOpen)
                           _SuggestionsSliver(
@@ -1535,151 +1526,6 @@ class _NebulaBackground extends StatelessWidget {
                   color2: colors[1].withValues(alpha: 0.18))),
         );
       },
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Playlist Suggestions Sliver
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _PlaylistSuggestionsSliver extends StatelessWidget {
-  final Function(String) onSuggestionTap;
-
-  const _PlaylistSuggestionsSliver({
-    required this.onSuggestionTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final countryCode = context.watch<SettingsCubit>().state.countryCode;
-    final suggestions = countryCode.isNotEmpty && countryCode != 'XX'
-        ? PlaylistSuggestionsService.getSuggestionsForCountry(countryCode)
-        : PlaylistSuggestionsService.getSuggestions();
-    
-    return SliverToBoxAdapter(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Icon(
-                  MingCute.music_2_line,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Popular Playlists',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  'Global Access',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                    fontSize: 11,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 140,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: suggestions.length,
-              itemBuilder: (context, index) {
-                final suggestion = suggestions[index];
-                return _SearchPlaylistSuggestionCard(
-                  suggestion: suggestion,
-                  onTap: () => onSuggestionTap(suggestion.searchQuery),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
-    );
-  }
-}
-
-class _SearchPlaylistSuggestionCard extends StatelessWidget {
-  final PlaylistSuggestion suggestion;
-  final VoidCallback onTap;
-
-  const _SearchPlaylistSuggestionCard({
-    required this.suggestion,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 140,
-      margin: const EdgeInsets.only(right: 12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child: Text(
-                      suggestion.icon,
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  suggestion.title,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  suggestion.category,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                    fontSize: 10,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
