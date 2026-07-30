@@ -562,7 +562,7 @@ class _EditorialHeroMasthead extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        _buildArtwork(imgUrl, imgUrl, 240),
+        _buildArtwork(context, imgUrl, imgUrl, 240),
         const SizedBox(width: 40),
         Expanded(
           child: Column(
@@ -593,7 +593,7 @@ class _EditorialHeroMasthead extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const SizedBox(height: 8),
-        Center(child: _buildArtwork(imgUrl, imgUrl, 220)),
+        Center(child: _buildArtwork(context, imgUrl, imgUrl, 220)),
         const SizedBox(height: 24),
         _buildRankLabel(context),
         const SizedBox(height: 10),
@@ -648,7 +648,7 @@ class _EditorialHeroMasthead extends StatelessWidget {
     );
   }
 
-  Widget _buildArtwork(String url, String fallbackUrl, double size) {
+  Widget _buildArtwork(BuildContext context, String url, String fallbackUrl, double size) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: size,

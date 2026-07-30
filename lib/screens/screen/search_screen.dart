@@ -91,9 +91,9 @@ class _SearchScreenState extends State<SearchScreen> {
     ];
     
     final orderedResolvers = [
-      ...filteredResolvers.where(priorityOrder[0]),
-      ...filteredResolvers.where(priorityOrder[1]),
-      ...filteredResolvers.where(priorityOrder[2]),
+      ...filteredResolvers.where((r) => priorityOrder[0](r)),
+      ...filteredResolvers.where((r) => priorityOrder[1](r)),
+      ...filteredResolvers.where((r) => priorityOrder[2](r)),
       ...filteredResolvers.where((r) => !priorityOrder.any((p) => p(r))),
     ];
     

@@ -666,7 +666,7 @@ class ChangeItemWidget extends StatelessWidget {
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Gilroy',
-                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black)));
+                  color: color)));
         } else if (matchText.startsWith('`')) {
           spans.add(WidgetSpan(
               alignment: PlaceholderAlignment.middle,
@@ -678,7 +678,7 @@ class ChangeItemWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5.0)),
                   child: Text(matchText.replaceAll('`', ''),
                       style: TextStyle(
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+                          color: color,
                           fontFamily: 'monospace',
                           fontSize: 13)))));
         }
@@ -689,7 +689,7 @@ class ChangeItemWidget extends StatelessWidget {
             text: nonMatch,
             style: TextStyle(
                 fontFamily: 'Gilroy',
-                color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.85) : Colors.black.withValues(alpha: 0.7))));
+                color: color.withValues(alpha: 0.85))));
         return '';
       },
     );

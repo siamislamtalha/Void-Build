@@ -700,9 +700,9 @@ class _MultiSourceSongSuggestionsState extends State<_MultiSourceSongSuggestions
         ];
         
         final orderedResolvers = [
-          ...filteredResolvers.where(priorityOrder[0]),
-          ...filteredResolvers.where(priorityOrder[1]),
-          ...filteredResolvers.where(priorityOrder[2]),
+          ...filteredResolvers.where((r) => priorityOrder[0](r)),
+          ...filteredResolvers.where((r) => priorityOrder[1](r)),
+          ...filteredResolvers.where((r) => priorityOrder[2](r)),
           ...filteredResolvers.where((r) => !priorityOrder.any((p) => p(r))),
         ];
         
@@ -1424,7 +1424,7 @@ class NotificationIcon extends StatelessWidget {
             child: Text(
               state.notifications.length.toString(),
               style: Default_Theme.primaryTextStyle.merge(
-                const TextStyle(
+                TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onSurface,

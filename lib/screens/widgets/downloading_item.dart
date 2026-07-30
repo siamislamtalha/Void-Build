@@ -80,7 +80,7 @@ class DownloadingCardWidget extends StatelessWidget {
               child: ScaleTransition(scale: animation, child: child),
             );
           },
-          child: _getStatusIcon(status.state),
+          child: _getStatusIcon(context, status.state),
         ),
       ],
     );
@@ -134,7 +134,7 @@ class DownloadingCardWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          _getStatusText(status.state),
+          _getStatusText(context, status.state),
           const SizedBox(height: 4),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -223,7 +223,7 @@ class DownloadingCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _getStatusText(DownloadState state) {
+  Widget _getStatusText(BuildContext context, DownloadState state) {
     switch (state) {
       case DownloadState.completed:
         return const Text(
@@ -288,7 +288,7 @@ class DownloadingCardWidget extends StatelessWidget {
     }
   }
 
-  Widget _getStatusIcon(DownloadState state) {
+  Widget _getStatusIcon(BuildContext context, DownloadState state) {
     switch (state) {
       case DownloadState.completed:
         return const Icon(
@@ -342,7 +342,7 @@ class DownloadingCardWidget extends StatelessWidget {
           Icons.refresh,
           color: Colors.orangeAccent,
           size: 20,
-          key: ValueKey('retrying'),
+          key: const ValueKey('retrying'),
         );
       case DownloadState.cancelled:
         return const Icon(

@@ -69,8 +69,9 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
     final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
     final musicPlayer = bloomeePlayerCubit.bloomeePlayer;
     final isMobile = ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final iconColor = Theme.of(context).colorScheme.onSurface;
-    final secondaryTextColor = Theme.of(context).brightness == Brightness.dark 
+    final secondaryTextColor = isDark 
         ? Default_Theme.primaryColor2 
         : const Color(0xFF66666E);
 
