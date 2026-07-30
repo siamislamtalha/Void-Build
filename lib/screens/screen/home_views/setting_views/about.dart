@@ -380,7 +380,7 @@ class About extends StatelessWidget {
                 spacing: 12.0,
                 children: [
                   _InfoPill(
-                      icon: FontAwesome.github_brands,
+                      icon: MingCute.github_fill,
                       text: 'SilentCode-CO',
                       tooltip: 'GitHub',
                       onTap: () {
