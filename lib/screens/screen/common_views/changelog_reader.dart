@@ -239,7 +239,7 @@ class ChangelogScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white70),
+            icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54),
             onPressed: () async {
               await Navigator.of(context).maybePop();
               if (!context.mounted) return;
@@ -355,12 +355,12 @@ class ChangelogScreen extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ).createShader(bounds),
-                    child: const Text("What's new",
+                    child: Text("What's new",
                         style: TextStyle(
                             fontSize: 36,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Gilroy',
-                            color: Colors.white)),
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black)),
                   ),
                 );
               }
@@ -495,9 +495,9 @@ class VersionCardState extends State<VersionCard> {
                 end: Alignment.bottomRight,
               ),
             ),
-            child: const Text("LATEST",
+            child: Text("LATEST",
                 style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Gilroy',
@@ -546,7 +546,7 @@ class VersionCardState extends State<VersionCard> {
           collapsedShape: const Border(),
           iconColor:
               isUnreleased ? Colors.amberAccent : Theme.of(context).colorScheme.primary,
-          collapsedIconColor: Colors.white70,
+          collapsedIconColor: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54,
           title: Row(
             children: [
               Expanded(
@@ -562,15 +562,15 @@ class VersionCardState extends State<VersionCard> {
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Gilroy',
                           color:
-                              isUnreleased ? Colors.amberAccent : Colors.white),
+                              isUnreleased ? Colors.amberAccent : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black)),
                     ),
                     if (widget.version.releaseDate != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 2.0),
                         child: Text(
                           _formatDate(widget.version.releaseDate!),
-                          style: const TextStyle(
-                              color: Colors.white70,
+                          style: TextStyle(
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54,
                               fontSize: 13,
                               fontFamily: 'Gilroy'),
                         ),
@@ -663,10 +663,10 @@ class ChangeItemWidget extends StatelessWidget {
         if (matchText.startsWith('**')) {
           spans.add(TextSpan(
               text: matchText.replaceAll('**', ''),
-              style: const TextStyle(
+              style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Gilroy',
-                  color: Colors.white)));
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black)));
         } else if (matchText.startsWith('`')) {
           spans.add(WidgetSpan(
               alignment: PlaceholderAlignment.middle,
@@ -674,11 +674,11 @@ class ChangeItemWidget extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 6.0, vertical: 2.0),
                   decoration: BoxDecoration(
-                      color: Colors.grey.shade800,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade300,
                       borderRadius: BorderRadius.circular(5.0)),
                   child: Text(matchText.replaceAll('`', ''),
-                      style: const TextStyle(
-                          color: Colors.white,
+                      style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                           fontFamily: 'monospace',
                           fontSize: 13)))));
         }
@@ -689,7 +689,7 @@ class ChangeItemWidget extends StatelessWidget {
             text: nonMatch,
             style: TextStyle(
                 fontFamily: 'Gilroy',
-                color: Colors.white.withValues(alpha: 0.85))));
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.85) : Colors.black.withValues(alpha: 0.7))));
         return '';
       },
     );

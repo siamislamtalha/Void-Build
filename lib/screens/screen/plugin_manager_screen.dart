@@ -1923,20 +1923,20 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.accentColor(context),
-                    foregroundColor: Colors.white,
+                    foregroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14)),
                   ),
                   child: _isSaving
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 22,
                           height: 22,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2.5, color: Colors.white))
+                              strokeWidth: 2.5, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black))
                       : Text(l10n.pluginManagerSave,
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black)),
                 ),
               ),
             ],

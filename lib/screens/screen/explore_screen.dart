@@ -489,7 +489,7 @@ String _getFriendlySourceName(String pluginId, String pluginName) {
   final id = pluginId.toLowerCase();
   if (id.contains('ytmusic') || id.contains('youtube_music') || id.contains('youtubemusic')) {
     return 'YouTube Music';
-  } else if (id.contains('ytvideo') || id.contains('youtube')) {
+  } else if (id.contains('ytvideo')) {
     return 'YouTube';
   } else if (id.contains('spotify')) {
     return 'Spotify';
@@ -686,11 +686,31 @@ class _MultiSourceSongSuggestionsState extends State<_MultiSourceSongSuggestions
         final resolvers = pluginState.loadedContentResolvers;
         if (resolvers.isEmpty) return const SizedBox.shrink();
         
+        // Filter out universal-downloader and reorder with priority
+        final filteredResolvers = resolvers.where((r) => 
+          !r.manifest.id.toLowerCase().contains('universal')).toList();
+        
+        // Custom priority order: ytmusic > ytvideo > multi-source > others
+        final priorityOrder = [
+          (r) => r.manifest.id.toLowerCase().contains('ytmusic') || 
+                 r.manifest.id.toLowerCase().contains('youtube_music'),
+          (r) => r.manifest.id.toLowerCase().contains('ytvideo'),
+          (r) => r.manifest.id.toLowerCase().contains('multi') || 
+                 r.manifest.id.toLowerCase().contains('bloomfactory'),
+        ];
+        
+        final orderedResolvers = [
+          ...filteredResolvers.where(priorityOrder[0]),
+          ...filteredResolvers.where(priorityOrder[1]),
+          ...filteredResolvers.where(priorityOrder[2]),
+          ...filteredResolvers.where((r) => !priorityOrder.any((p) => p(r))),
+        ];
+        
         // Separate playlist sections and song sections
         final playlistSections = <Widget>[];
         final songSections = <Widget>[];
         
-        for (final plugin in resolvers) {
+        for (final plugin in orderedResolvers) {
           final pluginName = _getFriendlySourceName(plugin.manifest.id, plugin.manifest.name);
           
           // Add playlist section for this plugin
@@ -956,10 +976,7 @@ class _PluginSongSectionState extends State<_PluginSongSection> {
   }
 
   Widget _buildLoadingRow(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final shimmerColor = isDark
-        ? Colors.white.withValues(alpha: 0.06)
-        : Colors.black.withValues(alpha: 0.05);
+    final shimmerColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05);
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Column(
@@ -1183,10 +1200,7 @@ class _PluginPlaylistSectionState extends State<_PluginPlaylistSection> {
   }
 
   Widget _buildPlaylistLoadingRow(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final shimmerColor = isDark
-        ? Colors.white.withValues(alpha: 0.06)
-        : Colors.black.withValues(alpha: 0.05);
+    final shimmerColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05);
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Column(
@@ -1346,7 +1360,7 @@ class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
                       TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -1382,8 +1396,7 @@ class NotificationIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final iconColor = Theme.of(context).colorScheme.onSurface;
     return BlocBuilder<NotificationCubit, NotificationState>(
       builder: (context, state) {
         if (state is NotificationInitial || state.notifications.isEmpty) {
@@ -1414,7 +1427,7 @@ class NotificationIcon extends StatelessWidget {
                 const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -1452,8 +1465,7 @@ class TimerIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final iconColor = Theme.of(context).colorScheme.onSurface;
     return IconButton(
       padding: const EdgeInsets.all(5),
       constraints: const BoxConstraints(),
@@ -1477,8 +1489,7 @@ class SettingsIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final iconColor = Theme.of(context).colorScheme.onSurface;
     return IconButton(
       padding: const EdgeInsets.all(5),
       constraints: const BoxConstraints(),

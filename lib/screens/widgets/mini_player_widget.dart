@@ -365,10 +365,8 @@ class _TrackInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
-    final subtitleColor = isDark
-        ? Colors.white.withValues(alpha: 0.55)
-        : const Color(0xFF8E8E93);
+    final titleColor = Theme.of(context).colorScheme.onSurface;
+    final subtitleColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -479,7 +477,7 @@ class _PlayPauseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final iconColor = Theme.of(context).colorScheme.onSurface;
     if (state.isLoading || state.isResolving) {
       return Padding(
         padding: const EdgeInsets.all(10),
@@ -534,9 +532,7 @@ class _ControlButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = isDark
-        ? Colors.white.withValues(alpha: 0.9)
-        : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
+    final iconColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -557,9 +553,7 @@ class _CloseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = isDark
-        ? Colors.white.withValues(alpha: 0.55)
-        : const Color(0xFF1C1C1E).withValues(alpha: 0.45);
+    final iconColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -583,9 +577,7 @@ class _GlowingProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final barColor = isDark
-        ? Colors.white.withValues(alpha: 0.8)
-        : const Color(0xFF1C1C1E).withValues(alpha: 0.7);
+    final barColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
     final glowColor = isDark
         ? Colors.white.withValues(alpha: 0.4)
         : const Color(0xFF1C1C1E).withValues(alpha: 0.15);

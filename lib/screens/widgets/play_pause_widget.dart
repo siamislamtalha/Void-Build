@@ -31,8 +31,8 @@ class _PlayPauseButtonState extends State<PlayPauseButton> {
   Widget build(BuildContext context) {
     final size = widget.size;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final btnBg = isDark ? Colors.white : const Color(0xFF1C1C1E);
-    final iconColor = isDark ? Colors.black : Colors.white;
+    final btnBg = Theme.of(context).colorScheme.onSurface;
+    final iconColor = Theme.of(context).colorScheme.surface;
 
     return GestureDetector(
       onTap: _togglePlayPause,

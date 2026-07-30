@@ -137,9 +137,8 @@ class LyricsSearchDelegate extends SearchDelegate {
 
   @override
   ThemeData appBarTheme(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = Theme.of(context).scaffoldBackgroundColor;
-    final textColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final textColor = Theme.of(context).colorScheme.onSurface;
     return Theme.of(context).copyWith(
       appBarTheme: AppBarTheme(
         backgroundColor: bgColor,
@@ -184,10 +183,9 @@ class LyricsSearchDelegate extends SearchDelegate {
 
   @override
   Widget? buildLeading(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return IconButton(
       onPressed: () => close(context, null),
-      icon: Icon(Icons.arrow_back_rounded, color: isDark ? Colors.white : const Color(0xFF1C1C1E), size: 22),
+      icon: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 22),
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
     );

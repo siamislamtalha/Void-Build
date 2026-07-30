@@ -55,7 +55,7 @@ class SourceBadge extends StatelessWidget {
     // Other SVGs are already colored
     Color? iconColor;
     if (isMultiSource) {
-      iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+      iconColor = Theme.of(context).colorScheme.onSurface;
     }
 
     return SvgPicture.asset(
@@ -94,7 +94,7 @@ class SourceBadgeByPluginId extends StatelessWidget {
     // Other SVGs are already colored
     Color? iconColor;
     if (isMultiSource) {
-      iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+      iconColor = Theme.of(context).colorScheme.onSurface;
     }
 
     return SvgPicture.asset(

@@ -304,13 +304,9 @@ class _CompactHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? Colors.white : Theme.of(context).colorScheme.onSurface;
-    final iconColor = isDark
-        ? Default_Theme.primaryColor2.withValues(alpha: 0.8)
-        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
-    final arrowColor = isDark
-        ? Default_Theme.primaryColor2.withValues(alpha: 0.5)
-        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4);
+    final titleColor = Theme.of(context).colorScheme.onSurface;
+    final iconColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
+    final arrowColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4);
 
     return Center(
       child: Row(

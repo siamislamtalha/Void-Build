@@ -248,22 +248,22 @@ class DownloadingCardWidget extends StatelessWidget {
               color: Colors.orange, fontSize: 12, fontWeight: FontWeight.bold),
         );
       case DownloadState.resolving:
-        return const Text(
+        return Text(
           "Resolving",
           style: TextStyle(
-              color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+              color: Theme.of(context).colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.bold),
         );
       case DownloadState.fetchingMetadata:
-        return const Text(
+        return Text(
           "Tagging",
           style: TextStyle(
-              color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+              color: Theme.of(context).colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.bold),
         );
       case DownloadState.downloading:
-        return const Text(
+        return Text(
           "Downloading",
           style: TextStyle(
-              color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+              color: Theme.of(context).colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.bold),
         );
       case DownloadState.paused:
         return const Text(
@@ -303,42 +303,42 @@ class DownloadingCardWidget extends StatelessWidget {
           key: ValueKey('failed'),
         );
       case DownloadState.queued:
-        return const Icon(
+        return Icon(
           MingCute.sandglass_line,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onSurface,
           size: 20,
-          key: ValueKey('queued'),
+          key: const ValueKey('queued'),
         );
       case DownloadState.resolving:
-        return const Icon(
+        return Icon(
           Icons.link,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onSurface,
           size: 20,
-          key: ValueKey('resolving'),
+          key: const ValueKey('resolving'),
         );
       case DownloadState.fetchingMetadata:
-        return const Icon(
+        return Icon(
           Icons.info_outline,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onSurface,
           size: 20,
-          key: ValueKey('fetchingMetadata'),
+          key: const ValueKey('fetchingMetadata'),
         );
       case DownloadState.downloading:
-        return const Icon(
+        return Icon(
           Icons.arrow_downward,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onSurface,
           size: 20,
           key: ValueKey('downloading'),
         );
       case DownloadState.paused:
-        return const Icon(
+        return Icon(
           Icons.pause_circle_outline,
           color: Colors.amber,
           size: 20,
-          key: ValueKey('paused'),
+          key: const ValueKey('paused'),
         );
       case DownloadState.retrying:
-        return const Icon(
+        return Icon(
           Icons.refresh,
           color: Colors.orangeAccent,
           size: 20,

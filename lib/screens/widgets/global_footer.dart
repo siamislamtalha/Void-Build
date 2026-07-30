@@ -58,6 +58,7 @@ class _GlobalFooterState extends State<GlobalFooter> {
   Widget build(BuildContext context) {
     context.watch<PlayerOverlayCubit>();
     final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final isDesktop = ResponsiveBreakpoints.of(context).isDesktop;
 
     return PlayerOverlayWrapper(
       child: BackButtonListener(
@@ -177,7 +178,7 @@ class _GlobalFooterState extends State<GlobalFooter> {
 // Outer bottom padding on the Column = 6.
 // Mobile total WITH mini player = 72 + 6 + 66 + 6 = 150.
 // Mobile total WITHOUT mini player = 0 + 66 + 6 = 72.
-// Desktop: mini player lives inside the sidebar — not in the floating overlay.
+// Desktop: mini player in footer connected to sidebar (no nav bar, no sidebar mini player).
 const double _kMiniPlayerHeight = 72.0; // card(64) + vertical padding(4+4)
 const double _kMiniPlayerGap = 6.0;     // gap between mini player and nav bar
 const double _kNavBarFooterHeight = 72.0; // gap(6) + navBar(66)
@@ -207,11 +208,10 @@ class _FooterAwareBody extends StatelessWidget {
 
         // Calculate dynamic footer height:
         // Nav bar (mobile only) + optional mini player
-        // On desktop the mini player lives inside the sidebar so only
-        // mobile needs the extra bottom inset for the floating overlay.
+        // On desktop mini player is in footer only (no sidebar mini player)
         double footerExtra = _kOuterBottomPadding;
         if (isMobile) footerExtra += _kNavBarFooterHeight;
-        if (isMobile && hasMiniPlayer) footerExtra += _kMiniPlayerHeight + _kMiniPlayerGap;
+        if (hasMiniPlayer) footerExtra += _kMiniPlayerHeight + _kMiniPlayerGap;
 
         // Inject footer height into MediaQuery so scrollable children
         // automatically add bottom padding to avoid content being hidden
@@ -234,9 +234,11 @@ class _FooterAwareBody extends StatelessWidget {
             : Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Full-height sidebar — no extra padding so it goes
-                  // edge-to-edge and forms one continuous blur bar.
-                  DesktopSidebar(navigationShell: navigationShell),
+                  // Sidebar navigation
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4),
+                    child: VerticalNavBar(navigationShell: navigationShell),
+                  ),
                   Expanded(
                     child: _AnimatedPageView(navigationShell: navigationShell),
                   ),
@@ -271,23 +273,51 @@ class _GlassFooterOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     // Bottom inset = device home indicator / gesture bar height.
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
+    final isDesktop = ResponsiveBreakpoints.of(context).isDesktop;
 
-    // On desktop the mini player is embedded in the sidebar —
-    // this overlay only handles mobile.
-    if (!isMobile) {
-      return SizedBox(height: bottomInset + _kOuterBottomPadding);
+    if (isMobile) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MiniPlayerWidget(currentPageIndex: navigationShell.currentIndex),
+            const SizedBox(height: 6),
+            _FrostedNavBarArea(
+              bottomInset: bottomInset,
+              navigationShell: navigationShell,
+            ),
+          ],
+        ),
+      );
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+    // Desktop: mini player in footer connected to sidebar (like old code)
+    // Footer spans full width and is visually connected to sidebar like header
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.only(
+        bottom: bottomInset + _kOuterBottomPadding,
+      ),
+      decoration: BoxDecoration(
+        color: glassColor,
+        border: Border(
+          top: BorderSide(color: glassBorder, width: 1.0),
+        ),
+      ),
+      child: Row(
         children: [
-          MiniPlayerWidget(currentPageIndex: navigationShell.currentIndex),
-          const SizedBox(height: 6),
-          _FrostedNavBarArea(
-            bottomInset: bottomInset,
-            navigationShell: navigationShell,
+          // Spacer for sidebar width (keeps footer connected to sidebar visually)
+          SizedBox(width: _kDesktopSidebarWidth + 4),
+          // Mini player content
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: MiniPlayerWidget(currentPageIndex: navigationShell.currentIndex),
+            ),
           ),
         ],
       ),
@@ -382,10 +412,9 @@ class _AnimatedPageViewState extends State<_AnimatedPageView>
   }
 }
 
-/// Full-height desktop sidebar that contains the navigation rail at the top
-/// and the mini player at the bottom. It appears as one continuous frosted-
-/// glass bar from the very top to the very bottom of the screen, matching
-/// the aesthetic of the header and eliminating separate floating sections.
+/// Full-height desktop sidebar that contains the navigation rail.
+/// It appears as one continuous frosted-glass bar from the very top to the
+/// very bottom of the screen, matching the aesthetic of the header.
 class DesktopSidebar extends StatelessWidget {
   const DesktopSidebar({super.key, required this.navigationShell});
   final StatefulNavigationShell navigationShell;
@@ -413,211 +442,42 @@ class DesktopSidebar extends StatelessWidget {
           right: BorderSide(color: borderColor, width: 1.0),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // ── Navigation Rail (fills remaining vertical space) ──
-          Expanded(
-            child: NavigationRail(
-              backgroundColor: Colors.transparent,
-              destinations: [
-                NavigationRailDestination(
-                    icon: const Icon(MingCute.home_4_fill), label: Text(l10n.navHome)),
-                NavigationRailDestination(
-                    icon: const Icon(MingCute.book_5_fill),
-                    label: Text(l10n.navLibrary)),
-                NavigationRailDestination(
-                    icon: const Icon(MingCute.search_2_fill),
-                    label: Text(l10n.navSearch)),
-                NavigationRailDestination(
-                    icon: const Icon(MingCute.music_2_fill),
-                    label: Text(l10n.navLocal)),
-                NavigationRailDestination(
-                    icon: const Icon(MingCute.folder_download_fill),
-                    label: Text(l10n.navOffline)),
-              ],
-              selectedIndex: navigationShell.currentIndex,
-              minWidth: _kDesktopSidebarWidth,
-              onDestinationSelected: navigationShell.goBranch,
-              groupAlignment: 0.0,
-              selectedIconTheme: IconThemeData(color: activeColor),
-              unselectedIconTheme: IconThemeData(color: inactiveColor),
-              indicatorColor: isDark
-                  ? Colors.white.withValues(alpha: 0.2)
-                  : const Color(0xFF1C1C1E).withValues(alpha: 0.08),
-              indicatorShape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
-              ),
-            ),
-          ),
-
-          // ── Divider between rail and mini player ──
-          Container(
-            height: 1,
-            color: borderColor,
-          ),
-
-          // ── Mini Player embedded in sidebar ──
-          _SidebarMiniPlayer(navigationShell: navigationShell),
+      child: NavigationRail(
+        backgroundColor: Colors.transparent,
+        destinations: [
+          NavigationRailDestination(
+              icon: const Icon(MingCute.home_4_fill), label: Text(l10n.navHome)),
+          NavigationRailDestination(
+              icon: const Icon(MingCute.book_5_fill),
+              label: Text(l10n.navLibrary)),
+          NavigationRailDestination(
+              icon: const Icon(MingCute.search_2_fill),
+              label: Text(l10n.navSearch)),
+          NavigationRailDestination(
+              icon: const Icon(MingCute.music_2_fill),
+              label: Text(l10n.navLocal)),
+          NavigationRailDestination(
+              icon: const Icon(MingCute.folder_download_fill),
+              label: Text(l10n.navOffline)),
         ],
-      ),
-    );
-  }
-}
-
-/// Mini player slot embedded in the desktop sidebar.
-/// Shows nothing when no track is loaded.
-class _SidebarMiniPlayer extends StatelessWidget {
-  const _SidebarMiniPlayer({required this.navigationShell});
-  final StatefulNavigationShell navigationShell;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
-
-    return BlocBuilder<MiniPlayerCubit, MiniPlayerState>(
-      builder: (context, state) {
-        if (!state.isVisible || state.track == null) {
-          return const SizedBox.shrink();
-        }
-
-        final song = state.track!;
-        final thumbUrl = song.thumbnail.urlLow ?? song.thumbnail.url;
-
-        return GestureDetector(
-          onTap: () {
-            HapticFeedback.selectionClick();
-            context.read<PlayerOverlayCubit>().showPlayer(
-                  fromPageIndex: navigationShell.currentIndex,
-                );
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Artwork
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: LoadImageCached(
-                      imageUrl: thumbUrl,
-                      fallbackUrl: song.thumbnail.url,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                // Title
-                Text(
-                  song.title,
-                  style: TextStyle(
-                    fontFamily: 'Unageo',
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: iconColor,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 6),
-                // Play / Pause + Skip
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Prev
-                    _SidebarIconBtn(
-                      icon: FontAwesome.backward_step_solid,
-                      color: iconColor.withValues(alpha: 0.7),
-                      onTap: () => context
-                          .read<BloomeePlayerCubit>()
-                          .bloomeePlayer
-                          .skipToPrevious(),
-                    ),
-                    const SizedBox(width: 4),
-                    // Play / Pause
-                    _SidebarPlayPause(state: state, iconColor: iconColor),
-                    const SizedBox(width: 4),
-                    // Next
-                    _SidebarIconBtn(
-                      icon: FontAwesome.forward_step_solid,
-                      color: iconColor.withValues(alpha: 0.7),
-                      onTap: () => context
-                          .read<BloomeePlayerCubit>()
-                          .bloomeePlayer
-                          .skipToNext(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _SidebarPlayPause extends StatelessWidget {
-  const _SidebarPlayPause({required this.state, required this.iconColor});
-  final MiniPlayerState state;
-  final Color iconColor;
-
-  @override
-  Widget build(BuildContext context) {
-    if (state.isLoading || state.isResolving) {
-      return SizedBox.square(
-        dimension: 28,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: iconColor,
+        selectedIndex: navigationShell.currentIndex,
+        minWidth: _kDesktopSidebarWidth,
+        onDestinationSelected: navigationShell.goBranch,
+        groupAlignment: 0.0,
+        selectedIconTheme: IconThemeData(color: activeColor),
+        unselectedIconTheme: IconThemeData(color: inactiveColor),
+        indicatorColor: isDark
+            ? Colors.white.withValues(alpha: 0.2)
+            : const Color(0xFF1C1C1E).withValues(alpha: 0.08),
+        indicatorShape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(15)),
         ),
-      );
-    }
-    return _SidebarIconBtn(
-      icon: state.isPlaying
-          ? FontAwesome.pause_solid
-          : FontAwesome.play_solid,
-      color: iconColor,
-      size: 20,
-      onTap: () {
-        state.isPlaying
-            ? context.read<BloomeePlayerCubit>().bloomeePlayer.pause()
-            : context.read<BloomeePlayerCubit>().bloomeePlayer.play();
-      },
-    );
-  }
-}
-
-class _SidebarIconBtn extends StatelessWidget {
-  const _SidebarIconBtn({
-    required this.icon,
-    required this.color,
-    required this.onTap,
-    this.size = 16,
-  });
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Icon(icon, size: size, color: color),
       ),
     );
   }
 }
+
+
 
 /// Kept for backward-compat but no longer used on desktop.
 class VerticalNavBar extends StatelessWidget {

@@ -244,7 +244,7 @@ class BackupSettings extends StatelessWidget {
                                   backgroundColor: Colors.red.shade700),
                               onPressed: () => Navigator.of(ctx).pop(true),
                               child: Text(l10n.storageResetButton,
-                                  style: const TextStyle(color: Colors.white)),
+                                  style: TextStyle(color: Theme.of(ctx).brightness == Brightness.dark ? Colors.white : Colors.black)),
                             ),
                           ],
                         ),

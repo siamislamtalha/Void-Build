@@ -69,9 +69,10 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
     final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
     final musicPlayer = bloomeePlayerCubit.bloomeePlayer;
     final isMobile = ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
-    final secondaryTextColor = isDark ? Default_Theme.primaryColor2 : const Color(0xFF66666E);
+    final iconColor = Theme.of(context).colorScheme.onSurface;
+    final secondaryTextColor = Theme.of(context).brightness == Brightness.dark 
+        ? Default_Theme.primaryColor2 
+        : const Color(0xFF66666E);
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF000000) : AppTheme.lightBg,
@@ -322,10 +323,9 @@ class _SongInfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryTextColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
-    final subtitleColor = isDark
-        ? Colors.white.withValues(alpha: 0.7)
+    final primaryTextColor = Theme.of(context).colorScheme.onSurface;
+    final subtitleColor = Theme.of(context).brightness == Brightness.dark
+        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)
         : const Color(0xFF66666E);
 
     return Row(
@@ -427,10 +427,7 @@ class _DownloadButtonState extends State<_DownloadButton> {
   @override
   Widget build(BuildContext context) {
     if (!_isDownloaded) return const SizedBox.shrink();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark
-        ? Colors.white.withValues(alpha: 0.5)
-        : const Color(0xFF1C1C1E).withValues(alpha: 0.5);
+    final iconColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
 
     return Tooltip(
       message: AppLocalizations.of(context)!.tooltipAvailableOffline,
@@ -748,8 +745,8 @@ class _PlayPauseButton extends StatelessWidget {
     final musicPlayer = context.read<BloomeePlayerCubit>().bloomeePlayer;
     // In dark mode: white button with black icon (original).
     // In light mode: dark button with white icon to match the theme inversion.
-    final buttonColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
-    final iconColor = isDark ? Colors.black : Colors.white;
+    final buttonColor = Theme.of(context).colorScheme.onSurface;
+    final iconColor = Theme.of(context).colorScheme.surface;
     return BlocBuilder<MiniPlayerCubit, MiniPlayerState>(
       builder: (context, state) {
         Widget child;

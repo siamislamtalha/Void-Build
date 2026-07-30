@@ -113,7 +113,7 @@ class _PlaylistViewState extends State<PlaylistView> {
   List<Color> _getOptimizedPalette(BuildContext context) {
     final pallete =
         context.read<CurrentPlaylistCubit>().getCurrentPlaylistPallete();
-    Color fgColor = pallete?.lightVibrantColor?.color ?? Colors.white;
+    Color fgColor = pallete?.lightVibrantColor?.color ?? Theme.of(context).colorScheme.onSurface;
     Color bgColor = pallete?.dominantColor?.color ??
         pallete?.darkMutedColor?.color ??
         Default_Theme.themeColor;
@@ -190,14 +190,9 @@ class _PlaylistViewState extends State<PlaylistView> {
   }
 
   PreferredSizeWidget _buildAppBar() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
-    final containerColor = isDark 
-        ? Colors.white.withValues(alpha: 0.05)
-        : Colors.black.withValues(alpha: 0.05);
-    final borderColor = isDark 
-        ? Colors.white.withValues(alpha: 0.1)
-        : Colors.black.withValues(alpha: 0.1);
+    final iconColor = Theme.of(context).colorScheme.onSurface;
+    final containerColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05);
+    final borderColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
 
     return AppBar(
       backgroundColor: Colors.transparent,
@@ -485,7 +480,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                   widthFactor: 0.3,
                   heightFactor: 0.3,
                   child: Icon(MingCute.music_2_line,
-                      color: Colors.white.withValues(alpha: 0.3)),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                 )
               : Stack(
                   fit: StackFit.expand,
@@ -509,10 +504,9 @@ class _PlaylistViewState extends State<PlaylistView> {
     final creatorText = l10n.playlistByCreator(
         state.playlist.artists?.map((a) => a.name).join(', ') ??
             l10n.playlistYou);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? Colors.white.withValues(alpha: 0.95) : const Color(0xFF1C1C1E);
-    final subtitleColor = isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF66666E);
-    final tertiaryColor = isDark ? Colors.white.withValues(alpha: 0.5) : const Color(0xFF8E8E93);
+    final titleColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95);
+    final subtitleColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
+    final tertiaryColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
 
     return Column(
       crossAxisAlignment:
@@ -667,20 +661,11 @@ class _PlaylistViewState extends State<PlaylistView> {
   }
 
   Widget _buildActionIcon(IconData icon, String tooltip, VoidCallback? onTap) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
-    final containerColor = isDark 
-        ? Colors.white.withValues(alpha: 0.04)
-        : Colors.black.withValues(alpha: 0.04);
-    final borderColor = isDark 
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.08);
-    final splashColor = isDark 
-        ? Colors.white.withValues(alpha: 0.1)
-        : Colors.black.withValues(alpha: 0.1);
-    final highlightColor = isDark 
-        ? Colors.white.withValues(alpha: 0.05)
-        : Colors.black.withValues(alpha: 0.05);
+    final iconColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85);
+    final containerColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04);
+    final borderColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08);
+    final splashColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+    final highlightColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05);
 
     return Tooltip(
       message: tooltip,
@@ -769,7 +754,7 @@ class _PlaylistViewState extends State<PlaylistView> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.accentColor(context),
-              foregroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),

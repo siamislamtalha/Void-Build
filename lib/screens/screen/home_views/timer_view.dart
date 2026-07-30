@@ -375,8 +375,8 @@ class _TimerViewState extends State<TimerView> {
             },
             child: Text(
               l10n.timerStart,
-              style: const TextStyle(
-                      color: Colors.white,
+              style: TextStyle(
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                       fontSize: 20,
                       fontWeight: FontWeight.bold)
                   .merge(Default_Theme.secondoryTextStyle),

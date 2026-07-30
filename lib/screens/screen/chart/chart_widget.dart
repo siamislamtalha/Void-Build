@@ -73,7 +73,7 @@ class ChartWidget extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: Default_Theme.secondoryTextStyleMedium.merge(
                   TextStyle(
-                    color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.3,
@@ -101,7 +101,7 @@ class _ChartPlaceholder extends StatelessWidget {
         child: Icon(
           MingCute.music_2_fill,
           size: 48,
-          color: isDark ? Colors.white.withValues(alpha: 0.15) : const Color(0xFF1C1C1E).withValues(alpha: 0.15),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
         ),
       ),
     );

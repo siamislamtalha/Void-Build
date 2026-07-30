@@ -85,8 +85,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final priorityOrder = [
       (r) => r.manifest.id.toLowerCase().contains('ytmusic') || 
              r.manifest.id.toLowerCase().contains('youtube_music'),
-      (r) => r.manifest.id.toLowerCase().contains('ytvideo') || 
-             r.manifest.id.toLowerCase().contains('youtube'),
+      (r) => r.manifest.id.toLowerCase().contains('ytvideo'),
       (r) => r.manifest.id.toLowerCase().contains('multi') || 
              r.manifest.id.toLowerCase().contains('bloomfactory'),
     ];

@@ -55,10 +55,10 @@ class ToggleButtonState extends State<ToggleButton>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final activeBg = isDark ? Colors.white : const Color(0xFF1C1C1E);
-    final activeText = isDark ? Colors.black : Colors.white;
+    final activeBg = Theme.of(context).colorScheme.onSurface;
+    final activeText = Theme.of(context).colorScheme.surface;
     final inactiveBg = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF0F0F3);
-    final inactiveText = isDark ? Colors.white70 : const Color(0xFF66666E);
+    final inactiveText = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
     final inactiveBorder = isDark ? Colors.white24 : const Color(0xFFE5E5EA);
 
     return GestureDetector(

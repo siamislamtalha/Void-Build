@@ -17,6 +17,7 @@ import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/utils/load_image.dart';
+import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -302,12 +303,12 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
                   ),
                 )
               else if (status == DetailStatus.loaded)
-                const SliverToBoxAdapter(
+                SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.only(top: 80, bottom: 120),
+                    padding: const EdgeInsets.only(top: 80, bottom: 120),
                     child: Center(
                         child: SignBoardWidget(
-                            message: 'No tracks available',
+                            message: AppLocalizations.of(context)!.emptyNoTracks,
                             icon: MingCute.music_2_line)),
                   ),
                 )

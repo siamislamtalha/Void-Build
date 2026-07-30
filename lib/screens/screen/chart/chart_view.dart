@@ -649,11 +649,12 @@ class _EditorialHeroMasthead extends StatelessWidget {
   }
 
   Widget _buildArtwork(String url, String fallbackUrl, double size) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: const Color(0xFF111111),
+        color: isDark ? const Color(0xFF111111) : Colors.grey[300],
         borderRadius: BorderRadius.circular(6),
         boxShadow: [
           BoxShadow(

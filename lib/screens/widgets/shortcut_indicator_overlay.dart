@@ -167,18 +167,19 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
   }
 
   Widget _buildIcon(ShortcutIndicatorType type) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     IconData icon = MingCute.check_circle_fill;
-    Color color = Colors.white;
+    Color color = Theme.of(context).colorScheme.onSurface;
 
     switch (type) {
       case ShortcutIndicatorType.volume:
         final level = widget.state.volumeLevel ?? 0;
         if (level == 0) {
           icon = MingCute.volume_off_fill;
-          color = Colors.white.withValues(alpha: 0.5);
+          color = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
         } else {
           icon = MingCute.volume_fill;
-          color = Colors.white.withValues(alpha: 0.9);
+          color = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9);
         }
         break;
 
@@ -186,7 +187,7 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
         final isMuted = widget.state.isMuted ?? false;
         icon = isMuted ? MingCute.volume_off_fill : MingCute.volume_fill;
         color = isMuted
-            ? Colors.white.withValues(alpha: 0.5)
+            ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)
             : AppTheme.accentColor(context);
         break;
 
@@ -194,7 +195,7 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
         icon = MingCute.shuffle_2_line;
         color = (widget.state.isShuffleOn ?? false)
             ? AppTheme.accentColor(context)
-            : Colors.white.withValues(alpha: 0.5);
+            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
         break;
 
       case ShortcutIndicatorType.loop:
@@ -202,7 +203,7 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
         switch (mode) {
           case LoopMode.off:
             icon = MingCute.repeat_line;
-            color = Colors.white.withValues(alpha: 0.5);
+            color = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
             break;
           case LoopMode.one:
             icon = MingCute.repeat_one_line;
@@ -220,7 +221,7 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
         icon = isLiked ? AntDesign.heart_fill : AntDesign.heart_outline;
         color = isLiked
             ? AppTheme.accentColor(context)
-            : Colors.white.withValues(alpha: 0.9);
+            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9);
         break;
     }
 
@@ -240,7 +241,7 @@ class _ShortcutIndicatorState extends State<_ShortcutIndicator>
 
   Widget _buildLabel(ShortcutIndicatorType type) {
     String label = '';
-    Color labelColor = Colors.white.withValues(alpha: 0.9);
+    Color labelColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9);
 
     switch (type) {
       case ShortcutIndicatorType.volume:

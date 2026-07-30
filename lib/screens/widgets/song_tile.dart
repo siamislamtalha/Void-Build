@@ -336,12 +336,13 @@ class _ActionButton extends StatelessWidget {
     );
 
     if (tooltip != null) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
       return Tooltip(
         message: tooltip,
-        textStyle: const TextStyle(
-            fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500),
+        textStyle: TextStyle(
+            fontSize: 12, color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.w500),
         decoration: BoxDecoration(
-            color: Colors.black87, borderRadius: BorderRadius.circular(6)),
+            color: isDark ? Colors.black87 : Colors.white.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(6)),
         child: button,
       );
     }
