@@ -652,7 +652,7 @@ class ChangeItemWidget extends StatelessWidget {
       {Key? key, required this.item, required this.color, this.level = 0})
       : super(key: key);
 
-  List<InlineSpan> _buildStyledText(String text) {
+  List<InlineSpan> _buildStyledText(BuildContext context, String text) {
     final List<InlineSpan> spans = [];
     final RegExp pattern = RegExp(r'(\*\*.*?\*\*|`.*?`)');
 
@@ -718,7 +718,7 @@ class ChangeItemWidget extends StatelessWidget {
                     style: DefaultTextStyle.of(context)
                         .style
                         .copyWith(height: 1.5, fontFamily: 'Gilroy'),
-                    children: _buildStyledText(item.text),
+                    children: _buildStyledText(context, item.text),
                   ),
                 ),
               ),
