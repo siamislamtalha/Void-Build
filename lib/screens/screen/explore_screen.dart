@@ -25,6 +25,7 @@ import 'package:voidmusic/screens/widgets/song_tile.dart';
 import 'package:voidmusic/screens/widgets/source_badge.dart';
 import 'package:voidmusic/screens/widgets/square_card.dart';
 import 'package:voidmusic/screens/screen/common_views/playlist_view.dart';
+import 'package:voidmusic/services/playlist_suggestions_service.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/screens/screen/home_views/notification_view.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_view.dart';
@@ -306,7 +307,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           return const SizedBox.shrink();
                         },
                       ),
-                      // Home sections from plugin
+                      // Home sections from plugin (Old App List - shown first)
                       BlocBuilder<ContentBloc, ContentState>(
                         bloc: _homeContentBloc,
                         builder: (context, state) {
@@ -411,7 +412,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           );
                         },
                       ),
-                      // ── Multi-source Song Suggestions ──
+                      // Playlist Suggestions (New App List - shown after Old App List)
+                      _PlaylistSuggestionsSection(),
+                      // ── Multi-source Song Suggestions (New App List - shown after Playlist Suggestions)
                       // One horizontal row per loaded content-resolver plugin,
                       // showing only Track items from that plugin's home sections.
                       // Rows that yield zero tracks are hidden automatically.
@@ -495,6 +498,177 @@ String _getFriendlySourceName(String pluginId, String pluginName) {
     return 'JioSaavn';
   }
   return pluginName;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Playlist Suggestions Section
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _PlaylistSuggestionsSection extends StatelessWidget {
+  const _PlaylistSuggestionsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final countryCode = context.watch<SettingsCubit>().state.countryCode;
+    final suggestions = countryCode.isNotEmpty && countryCode != 'XX'
+        ? PlaylistSuggestionsService.getSuggestionsForCountry(countryCode)
+        : PlaylistSuggestionsService.getSuggestions();
+    final l10n = AppLocalizations.of(context)!;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                MingCute.music_2_line,
+                color: AppTheme.accentColor(context),
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Playlist Suggestions',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                'Available Globally',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 180,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: suggestions.length,
+            itemBuilder: (context, index) {
+              final suggestion = suggestions[index];
+              return _PlaylistSuggestionCard(
+                suggestion: suggestion,
+                onTap: () {
+                  // Navigate to search with the suggestion query
+                  Navigator.pushNamed(
+                    context,
+                    '/search',
+                    arguments: suggestion.searchQuery,
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PlaylistSuggestionCard extends StatelessWidget {
+  final PlaylistSuggestion suggestion;
+  final VoidCallback onTap;
+
+  const _PlaylistSuggestionCard({
+    required this.suggestion,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 160,
+      margin: const EdgeInsets.only(right: 12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      suggestion.icon,
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  suggestion.title,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  suggestion.description,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    fontSize: 11,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    suggestion.category,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Renders one `_PluginSongSection` per loaded content-resolver plugin.

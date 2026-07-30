@@ -184,9 +184,10 @@ class LyricsSearchDelegate extends SearchDelegate {
 
   @override
   Widget? buildLeading(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return IconButton(
       onPressed: () => close(context, null),
-      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 22),
+      icon: Icon(Icons.arrow_back_rounded, color: isDark ? Colors.white : const Color(0xFF1C1C1E), size: 22),
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
     );
@@ -420,7 +421,7 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
                               child: Text(
                                 widget.match.title,
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.95),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: -0.2,
@@ -640,7 +641,7 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
                               Text(
                                 widget.match.title,
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.95),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: -0.2,
@@ -687,7 +688,7 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
                           _fetchedLyrics!.lyricsPlain,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.85),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85),
                             fontSize: 17,
                             height: 1.8,
                             fontWeight: FontWeight.w500,

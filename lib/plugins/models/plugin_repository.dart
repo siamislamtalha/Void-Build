@@ -58,11 +58,8 @@ class RemotePluginModel {
   }
 
   bool isAllowedInCountry(String countryCode) {
-    if (countryAllowlist.isEmpty) {
-      return true;
-    }
-    final normalized = CountryInfoService.normalizeCountryCode(countryCode);
-    return normalized.isNotEmpty && countryAllowlist.contains(normalized);
+    // Country restrictions removed - all plugins available to all countries
+    return true;
   }
 }
 

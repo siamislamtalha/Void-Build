@@ -202,15 +202,16 @@ class PluginService {
         );
       }
 
-      if (packedManifest.countryAllowlist.isNotEmpty &&
-          (countryCode.isEmpty ||
-              !packedManifest.countryAllowlist.contains(countryCode))) {
-        throw PluginCountryRestrictedException(
-          pluginId: packedManifest.pluginId,
-          countryCode: countryCode,
-          allowlist: packedManifest.countryAllowlist,
-        );
-      }
+      // Country restrictions removed - all plugins available to all countries
+      // if (packedManifest.countryAllowlist.isNotEmpty &&
+      //     (countryCode.isEmpty ||
+      //         !packedManifest.countryAllowlist.contains(countryCode))) {
+      //   throw PluginCountryRestrictedException(
+      //     pluginId: packedManifest.pluginId,
+      //     countryCode: countryCode,
+      //     allowlist: packedManifest.countryAllowlist,
+      //   );
+      // }
 
       final tempDir = (await getTemporaryDirectory()).path;
       final pluginsDir = await bridge.getPluginsDir(manager: manager);
@@ -224,14 +225,15 @@ class PluginService {
         manager: manager,
       );
 
-      if (result.status == PluginInstallStatus.failed &&
-          (result.error?.contains('country') ?? false)) {
-        throw PluginCountryRestrictedException(
-          pluginId: result.pluginId,
-          countryCode: countryCode,
-          allowlist: packedManifest.countryAllowlist,
-        );
-      }
+      // Country restrictions removed - no longer throw PluginCountryRestrictedException
+      // if (result.status == PluginInstallStatus.failed &&
+      //     (result.error?.contains('country') ?? false)) {
+      //   throw PluginCountryRestrictedException(
+      //     pluginId: result.pluginId,
+      //     countryCode: countryCode,
+      //     allowlist: packedManifest.countryAllowlist,
+      //   );
+      // }
 
       log('Installed plugin: ${result.pluginId} (status: ${result.status})',
           name: 'PluginService');

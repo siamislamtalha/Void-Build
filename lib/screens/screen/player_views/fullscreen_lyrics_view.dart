@@ -129,9 +129,10 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
     final l10n = AppLocalizations.of(context)!;
     final bloomeePlayerCubit = context.read<BloomeePlayerCubit>();
     final isDesktop = MediaQuery.of(context).size.width > 600;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: isDark ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
         onTap: _toggleControls,
@@ -139,7 +140,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
         child: Stack(
           children: [
             _buildBackground(bloomeePlayerCubit),
-            Container(color: Colors.black.withValues(alpha: 0.4)),
+            Container(color: isDark ? Colors.black.withValues(alpha: 0.4) : Colors.black.withValues(alpha: 0.1)),
             Positioned.fill(
               child: BlocBuilder<LyricsCubit, LyricsState>(
                 builder: (context, state) {
@@ -332,7 +333,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                 width: 1,
               ),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.keyboard_arrow_down_rounded,
               color: Colors.white,
               size: 32,
@@ -362,7 +363,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
             children: [
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.keyboard_arrow_down_rounded,
+                icon: Icon(Icons.keyboard_arrow_down_rounded,
                     color: Colors.white, size: 32),
               ),
               const SizedBox(width: 16),
@@ -555,7 +556,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                 children: [
                   IconButton(
                     onPressed: () => musicPlayer.skipToPrevious(),
-                    icon: const Icon(MingCute.skip_previous_fill,
+                    icon: Icon(MingCute.skip_previous_fill,
                         color: Colors.white),
                     iconSize: isDesktop ? 40 : 36,
                   ),
@@ -573,7 +574,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                   const SizedBox(width: 32),
                   IconButton(
                     onPressed: () => musicPlayer.skipToNext(),
-                    icon: const Icon(MingCute.skip_forward_fill,
+                    icon: Icon(MingCute.skip_forward_fill,
                         color: Colors.white),
                     iconSize: isDesktop ? 40 : 36,
                   ),
@@ -941,11 +942,14 @@ class _LyricsSettingsBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF151515).withValues(alpha: 0.8),
+          color: isDark 
+              ? const Color(0xFF151515).withValues(alpha: 0.8)
+              : Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           border: Border(
               top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),

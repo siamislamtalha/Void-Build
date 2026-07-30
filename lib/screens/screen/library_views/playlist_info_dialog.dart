@@ -68,11 +68,14 @@ String getArtists(List<Track> tracks) {
 Future<dynamic> showPlaylistInfo(
   BuildContext context,
   CurrentPlaylistState state, {
-  Color bgColor = const Color.fromARGB(255, 15, 0, 19),
-  Color fgColor = Default_Theme.primaryColor1,
+  Color? bgColor,
+  Color? fgColor,
 }) {
-  bgColor =
-      bgColor == Colors.black ? const Color.fromARGB(255, 15, 0, 19) : bgColor;
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  bgColor = bgColor ?? (isDark ? const Color.fromARGB(255, 15, 0, 19) : Theme.of(context).colorScheme.surface);
+  fgColor = fgColor ?? (isDark ? Default_Theme.primaryColor1 : const Color(0xFF1C1C1E));
+  
+  bgColor = bgColor == Colors.black ? const Color.fromARGB(255, 15, 0, 19) : bgColor;
   fgColor = fgColor == Colors.white ? Default_Theme.primaryColor1 : fgColor;
   return showDialog(
     context: context,

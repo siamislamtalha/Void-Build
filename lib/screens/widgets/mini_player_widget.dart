@@ -183,13 +183,14 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
       child: Transform.translate(
         offset: Offset(_dragOffset, 0),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+          padding: EdgeInsets.symmetric(horizontal: isDesktop ? 16 : 0, vertical: 4),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
             child: BackdropFilter(
               filter: AppTheme.glassBlur,
               child: Container(
                 height: _cardHeight,
+                width: isDesktop ? double.infinity : null,
                 decoration: BoxDecoration(
                   color: glassColor,
                   borderRadius: BorderRadius.circular(30),

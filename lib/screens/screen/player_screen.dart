@@ -5,13 +5,13 @@ import 'package:voidmusic/blocs/library/cubit/library_items_cubit.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/core/adapters/track_adapter.dart';
 import 'package:voidmusic/screens/screen/home_views/timer_view.dart';
-import 'package:voidmusic/screens/screen/home_views/setting_views/player_setting.dart';
 import 'package:voidmusic/screens/widgets/gradient_progress_bar.dart';
 import 'package:voidmusic/screens/widgets/more_bottom_sheet.dart';
 import 'package:voidmusic/screens/widgets/up_next_panel.dart';
 import 'package:voidmusic/screens/widgets/volume_slider.dart';
 import 'package:voidmusic/screens/widgets/media_metadata_links.dart';
 import 'package:voidmusic/screens/screen/player_views/segments_sheet.dart';
+import 'package:voidmusic/screens/screen/player_views/equalizer_view.dart';
 import 'package:voidmusic/services/bloomee_player.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
@@ -282,6 +282,7 @@ class CoverImageVolSlider extends StatelessWidget {
                     imageUrl: highResUrl,
                     fallbackUrl: lowResUrl,
                     fit: BoxFit.cover,
+                    maxMemCacheWidth: 2500, // High quality thumbnail
                   ),
                 ),
               ),
@@ -640,7 +641,7 @@ class _PlayerControlsRow extends StatelessWidget {
             icon: Icon(MingCute.settings_6_line,
                 color: iconColor, size: 24),
             onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const PlayerSettings())),
+                MaterialPageRoute(builder: (_) => const EqualizerView())),
           ),
         ),
         _buildControlColumn(

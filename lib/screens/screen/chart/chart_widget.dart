@@ -20,6 +20,7 @@ class ChartWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMobile = ResponsiveBreakpoints.of(context).isMobile;
     final isTablet = ResponsiveBreakpoints.of(context).isTablet;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final artwork = chart.thumbnail;
     final thumbnailUrl = artwork?.urlHigh ?? artwork?.url ?? artwork?.urlLow;
@@ -71,8 +72,8 @@ class ChartWidget extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: Default_Theme.secondoryTextStyleMedium.merge(
-                  const TextStyle(
-                    color: Colors.white,
+                  TextStyle(
+                    color: isDark ? Colors.white : const Color(0xFF1C1C1E),
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.3,
@@ -93,13 +94,14 @@ class _ChartPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       color: Default_Theme.primaryColor2.withValues(alpha: 0.08),
       child: Center(
         child: Icon(
           MingCute.music_2_fill,
           size: 48,
-          color: Colors.white.withValues(alpha: 0.15),
+          color: isDark ? Colors.white.withValues(alpha: 0.15) : const Color(0xFF1C1C1E).withValues(alpha: 0.15),
         ),
       ),
     );

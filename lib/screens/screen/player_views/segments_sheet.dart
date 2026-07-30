@@ -21,7 +21,9 @@ void showSegmentsSheet(
 }) {
   showModalBottomSheet(
     context: context,
-    backgroundColor: const Color(0xFF121212),
+    backgroundColor: Theme.of(context).brightness == Brightness.dark 
+        ? const Color(0xFF121212) 
+        : Theme.of(context).scaffoldBackgroundColor,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),

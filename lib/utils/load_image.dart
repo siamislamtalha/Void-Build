@@ -110,6 +110,7 @@ class LoadImageCached extends StatefulWidget {
   final double? width;
   final double? height;
   final BorderRadius? borderRadius;
+  final int? maxMemCacheWidth;
 
   const LoadImageCached({
     Key? key,
@@ -120,6 +121,7 @@ class LoadImageCached extends StatefulWidget {
     this.width,
     this.height,
     this.borderRadius,
+    this.maxMemCacheWidth,
   }) : super(key: key);
 
   /// Creates a LoadImageCached that automatically fills all available space
@@ -132,6 +134,7 @@ class LoadImageCached extends StatefulWidget {
     String placeholderUrl = "assets/icons/bloomee_new_logo_c.png",
     BoxFit fit = BoxFit.cover,
     BorderRadius? borderRadius,
+    int? maxMemCacheWidth,
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -148,6 +151,7 @@ class LoadImageCached extends StatefulWidget {
           width: w,
           height: h,
           borderRadius: borderRadius,
+          maxMemCacheWidth: maxMemCacheWidth,
         );
       },
     );
@@ -163,9 +167,10 @@ class _LoadImageCachedState extends State<LoadImageCached> {
   /// Compute memCacheWidth based on explicit width + device pixel ratio
   /// for efficient memory usage while maintaining sharpness.
   int? get _memCacheWidth {
-    if (widget.width == null) return 500; // sensible default
+    if (widget.maxMemCacheWidth != null) return widget.maxMemCacheWidth;
+    if (widget.width == null) return 1200; // higher default for better quality
     final dpr = MediaQuery.of(context).devicePixelRatio;
-    return (widget.width! * dpr).ceil().clamp(100, 1500);
+    return (widget.width! * dpr).ceil().clamp(100, 2500);
   }
 
   @override

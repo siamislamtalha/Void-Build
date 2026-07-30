@@ -190,6 +190,15 @@ class _PlaylistViewState extends State<PlaylistView> {
   }
 
   PreferredSizeWidget _buildAppBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
+    final containerColor = isDark 
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.black.withValues(alpha: 0.05);
+    final borderColor = isDark 
+        ? Colors.white.withValues(alpha: 0.1)
+        : Colors.black.withValues(alpha: 0.1);
+
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -202,12 +211,12 @@ class _PlaylistViewState extends State<PlaylistView> {
             icon: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: containerColor,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                border: Border.all(color: borderColor),
               ),
-              child: const Icon(Icons.arrow_back_rounded,
-                  color: Colors.white, size: 20),
+              child: Icon(Icons.arrow_back_rounded,
+                  color: iconColor, size: 20),
             ),
             onPressed: () => Navigator.of(context).pop(),
           ),
@@ -500,6 +509,10 @@ class _PlaylistViewState extends State<PlaylistView> {
     final creatorText = l10n.playlistByCreator(
         state.playlist.artists?.map((a) => a.name).join(', ') ??
             l10n.playlistYou);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Colors.white.withValues(alpha: 0.95) : const Color(0xFF1C1C1E);
+    final subtitleColor = isDark ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF66666E);
+    final tertiaryColor = isDark ? Colors.white.withValues(alpha: 0.5) : const Color(0xFF8E8E93);
 
     return Column(
       crossAxisAlignment:
@@ -511,7 +524,7 @@ class _PlaylistViewState extends State<PlaylistView> {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.95),
+            color: titleColor,
             fontSize: 36,
             fontWeight: FontWeight.w800,
             letterSpacing: -1.0,
@@ -523,7 +536,7 @@ class _PlaylistViewState extends State<PlaylistView> {
           l10n.playlistSongCount(state.totalTracks),
           textAlign: isCentered ? TextAlign.center : TextAlign.left,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.7),
+            color: subtitleColor,
             fontSize: 15,
             fontWeight: FontWeight.w600,
           ),
@@ -533,7 +546,7 @@ class _PlaylistViewState extends State<PlaylistView> {
           creatorText,
           textAlign: isCentered ? TextAlign.center : TextAlign.left,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.5),
+            color: tertiaryColor,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -654,6 +667,21 @@ class _PlaylistViewState extends State<PlaylistView> {
   }
 
   Widget _buildActionIcon(IconData icon, String tooltip, VoidCallback? onTap) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
+    final containerColor = isDark 
+        ? Colors.white.withValues(alpha: 0.04)
+        : Colors.black.withValues(alpha: 0.04);
+    final borderColor = isDark 
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.08);
+    final splashColor = isDark 
+        ? Colors.white.withValues(alpha: 0.1)
+        : Colors.black.withValues(alpha: 0.1);
+    final highlightColor = isDark 
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.black.withValues(alpha: 0.05);
+
     return Tooltip(
       message: tooltip,
       child: Material(
@@ -661,18 +689,17 @@ class _PlaylistViewState extends State<PlaylistView> {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(22),
-          splashColor: Colors.white.withValues(alpha: 0.1),
-          highlightColor: Colors.white.withValues(alpha: 0.05),
+          splashColor: splashColor,
+          highlightColor: highlightColor,
           child: Container(
             height: 44,
             width: 44,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.04),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              color: containerColor,
+              border: Border.all(color: borderColor),
             ),
-            child: Icon(icon,
-                color: Colors.white.withValues(alpha: 0.85), size: 20),
+            child: Icon(icon, color: iconColor, size: 20),
           ),
         ),
       ),

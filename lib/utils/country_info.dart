@@ -8,7 +8,7 @@ import 'package:voidmusic/services/db/db_provider.dart';
 import 'package:http/http.dart' as http;
 
 class CountryInfoService {
-  static const String defaultCountryCode = 'IN';
+  static const String defaultCountryCode = ''; // Removed country restriction - empty string allows all countries
   static bool _countryCodesInitialized = false;
 
   static final List<Uri> _countryLookupUris = [

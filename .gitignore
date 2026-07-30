@@ -14,6 +14,7 @@
 .refcode/
 .original_lib/
 BloomeeTunes-main/
+readme/
 # IntelliJ related
 *.iml
 *.ipr

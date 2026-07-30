@@ -196,16 +196,17 @@ class PluginBootstrapService {
           continue;
         }
 
-        if (!plugin.isAllowedInCountry(countryCode)) {
-          if (plugin.countryAllowlist.isNotEmpty) {
-            log(
-              'Skipped by allowlist: ${plugin.id} country=$countryCode allowlist=${plugin.countryAllowlist}',
-              name: 'PluginBootstrap',
-            );
-          }
-          processedPlugins++;
-          continue;
-        }
+        // Country restrictions removed - all plugins available to all countries
+        // if (!plugin.isAllowedInCountry(countryCode)) {
+        //   if (plugin.countryAllowlist.isNotEmpty) {
+        //     log(
+        //       'Skipped by allowlist: ${plugin.id} country=$countryCode allowlist=${plugin.countryAllowlist}',
+        //       name: 'PluginBootstrap',
+        //     );
+        //   }
+        //   processedPlugins++;
+        //   continue;
+        // }
 
         bootstrapTargetIds.add(plugin.id);
 
@@ -270,7 +271,8 @@ class PluginBootstrapService {
           if (installed) break;
         }
 
-        if (!installed && !skippedByCountry) {
+        // Country restrictions removed - always add error if installation failed
+        if (!installed) {
           errors.add('$errorType "${plugin.name}" because $reason$lastError');
         }
 
@@ -461,9 +463,10 @@ class PluginBootstrapService {
           if (!_isRemoteManifestCompatible(remote)) {
             continue;
           }
-          if (!remote.isAllowedInCountry(countryCode)) {
-            continue;
-          }
+          // Country restrictions removed - all plugins available to all countries
+          // if (!remote.isAllowedInCountry(countryCode)) {
+          //   continue;
+          // }
           final existing = remoteLatestById[remote.id];
           if (existing == null ||
               _compareVersions(remote.version, existing.version) > 0) {
@@ -528,8 +531,9 @@ class PluginBootstrapService {
           // Add to auto-load list if updated.
           final loadStateService = PluginLoadStateService(settingsDao);
           await loadStateService.addAutoLoadPluginIds(<String>[pluginId]);
-        } on PluginCountryRestrictedException {
-          continue;
+        // Country restrictions removed - no longer catch PluginCountryRestrictedException
+        // } on PluginCountryRestrictedException {
+        //   continue;
         } catch (e) {
           log('Auto-update failed for $pluginId: $e', name: 'PluginBootstrap');
         }

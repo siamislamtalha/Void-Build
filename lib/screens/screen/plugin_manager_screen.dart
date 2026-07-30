@@ -1267,7 +1267,7 @@ class _PluginSettingsCardState extends State<_PluginSettingsCard> {
 
               // ── Content Resolver Settings ──
               if (_isContentResolver) ...[
-                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+                Divider(height: 1, thickness: 1, color: Theme.of(context).brightness == Brightness.dark ? const Color(0x0AFFFFFF) : const Color(0x0A000000)),
 
                 // Use as Home Plugin
                 _SettingsTile(
@@ -1292,7 +1292,7 @@ class _PluginSettingsCardState extends State<_PluginSettingsCard> {
                   ),
                 ),
 
-                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+                Divider(height: 1, thickness: 1, color: Theme.of(context).brightness == Brightness.dark ? const Color(0x0AFFFFFF) : const Color(0x0A000000)),
 
                 // Use as Search Plugin
                 _SettingsTile(
@@ -1317,7 +1317,7 @@ class _PluginSettingsCardState extends State<_PluginSettingsCard> {
                   ),
                 ),
 
-                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+                Divider(height: 1, thickness: 1, color: Theme.of(context).brightness == Brightness.dark ? const Color(0x0AFFFFFF) : const Color(0x0A000000)),
 
                 // Use for Downloads
                 _SettingsTile(
@@ -1342,7 +1342,7 @@ class _PluginSettingsCardState extends State<_PluginSettingsCard> {
                   ),
                 ),
 
-                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+                Divider(height: 1, thickness: 1, color: Theme.of(context).brightness == Brightness.dark ? const Color(0x0AFFFFFF) : const Color(0x0A000000)),
 
                 // Resolver Priority
                 _SettingsPriorityTile(
@@ -1374,7 +1374,7 @@ class _PluginSettingsCardState extends State<_PluginSettingsCard> {
 
               // ── Lyrics Provider Settings ──
               if (_isLyricsProvider) ...[
-                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+                Divider(height: 1, thickness: 1, color: Theme.of(context).brightness == Brightness.dark ? const Color(0x0AFFFFFF) : const Color(0x0A000000)),
                 _SettingsPriorityTile(
                   icon: MingCute.align_center_line,
                   title: 'Lyrics Priority',
@@ -1404,7 +1404,7 @@ class _PluginSettingsCardState extends State<_PluginSettingsCard> {
 
               // ── Suggestion Provider Settings ──
               if (_isSuggestionProvider) ...[
-                const Divider(height: 1, thickness: 1, color: Color(0x0AFFFFFF)),
+                Divider(height: 1, thickness: 1, color: Theme.of(context).brightness == Brightness.dark ? const Color(0x0AFFFFFF) : const Color(0x0A000000)),
                 _SettingsPriorityTile(
                   icon: MingCute.search_3_line,
                   title: 'Suggestion Priority',

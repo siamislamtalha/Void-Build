@@ -155,7 +155,7 @@ class OfflineArtistDetailScreen extends StatelessWidget {
                               child: coverUrl.isEmpty
                                   ? Container(
                                       color: Colors.black.withValues(alpha: 0.2),
-                                      child: const Icon(MingCute.user_3_fill, size: 60, color: Colors.white24),
+                                      child: Icon(MingCute.user_3_fill, size: 60, color: Colors.white24),
                                     )
                                   : LoadImageCached(imageUrl: coverUrl, fit: BoxFit.cover),
                             ),
@@ -435,7 +435,7 @@ class OfflineAlbumDetailScreen extends StatelessWidget {
                               child: coverUrl.isEmpty
                                   ? Container(
                                       color: Colors.black.withValues(alpha: 0.2),
-                                      child: const Icon(MingCute.music_2_fill, size: 60, color: Colors.white24),
+                                      child: Icon(MingCute.music_2_fill, size: 60, color: Colors.white24),
                                     )
                                   : LoadImageCached(imageUrl: coverUrl, fit: BoxFit.cover),
                             ),
