@@ -77,9 +77,6 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
         ? Default_Theme.primaryColor2 
         : const Color(0xFF66666E);
 
-    final glassColor = AppTheme.glassColor(context);
-    final glassBorder = AppTheme.glassBorder(context);
-    
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF000000) : AppTheme.lightBg,
       resizeToAvoidBottomInset: false,
@@ -90,13 +87,6 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
         elevation: 0,
         foregroundColor: iconColor,
         centerTitle: true,
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
         leading: IconButton(
           icon: Icon(Icons.keyboard_arrow_down_rounded, size: 32, color: iconColor),
           onPressed: () {
@@ -989,7 +979,7 @@ class _CastDialogState extends State<_CastDialog> {
       ),
       title: Row(
         children: [
-          ChromcastIcon(size: 24, color: iconColor),
+          const ChromecastIcon(size: 24, color: null),
           const SizedBox(width: 12),
           Text(
             'Cast to Device',

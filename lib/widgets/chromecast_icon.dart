@@ -5,7 +5,7 @@ class ChromecastIcon extends StatelessWidget {
   final double size;
   final Color? color;
 
-  const ChromcastIcon({
+  const ChromecastIcon({
     super.key,
     this.size = 24,
     this.color,

@@ -442,11 +442,11 @@ class _FloatingSearchBarSliver extends StatelessWidget {
                   color: colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: colorScheme.outline.withOpacity(0.3),
+                    color: colorScheme.outline.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
-                  child: Row(
+                child: Row(
                     children: [
                       const SizedBox(width: 16),
                       _buildAnimatedSearchLeadingIcon(),

@@ -19,7 +19,7 @@ import 'package:equatable/equatable.dart';
 
 part 'lyrics_state.dart';
 
-class LyricsCubit extends EmitCubit<LyricsState> {
+class LyricsCubit extends Cubit<LyricsState> {
   final LyricsDAO _lyricsDao;
   final SettingsDAO _settingsDao;
   final PluginService _pluginService;
@@ -97,7 +97,7 @@ class LyricsCubit extends EmitCubit<LyricsState> {
 
         if (direct != null) {
           emit(LyricsLoaded(direct, track));
-          _autoSave(direct);
+          unawaited(_autoSave(direct));
           log(
             'Lyrics loaded for ID: ${track.id} [Plugin: $pluginId/direct]',
             name: 'LyricsCubit',
@@ -114,7 +114,7 @@ class LyricsCubit extends EmitCubit<LyricsState> {
 
         if (searched != null) {
           emit(LyricsLoaded(searched, track));
-          _autoSave(searched);
+          unawaited(_autoSave(searched));
           log(
             'Lyrics loaded for ID: ${track.id} [Plugin: $pluginId/search]',
             name: 'LyricsCubit',
@@ -447,20 +447,47 @@ class LyricsCubit extends EmitCubit<LyricsState> {
       final available = await _pluginService.getAvailablePlugins();
       return available
           .where((plugin) =>
-              plugin.capabilities.contains(PluginCapability.lyricsProvider))
-          .map((plugin) => plugin.id)
+              plugin.pluginType == PluginType.lyricsProvider &&
+              loadedIds.contains(plugin.manifest.id))
+          .map((plugin) => plugin.manifest.id)
           .toList();
-    } catch (_) {
+    } catch (e) {
+      log('Failed to enumerate lyrics plugins: $e', name: 'LyricsCubit');
       return [];
     }
   }
 
-  void _autoSave(Lyrics lyrics) {
-    _lyricsDao.insertLyrics(lyrics).catchError((_) {});
+  Future<void> _autoSave(Lyrics lyrics) async {
+    final enabled =
+        await _settingsDao.getSettingBool(SettingKeys.autoSaveLyrics);
+    if ((enabled ?? false)) {
+      await _lyricsDao.putLyrics(lyrics);
+      log('Lyrics saved for ID: ${lyrics.mediaID}', name: 'LyricsCubit');
+    }
+  }
+
+  Future<void> setLyricsToDB(Lyrics lyrics, String mediaID,
+      {int? offset}) async {
+    final updated = lyrics.copyWith(mediaID: mediaID, offset: offset);
+    await _lyricsDao.putLyrics(updated, offset: offset);
+    if (!isClosed) {
+      emit(LyricsLoaded(updated, state.track));
+    }
+    log('Lyrics updated for ID: ${updated.mediaID} (offset: $offset)',
+        name: 'LyricsCubit');
+  }
+
+  Future<void> deleteLyricsFromDB(Track track) async {
+    await _lyricsDao.removeLyricsById(track.id);
+    if (!isClosed) {
+      emit(LyricsInitial());
+      unawaited(getLyrics(track));
+    }
+    log('Lyrics deleted for ID: ${track.id}', name: 'LyricsCubit');
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     _mediaItemSubscription?.cancel();
     return super.close();
   }
