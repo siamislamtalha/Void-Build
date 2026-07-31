@@ -19,7 +19,7 @@ import 'package:equatable/equatable.dart';
 
 part 'lyrics_state.dart';
 
-class LyricsCubit extends Cubit<LyricsState> {
+class LyricsCubit extends EmitCubit<LyricsState> {
   final LyricsDAO _lyricsDao;
   final SettingsDAO _settingsDao;
   final PluginService _pluginService;
@@ -447,43 +447,16 @@ class LyricsCubit extends Cubit<LyricsState> {
       final available = await _pluginService.getAvailablePlugins();
       return available
           .where((plugin) =>
-              plugin.pluginType == PluginType.lyricsProvider &&
-              loadedIds.contains(plugin.manifest.id))
-          .map((plugin) => plugin.manifest.id)
+              plugin.capabilities.contains(PluginCapability.lyricsProvider))
+          .map((plugin) => plugin.id)
           .toList();
-    } catch (e) {
-      log('Failed to enumerate lyrics plugins: $e', name: 'LyricsCubit');
+    } catch (_) {
       return [];
     }
   }
 
-  Future<void> _autoSave(Lyrics lyrics) async {
-    final enabled =
-        await _settingsDao.getSettingBool(SettingKeys.autoSaveLyrics);
-    if ((enabled ?? false)) {
-      await _lyricsDao.putLyrics(lyrics);
-      log('Lyrics saved for ID: ${lyrics.mediaID}', name: 'LyricsCubit');
-    }
-  }
-
-  Future<void> setLyricsToDB(Lyrics lyrics, String mediaID,
-      {int? offset}) async {
-    final updated = lyrics.copyWith(mediaID: mediaID, offset: offset);
-    await _lyricsDao.putLyrics(updated, offset: offset);
-    if (!isClosed) {
-      emit(LyricsLoaded(updated, state.track));
-    }
-    log('Lyrics updated for ID: ${updated.mediaID} (offset: $offset)',
-        name: 'LyricsCubit');
-  }
-
-  Future<void> deleteLyricsFromDB(Track track) async {
-    await _lyricsDao.removeLyricsById(track.id);
-    if (!isClosed) {
-      emit(LyricsInitial());
-      unawaited(getLyrics(track));
-    }
-    log('Lyrics deleted for ID: ${track.id}', name: 'LyricsCubit');
+  void _autoSave(Lyrics lyrics) {
+    _lyricsDao.insertLyrics(lyrics).catchError((_) {});
   }
 
   @override
@@ -498,7 +471,7 @@ class _LyricsTrackProfile {
   final List<plugin_models.TrackMetadata> metadataVariants;
   final List<String> searchQueries;
 
-  const _LyricsTrackProfile({
+  _LyricsTrackProfile({
     required this.target,
     required this.metadataVariants,
     required this.searchQueries,
@@ -509,7 +482,7 @@ class _LyricsSearchCandidate {
   final plugin_models.LyricsMatch match;
   final double confidence;
 
-  const _LyricsSearchCandidate({
+  _LyricsSearchCandidate({
     required this.match,
     required this.confidence,
   });
