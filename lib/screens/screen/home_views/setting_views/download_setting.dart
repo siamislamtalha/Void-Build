@@ -348,8 +348,11 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                   );
                 },
                 itemCount: _selectedIds.length,
-                onReorderItem: (oldIndex, newIndex) {
+                onReorder: (oldIndex, newIndex) {
                   setState(() {
+                    if (oldIndex < newIndex) {
+                      newIndex -= 1;
+                    }
                     final item = _selectedIds.removeAt(oldIndex);
                     _selectedIds.insert(newIndex, item);
                   });
