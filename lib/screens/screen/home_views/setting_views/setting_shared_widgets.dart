@@ -631,8 +631,8 @@ class SettingSwitchTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? Default_Theme.primaryColor1 : Default_Theme.primaryColor2;
-    final subtitleColor = isDark ? Default_Theme.primaryColor2 : const Color(0xFF66666E);
+    final titleColor = isDark ? Default_Theme.primaryColor1 : const Color(0xFF1A1A1A);
+    final subtitleColor = isDark ? Default_Theme.primaryColor2 : const Color(0xFF666666);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),

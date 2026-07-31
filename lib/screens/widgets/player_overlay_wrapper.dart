@@ -70,7 +70,7 @@ class _PlayerOverlayWrapperState extends State<PlayerOverlayWrapper>
     // ── Dismiss animation ────────────────────────────────────────────────────
     _dismissController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 260),
     );
 
     // Slide down with an acceleration curve (feels purposeful, not sluggish).

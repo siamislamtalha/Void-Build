@@ -513,37 +513,17 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
 
   SliverAppBar _buildSliverAppBar(BuildContext context, LocalMusicState state) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
-    final iconColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
-
-    final glassColor = AppTheme.glassColor(context);
-    final glassBorder = AppTheme.glassBorder(context);
+    final titleColor = isDark ? Default_Theme.primaryColor1 : const Color(0xFF1A1A1A);
+    final iconColor = isDark ? Default_Theme.primaryColor1 : const Color(0xFF1A1A1A);
+    final subtitleColor = isDark ? Default_Theme.primaryColor2 : const Color(0xFF666666);
 
     return SliverAppBar(
       floating: true,
       pinned: false,
       surfaceTintColor: Colors.transparent,
-      backgroundColor: Colors.transparent,
+      backgroundColor: isDark ? const Color(0xFF000000) : AppTheme.lightBg,
       automaticallyImplyLeading: false,
       titleSpacing: 16,
-      flexibleSpace: FlexibleSpaceBar(
-        background: ClipRect(
-          child: BackdropFilter(
-            filter: AppTheme.glassBlur,
-            child: Container(
-              decoration: BoxDecoration(
-                color: glassColor,
-                border: Border(
-                  bottom: BorderSide(
-                    color: glassBorder,
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
       title: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         child: _isSearch
@@ -556,7 +536,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                   hintText: AppLocalizations.of(context)!.localMusicSearchHint,
                   border: InputBorder.none,
                   hintStyle: TextStyle(
-                      color: isDark ? Colors.white54 : const Color(0xFF8E8E93)),
+                      color: subtitleColor),
                 ),
                 style: Default_Theme.secondoryTextStyle.copyWith(
                     color: titleColor, fontSize: 16.0),

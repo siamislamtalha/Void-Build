@@ -66,7 +66,6 @@ import 'package:voidmusic/services/onboarding_service.dart';
 import 'package:voidmusic/services/plugin_bootstrap_service.dart';
 import 'package:voidmusic/plugins/services/plugin_repository_service.dart';
 import 'package:voidmusic/services/shared_url_resolver_service.dart';
-import 'package:voidmusic/services/desktop_system_tray_service.dart';
 
 void processIncomingIntent(SharedMedia sharedMedia) {
   if (sharedMedia.content != null && isUrl(sharedMedia.content!)) {
@@ -201,18 +200,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     _onboardingPending = !OnboardingService.onboardingDone;
     _pluginBootstrapPending = !PluginBootstrapService.bootstrapDone;
     //--------------------------------------------------------------------
-
-    if (DesktopSystemTrayService.isDesktop) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          DesktopSystemTrayService().init(
-            playerCubit: voidMusicPlayerCubit,
-            miniPlayerCubit: context.read<MiniPlayerCubit>(),
-            settingsCubit: context.read<SettingsCubit>(),
-          );
-        }
-      });
-    }
 
     if (io.Platform.isAndroid) {
       initPlatformState();

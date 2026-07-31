@@ -720,20 +720,22 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnabled = !isLoading;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = AppTheme.accentColor(context);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: isEnabled ? onTap : null,
         borderRadius: BorderRadius.circular(18),
-        splashColor: Colors.white.withValues(alpha: 0.1),
+        splashColor: accentColor.withValues(alpha: 0.1),
         highlightColor: Colors.transparent,
         child: Ink(
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.08),
+            color: accentColor.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: accentColor.withValues(alpha: 0.2),
               width: 1,
             ),
           ),

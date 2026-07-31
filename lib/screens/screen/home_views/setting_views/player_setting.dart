@@ -4,7 +4,12 @@ import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
 import 'package:voidmusic/screens/screen/player_views/equalizer_view.dart';
+import 'package:voidmusic/screens/screen/home_views/setting_views/audio_settings.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
+import 'package:voidmusic/services/audio/volume_normalization_service.dart';
+import 'package:voidmusic/services/audio/skip_silence_service.dart';
+import 'package:voidmusic/services/audio/gapless_playback_service.dart';
+import 'package:voidmusic/services/player/playback_speed_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
@@ -19,26 +24,10 @@ class PlayerSetting extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leadingWidth: 64,
-        flexibleSpace: ClipRect(
-          child: BackdropFilter(
-            filter: AppTheme.glassBlur,
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppTheme.glassColor(context),
-                border: Border(
-                  bottom: BorderSide(
-                    color: AppTheme.glassBorder(context),
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
@@ -148,11 +137,9 @@ class PlayerSetting extends StatelessWidget {
                     icon: MingCute.volume_fill,
                     title: 'Audio Normalization',
                     subtitle: 'Balance volume across tracks',
-                    value: false,
+                    value: VolumeNormalizationService.instance.isEnabled,
                     onChanged: (v) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Audio normalization coming soon')),
-                      );
+                      VolumeNormalizationService.instance.setEnabled(v);
                     },
                   ),
                   const SettingDivider(),
@@ -217,24 +204,20 @@ class PlayerSetting extends StatelessWidget {
                     icon: MingCute.time_line,
                     title: 'Skip Silence',
                     subtitle: 'Remove silent parts from tracks',
-                    value: false,
+                    value: SkipSilenceService.instance.isEnabled,
                     onChanged: (v) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Skip silence feature coming soon')),
-                      );
+                      SkipSilenceService.instance.setEnabled(v);
                     },
                   ),
                   const SettingDivider(),
-                  SettingToggleTile(
-                    icon: MingCute.refresh_2_line,
-                    title: 'Replay Gain',
-                    subtitle: 'Normalize track loudness',
-                    value: false,
-                    onChanged: (v) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Replay gain feature coming soon')),
-                      );
-                    },
+                  SettingNavTile(
+                    icon: MingCute.music_2_fill,
+                    title: 'Audio Settings',
+                    subtitle: 'Advanced audio features and effects',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AudioSettings()),
+                    ),
                   ),
                   const SettingDivider(),
                   SettingNavTile(

@@ -28,6 +28,7 @@ import 'package:voidmusic/utils/pallete_generator.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:voidmusic/services/cast/google_cast_service.dart' as cast_service;
+import 'package:voidmusic/widgets/chromecast_icon.dart';
 import '../../blocs/media_player/voidmusic_player_cubit.dart';
 import '../../blocs/mini_player/mini_player_cubit.dart';
 import 'player_views/fullscreen_lyrics_view.dart';
@@ -84,20 +85,11 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
       resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: isDark ? const Color(0xFF000000) : AppTheme.lightBg,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         foregroundColor: iconColor,
         centerTitle: true,
-        flexibleSpace: ClipRect(
-          child: BackdropFilter(
-            filter: AppTheme.glassBlur,
-            child: Container(
-              decoration: BoxDecoration(
-                color: glassColor,
-                border: Border(
-                  bottom: BorderSide(
-                    color: glassBorder,
                     width: 1.0,
                   ),
                 ),
@@ -997,7 +989,7 @@ class _CastDialogState extends State<_CastDialog> {
       ),
       title: Row(
         children: [
-          Icon(MingCute.send_plane_fill, color: iconColor, size: 24),
+          ChromcastIcon(size: 24, color: iconColor),
           const SizedBox(width: 12),
           Text(
             'Cast to Device',

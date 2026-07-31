@@ -70,24 +70,8 @@ class About extends StatelessWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: isDark ? const Color(0xFF000000) : AppTheme.lightBg,
         elevation: 0,
-        flexibleSpace: ClipRect(
-          child: BackdropFilter(
-            filter: AppTheme.glassBlur,
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppTheme.glassColor(context),
-                border: Border(
-                  bottom: BorderSide(
-                    color: AppTheme.glassBorder(context),
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded,
               color: Theme.of(context).colorScheme.onSurface),

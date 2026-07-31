@@ -35,30 +35,16 @@ class AdvancedFeaturesSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final iconColor = isDark ? Default_Theme.primaryColor1 : Default_Theme.primaryColor2;
+    final textColor = isDark ? Default_Theme.primaryColor1 : const Color(0xFF1A1A1A);
+    final subtitleColor = isDark ? Default_Theme.primaryColor2 : const Color(0xFF666666);
     
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF000000) : AppTheme.lightBg,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: isDark ? const Color(0xFF000000) : AppTheme.lightBg,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leadingWidth: 64,
-        flexibleSpace: ClipRect(
-          child: BackdropFilter(
-            filter: AppTheme.glassBlur,
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppTheme.glassColor(context),
-                border: Border(
-                  bottom: BorderSide(
-                    color: AppTheme.glassBorder(context),
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
@@ -90,7 +76,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
           const SettingSectionHeader(label: 'Audio Features'),
           SettingCard(
             children: [
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.volume_line,
                 title: 'Volume Normalization',
                 subtitle: 'ReplayGain volume leveling',
@@ -99,7 +85,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   VolumeNormalizationService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.skip_forward_line,
                 title: 'Skip Silence',
                 subtitle: 'Auto-skip silent sections',
@@ -108,7 +94,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   SkipSilenceService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.music_2_line,
                 title: 'Advanced Equalizer',
                 subtitle: '31-band parametric EQ',
@@ -117,7 +103,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   AdvancedEqualizerService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.magic_1_line,
                 title: 'Audio Effects',
                 subtitle: 'Reverb, bass boost, etc.',
@@ -126,7 +112,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   AudioEffectsService.instance.setGlobalEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.wifi_line,
                 title: 'Gapless Playback',
                 subtitle: 'Seamless track transitions',
@@ -135,7 +121,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   GaplessPlaybackService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.display_line,
                 title: 'High Refresh Rate',
                 subtitle: '120Hz+ display support',
@@ -153,7 +139,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
           const SettingSectionHeader(label: 'Lyrics Features'),
           SettingCard(
             children: [
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.translate_2_line,
                 title: 'Multi-Source Lyrics',
                 subtitle: 'Fetch from multiple sources',
@@ -162,7 +148,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   MultiSourceLyricsService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.translate_line,
                 title: 'Lyrics Translation',
                 subtitle: 'Auto-translate to your language',
@@ -171,7 +157,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   LyricsTranslationService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.font_line,
                 title: 'Lyrics Romanization',
                 subtitle: 'Convert non-Latin scripts to Latin',
@@ -180,7 +166,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   LyricsRomanizationService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.arrow_down_line,
                 title: 'Advanced Scrolling',
                 subtitle: 'Customizable lyrics scrolling',
@@ -198,7 +184,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
           const SettingSectionHeader(label: 'Gesture & Interaction'),
           SettingCard(
             children: [
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.finger_swipe_line,
                 title: 'Swipe Actions',
                 subtitle: 'Quick actions on list items',
@@ -207,7 +193,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   SwipeActionsService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.cellphone_vibration_line,
                 title: 'Haptic Feedback',
                 subtitle: 'Tactile feedback on interactions',
@@ -216,7 +202,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   HapticService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.finger_press_line,
                 title: 'Enhanced Gestures',
                 subtitle: 'Advanced gesture controls',
@@ -234,7 +220,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
           const SettingSectionHeader(label: 'Playback & Queue'),
           SettingCard(
             children: [
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.fast_forward_line,
                 title: 'Playback Speed',
                 subtitle: 'Variable speed control',
@@ -243,7 +229,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   PlaybackSpeedService.instance.setSpeed(value ? 1.0 : 1.0);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.list_check_3_line,
                 title: 'Smart Queue',
                 subtitle: 'Intelligent queue management',
@@ -252,7 +238,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   SmartQueueService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.radio_fill,
                 title: 'Radio Stations',
                 subtitle: 'Infinite radio playlists',
@@ -261,7 +247,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   RadioService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.alarm_1_line,
                 title: 'Advanced Sleep Timer',
                 subtitle: 'Volume fade-out profiles',
@@ -279,7 +265,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
           const SettingSectionHeader(label: 'Library Management'),
           SettingCard(
             children: [
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.copy_line,
                 title: 'Duplicate Detection',
                 subtitle: 'Find and merge duplicates',
@@ -288,7 +274,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   DuplicateDetectionService.instance.setSimilarityThreshold(value ? 0.85 : 0.0);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.file_search_line,
                 title: 'Metadata Auto-fill',
                 subtitle: 'Enrich from online sources',
@@ -306,7 +292,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
           const SettingSectionHeader(label: 'Connectivity'),
           SettingCard(
             children: [
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.send_line,
                 title: 'Google Cast',
                 subtitle: 'Cast to Chromecast devices',
@@ -315,7 +301,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   GoogleCastService.instance.setEnabled(value);
                 },
               ),
-              SettingSwitchTile(
+              SettingToggleTile(
                 icon: MingCute.globe_line,
                 title: 'Proxy Support',
                 subtitle: 'Network proxy configuration',
@@ -333,7 +319,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
             const SettingSectionHeader(label: 'Desktop'),
             SettingCard(
               children: [
-                SettingSwitchTile(
+                SettingToggleTile(
                   icon: MingCute.device_line,
                   title: 'Audio Routing',
                   subtitle: 'Select output device',
@@ -351,7 +337,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
             const SettingSectionHeader(label: 'Android'),
             SettingCard(
               children: [
-                SettingSwitchTile(
+                SettingToggleTile(
                   icon: MingCute.bluetooth_line,
                   title: 'Bluetooth Codec',
                   subtitle: 'High-quality audio codec',

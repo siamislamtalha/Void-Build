@@ -420,35 +420,16 @@ class _FloatingSearchBarSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final glassColor = AppTheme.glassColor(context);
-    final glassBorder = AppTheme.glassBorder(context);
+    final colorScheme = Theme.of(context).colorScheme;
     
     return SliverAppBar(
       floating: true,
       snap: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: colorScheme.surface,
       shadowColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       titleSpacing: 16,
       toolbarHeight: 70,
-      flexibleSpace: FlexibleSpaceBar(
-        background: ClipRect(
-          child: BackdropFilter(
-            filter: AppTheme.glassBlur,
-            child: Container(
-              decoration: BoxDecoration(
-                color: glassColor,
-                border: Border(
-                  bottom: BorderSide(
-                    color: glassBorder,
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
       title: Focus(
         onKeyEvent: handleKeyEvent,
         child: Builder(
@@ -456,17 +437,15 @@ class _FloatingSearchBarSliver extends StatelessWidget {
             final onSurface = Theme.of(context).colorScheme.onSurface;
             return ClipRRect(
               borderRadius: BorderRadius.circular(18),
-              child: BackdropFilter(
-                filter: AppTheme.glassBlur,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.glassColor(context),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: AppTheme.glassBorder(context),
-                      width: 1,
-                    ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: colorScheme.outline.withOpacity(0.3),
+                    width: 1,
                   ),
+                ),
                   child: Row(
                     children: [
                       const SizedBox(width: 16),
