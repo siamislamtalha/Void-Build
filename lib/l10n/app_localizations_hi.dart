@@ -229,7 +229,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'आपकी खोज से मेल खाने वाली कोई प्लेलिस्ट नहीं है';
 
   @override
-  String get playlistCreateNew => 'नई प्लेलिस्ट बनाएँ 😍';
+  String get playlistCreateNew => 'नई प्लेलिस्ट बनाएँ';
 
   @override
   String get playlistCreateFirstOne =>
@@ -1194,7 +1194,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get timerStop => 'टाइमर रोकें';
 
   @override
-  String get timerFinishedMessage => 'संगीत बंद हो गया है। शुभ रात्रि 🥰।';
+  String get timerFinishedMessage => 'संगीत बंद हो गया है। शुभ रात्रि।';
 
   @override
   String get timerGotIt => 'समझ गया!';
@@ -1988,7 +1988,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Void Music🌸 का नया वर्शन आ गया है!\n\nवर्शन: $ver+$build';
+    return 'Void Music का नया वर्शन आ गया है!\n\nवर्शन: $ver+$build';
   }
 
   @override

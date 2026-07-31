@@ -139,11 +139,30 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
   }
 
   PreferredSizeWidget _buildAppBar() {
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
+    
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
       leadingWidth: 70,
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: AppTheme.glassBlur,
+          child: Container(
+            decoration: BoxDecoration(
+              color: glassColor,
+              border: Border(
+                bottom: BorderSide(
+                  color: glassBorder,
+                  width: 1.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       leading: Padding(
         padding: const EdgeInsets.only(left: 16.0),
         child: Center(
@@ -156,7 +175,7 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
                 border: Border.all(
                     color: Default_Theme.primaryColor1.withValues(alpha: 0.15)),
               ),
-              child: const Icon(Icons.arrow_back_rounded, color: Default_Theme.primaryColor1, size: 20),
+              child: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
             ),
             onPressed: () => Navigator.pop(context),
           ),

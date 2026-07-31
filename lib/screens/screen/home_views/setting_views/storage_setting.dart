@@ -26,6 +26,22 @@ class BackupSettings extends StatelessWidget {
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: AppTheme.glassBlur,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.glassColor(context),
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppTheme.glassBorder(context),
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
@@ -48,23 +64,19 @@ class BackupSettings extends StatelessWidget {
               SettingSectionHeader(label: l10n.settingsHistory),
               SettingCard(
                 children: [
-                  SettingDropdownTile<String>(
+                  SettingDropdownTile(
                     icon: MingCute.history_line,
                     title: l10n.storageClearHistoryEvery,
                     subtitle: l10n.storageClearHistorySubtitle,
                     value: state.historyClearTime,
-                    items: ['3', '7', '14', '30', '60', '90', '180', '365']
-                        .map((v) => SettingDropdownItem<String>(
-                              value: v,
-                              label: l10n.storageDays(int.parse(v)),
-                            ))
+                    options: const ['3', '7', '14', '30', '60', '90', '180', '365'],
+                    labels: const ['3', '7', '14', '30', '60', '90', '180', '365']
+                        .map((v) => l10n.storageDays(int.parse(v)))
                         .toList(),
                     onChanged: (newValue) {
-                      if (newValue != null) {
-                        context
-                            .read<SettingsCubit>()
-                            .setHistoryClearTime(newValue);
-                      }
+                      context
+                          .read<SettingsCubit>()
+                          .setHistoryClearTime(newValue);
                     },
                   ),
                 ],

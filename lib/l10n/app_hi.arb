@@ -77,7 +77,7 @@
   "playlistShuffle": "शफ़ल",
   "playlistMoreOptions": "अधिक विकल्प",
   "playlistNoMatchSearch": "आपकी खोज से मेल खाने वाली कोई प्लेलिस्ट नहीं है",
-  "playlistCreateNew": "नई प्लेलिस्ट बनाएँ 😍",
+  "playlistCreateNew": "नई प्लेलिस्ट बनाएँ",
   "playlistCreateFirstOne": "अभी तक कोई प्लेलिस्ट नहीं है। शुरुआत करने के लिए अपनी पहली प्लेलिस्ट बनाएँ!",
   "addToPlaylistNoSongSelected": "कोई गाना चुना नहीं गया",
   "createPlaylistDialogBarrierLabel": "प्लेलिस्ट बनाने का संवाद",
@@ -400,7 +400,7 @@
   "timerMinutes": "मिनट",
   "timerSeconds": "सेकंड",
   "timerStop": "टाइमर रोकें",
-  "timerFinishedMessage": "संगीत बंद हो गया है। शुभ रात्रि 🥰।",
+  "timerFinishedMessage": "संगीत बंद हो गया है। शुभ रात्रि।",
   "timerGotIt": "समझ गया!",
   "timerSetTimeError": "कृपया एक समय सेट करें",
   "timerStart": "टाइमर शुरू करें",
@@ -704,7 +704,7 @@
 
   "snackbarOpeningAlbumPage": "मूल एल्बम का पेज खोला जा रहा है।",
 
-  "updateAvailableBody": "Void Music🌸 का नया वर्शन आ गया है!\n\nवर्शन: {ver}+{build}",
+  "updateAvailableBody": "Void Music का नया वर्शन आ गया है!\n\nवर्शन: {ver}+{build}",
   "@updateAvailableBody": { "placeholders": { "ver": { "type": "String" }, "build": { "type": "String" } } },
 
   "pluginSnackbarInstalled": "प्लगइन \"{id}\" सफलतापूर्वक इंस्टॉल हो गया",

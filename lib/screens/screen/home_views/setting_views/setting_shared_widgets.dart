@@ -8,13 +8,15 @@ class SettingSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final subtitleColor = isDark ? Default_Theme.primaryColor2 : const Color(0xFF66666E);
+
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 12),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Text(
         label.toUpperCase(),
         style: Default_Theme.secondoryTextStyleMedium.copyWith(
-          color: colorScheme.onSurface.withValues(alpha: 0.45),
+          color: subtitleColor,
           fontSize: 12,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.5,
@@ -30,16 +32,16 @@ class SettingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? Default_Theme.cardSurfaceColor : Colors.white;
+    final borderColor = isDark ? Default_Theme.cardBorderColor : const Color(0xFFE5E5EA);
+
     return Container(
       decoration: BoxDecoration(
-        color: isDark
-            ? colorScheme.onSurface.withValues(alpha: 0.04)
-            : colorScheme.surface,
+        color: bgColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: colorScheme.onSurface.withValues(alpha: 0.06),
+          color: borderColor,
           width: 1,
         ),
       ),
@@ -55,12 +57,17 @@ class SettingCard extends StatelessWidget {
 class SettingDivider extends StatelessWidget {
   const SettingDivider({super.key});
   @override
-  Widget build(BuildContext context) => Divider(
-        height: 1,
-        indent: 16,
-        endIndent: 16,
-        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
-      );
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = isDark ? Default_Theme.cardBorderColor : const Color(0xFFE5E5EA);
+
+    return Divider(
+      height: 1,
+      indent: 16,
+      endIndent: 16,
+      color: borderColor,
+    );
+  }
 }
 
 class SettingIconBox extends StatelessWidget {
@@ -70,22 +77,25 @@ class SettingIconBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? Default_Theme.cardSurfaceColor : const Color(0xFFF0F0F3);
+    final borderColor = isDark ? Default_Theme.cardBorderColor : const Color(0xFFE5E5EA);
+
     return Container(
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        color: colorScheme.onSurface.withValues(alpha: 0.06),
+        color: bgColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: colorScheme.onSurface.withValues(alpha: 0.06),
+          color: borderColor,
         ),
       ),
       child: Center(
         child: Icon(
           icon,
           size: 20,
-          color: color ?? colorScheme.onSurface.withValues(alpha: 0.6),
+          color: color ?? Default_Theme.primaryColor2.withValues(alpha: 0.6),
         ),
       ),
     );
@@ -602,6 +612,272 @@ class SettingInfoText extends StatelessWidget {
   }
 }
 
+class SettingSwitchTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const SettingSwitchTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? Default_Theme.primaryColor1 : Default_Theme.primaryColor2;
+    final subtitleColor = isDark ? Default_Theme.primaryColor2 : const Color(0xFF66666E);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      child: Row(
+        children: [
+          SettingIconBox(icon: icon),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: titleColor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: subtitleColor,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SettingDropdownTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String value;
+  final List<String> options;
+  final List<String> labels;
+  final ValueChanged<String> onChanged;
+
+  const SettingDropdownTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.options,
+    required this.labels,
+    required this.onChanged,
+    super.key,
+  });
+
+  String _selectedLabel() {
+    final index = options.indexOf(value);
+    if (index >= 0 && index < labels.length) {
+      return labels[index];
+    }
+    return value;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Default_Theme.primaryColor1 : Default_Theme.primaryColor2;
+    final titleColor = isDark ? Default_Theme.primaryColor1 : Default_Theme.primaryColor2;
+    final subtitleColor = isDark ? Default_Theme.primaryColor2 : const Color(0xFF66666E);
+    final accentColor = AppTheme.accentColor(context);
+
+    return InkWell(
+      onTap: () => _openSelector(context),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+        child: Row(
+          children: [
+            SettingIconBox(icon: icon),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: titleColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: subtitleColor,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                Text(
+                  _selectedLabel(),
+                  style: TextStyle(
+                    color: accentColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right,
+                  color: iconColor.withValues(alpha: 0.4),
+                  size: 20,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openSelector(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => _SimpleDropdownBottomSheet(
+        title: title,
+        options: options,
+        labels: labels,
+        currentValue: value,
+        onSelected: (selected) {
+          onChanged(selected);
+          Navigator.of(context).pop();
+        },
+      ),
+    );
+  }
+}
+
+class _SimpleDropdownBottomSheet extends StatelessWidget {
+  final String title;
+  final List<String> options;
+  final List<String> labels;
+  final String currentValue;
+  final ValueChanged<String> onSelected;
+
+  const _SimpleDropdownBottomSheet({
+    required this.title,
+    required this.options,
+    required this.labels,
+    required this.currentValue,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Default_Theme.primaryColor1 : Default_Theme.primaryColor2;
+    final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final borderColor = isDark ? Default_Theme.cardBorderColor : const Color(0xFFE5E5EA);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: borderColor,
+                ),
+              ),
+            ),
+            child: Text(
+              title,
+              style: TextStyle(
+                color: iconColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ...options.asMap().entries.map((entry) {
+            final index = entry.key;
+            final option = entry.value;
+            final label = labels.length > index ? labels[index] : option;
+            final isSelected = option == currentValue;
+
+            return InkWell(
+              onTap: () => onSelected(option),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: borderColor,
+                    ),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: TextStyle(
+                          color: iconColor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    if (isSelected)
+                      Icon(
+                        Icons.check,
+                        color: AppTheme.accentColor(context),
+                        size: 20,
+                      ),
+                  ],
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
 class SettingTextFieldTile extends StatelessWidget {
   final String label;
   final TextEditingController controller;
@@ -658,336 +934,3 @@ class SettingDropdownItem<T> {
     this.icon,
   });
 }
-
-class SettingDropdownTile<T> extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final T value;
-  final List<SettingDropdownItem<T>> items;
-  final ValueChanged<T?> onChanged;
-
-  const SettingDropdownTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.items,
-    required this.onChanged,
-    super.key,
-  });
-
-  String _selectedLabel() {
-    for (final item in items) {
-      if (item.value == value) return item.label;
-    }
-    return '';
-  }
-
-  void _openSelector(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (_) => _DropdownBottomSheet<T>(
-        title: title,
-        items: items,
-        currentValue: value,
-        onSelected: (selected) {
-          onChanged(selected);
-          Navigator.of(context).pop();
-        },
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _openSelector(context),
-        borderRadius: BorderRadius.circular(20),
-        highlightColor: colorScheme.onSurface.withValues(alpha: 0.05),
-        splashColor: colorScheme.onSurface.withValues(alpha: 0.05),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Row(
-            children: [
-              SettingIconBox(icon: icon),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min, // Layout Performance Fix
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                        color: colorScheme.onSurface,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: Default_Theme.secondoryTextStyle.copyWith(
-                        color: colorScheme.onSurface.withValues(alpha: 0.5),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                decoration: BoxDecoration(
-                  color: colorScheme.onSurface.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: colorScheme.onSurface.withValues(alpha: 0.15),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _selectedLabel(),
-                      style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                        color: colorScheme.onSurface,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.1,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.unfold_more_rounded,
-                      color: colorScheme.onSurface.withValues(alpha: 0.6),
-                      size: 16,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DropdownBottomSheet<T> extends StatelessWidget {
-  final String title;
-  final List<SettingDropdownItem<T>> items;
-  final T currentValue;
-  final ValueChanged<T> onSelected;
-
-  const _DropdownBottomSheet({
-    required this.title,
-    required this.items,
-    required this.currentValue,
-    required this.onSelected,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(12, 0, 12, 24),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF141414) : colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: colorScheme.onSurface.withValues(alpha: 0.08),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min, // Layout Performance Fix
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 36,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                title.toUpperCase(),
-                style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.5,
-                ),
-              ),
-            ),
-          ),
-          Flexible(
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 20),
-              itemCount: items.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 4),
-              itemBuilder: (context, index) {
-                final item = items[index];
-                final isSelected = item.value == currentValue;
-                return _DropdownOption<T>(
-                  item: item,
-                  isSelected: isSelected,
-                  onTap: () => onSelected(item.value),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DropdownOption<T> extends StatelessWidget {
-  final SettingDropdownItem<T> item;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _DropdownOption({
-    required this.item,
-    required this.isSelected,
-    required this.onTap,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        highlightColor: colorScheme.onSurface.withValues(alpha: 0.06),
-        splashColor: colorScheme.onSurface.withValues(alpha: 0.08),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? colorScheme.onSurface.withValues(alpha: 0.08)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isSelected
-                  ? colorScheme.onSurface.withValues(alpha: 0.25)
-                  : colorScheme.onSurface.withValues(alpha: 0.05),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              if (item.icon != null) ...[
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? colorScheme.onSurface.withValues(alpha: 0.10)
-                        : colorScheme.onSurface.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      item.icon,
-                      size: 18,
-                      color: isSelected
-                          ? colorScheme.onSurface
-                          : colorScheme.onSurface.withValues(alpha: 0.5),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-              ],
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min, // Layout Performance Fix
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.label,
-                      style: Default_Theme.secondoryTextStyleMedium.copyWith(
-                        color: isSelected
-                            ? colorScheme.onSurface
-                            : colorScheme.onSurface.withValues(alpha: 0.7),
-                        fontSize: 15,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    if (item.description != null) ...[
-                      const SizedBox(height: 3),
-                      Text(
-                        item.description!,
-                        style: Default_Theme.secondoryTextStyle.copyWith(
-                          color: colorScheme.onSurface.withValues(alpha: 0.40),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                width: 22,
-                height: 22,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSelected
-                      ? colorScheme.primary
-                      : Colors.transparent,
-                  border: Border.all(
-                    color: isSelected
-                        ? colorScheme.primary
-                        : colorScheme.onSurface.withValues(alpha: 0.20),
-                    width: 2,
-                  ),
-                ),
-                child: isSelected
-                    ? Center(
-                        child: Icon(
-                          Icons.check_rounded,
-                          size: 14,
-                          color: colorScheme.onPrimary,
-                        ),
-                      )
-                    : null,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-

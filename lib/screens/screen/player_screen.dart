@@ -27,6 +27,7 @@ import 'package:voidmusic/utils/load_image.dart';
 import 'package:voidmusic/utils/pallete_generator.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:voidmusic/services/cast/google_cast_service.dart' as cast_service;
 import '../../blocs/media_player/voidmusic_player_cubit.dart';
 import '../../blocs/mini_player/mini_player_cubit.dart';
 import 'player_views/fullscreen_lyrics_view.dart';
@@ -75,6 +76,9 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
         ? Default_Theme.primaryColor2 
         : const Color(0xFF66666E);
 
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
+    
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF000000) : AppTheme.lightBg,
       resizeToAvoidBottomInset: false,
@@ -85,6 +89,22 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
         elevation: 0,
         foregroundColor: iconColor,
         centerTitle: true,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: AppTheme.glassBlur,
+            child: Container(
+              decoration: BoxDecoration(
+                color: glassColor,
+                border: Border(
+                  bottom: BorderSide(
+                    color: glassBorder,
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: Icon(Icons.keyboard_arrow_down_rounded, size: 32, color: iconColor),
           onPressed: () {
@@ -109,6 +129,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
             icon: Icon(MingCute.list_check_3_line,
                 size: 22, color: iconColor),
           ),
+          _CastButton(iconColor: iconColor),
           IconButton(
             onPressed: () =>
                 showMoreBottomSheet(context, musicPlayer.currentMedia),
@@ -881,6 +902,217 @@ class _AmbientImgShadowWidgetState extends State<AmbientImgShadowWidget> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CastButton extends StatefulWidget {
+  final Color iconColor;
+
+  const _CastButton({required this.iconColor});
+
+  @override
+  State<_CastButton> createState() => _CastButtonState();
+}
+
+class _CastButtonState extends State<_CastButton> {
+  final cast_service.GoogleCastService _castService = cast_service.GoogleCastService.instance;
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCast();
+  }
+
+  Future<void> _initializeCast() async {
+    await _castService.initialize();
+    if (mounted) {
+      setState(() {
+        _isInitialized = true;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return const SizedBox.shrink();
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Default_Theme.primaryColor1 : Default_Theme.primaryColor2;
+
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1), (_) {
+        return _castService.currentState;
+      }),
+      builder: (context, snapshot) {
+        final castState = snapshot.data ?? cast_service.CastState.disconnected;
+        final isCasting = castState == cast_service.CastState.connected;
+
+        return IconButton(
+          onPressed: () => _showCastDialog(),
+          icon: Icon(
+            isCasting ? MingCute.send_fill : MingCute.send_line,
+            color: isCasting 
+                ? AppTheme.accentColor(context) 
+                : iconColor,
+            size: 22,
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCastDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => _CastDialog(castService: _castService),
+    );
+  }
+}
+
+class _CastDialog extends StatefulWidget {
+  final cast_service.GoogleCastService castService;
+
+  const _CastDialog({required this.castService});
+
+  @override
+  State<_CastDialog> createState() => _CastDialogState();
+}
+
+class _CastDialogState extends State<_CastDialog> {
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Default_Theme.primaryColor1 : Default_Theme.primaryColor2;
+    final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final borderColor = isDark ? Default_Theme.cardBorderColor : const Color(0xFFE5E5EA);
+
+    return AlertDialog(
+      backgroundColor: bgColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      title: Row(
+        children: [
+          Icon(MingCute.send_plane_fill, color: iconColor, size: 24),
+          const SizedBox(width: 12),
+          Text(
+            'Cast to Device',
+            style: TextStyle(
+              color: iconColor,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+      content: SizedBox(
+        width: 300,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.castService.isCasting) ...[
+              _buildCurrentDevice(iconColor),
+              Divider(color: borderColor),
+              const SizedBox(height: 8),
+            ],
+            _buildDeviceList(iconColor),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            'Cancel',
+            style: TextStyle(color: iconColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCurrentDevice(Color iconColor) {
+    final device = widget.castService.currentDevice;
+    if (device == null) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Currently Connected',
+          style: TextStyle(
+            color: iconColor.withValues(alpha: 0.6),
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ListTile(
+          leading: Icon(MingCute.device_line, color: iconColor),
+          title: Text(
+            device.name,
+            style: TextStyle(color: iconColor),
+          ),
+          trailing: IconButton(
+            icon: Icon(MingCute.unlink_line, color: iconColor),
+            onPressed: () async {
+              await widget.castService.disconnect();
+              if (mounted) {
+                setState(() {});
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDeviceList(Color iconColor) {
+    final devices = widget.castService.availableDevices;
+    
+    if (devices.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text(
+          'No devices available',
+          style: TextStyle(
+            color: iconColor.withValues(alpha: 0.6),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Available Devices',
+          style: TextStyle(
+            color: iconColor.withValues(alpha: 0.6),
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...devices.map((device) => ListTile(
+          leading: Icon(MingCute.device_line, color: iconColor),
+          title: Text(
+            device.name,
+            style: TextStyle(color: iconColor),
+          ),
+          onTap: () async {
+            final success = await widget.castService.connectToDevice(device);
+            if (success && mounted) {
+              Navigator.pop(context);
+              setState(() {});
+            }
+          },
+        )),
+      ],
     );
   }
 }

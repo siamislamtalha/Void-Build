@@ -4,8 +4,9 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
-import 'dart:ui';
+import 'package:voidmusic/core/theme/app_theme.dart';
 import 'dart:math';
+import 'dart:ui';
 
 // Gradients adapted dynamically to theme mode
 Gradient getTitleGradient(BuildContext context) {
@@ -71,9 +72,25 @@ class About extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: AppTheme.glassBlur,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.glassColor(context),
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppTheme.glassBorder(context),
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: primaryTextColor.withValues(alpha: 0.7)),
+              color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),

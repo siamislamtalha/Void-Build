@@ -8,6 +8,8 @@ import 'package:voidmusic/screens/screen/home_views/setting_views/download_setti
 import 'package:voidmusic/screens/screen/home_views/setting_views/lastfm_setting.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/player_setting.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/updates_setting.dart';
+import 'package:voidmusic/screens/screen/home_views/setting_views/audio_settings.dart';
+import 'package:voidmusic/screens/screen/home_views/setting_views/advanced_features_settings.dart';
 import 'package:voidmusic/screens/screen/plugin_manager_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
@@ -90,6 +92,20 @@ class SettingsView extends StatelessWidget {
                     icon: MingCute.airpods_fill,
                     iconColor: AppTheme.accentColor(context),
                     onTap: () => _navigate(context, const PlayerSetting()),
+                  ),
+                  _SettingsTile(
+                    title: 'Audio Settings',
+                    subtitle: 'Advanced audio features and effects',
+                    icon: MingCute.music_2_fill,
+                    iconColor: AppTheme.accentColor(context),
+                    onTap: () => _navigate(context, const AudioSettings()),
+                  ),
+                  _SettingsTile(
+                    title: 'Advanced Features',
+                    subtitle: 'Experimental and power-user features',
+                    icon: MingCute.flash_fill,
+                    iconColor: AppTheme.accentColor(context),
+                    onTap: () => _navigate(context, const AdvancedFeaturesSettings()),
                   ),
                   _SettingsTile(
                     title: AppLocalizations.of(context)!.settingsDownloads,

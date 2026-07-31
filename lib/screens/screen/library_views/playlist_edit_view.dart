@@ -56,13 +56,31 @@ class _PlaylistEditViewState extends State<PlaylistEditView> {
                 floating: true,
                 centerTitle: true,
                 surfaceTintColor: Colors.transparent,
-                foregroundColor: Default_Theme.primaryColor1,
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                foregroundColor: Theme.of(context).colorScheme.onSurface,
+                backgroundColor: Colors.transparent,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: ClipRect(
+                    child: BackdropFilter(
+                      filter: AppTheme.glassBlur,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppTheme.glassColor(context),
+                          border: Border(
+                            bottom: BorderSide(
+                              color: AppTheme.glassBorder(context),
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 title: Text(
                   'Edit Playlist',
                   style: Default_Theme.secondoryTextStyleMedium.merge(
-                    const TextStyle(
-                        fontSize: 16, color: Default_Theme.primaryColor1),
+                    TextStyle(
+                        fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
                   ),
                 ),
                 actions: [
@@ -205,7 +223,7 @@ class _SliverPlaylistItemsState extends State<SliverPlaylistItems> {
         itemCount: _tracks.length,
         itemExtent: 70,
         proxyDecorator: _proxyDecorator,
-        onReorder: (oldIndex, newIndex) {
+        onReorderItem: (oldIndex, newIndex) {
           setState(() {
             final Track item = _tracks.removeAt(oldIndex);
             _tracks.insert(newIndex, item);

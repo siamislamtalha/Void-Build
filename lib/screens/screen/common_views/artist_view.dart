@@ -135,11 +135,30 @@ class _ArtistViewState extends State<ArtistView> {
   // ─── ARCHITECTURE METHODS ───
 
   PreferredSizeWidget _buildAppBar() {
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
+    
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
       leadingWidth: 70,
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: AppTheme.glassBlur,
+          child: Container(
+            decoration: BoxDecoration(
+              color: glassColor,
+              border: Border(
+                bottom: BorderSide(
+                  color: glassBorder,
+                  width: 1.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       leading: Padding(
         padding: const EdgeInsets.only(left: 16.0),
         child: Center(
@@ -153,9 +172,9 @@ class _ArtistViewState extends State<ArtistView> {
                   color: Default_Theme.primaryColor1.withValues(alpha: 0.15),
                 ),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.arrow_back_rounded,
-                color: Default_Theme.primaryColor1,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 20,
               ),
             ),
@@ -757,11 +776,22 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
+    
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        filter: AppTheme.glassBlur,
         child: Container(
-          color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.2),
+          decoration: BoxDecoration(
+            color: glassColor,
+            border: Border(
+              bottom: BorderSide(
+                color: glassBorder,
+                width: 1.0,
+              ),
+            ),
+          ),
           alignment: Alignment.center,
           child: Container(
             height: 44,

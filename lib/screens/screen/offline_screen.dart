@@ -386,11 +386,32 @@ class _OfflineScreenState extends State<OfflineScreen> {
 
   SliverAppBar customDiscoverSliverBar(
       BuildContext context, AppLocalizations l10n) {
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
+    
     return SliverAppBar(
       floating: true,
       pinned: true,
       surfaceTintColor: Colors.transparent,
       backgroundColor: Colors.transparent,
+      flexibleSpace: FlexibleSpaceBar(
+        background: ClipRect(
+          child: BackdropFilter(
+            filter: AppTheme.glassBlur,
+            child: Container(
+              decoration: BoxDecoration(
+                color: glassColor,
+                border: Border(
+                  bottom: BorderSide(
+                    color: glassBorder,
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       title: AnimatedSwitcher(
         duration: const Duration(milliseconds: 350),
         transitionBuilder: (Widget child, Animation<double> animation) {
@@ -418,9 +439,7 @@ class _OfflineScreenState extends State<OfflineScreen> {
             child: IconButton(
               icon: Icon(
                 MingCute.refresh_2_line,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : const Color(0xFF1C1C1E),
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               onPressed: () {
                 context.read<DownloaderCubit>().refreshDownloadedSongs();
@@ -432,9 +451,7 @@ class _OfflineScreenState extends State<OfflineScreen> {
           child: IconButton(
             icon: Icon(
               _isSearch ? Icons.close : Icons.search,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : const Color(0xFF1C1C1E),
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             onPressed: _toggleSearch,
           ),
@@ -472,8 +489,6 @@ class _OfflineScreenState extends State<OfflineScreen> {
   }
 
   Widget _buildTitle(AppLocalizations l10n) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     return Container(
       key: const ValueKey('title'),
       child: Row(
@@ -481,9 +496,11 @@ class _OfflineScreenState extends State<OfflineScreen> {
         children: [
           Text(
             l10n.offlineTitle,
-            style: Default_Theme.primaryTextStyle.copyWith(
-              fontSize: 34,
-              color: titleColor,
+            style: Default_Theme.primaryTextStyle.merge(
+              TextStyle(
+                fontSize: 34,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
           const Spacer(),
@@ -493,23 +510,23 @@ class _OfflineScreenState extends State<OfflineScreen> {
   }
 
   Widget _buildSearchField(AppLocalizations l10n) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : const Color(0xFF1C1C1E);
     return Container(
       key: const ValueKey('search'),
       child: TextField(
         controller: _searchController,
         autofocus: true,
-        cursorColor: textColor,
+        cursorColor: Theme.of(context).colorScheme.onSurface,
         decoration: InputDecoration(
           hintText: l10n.offlineSearchHint,
           border: InputBorder.none,
           hintStyle: TextStyle(
-            color: isDark ? Colors.white54 : const Color(0xFF8E8E93),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white54
+                : const Color(0xFF8E8E93),
           ),
         ),
         style: Default_Theme.secondoryTextStyle.copyWith(
-          color: textColor,
+          color: Theme.of(context).colorScheme.onSurface,
           fontSize: 16.0,
         ),
       ),

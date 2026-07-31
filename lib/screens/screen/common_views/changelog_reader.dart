@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:voidmusic/core/constants/setting_keys.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 // The final changelog string for testing all features
 const String changelogText = """
@@ -238,8 +240,24 @@ class ChangelogScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: AppTheme.glassBlur,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.glassColor(context),
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppTheme.glassBorder(context),
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54),
+            icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () async {
               await Navigator.of(context).maybePop();
               if (!context.mounted) return;
@@ -603,36 +621,42 @@ class CategorySection extends StatelessWidget {
 
   const CategorySection({Key? key, required this.category}) : super(key: key);
 
-  ({String emoji, Color color}) _getEmojiForCategory(String title) {
+  ({IconData icon, Color color}) _getIconForCategory(String title) {
     switch (title.toLowerCase()) {
       case 'added':
-        return (emoji: '✨', color: Colors.lightGreenAccent.shade400);
+        return (icon: MingCute.add_circle_fill, color: Colors.lightGreenAccent.shade400);
       case 'changed':
-        return (emoji: '🔄', color: Colors.lightBlueAccent.shade400);
+        return (icon: MingCute.refresh_2_fill, color: Colors.lightBlueAccent.shade400);
       case 'fixed':
-        return (emoji: '🐛', color: Colors.orangeAccent.shade400);
+        return (icon: MingCute.bug_fill, color: Colors.orangeAccent.shade400);
       case 'removed':
-        return (emoji: '❌', color: Colors.redAccent.shade400);
+        return (icon: MingCute.close_circle_fill, color: Colors.redAccent.shade400);
       default:
-        return (emoji: '🔹', color: Colors.grey);
+        return (icon: MingCute.information_fill, color: Colors.grey);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final categoryStyle = _getEmojiForCategory(category.title);
+    final categoryStyle = _getIconForCategory(category.title);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '${categoryStyle.emoji} ${category.title}',
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Gilroy',
-                color: categoryStyle.color),
+          Row(
+            children: [
+              Icon(categoryStyle.icon, color: categoryStyle.color, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                category.title,
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Gilroy',
+                    color: categoryStyle.color),
+              ),
+            ],
           ),
           const SizedBox(height: 12.0),
           for (var item in category.changes)

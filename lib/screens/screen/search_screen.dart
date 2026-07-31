@@ -420,6 +420,9 @@ class _FloatingSearchBarSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
+    
     return SliverAppBar(
       floating: true,
       snap: true,
@@ -428,6 +431,24 @@ class _FloatingSearchBarSliver extends StatelessWidget {
       surfaceTintColor: Colors.transparent,
       titleSpacing: 16,
       toolbarHeight: 70,
+      flexibleSpace: FlexibleSpaceBar(
+        background: ClipRect(
+          child: BackdropFilter(
+            filter: AppTheme.glassBlur,
+            child: Container(
+              decoration: BoxDecoration(
+                color: glassColor,
+                border: Border(
+                  bottom: BorderSide(
+                    color: glassBorder,
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       title: Focus(
         onKeyEvent: handleKeyEvent,
         child: Builder(

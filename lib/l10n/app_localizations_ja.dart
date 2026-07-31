@@ -219,7 +219,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get playlistNoMatchSearch => '一致するプレイリストがありません';
 
   @override
-  String get playlistCreateNew => '新しいプレイリストを作成 😍';
+  String get playlistCreateNew => '新しいプレイリストを作成';
 
   @override
   String get playlistCreateFirstOne => 'プレイリストがありません。お気に入りを作ってみましょう！';
@@ -1107,7 +1107,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get timerStop => 'タイマーを停止';
 
   @override
-  String get timerFinishedMessage => '音楽を停止しました。おやすみなさい 🥰。';
+  String get timerFinishedMessage => '音楽を停止しました。おやすみなさい。';
 
   @override
   String get timerGotIt => '了解';
@@ -1854,7 +1854,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Void Music🌸 の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
+    return 'Void Music の新しいバージョンが利用可能です！\n\nバージョン: $ver+$build';
   }
 
   @override

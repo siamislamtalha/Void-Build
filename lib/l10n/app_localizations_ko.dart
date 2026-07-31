@@ -218,7 +218,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get playlistNoMatchSearch => '일치하는 플레이리스트가 없습니다';
 
   @override
-  String get playlistCreateNew => '새 플레이리스트 만들기 😍';
+  String get playlistCreateNew => '새 플레이리스트 만들기';
 
   @override
   String get playlistCreateFirstOne => '플레이리스트가 없습니다. 첫 번째 리스트를 만들어 보세요!';
@@ -1109,7 +1109,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get timerStop => '타이머 중지';
 
   @override
-  String get timerFinishedMessage => '음악이 멈췄습니다. 좋은 꿈 꾸세요 🥰.';
+  String get timerFinishedMessage => '음악이 멈췄습니다. 좋은 꿈 꾸세요.';
 
   @override
   String get timerGotIt => '확인';
@@ -1382,7 +1382,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get aboutCreativeHighlights => '업데이트 및 주요 소식';
 
   @override
-  String get aboutTipQuote => 'Void Music가 마음에 드시나요? 소중한 후원이 더 멋진 발전을 만듭니다. 🌸';
+  String get aboutTipQuote => 'Void Music가 마음에 드시나요? 소중한 후원이 더 멋진 발전을 만듭니다.';
 
   @override
   String get aboutTipButton => '후원하기';

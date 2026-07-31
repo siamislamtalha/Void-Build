@@ -155,20 +155,36 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: AppTheme.glassBlur,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.glassColor(context),
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppTheme.glassBorder(context),
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_rounded,
-            color: Default_Theme.primaryColor1,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           onPressed: () => context.pop(),
         ),
         title: Text(
           l10n.menuAddToPlaylist,
           style: Default_Theme.secondoryTextStyleMedium.merge(
-            const TextStyle(
-              color: Default_Theme.primaryColor1,
+            TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
             ),
           ),

@@ -98,14 +98,29 @@ class _ImportProcessScreenState extends State<ImportProcessScreen> {
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.transparent,
-      elevation: 0,
       surfaceTintColor: Colors.transparent,
+      elevation: 0,
       centerTitle: true,
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: AppTheme.glassBlur,
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppTheme.glassColor(context),
+              border: Border(
+                bottom: BorderSide(
+                  color: AppTheme.glassBorder(context),
+                  width: 1.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       iconTheme: const IconThemeData(color: Default_Theme.primaryColor1),
       title: BlocBuilder<ContentImportCubit, ContentImportState>(
         builder: (context, state) {
           final title = state.collectionInfo?.title;
-          // Only using the highlight/heavy font for the main App Bar title
           return Text(
             title?.isNotEmpty == true
                 ? title!

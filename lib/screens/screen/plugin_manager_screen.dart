@@ -136,11 +136,30 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
 
   PreferredSizeWidget _buildAppBar(
       BuildContext context, AppLocalizations l10n) {
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
+    
     return AppBar(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       leadingWidth: 64,
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: AppTheme.glassBlur,
+          child: Container(
+            decoration: BoxDecoration(
+              color: glassColor,
+              border: Border(
+                bottom: BorderSide(
+                  color: glassBorder,
+                  width: 1.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       leading: Padding(
         padding: const EdgeInsets.only(left: 12.0),
         child: Center(

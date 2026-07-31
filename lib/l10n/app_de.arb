@@ -77,7 +77,7 @@
   "playlistShuffle": "Zufallswiedergabe",
   "playlistMoreOptions": "Weitere Optionen",
   "playlistNoMatchSearch": "Keine Playlists entsprechen deiner Suche",
-  "playlistCreateNew": "Neue Playlist erstellen 😍",
+  "playlistCreateNew": "Neue Playlist erstellen",
   "playlistCreateFirstOne": "Noch keine Playlists. Erstelle eine, um loszulegen!",
   "addToPlaylistNoSongSelected": "Kein Song ausgewählt",
   "createPlaylistDialogBarrierLabel": "Dialog zum Erstellen einer Playlist",
@@ -400,7 +400,7 @@
   "timerMinutes": "Minuten",
   "timerSeconds": "Sekunden",
   "timerStop": "Timer stoppen",
-  "timerFinishedMessage": "Musikwiedergabe beendet. Gute Nacht 🥰.",
+  "timerFinishedMessage": "Musikwiedergabe beendet. Gute Nacht.",
   "timerGotIt": "Alles klar",
   "timerSetTimeError": "Bitte stelle eine Zeit ein",
   "timerStart": "Timer starten",
@@ -704,7 +704,7 @@
 
   "snackbarOpeningAlbumPage": "Originale Album-Seite wird geöffnet.",
 
-  "updateAvailableBody": "Neue Version von Void Music🌸 verfügbar!\n\nVersion: {ver}+{build}",
+  "updateAvailableBody": "Neue Version von Void Music verfügbar!\n\nVersion: {ver}+{build}",
   "@updateAvailableBody": { "placeholders": { "ver": { "type": "String" }, "build": { "type": "String" } } },
 
   "pluginSnackbarInstalled": "Plugin „{id}“ erfolgreich installiert",

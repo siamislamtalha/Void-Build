@@ -2,6 +2,7 @@ import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:voidmusic/l10n/language_options.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
+import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
@@ -29,6 +30,22 @@ class CountrySettings extends StatelessWidget {
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: AppTheme.glassBlur,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.glassColor(context),
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppTheme.glassBorder(context),
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
@@ -69,16 +86,15 @@ class CountrySettings extends StatelessWidget {
               SettingSectionHeader(label: l10n.settingsLanguageCountry),
               SettingCard(
                 children: [
-                  SettingDropdownTile<String>(
+                  SettingDropdownTile(
                     icon: MingCute.translate_2_line,
                     title: l10n.countrySettingLanguageLabel,
                     subtitle: currentLanguageLabel,
                     value: state.languageCode,
-                    items: languageItems,
+                    options: languageItems.map((e) => e.value).toList(),
+                    labels: languageItems.map((e) => e.label).toList(),
                     onChanged: (newValue) {
-                      if (newValue != null) {
-                        context.read<SettingsCubit>().setLanguageCode(newValue);
-                      }
+                      context.read<SettingsCubit>().setLanguageCode(newValue);
                     },
                   ),
                   const SettingDivider(),
@@ -91,21 +107,15 @@ class CountrySettings extends StatelessWidget {
                         context.read<SettingsCubit>().setAutoGetCountry(value),
                   ),
                   const SettingDivider(),
-                  SettingDropdownTile<String>(
+                  SettingDropdownTile(
                     icon: MingCute.globe_line,
                     title: l10n.countrySettingCountryLabel,
                     subtitle: currentCountryName,
                     value: state.countryCode,
-                    items: countries.entries
-                        .map((e) => SettingDropdownItem<String>(
-                              value: e.value,
-                              label: e.key,
-                            ))
-                        .toList(),
+                    options: countries.values.toList(),
+                    labels: countries.keys.toList(),
                     onChanged: (newValue) {
-                      if (newValue != null) {
-                        context.read<SettingsCubit>().setCountryCode(newValue);
-                      }
+                      context.read<SettingsCubit>().setCountryCode(newValue);
                     },
                   ),
                 ],

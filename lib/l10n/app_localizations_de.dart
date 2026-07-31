@@ -228,7 +228,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine Playlists entsprechen deiner Suche';
 
   @override
-  String get playlistCreateNew => 'Neue Playlist erstellen 😍';
+  String get playlistCreateNew => 'Neue Playlist erstellen';
 
   @override
   String get playlistCreateFirstOne =>
@@ -1197,7 +1197,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get timerStop => 'Timer stoppen';
 
   @override
-  String get timerFinishedMessage => 'Musikwiedergabe beendet. Gute Nacht 🥰.';
+  String get timerFinishedMessage => 'Musikwiedergabe beendet. Gute Nacht.';
 
   @override
   String get timerGotIt => 'Alles klar';
@@ -1990,7 +1990,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Neue Version von Void Music🌸 verfügbar!\n\nVersion: $ver+$build';
+    return 'Neue Version von Void Music verfügbar!\n\nVersion: $ver+$build';
   }
 
   @override

@@ -297,6 +297,22 @@ class _ChartScreenBodyState extends State<_ChartScreenBody> {
           elevation: 0,
           scrolledUnderElevation: 0,
           leadingWidth: 70,
+          flexibleSpace: ClipRect(
+            child: BackdropFilter(
+              filter: AppTheme.glassBlur,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.glassColor(context),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: AppTheme.glassBorder(context),
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
           leading: Padding(
             padding: const EdgeInsets.only(left: 16.0),
             child: Center(
@@ -356,9 +372,9 @@ class _ChartScreenBodyState extends State<_ChartScreenBody> {
                                   color: Default_Theme.primaryColor1,
                                 ),
                               )
-                            : const Icon(
+                            : Icon(
                                 Icons.refresh_rounded,
-                                color: Default_Theme.primaryColor1,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 size: 20,
                               ),
                       ),

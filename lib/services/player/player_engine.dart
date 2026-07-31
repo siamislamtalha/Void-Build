@@ -3,6 +3,12 @@ import 'dart:developer';
 
 import 'package:media_kit/media_kit.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:voidmusic/services/audio/volume_normalization_service.dart';
+import 'package:voidmusic/services/audio/skip_silence_service.dart';
+import 'package:voidmusic/services/audio/audio_effects_service.dart';
+import 'package:voidmusic/services/audio/gapless_playback_service.dart';
+import 'package:voidmusic/services/player/playback_speed_service.dart';
+import 'package:voidmusic/services/cast/google_cast_service.dart' as cast_service;
 
 enum EngineState { idle, loading, buffering, ready, completed, error }
 
@@ -164,6 +170,76 @@ class PlayerEngine {
 
     _activePlayerSubject = BehaviorSubject.seeded(_playerA);
     _subs = _buildSubscriptions();
+    
+    // Initialize audio services
+    _initializeAudioServices();
+  }
+
+  void _initializeAudioServices() {
+    // Set player instances for audio services
+    VolumeNormalizationService.instance;
+    SkipSilenceService.instance.setPlayer(_active);
+    AudioEffectsService.instance;
+    GaplessPlaybackService.instance.setPlayer(_active);
+    PlaybackSpeedService.instance;
+    
+    // Initialize services that need to be started
+    if (SkipSilenceService.instance.isEnabled) {
+      SkipSilenceService.instance.setPlayer(_active);
+    }
+    if (GaplessPlaybackService.instance.isEnabled) {
+      GaplessPlaybackService.instance.setPlayer(_active);
+    }
+    
+    // Initialize Google Cast service
+    cast_service.GoogleCastService.instance.initialize();
+  }
+  
+  // ── Google Cast Integration ───────────────────────────────────────────────
+  
+  Future<void> castToDevice(cast_service.CastDevice device) async {
+    final castService = cast_service.GoogleCastService.instance;
+    final success = await castService.connectToDevice(device);
+    if (success) {
+      // Load current media to cast device
+      await castService.loadMedia(
+        mediaUrl: _getCurrentMediaUrl(),
+        title: _getCurrentMediaTitle(),
+        artist: _getCurrentMediaArtist(),
+        album: _getCurrentMediaAlbum(),
+        duration: _durationSubject.value,
+      );
+      
+      if (_playingSubject.value) {
+        await castService.play();
+      }
+    }
+  }
+  
+  Future<void> disconnectCast() async {
+    await cast_service.GoogleCastService.instance.disconnect();
+  }
+  
+  bool get isCasting => cast_service.GoogleCastService.instance.isCasting;
+  
+  String _getCurrentMediaUrl() {
+    // Placeholder - would need to track current media URL
+    return '';
+  }
+  
+  String _getCurrentMediaTitle() {
+    // Placeholder - would need to track current media title
+    return '';
+  }
+  
+  String _getCurrentMediaArtist() {
+    // Placeholder - would need to track current media artist
+    return '';
+  }
+  
+  String _getCurrentMediaAlbum() {
+    // Placeholder - would need to track current media album
+    return '';
   }
 
   void _configureNativePlayer(Player player) {
@@ -398,6 +474,22 @@ class PlayerEngine {
       _swapActivePlayer();
       // FIX M-09: Apply EQ to the newly active player after swap.
       if (_eqEnabled) await _applyEqualizerToPlayer(_active);
+      
+      // Apply volume normalization
+      if (VolumeNormalizationService.instance.isEnabled) {
+        await _applyVolumeNormalization();
+      }
+      
+      // Start skip silence detection
+      if (SkipSilenceService.instance.isEnabled) {
+        SkipSilenceService.instance.setPlayer(_active);
+      }
+      
+      // Update gapless playback
+      GaplessPlaybackService.instance.setPlayer(_active);
+      
+      // Notify gapless service of track change
+      GaplessPlaybackService.instance.onTrackEnded();
 
       return EngineSuccess();
     } catch (e) {
@@ -587,12 +679,31 @@ class PlayerEngine {
       await Future.wait([_playerA.setVolume(vol), _playerB.setVolume(vol)]);
     }
     _volumeSubject.add(_userVolume);
+    
+    // Apply volume normalization if enabled
+    if (VolumeNormalizationService.instance.isEnabled) {
+      final normalizedVolume = _userVolume * _getNormalizationGain();
+      if (!_isTransitioning) {
+        final vol = normalizedVolume.clamp(0.0, 1.0) * 100.0;
+        await Future.wait([_playerA.setVolume(vol), _playerB.setVolume(vol)]);
+      }
+    }
+  }
+  
+  double _getNormalizationGain() {
+    // Placeholder for getting the current normalization gain
+    // This would be implemented based on the current track's gain value
+    return 1.0;
   }
 
   Future<void> setSpeed(double speed) async {
     if (_disposed) return;
-    await _active.setRate(speed);
-    _speedSubject.add(speed);
+    final adjustedSpeed = PlaybackSpeedService.instance.currentSpeed;
+    await _active.setRate(adjustedSpeed);
+    _speedSubject.add(adjustedSpeed);
+    
+    // Update playback speed service
+    PlaybackSpeedService.instance.setSpeed(speed);
   }
 
   Future<void> setLoopMode(LoopMode mode) async {
@@ -779,6 +890,25 @@ class PlayerEngine {
     }
     if (parts.isEmpty) return '';
     return 'lavfi=[${parts.join(',')}]';
+  }
+
+  Future<void> _applyVolumeNormalization() async {
+    // Apply volume normalization from VolumeNormalizationService
+    final normalization = VolumeNormalizationService.instance;
+    
+    if (!normalization.isEnabled) return;
+    
+    // Get current track gain (would need track info)
+    // For now, apply a basic gain adjustment
+    final gain = normalization.preGain;
+    
+    if (gain.abs() > 0.01) {
+      if (_active.platform is NativePlayer) {
+        final native = _active.platform as NativePlayer;
+        // Apply gain filter
+        native.setProperty('af', 'volume=${gain}dB');
+      }
+    }
   }
 
   Future<void> dispose() async {

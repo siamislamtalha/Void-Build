@@ -226,7 +226,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playlistNoMatchSearch => 'No playlists match your search';
 
   @override
-  String get playlistCreateNew => 'Create New Playlist 😍';
+  String get playlistCreateNew => 'Create New Playlist';
 
   @override
   String get playlistCreateFirstOne =>
@@ -1188,7 +1188,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get timerStop => 'Stop Timer';
 
   @override
-  String get timerFinishedMessage => 'The tunes have rested. Sweet Dreams 🥰.';
+  String get timerFinishedMessage => 'The tunes have rested. Sweet Dreams.';
 
   @override
   String get timerGotIt => 'Got it!';
@@ -1974,7 +1974,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'New Version of Void Music🌸 is now available!\n\nVersion: $ver+$build';
+    return 'New Version of Void Music is now available!\n\nVersion: $ver+$build';
   }
 
   @override

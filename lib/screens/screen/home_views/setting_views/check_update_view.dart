@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class CheckUpdateView extends StatelessWidget {
   const CheckUpdateView({super.key});
@@ -11,6 +12,24 @@ class CheckUpdateView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: AppTheme.glassBlur,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.glassColor(context),
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppTheme.glassBorder(context),
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         title: Text(
           l10n.updateCheckTitle,
           style: TextStyle(
@@ -25,38 +44,67 @@ class CheckUpdateView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(),
-            Text(
-              "🎧 Update Check Temporarily Disabled 🎧",
-              style: TextStyle(
-                      color: AppTheme.accentColor(context), fontSize: 20)
-                  .merge(Default_Theme.secondoryTextStyleMedium),
-              textAlign: TextAlign.center,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(MingCute.music_2_fill, size: 24, color: AppTheme.accentColor(context)),
+                const SizedBox(width: 8),
+                Text(
+                  "Update Check Temporarily Disabled",
+                  style: TextStyle(
+                          color: AppTheme.accentColor(context), fontSize: 20)
+                      .merge(Default_Theme.secondoryTextStyleMedium),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(width: 8),
+                Icon(MingCute.music_2_fill, size: 24, color: AppTheme.accentColor(context)),
+              ],
             ),
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text(
-                "We're cooking up something amazing in the void! 🚀 Please be patient while we prepare the next update. Good things take time, and we promise it'll be worth the wait! ⏳✨",
-                style: TextStyle(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.8),
-                        fontSize: 16)
-                    .merge(Default_Theme.tertiaryTextStyle),
-                textAlign: TextAlign.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(MingCute.fire_fill, size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "We're cooking up something amazing in the void! Please be patient while we prepare the next update. Good things take time, and we promise it'll be worth the wait!",
+                      style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.8),
+                          fontSize: 16)
+                          .merge(Default_Theme.tertiaryTextStyle),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(MingCute.time_fill, size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8)),
+                ],
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              "Stay tuned, music lover! 🎵",
-              style: TextStyle(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.6),
-                      fontSize: 14)
-                  .merge(Default_Theme.tertiaryTextStyle),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(MingCute.sparkles_fill, size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                const SizedBox(width: 8),
+                Text(
+                  "Stay tuned, music lover!",
+                  style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.6),
+                          fontSize: 14)
+                      .merge(Default_Theme.tertiaryTextStyle),
+                ),
+                const SizedBox(width: 8),
+                Icon(MingCute.music_2_fill, size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+              ],
             ),
             const Spacer(),
           ],

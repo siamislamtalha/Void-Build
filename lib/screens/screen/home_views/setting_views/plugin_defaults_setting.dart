@@ -24,6 +24,22 @@ class PluginDefaultsSettings extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leadingWidth: 64,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: AppTheme.glassBlur,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.glassColor(context),
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppTheme.glassBorder(context),
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
@@ -439,7 +455,7 @@ class _ResolverPriorityListState extends State<_ResolverPriorityList> {
             );
           },
           itemCount: _items.length,
-          onReorder: (oldIndex, newIndex) {
+          onReorderItem: (oldIndex, newIndex) {
             setState(() {
               final item = _items.removeAt(oldIndex);
               _items.insert(newIndex, item);

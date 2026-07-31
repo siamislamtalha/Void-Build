@@ -507,7 +507,7 @@ abstract class AppLocalizations {
   /// No description provided for @playlistCreateNew.
   ///
   /// In en, this message translates to:
-  /// **'Create New Playlist 😍'**
+  /// **'Create New Playlist'**
   String get playlistCreateNew;
 
   /// No description provided for @playlistCreateFirstOne.
@@ -2181,7 +2181,7 @@ abstract class AppLocalizations {
   /// No description provided for @timerFinishedMessage.
   ///
   /// In en, this message translates to:
-  /// **'The tunes have rested. Sweet Dreams 🥰.'**
+  /// **'The tunes have rested. Sweet Dreams.'**
   String get timerFinishedMessage;
 
   /// No description provided for @timerGotIt.
@@ -3549,7 +3549,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateAvailableBody.
   ///
   /// In en, this message translates to:
-  /// **'New Version of Void Music🌸 is now available!\n\nVersion: {ver}+{build}'**
+  /// **'New Version of Void Music is now available!\n\nVersion: {ver}+{build}'**
   String updateAvailableBody(String ver, String build);
 
   /// No description provided for @pluginSnackbarInstalled.

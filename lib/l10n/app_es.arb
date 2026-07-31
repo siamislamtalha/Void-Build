@@ -77,7 +77,7 @@
   "playlistShuffle": "Aleatorio",
   "playlistMoreOptions": "Más opciones",
   "playlistNoMatchSearch": "Ninguna lista coincide con tu búsqueda",
-  "playlistCreateNew": "Crear nueva lista 😍",
+  "playlistCreateNew": "Crear nueva lista",
   "playlistCreateFirstOne": "No tienes listas aún. ¡Crea una para empezar!",
   "addToPlaylistNoSongSelected": "No hay canción seleccionada",
   "createPlaylistDialogBarrierLabel": "Diálogo para crear lista",
@@ -400,7 +400,7 @@
   "timerMinutes": "Minutos",
   "timerSeconds": "Segundos",
   "timerStop": "Detener temporizador",
-  "timerFinishedMessage": "La música se ha detenido. ¡Que descanses! 🥰",
+  "timerFinishedMessage": "La música se ha detenido. ¡Que descanses!",
   "timerGotIt": "Entendido",
   "timerSetTimeError": "Por favor, elige un tiempo",
   "timerStart": "Iniciar temporizador",
@@ -704,7 +704,7 @@
 
   "snackbarOpeningAlbumPage": "Abriendo página original del álbum.",
 
-  "updateAvailableBody": "¡Nueva versión de Void Music🌸 disponible!\n\nVersión: {ver}+{build}",
+  "updateAvailableBody": "¡Nueva versión de Void Music disponible!\n\nVersión: {ver}+{build}",
   "@updateAvailableBody": { "placeholders": { "ver": { "type": "String" }, "build": { "type": "String" } } },
 
   "pluginSnackbarInstalled": "Plugin \"{id}\" instalado con éxito",

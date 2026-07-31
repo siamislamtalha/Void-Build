@@ -60,6 +60,22 @@ class _DownloadSettingsState extends State<DownloadSettings> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leadingWidth: 64,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: AppTheme.glassBlur,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.glassColor(context),
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppTheme.glassBorder(context),
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
@@ -332,7 +348,7 @@ class _DownloadPluginSelectorState extends State<_DownloadPluginSelector> {
                   );
                 },
                 itemCount: _selectedIds.length,
-                onReorder: (oldIndex, newIndex) {
+                onReorderItem: (oldIndex, newIndex) {
                   setState(() {
                     final item = _selectedIds.removeAt(oldIndex);
                     _selectedIds.insert(newIndex, item);

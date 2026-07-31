@@ -193,12 +193,31 @@ class _PlaylistViewState extends State<PlaylistView> {
     final iconColor = Theme.of(context).colorScheme.onSurface;
     final containerColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05);
     final borderColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+    final glassColor = AppTheme.glassColor(context);
+    final glassBorder = AppTheme.glassBorder(context);
 
     return AppBar(
       backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
       leadingWidth: 70,
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: AppTheme.glassBlur,
+          child: Container(
+            decoration: BoxDecoration(
+              color: glassColor,
+              border: Border(
+                bottom: BorderSide(
+                  color: glassBorder,
+                  width: 1.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       leading: Padding(
         padding: const EdgeInsets.only(left: 16.0),
         child: Center(
