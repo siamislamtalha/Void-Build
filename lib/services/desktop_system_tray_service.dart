@@ -18,6 +18,7 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
   SettingsCubit? _settingsCubit;
   bool _initialized = false;
   bool _isHiddenToTray = false;
+  bool get isHiddenToTray => _isHiddenToTray;
 
   static bool get isDesktop =>
       !kIsWeb &&

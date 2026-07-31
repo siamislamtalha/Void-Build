@@ -11,6 +11,7 @@ import 'package:voidmusic/services/db/dao/lyrics_dao.dart';
 import 'package:voidmusic/services/db/dao/settings_dao.dart';
 import 'package:voidmusic/services/meta_resolver/cross_plugin_resolver.dart';
 import 'package:voidmusic/services/plugin/plugin_service.dart';
+import 'package:voidmusic/services/lyrics/multi_source_lyrics_service.dart';
 import 'package:voidmusic/src/rust/api/plugin/commands.dart';
 import 'package:voidmusic/src/rust/api/plugin/models.dart' as plugin_models;
 import 'package:voidmusic/src/rust/api/plugin/types.dart';
@@ -77,11 +78,6 @@ class LyricsCubit extends Cubit<LyricsState> {
     final priority = await _loadPriority();
     if (_isStale(requestId)) return;
 
-    if (priority.isEmpty) {
-      emit(LyricsNoPlugin(track));
-      return;
-    }
-
     final profile = _buildTrackProfile(track);
 
     for (final pluginId in priority) {
@@ -124,6 +120,45 @@ class LyricsCubit extends Cubit<LyricsState> {
       } catch (e) {
         log('Plugin $pluginId failed: $e', name: 'LyricsCubit');
       }
+    }
+
+    // Try online multi-source fallback chain (LrcLib, Lyrist, etc.)
+    try {
+      final multiResult = await MultiSourceLyricsService.instance.fetchLyrics(
+        title: track.title,
+        artist: _artistStr(track),
+        album: track.album?.title,
+        duration: track.durationMs != null
+            ? Duration(milliseconds: track.durationMs!.toInt())
+            : null,
+      );
+
+      if (_isStale(requestId)) return;
+
+      if (multiResult != null && multiResult.text.isNotEmpty) {
+        final isSynced = multiResult.isSynced;
+        final lyricsObj = Lyrics(
+          id: track.id,
+          artist: _artistStr(track),
+          title: track.title,
+          album: track.album?.title,
+          lyricsPlain: isSynced ? '' : multiResult.text,
+          lyricsSynced: isSynced ? multiResult.text : null,
+          provider: LyricsProvider.none,
+          mediaID: track.id,
+          duration: track.durationMs.toString(),
+        );
+
+        emit(LyricsLoaded(lyricsObj, track));
+        unawaited(_autoSave(lyricsObj));
+        log(
+          'Lyrics loaded for ID: ${track.id} [MultiSource: ${multiResult.source}]',
+          name: 'LyricsCubit',
+        );
+        return;
+      }
+    } catch (e) {
+      log('MultiSource lyrics fallback error: $e', name: 'LyricsCubit');
     }
 
     if (_isStale(requestId)) return;

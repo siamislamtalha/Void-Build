@@ -15,9 +15,14 @@ import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'dart:io';
 
-class AudioSettings extends StatelessWidget {
+class AudioSettings extends StatefulWidget {
   const AudioSettings({super.key});
 
+  @override
+  State<AudioSettings> createState() => _AudioSettingsState();
+}
+
+class _AudioSettingsState extends State<AudioSettings> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -51,7 +56,7 @@ class AudioSettings extends StatelessWidget {
           child: Center(
             child: IconButton(
               icon: Icon(
-                Icons.arrow_back_rounded,
+                MingCute.left_line,
                 color: iconColor,
                 size: 24,
               ),
@@ -83,7 +88,9 @@ class AudioSettings extends StatelessWidget {
                 subtitle: 'Balance volume across tracks',
                 value: VolumeNormalizationService.instance.isEnabled,
                 onChanged: (value) {
-                  VolumeNormalizationService.instance.setEnabled(value);
+                  setState(() {
+                    VolumeNormalizationService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingDropdownTile(
@@ -102,7 +109,9 @@ class AudioSettings extends StatelessWidget {
                     final mode = NormalizationMode.values.firstWhere(
                       (e) => e.toString() == value,
                     );
-                    VolumeNormalizationService.instance.setMode(mode);
+                    setState(() {
+                      VolumeNormalizationService.instance.setMode(mode);
+                    });
                   } catch (e) {
                     debugPrint('Error setting normalization mode: $e');
                   }
@@ -123,7 +132,9 @@ class AudioSettings extends StatelessWidget {
                 subtitle: 'Automatically skip silent sections',
                 value: SkipSilenceService.instance.isEnabled,
                 onChanged: (value) {
-                  SkipSilenceService.instance.setEnabled(value);
+                  setState(() {
+                    SkipSilenceService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingSwitchTile(
@@ -132,7 +143,9 @@ class AudioSettings extends StatelessWidget {
                 subtitle: 'Seamless track transitions',
                 value: GaplessPlaybackService.instance.isEnabled,
                 onChanged: (value) {
-                  GaplessPlaybackService.instance.setEnabled(value);
+                  setState(() {
+                    GaplessPlaybackService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingDropdownTile(
@@ -143,7 +156,9 @@ class AudioSettings extends StatelessWidget {
                 options: const ['0.5', '0.75', '1.0', '1.25', '1.5', '2.0'],
                 labels: const ['0.5x', '0.75x', '1.0x', '1.25x', '1.5x', '2.0x'],
                 onChanged: (value) {
-                  PlaybackSpeedService.instance.setSpeed(double.parse(value));
+                  setState(() {
+                    PlaybackSpeedService.instance.setSpeed(double.parse(value));
+                  });
                 },
               ),
             ],
@@ -170,7 +185,9 @@ class AudioSettings extends StatelessWidget {
                     final mode = EqualizerMode.values.firstWhere(
                       (e) => e.toString() == value,
                     );
-                    AdvancedEqualizerService.instance.setMode(mode);
+                    setState(() {
+                      AdvancedEqualizerService.instance.setMode(mode);
+                    });
                   } catch (e) {
                     debugPrint('Error setting equalizer mode: $e');
                   }
@@ -182,7 +199,9 @@ class AudioSettings extends StatelessWidget {
                 subtitle: 'Apply frequency adjustments',
                 value: AdvancedEqualizerService.instance.isEnabled,
                 onChanged: (value) {
-                  AdvancedEqualizerService.instance.setEnabled(value);
+                  setState(() {
+                    AdvancedEqualizerService.instance.setEnabled(value);
+                  });
                 },
               ),
             ],
@@ -200,18 +219,22 @@ class AudioSettings extends StatelessWidget {
                 subtitle: 'Reverb, bass boost, etc.',
                 value: AudioEffectsService.instance.globalEnabled,
                 onChanged: (value) {
-                  AudioEffectsService.instance.setGlobalEnabled(value);
+                  setState(() {
+                    AudioEffectsService.instance.setGlobalEnabled(value);
+                  });
                 },
               ),
               SettingDropdownTile(
                 icon: MingCute.magic_1_line,
                 title: 'Effect Preset',
                 subtitle: 'Quick effect combinations',
-                value: 'Custom',
+                value: AudioEffectsService.instance.currentPresetName ?? 'Custom',
                 options: const ['Custom', 'Concert', 'Club', 'Vocal', 'Bass', 'Immersive'],
                 labels: const ['Custom', 'Concert', 'Club', 'Vocal', 'Bass', 'Immersive'],
                 onChanged: (value) {
-                  AudioEffectsService.instance.applyPreset(value);
+                  setState(() {
+                    AudioEffectsService.instance.applyPreset(value);
+                  });
                 },
               ),
             ],
@@ -229,7 +252,9 @@ class AudioSettings extends StatelessWidget {
                 subtitle: 'Enable 120Hz+ displays',
                 value: HighRefreshRateService.instance.preferHighRefreshRate,
                 onChanged: (value) {
-                  HighRefreshRateService.instance.setPreferHighRefreshRate(value);
+                  setState(() {
+                    HighRefreshRateService.instance.setPreferHighRefreshRate(value);
+                  });
                 },
               ),
               SettingSwitchTile(
@@ -238,7 +263,9 @@ class AudioSettings extends StatelessWidget {
                 subtitle: 'Vibration on interactions',
                 value: HapticService.instance.isEnabled,
                 onChanged: (value) {
-                  HapticService.instance.setEnabled(value);
+                  setState(() {
+                    HapticService.instance.setEnabled(value);
+                  });
                 },
               ),
             ],
@@ -256,7 +283,9 @@ class AudioSettings extends StatelessWidget {
                   subtitle: 'Select output device',
                   value: AudioRoutingService.instance.isEnabled,
                   onChanged: (value) {
-                    AudioRoutingService.instance.setEnabled(value);
+                    setState(() {
+                      AudioRoutingService.instance.setEnabled(value);
+                    });
                   },
                 ),
               ],
@@ -272,7 +301,9 @@ class AudioSettings extends StatelessWidget {
                   subtitle: 'High-quality audio codec',
                   value: BluetoothCodecService.instance.isHighQualityEnabled,
                   onChanged: (value) {
-                    BluetoothCodecService.instance.setHighQualityEnabled(value);
+                    setState(() {
+                      BluetoothCodecService.instance.setHighQualityEnabled(value);
+                    });
                   },
                 ),
               ],

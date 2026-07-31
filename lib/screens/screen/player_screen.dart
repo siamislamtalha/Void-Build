@@ -88,7 +88,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
         foregroundColor: iconColor,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.keyboard_arrow_down_rounded, size: 32, color: iconColor),
+          icon: Icon(MingCute.down_line, size: 32, color: iconColor),
           onPressed: () {
             // Collapse Up Next panel if expanded, then always minimize the player.
             _upNextPanelController.collapse();
@@ -925,10 +925,9 @@ class _CastButtonState extends State<_CastButton> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final iconColor = isDark ? Default_Theme.primaryColor1 : Default_Theme.primaryColor2;
 
-    return StreamBuilder(
-      stream: Stream.periodic(const Duration(seconds: 1), (_) {
-        return _castService.currentState;
-      }),
+    return StreamBuilder<cast_service.CastState>(
+      stream: _castService.stateStream,
+      initialData: _castService.currentState,
       builder: (context, snapshot) {
         final castState = snapshot.data ?? cast_service.CastState.disconnected;
         final isCasting = castState == cast_service.CastState.connected;
@@ -966,54 +965,87 @@ class _CastDialog extends StatefulWidget {
 
 class _CastDialogState extends State<_CastDialog> {
   @override
+  void initState() {
+    super.initState();
+    widget.castService.scanForDevices();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final iconColor = isDark ? Default_Theme.primaryColor1 : Default_Theme.primaryColor2;
     final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
     final borderColor = isDark ? Default_Theme.cardBorderColor : const Color(0xFFE5E5EA);
 
-    return AlertDialog(
-      backgroundColor: bgColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      title: Row(
-        children: [
-          const ChromecastIcon(size: 24, color: null),
-          const SizedBox(width: 12),
-          Text(
-            'Cast to Device',
-            style: TextStyle(
-              color: iconColor,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-      content: SizedBox(
-        width: 300,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (widget.castService.isCasting) ...[
-              _buildCurrentDevice(iconColor),
-              Divider(color: borderColor),
-              const SizedBox(height: 8),
-            ],
-            _buildDeviceList(iconColor),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(
-            'Cancel',
-            style: TextStyle(color: iconColor),
-          ),
-        ),
-      ],
+    return StreamBuilder<cast_service.CastState>(
+      stream: widget.castService.stateStream,
+      initialData: widget.castService.currentState,
+      builder: (context, stateSnapshot) {
+        return StreamBuilder<List<cast_service.CastDevice>>(
+          stream: widget.castService.devicesStream,
+          initialData: widget.castService.availableDevices,
+          builder: (context, devicesSnapshot) {
+            final isCasting = widget.castService.isCasting;
+            final isConnecting = stateSnapshot.data == cast_service.CastState.connecting;
+            final devices = devicesSnapshot.data ?? [];
+
+            return AlertDialog(
+              backgroundColor: bgColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Row(
+                children: [
+                  const ChromecastIcon(size: 24, color: null),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Cast to Device',
+                    style: TextStyle(
+                      color: iconColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (isConnecting) ...[
+                    const Spacer(),
+                    SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.accentColor(context),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              content: SizedBox(
+                width: 300,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isCasting) ...[
+                      _buildCurrentDevice(iconColor),
+                      Divider(color: borderColor),
+                      const SizedBox(height: 8),
+                    ],
+                    _buildDeviceList(iconColor, devices),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: iconColor),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -1043,9 +1075,6 @@ class _CastDialogState extends State<_CastDialog> {
             icon: Icon(MingCute.unlink_line, color: iconColor),
             onPressed: () async {
               await widget.castService.disconnect();
-              if (mounted) {
-                setState(() {});
-              }
             },
           ),
         ),
@@ -1053,14 +1082,12 @@ class _CastDialogState extends State<_CastDialog> {
     );
   }
 
-  Widget _buildDeviceList(Color iconColor) {
-    final devices = widget.castService.availableDevices;
-    
+  Widget _buildDeviceList(Color iconColor, List<cast_service.CastDevice> devices) {
     if (devices.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(16),
         child: Text(
-          'No devices available',
+          'Searching for devices...',
           style: TextStyle(
             color: iconColor.withValues(alpha: 0.6),
           ),
@@ -1090,7 +1117,6 @@ class _CastDialogState extends State<_CastDialog> {
             final success = await widget.castService.connectToDevice(device);
             if (success && mounted) {
               Navigator.pop(context);
-              setState(() {});
             }
           },
         )),

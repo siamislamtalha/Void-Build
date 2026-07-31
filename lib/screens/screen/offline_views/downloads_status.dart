@@ -13,8 +13,8 @@ class DownloadsView extends StatelessWidget {
         centerTitle: true,
         title: Text(
           'Downloads',
-          style: const TextStyle(
-                  color: Default_Theme.primaryColor1,
+          style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 20,
                   fontWeight: FontWeight.bold)
               .merge(Default_Theme.secondoryTextStyle),

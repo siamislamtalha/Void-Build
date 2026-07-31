@@ -85,6 +85,9 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
     final l10n = AppLocalizations.of(context)!;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -97,8 +100,8 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
           child: Container(
             decoration: AppTheme.liquidGlassDecoration(
               borderRadius: 24,
-              glassColor: const Color(0xF50A040C),
-              borderColor: const Color(0x3BFFFFFF),
+              glassColor: isDark ? const Color(0xF50A040C) : Colors.white,
+              borderColor: isDark ? const Color(0x3BFFFFFF) : const Color(0x1F000000),
               borderWidth: 1,
             ),
             child: ClipRRect(
@@ -148,8 +151,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                             TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.w600,
-                              color: Default_Theme.primaryColor2.withValues(
-                                  alpha: 0.9), // Typed text in clear white
+                              color: colorScheme.onSurface,
                             ),
                           ),
                           decoration: InputDecoration(
@@ -159,8 +161,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                                 Default_Theme.secondoryTextStyleMedium.merge(
                               TextStyle(
                                 fontSize: 32,
-                                color: Default_Theme.primaryColor2.withValues(
-                                    alpha: 0.2), // Greyed out hint text
+                                color: colorScheme.onSurface.withValues(alpha: 0.25),
                               ),
                             ),
                             isDense: true,
@@ -202,7 +203,7 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // FIXED Cancel Button (Greyed-out white, more weight)
+                            // Cancel Button
                             InkWell(
                               onTap: () => context.pop(),
                               borderRadius: BorderRadius.circular(8),
@@ -215,11 +216,9 @@ class _CreatePlaylistDialogState extends State<_CreatePlaylistDialog> {
                                       .merge(
                                     TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight
-                                          .w600, // Added more weight so it isn't blurry
-                                      color: Default_Theme.primaryColor2
-                                          .withValues(
-                                              alpha: 0.6), // Greyed-out white
+                                      fontWeight: FontWeight.w600,
+                                      color: colorScheme.onSurface
+                                          .withValues(alpha: 0.6),
                                     ),
                                   ),
                                 ),

@@ -21,6 +21,9 @@ import 'package:voidmusic/services/metadata/duplicate_detection_service.dart';
 import 'package:voidmusic/services/metadata/metadata_autofill_service.dart';
 import 'package:voidmusic/services/cast/google_cast_service.dart';
 import 'package:voidmusic/services/network/proxy_service.dart';
+import 'package:voidmusic/services/car/android_auto_service.dart';
+import 'package:voidmusic/services/widget/lock_screen_widget_service.dart';
+import 'package:voidmusic/services/l10n/language_expansion_service.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/setting_shared_widgets.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:flutter/material.dart';
@@ -28,15 +31,18 @@ import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'dart:io';
 
-class AdvancedFeaturesSettings extends StatelessWidget {
+class AdvancedFeaturesSettings extends StatefulWidget {
   const AdvancedFeaturesSettings({super.key});
 
+  @override
+  State<AdvancedFeaturesSettings> createState() => _AdvancedFeaturesSettingsState();
+}
+
+class _AdvancedFeaturesSettingsState extends State<AdvancedFeaturesSettings> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final iconColor = isDark ? Default_Theme.primaryColor1 : Default_Theme.primaryColor2;
-    final textColor = isDark ? Default_Theme.primaryColor1 : const Color(0xFF1A1A1A);
-    final subtitleColor = isDark ? Default_Theme.primaryColor2 : const Color(0xFF666666);
     
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF000000) : AppTheme.lightBg,
@@ -50,7 +56,7 @@ class AdvancedFeaturesSettings extends StatelessWidget {
           child: Center(
             child: IconButton(
               icon: Icon(
-                Icons.arrow_back_rounded,
+                MingCute.left_line,
                 color: iconColor,
                 size: 24,
               ),
@@ -82,7 +88,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'ReplayGain volume leveling',
                 value: VolumeNormalizationService.instance.isEnabled,
                 onChanged: (value) {
-                  VolumeNormalizationService.instance.setEnabled(value);
+                  setState(() {
+                    VolumeNormalizationService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -91,7 +99,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Auto-skip silent sections',
                 value: SkipSilenceService.instance.isEnabled,
                 onChanged: (value) {
-                  SkipSilenceService.instance.setEnabled(value);
+                  setState(() {
+                    SkipSilenceService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -100,7 +110,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: '31-band parametric EQ',
                 value: AdvancedEqualizerService.instance.isEnabled,
                 onChanged: (value) {
-                  AdvancedEqualizerService.instance.setEnabled(value);
+                  setState(() {
+                    AdvancedEqualizerService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -109,7 +121,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Reverb, bass boost, etc.',
                 value: AudioEffectsService.instance.globalEnabled,
                 onChanged: (value) {
-                  AudioEffectsService.instance.setGlobalEnabled(value);
+                  setState(() {
+                    AudioEffectsService.instance.setGlobalEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -118,7 +132,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Seamless track transitions',
                 value: GaplessPlaybackService.instance.isEnabled,
                 onChanged: (value) {
-                  GaplessPlaybackService.instance.setEnabled(value);
+                  setState(() {
+                    GaplessPlaybackService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -127,7 +143,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: '120Hz+ display support',
                 value: HighRefreshRateService.instance.preferHighRefreshRate,
                 onChanged: (value) {
-                  HighRefreshRateService.instance.setPreferHighRefreshRate(value);
+                  setState(() {
+                    HighRefreshRateService.instance.setPreferHighRefreshRate(value);
+                  });
                 },
               ),
             ],
@@ -145,7 +163,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Fetch from multiple sources',
                 value: MultiSourceLyricsService.instance.isEnabled,
                 onChanged: (value) {
-                  MultiSourceLyricsService.instance.setEnabled(value);
+                  setState(() {
+                    MultiSourceLyricsService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -154,7 +174,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Auto-translate to your language',
                 value: LyricsTranslationService.instance.isEnabled,
                 onChanged: (value) {
-                  LyricsTranslationService.instance.setEnabled(value);
+                  setState(() {
+                    LyricsTranslationService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -163,7 +185,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Convert non-Latin scripts to Latin',
                 value: LyricsRomanizationService.instance.isEnabled,
                 onChanged: (value) {
-                  LyricsRomanizationService.instance.setEnabled(value);
+                  setState(() {
+                    LyricsRomanizationService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -172,7 +196,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Customizable lyrics scrolling',
                 value: AdvancedLyricsScrollingService.instance.autoScroll,
                 onChanged: (value) {
-                  AdvancedLyricsScrollingService.instance.setAutoScroll(value);
+                  setState(() {
+                    AdvancedLyricsScrollingService.instance.setAutoScroll(value);
+                  });
                 },
               ),
             ],
@@ -190,7 +216,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Quick actions on list items',
                 value: SwipeActionsService.instance.isEnabled,
                 onChanged: (value) {
-                  SwipeActionsService.instance.setEnabled(value);
+                  setState(() {
+                    SwipeActionsService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -199,7 +227,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Tactile feedback on interactions',
                 value: HapticService.instance.isEnabled,
                 onChanged: (value) {
-                  HapticService.instance.setEnabled(value);
+                  setState(() {
+                    HapticService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -208,7 +238,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Advanced gesture controls',
                 value: EnhancedGestureService.instance.isEnabled,
                 onChanged: (value) {
-                  EnhancedGestureService.instance.setEnabled(value);
+                  setState(() {
+                    EnhancedGestureService.instance.setEnabled(value);
+                  });
                 },
               ),
             ],
@@ -226,7 +258,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Variable speed control',
                 value: PlaybackSpeedService.instance.currentSpeed != 1.0,
                 onChanged: (value) {
-                  PlaybackSpeedService.instance.setSpeed(value ? 1.0 : 1.0);
+                  setState(() {
+                    PlaybackSpeedService.instance.setSpeed(value ? 1.25 : 1.0);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -235,7 +269,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Intelligent queue management',
                 value: SmartQueueService.instance.isEnabled,
                 onChanged: (value) {
-                  SmartQueueService.instance.setEnabled(value);
+                  setState(() {
+                    SmartQueueService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -244,7 +280,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Infinite radio playlists',
                 value: RadioService.instance.isEnabled,
                 onChanged: (value) {
-                  RadioService.instance.setEnabled(value);
+                  setState(() {
+                    RadioService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -253,7 +291,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Volume fade-out profiles',
                 value: AdvancedSleepTimerService.instance.isEnabled,
                 onChanged: (value) {
-                  AdvancedSleepTimerService.instance.setEnabled(value);
+                  setState(() {
+                    AdvancedSleepTimerService.instance.setEnabled(value);
+                  });
                 },
               ),
             ],
@@ -271,7 +311,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Find and merge duplicates',
                 value: DuplicateDetectionService.instance.similarityThreshold > 0,
                 onChanged: (value) {
-                  DuplicateDetectionService.instance.setSimilarityThreshold(value ? 0.85 : 0.0);
+                  setState(() {
+                    DuplicateDetectionService.instance.setSimilarityThreshold(value ? 0.85 : 0.0);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -280,7 +322,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Enrich from online sources',
                 value: MetadataAutofillService.instance.isEnabled,
                 onChanged: (value) {
-                  MetadataAutofillService.instance.setEnabled(value);
+                  setState(() {
+                    MetadataAutofillService.instance.setEnabled(value);
+                  });
                 },
               ),
             ],
@@ -298,7 +342,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Cast to Chromecast devices',
                 value: GoogleCastService.instance.isEnabled,
                 onChanged: (value) {
-                  GoogleCastService.instance.setEnabled(value);
+                  setState(() {
+                    GoogleCastService.instance.setEnabled(value);
+                  });
                 },
               ),
               SettingToggleTile(
@@ -307,7 +353,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                 subtitle: 'Network proxy configuration',
                 value: ProxyService.instance.isEnabled,
                 onChanged: (value) {
-                  ProxyService.instance.setEnabled(value);
+                  setState(() {
+                    ProxyService.instance.setEnabled(value);
+                  });
                 },
               ),
             ],
@@ -325,7 +373,9 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   subtitle: 'Select output device',
                   value: AudioRoutingService.instance.isEnabled,
                   onChanged: (value) {
-                    AudioRoutingService.instance.setEnabled(value);
+                    setState(() {
+                      AudioRoutingService.instance.setEnabled(value);
+                    });
                   },
                 ),
               ],
@@ -343,12 +393,65 @@ class AdvancedFeaturesSettings extends StatelessWidget {
                   subtitle: 'High-quality audio codec',
                   value: BluetoothCodecService.instance.isHighQualityEnabled,
                   onChanged: (value) {
-                    BluetoothCodecService.instance.setHighQualityEnabled(value);
+                    setState(() {
+                      BluetoothCodecService.instance.setHighQualityEnabled(value);
+                    });
                   },
                 ),
               ],
             ),
           ],
+
+          const SizedBox(height: 28),
+
+          // Platform & Integration Features
+          const SettingSectionHeader(label: 'Platform & Car Features'),
+          SettingCard(
+            children: [
+              SettingToggleTile(
+                icon: MingCute.car_line,
+                title: 'Android Auto',
+                subtitle: 'Car mode & voice playback controls',
+                value: AndroidAutoService.instance.isEnabled,
+                onChanged: (value) {
+                  setState(() {
+                    AndroidAutoService.instance.setEnabled(value);
+                  });
+                },
+              ),
+              SettingToggleTile(
+                icon: MingCute.cellphone_line,
+                title: 'Lock Screen Widgets',
+                subtitle: 'Platform lock screen media controls',
+                value: LockScreenWidgetService.instance.isEnabled,
+                onChanged: (value) {
+                  setState(() {
+                    LockScreenWidgetService.instance.setEnabled(value);
+                  });
+                },
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 28),
+
+          // Localization & Community Translation
+          const SettingSectionHeader(label: 'Language & Community Translation'),
+          SettingCard(
+            children: [
+              SettingToggleTile(
+                icon: MingCute.earth_line,
+                title: 'Community Translations',
+                subtitle: 'Use crowdsourced translation overrides',
+                value: LanguageExpansionService.instance.communityTranslationsEnabled,
+                onChanged: (value) {
+                  setState(() {
+                    LanguageExpansionService.instance.setCommunityTranslationsEnabled(value);
+                  });
+                },
+              ),
+            ],
+          ),
 
           const SizedBox(height: 28),
           const BottomSafeAreaSpacer(),

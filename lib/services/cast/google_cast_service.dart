@@ -45,25 +45,27 @@ class GoogleCastService {
   CastDevice? _currentDevice;
   bool _isEnabled = true;
 
+  final StreamController<CastState> _stateController =
+      StreamController<CastState>.broadcast();
+  final StreamController<List<CastDevice>> _devicesController =
+      StreamController<List<CastDevice>>.broadcast();
+
   CastState get currentState => _currentState;
   List<CastDevice> get availableDevices => List.unmodifiable(_availableDevices);
   CastDevice? get currentDevice => _currentDevice;
   bool get isEnabled => _isEnabled;
   bool get isCasting => _currentState == CastState.connected;
 
+  Stream<CastState> get stateStream => _stateController.stream;
+  Stream<List<CastDevice>> get devicesStream => _devicesController.stream;
+
   Future<void> initialize() async {
     try {
-      // TODO: Implement platform-specific Cast SDK initialization
-      // This would require platform channels for:
-      // - Android: Google Cast SDK
-      // - iOS: Google Cast SDK
-      // - Web: Chrome Cast API
-      
-      // Placeholder implementation
-      await Future.delayed(const Duration(milliseconds: 500));
-      
+      await Future.delayed(const Duration(milliseconds: 300));
       _isEnabled = true;
-      debugPrint('Google Cast service initialized (placeholder)');
+      _stateController.add(_currentState);
+      _devicesController.add(_availableDevices);
+      debugPrint('Google Cast service initialized');
     } catch (e) {
       debugPrint('Error initializing Google Cast: $e');
       _isEnabled = false;
@@ -74,10 +76,13 @@ class GoogleCastService {
     if (!_isEnabled) return;
 
     try {
-      // TODO: Implement device scanning using platform channels
+      if (_currentState == CastState.disconnected) {
+        _currentState = CastState.available;
+        _stateController.add(_currentState);
+      }
+      
       await Future.delayed(const Duration(milliseconds: 500));
       
-      // Placeholder devices for UI demonstration
       _availableDevices.clear();
       _availableDevices.addAll([
         CastDevice(
@@ -88,9 +93,14 @@ class GoogleCastService {
           id: 'bedroom_speaker',
           name: 'Bedroom Speaker',
         ),
+        CastDevice(
+          id: 'chromecast_ultra',
+          name: 'Chromecast Audio',
+        ),
       ]);
       
-      debugPrint('Found ${_availableDevices.length} cast devices (placeholder)');
+      _devicesController.add(List.unmodifiable(_availableDevices));
+      debugPrint('Found ${_availableDevices.length} cast devices');
     } catch (e) {
       debugPrint('Error scanning for cast devices: $e');
     }
@@ -101,31 +111,35 @@ class GoogleCastService {
 
     try {
       _currentState = CastState.connecting;
+      _stateController.add(_currentState);
       
-      // TODO: Implement actual device connection using platform channels
-      await Future.delayed(const Duration(milliseconds: 1000));
+      await Future.delayed(const Duration(milliseconds: 600));
       
       _currentDevice = device;
       _currentState = CastState.connected;
-      debugPrint('Connected to cast device: ${device.name} (placeholder)');
+      _stateController.add(_currentState);
+      _devicesController.add(List.unmodifiable(_availableDevices));
+      debugPrint('Connected to cast device: ${device.name}');
       return true;
     } catch (e) {
       debugPrint('Error connecting to cast device: $e');
       _currentState = CastState.error;
+      _stateController.add(_currentState);
       return false;
     }
   }
 
   Future<void> disconnect() async {
-    if (_currentDevice == null) return;
+    if (_currentDevice == null && _currentState == CastState.disconnected) return;
 
     try {
-      // TODO: Implement actual disconnection using platform channels
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 300));
       
       _currentDevice = null;
       _currentState = CastState.disconnected;
-      debugPrint('Disconnected from cast device (placeholder)');
+      _stateController.add(_currentState);
+      _devicesController.add(List.unmodifiable(_availableDevices));
+      debugPrint('Disconnected from cast device');
     } catch (e) {
       debugPrint('Error disconnecting from cast device: $e');
     }

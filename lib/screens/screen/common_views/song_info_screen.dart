@@ -720,7 +720,6 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnabled = !isLoading;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentColor = AppTheme.accentColor(context);
 
     return Material(

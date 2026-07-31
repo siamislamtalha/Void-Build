@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -107,7 +107,7 @@ class _PlaylistOptionsSheet extends StatelessWidget {
                         width: 42,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.20),
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
@@ -118,7 +118,7 @@ class _PlaylistOptionsSheet extends StatelessWidget {
                       child: Text(
                         title,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.95),
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           letterSpacing: -0.3,
@@ -287,10 +287,11 @@ class _OptionGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.04), // Borderless floating card
+        color: cs.onSurface.withValues(alpha: 0.04), // Floating card
         borderRadius: BorderRadius.circular(16),
       ),
       child: ClipRRect(
@@ -298,14 +299,14 @@ class _OptionGroup extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: Column(
-            children: _buildChildrenWithDividers(),
+            children: _buildChildrenWithDividers(cs),
           ),
         ),
       ),
     );
   }
 
-  List<Widget> _buildChildrenWithDividers() {
+  List<Widget> _buildChildrenWithDividers(ColorScheme cs) {
     final List<Widget> result = [];
     for (int i = 0; i < children.length; i++) {
       result.add(children[i]);
@@ -313,8 +314,7 @@ class _OptionGroup extends StatelessWidget {
         result.add(
           Divider(
             height: 1,
-            color:
-                Colors.white.withValues(alpha: 0.04), // Ultra subtle separator
+            color: cs.onSurface.withValues(alpha: 0.06), // Subtle separator
             indent: 52, // Perfectly aligns with the start of the text
           ),
         );
@@ -343,18 +343,19 @@ class _BottomSheetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final effectiveIconColor =
-        iconColor ?? Colors.white.withValues(alpha: 0.55);
+        iconColor ?? cs.onSurface.withValues(alpha: 0.60);
     final effectiveTitleColor =
-        titleColor ?? Colors.white.withValues(alpha: 0.9);
+        titleColor ?? cs.onSurface.withValues(alpha: 0.90);
 
     return InkWell(
       onTap: () {
         Navigator.pop(context);
         onTap();
       },
-      splashColor: Colors.white.withValues(alpha: 0.06),
-      highlightColor: Colors.white.withValues(alpha: 0.03),
+      splashColor: cs.onSurface.withValues(alpha: 0.06),
+      highlightColor: cs.onSurface.withValues(alpha: 0.03),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(

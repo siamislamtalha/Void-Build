@@ -37,12 +37,12 @@ class _ImportMediaFromPlatformsViewState
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Default_Theme.primaryColor1),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
         title: Text(
           AppLocalizations.of(context)!.importSongsTitle,
           style: Default_Theme.secondoryTextStyle.merge(
-            const TextStyle(
-              color: Default_Theme.primaryColor1,
+            TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 20,
             ),
           ),
@@ -144,8 +144,8 @@ class _ImportMediaFromPlatformsViewState
         title: Text(
           AppLocalizations.of(context)!.importNoteTitle,
           style: Default_Theme.primaryTextStyle.merge(
-            const TextStyle(
-              color: Default_Theme.primaryColor1,
+            TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
             ),
           ),

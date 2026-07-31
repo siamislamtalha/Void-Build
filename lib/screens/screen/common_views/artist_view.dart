@@ -341,7 +341,7 @@ class _ArtistViewState extends State<ArtistView> {
           return Center(
             child: Text(
               state.error ?? 'Failed to load artist',
-              style: const TextStyle(color: Default_Theme.primaryColor1),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
           );
         }

@@ -122,26 +122,53 @@ class ParsedLyrics {
   }
 
   void parseLyrics(String syncedLyrics) {
-    //LRC fromat is [mm:ss.xx] lyrics
-    final regex = RegExp(r'\[(\d+):(\d+)\.(\d+)\] (.+)');
-    final matches = regex.allMatches(syncedLyrics);
+    lyrics.clear();
+    // Split by lines to handle single or multi-timestamp LRC lines
+    final lineSplitter = syncedLyrics.split(RegExp(r'\r?\n'));
+    final timestampRegex = RegExp(r'\[(\d+):(\d+)(?:[\.:](\d+))?\]');
 
-    for (var match in matches) {
-      final min = int.parse(match.group(1)!);
-      final sec = int.parse(match.group(2)!);
-      final milli = int.parse(match.group(3)!);
-      final text = match.group(4)!;
-      lyrics.add(
-        ParsedLyric(
-          text: text,
-          start: Duration(
-            minutes: min,
-            seconds: sec.toInt(),
-            milliseconds: milli,
+    for (final rawLine in lineSplitter) {
+      if (rawLine.trim().isEmpty) continue;
+
+      final matches = timestampRegex.allMatches(rawLine).toList();
+      if (matches.isEmpty) continue;
+
+      // Extract the text after all timestamp tags on this line
+      final lastMatch = matches.last;
+      final text = rawLine.substring(lastMatch.end).trim();
+
+      for (final match in matches) {
+        final min = int.parse(match.group(1)!);
+        final sec = int.parse(match.group(2)!);
+        final fracStr = match.group(3);
+
+        int milli = 0;
+        if (fracStr != null && fracStr.isNotEmpty) {
+          final parsedFrac = int.parse(fracStr);
+          if (fracStr.length == 1) {
+            milli = parsedFrac * 100;
+          } else if (fracStr.length == 2) {
+            milli = parsedFrac * 10;
+          } else {
+            milli = parsedFrac;
+          }
+        }
+
+        lyrics.add(
+          ParsedLyric(
+            text: text,
+            start: Duration(
+              minutes: min,
+              seconds: sec,
+              milliseconds: milli,
+            ),
           ),
-        ),
-      );
+        );
+      }
     }
+
+    // Sort lyrics by timestamp in ascending order
+    lyrics.sort((a, b) => a.start.compareTo(b.start));
     log("ParsedLyrics: ${lyrics.length}");
   }
 

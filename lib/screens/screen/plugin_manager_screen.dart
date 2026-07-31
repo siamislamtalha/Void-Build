@@ -636,7 +636,7 @@ class _PluginCard extends StatelessWidget {
         _pluginTypeIcon(type),
         color: isLoaded
             ? AppTheme.accentColor(context)
-            : Default_Theme.primaryColor1.withValues(alpha: 0.5),
+            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
         size: iconSize,
       ),
     );
@@ -1941,7 +1941,7 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.accentColor(context),
-                    foregroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+                    foregroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14)),
@@ -1951,10 +1951,10 @@ class _ApiKeysDialogContentState extends State<_ApiKeysDialogContent> {
                           width: 22,
                           height: 22,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2.5, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black))
+                              strokeWidth: 2.5, color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white))
                       : Text(l10n.pluginManagerSave,
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black)),
+                              fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white)),
                 ),
               ),
             ],

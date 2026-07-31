@@ -1,15 +1,23 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:voidmusic/core/constants/setting_keys.dart';
 import 'package:voidmusic/core/di/service_locator.dart';
+import 'package:voidmusic/services/car/android_auto_service.dart';
+import 'package:voidmusic/services/cast/google_cast_service.dart';
 import 'package:voidmusic/services/db/dao/settings_dao.dart';
-import 'package:voidmusic/services/local_music_service.dart';
-import 'package:voidmusic/services/plugin_bootstrap_service.dart';
-import 'package:voidmusic/services/onboarding_service.dart';
-import 'package:voidmusic/src/rust/frb_generated.dart';
 import 'package:voidmusic/services/db/db_provider.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:voidmusic/services/local_music_service.dart';
+import 'package:voidmusic/services/network/proxy_service.dart';
+import 'package:voidmusic/services/onboarding_service.dart';
+import 'package:voidmusic/services/plugin_bootstrap_service.dart';
+import 'package:voidmusic/services/display/high_refresh_rate_service.dart';
+import 'package:voidmusic/services/bluetooth/bluetooth_codec_service.dart';
+import 'package:voidmusic/services/widget/lock_screen_widget_service.dart';
+import 'package:voidmusic/services/l10n/language_expansion_service.dart';
+import 'package:voidmusic/src/rust/frb_generated.dart';
 
 /// Application bootstrap — run once before [runApp].
 ///
@@ -79,5 +87,19 @@ Future<void> bootstrapApp() async {
   } catch (e) {
     log('Could not load bootstrap flag (will re-run bootstrap)',
         error: e, name: 'Bootstrap');
+  }
+
+  // Initialize advanced feature services
+  try {
+    AndroidAutoService.instance.initialize();
+    GoogleCastService.instance.initialize();
+    ProxyService.instance.initialize();
+    HighRefreshRateService.instance.initialize();
+    BluetoothCodecService.instance.initialize();
+    LockScreenWidgetService.instance;
+    LanguageExpansionService.instance;
+    debugPrint('Advanced feature services initialized successfully');
+  } catch (e) {
+    log('Advanced feature services initialization error: $e', name: 'Bootstrap');
   }
 }

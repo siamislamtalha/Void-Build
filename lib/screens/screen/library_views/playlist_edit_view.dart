@@ -156,7 +156,7 @@ class _PlaylistEditViewState extends State<PlaylistEditView> {
                               TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: Default_Theme.primaryColor1
+                                color: Theme.of(context).colorScheme.onSurface
                                     .withValues(alpha: 0.6),
                               ),
                             ),

@@ -18,6 +18,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:voidmusic/services/lyrics/lyrics_translation_service.dart';
+import 'package:voidmusic/services/lyrics/lyrics_romanization_service.dart';
 
 class FullscreenLyricsView extends StatefulWidget {
   const FullscreenLyricsView({super.key});
@@ -153,7 +155,8 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
                       LyricsLoading() => Center(
                           child: CircularProgressIndicator(
                               color: AppTheme.accentColor(context))),
-                      LyricsLoaded() => state.lyrics.parsedLyrics != null
+                      LyricsLoaded() => (state.lyrics.parsedLyrics != null &&
+                              state.lyrics.parsedLyrics!.lyrics.isNotEmpty)
                           ? FullscreenSyncedLyrics(
                               state: state,
                               positionNotifier: _positionNotifier,
@@ -334,7 +337,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
               ),
             ),
             child: const Icon(
-              Icons.keyboard_arrow_down_rounded,
+              MingCute.down_line,
               color: Colors.white,
               size: 32,
             ),
@@ -363,7 +366,7 @@ class _FullscreenLyricsViewState extends State<FullscreenLyricsView> {
             children: [
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.keyboard_arrow_down_rounded,
+                icon: const Icon(MingCute.down_line,
                     color: Colors.white, size: 32),
               ),
               const SizedBox(width: 16),
@@ -994,6 +997,36 @@ class _LyricsSettingsBottomSheet extends StatelessWidget {
               subtitle: l10n.lyricsSettingsSyncSubtitle,
               color: AppTheme.accentColor(context),
               onTap: onSyncTap,
+            ),
+            _buildMenuItem(
+              icon: MingCute.translate_line,
+              title: 'Translate Lyrics',
+              subtitle: LyricsTranslationService.instance.isEnabled
+                  ? 'Translation enabled (${LyricsTranslationService.instance.targetLanguage.toUpperCase()})'
+                  : 'Translate lyrics to target language',
+              color: LyricsTranslationService.instance.isEnabled
+                  ? AppTheme.accentColor(context)
+                  : Colors.white,
+              onTap: () {
+                final current = LyricsTranslationService.instance.isEnabled;
+                LyricsTranslationService.instance.setEnabled(!current);
+                Navigator.pop(context);
+              },
+            ),
+            _buildMenuItem(
+              icon: MingCute.font_line,
+              title: 'Romanize Lyrics',
+              subtitle: LyricsRomanizationService.instance.isEnabled
+                  ? 'Converting scripts to Latin'
+                  : 'Convert non-Latin scripts to Latin',
+              color: LyricsRomanizationService.instance.isEnabled
+                  ? AppTheme.accentColor(context)
+                  : Colors.white,
+              onTap: () {
+                final current = LyricsRomanizationService.instance.isEnabled;
+                LyricsRomanizationService.instance.setEnabled(!current);
+                Navigator.pop(context);
+              },
             ),
             const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),

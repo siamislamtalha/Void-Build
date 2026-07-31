@@ -45,6 +45,14 @@ class ProxyService {
   ProxyConfig? get proxyConfig => _proxyConfig;
   bool get isEnabled => _isEnabled;
 
+  Future<void> initialize() async {
+    try {
+      debugPrint('Proxy service initialized');
+    } catch (e) {
+      debugPrint('Error initializing proxy service: $e');
+    }
+  }
+
   void setProxyConfig(ProxyConfig config) {
     _proxyConfig = config;
     _isEnabled = config.isEnabled;

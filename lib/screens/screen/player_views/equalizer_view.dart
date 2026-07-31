@@ -10,6 +10,7 @@ import 'package:voidmusic/services/player/player_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'dart:ui' as ui;
 
 const Map<String, List<double>> _kPresets = {
@@ -285,7 +286,7 @@ class _EqualizerViewState extends State<EqualizerView>
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 22),
+          icon: Icon(MingCute.left_line, color: Theme.of(context).colorScheme.onSurface, size: 22),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(l10n.eqTitle,
@@ -296,7 +297,7 @@ class _EqualizerViewState extends State<EqualizerView>
         actions: [
           if (isBuiltinMode)
             IconButton(
-              icon: Icon(Icons.refresh_rounded,
+              icon: Icon(MingCute.refresh_3_line,
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), size: 22),
               onPressed: _resetEQ,
             ),
@@ -373,7 +374,7 @@ class _EqualizerViewState extends State<EqualizerView>
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(Icons.info_outline_rounded,
+                                  Icon(MingCute.information_line,
                                       color: accent, size: 16),
                                   const SizedBox(width: 8),
                                   Expanded(

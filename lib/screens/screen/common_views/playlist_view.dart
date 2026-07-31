@@ -338,7 +338,7 @@ class _OnlPlaylistViewState extends State<OnlPlaylistView> {
                       child: Text(
                         state.error ?? 'Failed to load playlist',
                         style: TextStyle(
-                                color: Default_Theme.primaryColor1
+                                color: Theme.of(context).colorScheme.onSurface
                                     .withValues(alpha: 0.5))
                             .merge(Default_Theme.secondoryTextStyle),
                       ),

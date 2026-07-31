@@ -447,8 +447,8 @@ class _SongInfoCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Default_Theme.secondoryTextStyleMedium.merge(
-                    const TextStyle(
-                      color: Default_Theme.primaryColor1,
+                    TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 14,
                     ),
                   ),
@@ -460,7 +460,7 @@ class _SongInfoCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: Default_Theme.secondoryTextStyle.merge(
                     TextStyle(
-                      color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                       fontSize: 12,
                     ),
                   ),
@@ -487,21 +487,22 @@ class _SearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       child: Container(
         decoration: AppTheme.liquidGlassDecoration(
           borderRadius: 14,
-          glassColor: const Color(0x1A120B16),
-          borderColor: const Color(0x2DFFFFFF),
+          glassColor: AppTheme.glassColor(context),
+          borderColor: AppTheme.glassBorder(context),
         ),
         child: TextField(
           controller: controller,
           focusNode: focusNode,
           textInputAction: TextInputAction.search,
           style: Default_Theme.secondoryTextStyle.merge(
-            const TextStyle(
-              color: Default_Theme.primaryColor1,
+            TextStyle(
+              color: cs.onSurface,
               fontSize: 15,
             ),
           ),
@@ -509,13 +510,13 @@ class _SearchBar extends StatelessWidget {
             hintText: AppLocalizations.of(context)!.searchHintPlaylists,
             hintStyle: Default_Theme.secondoryTextStyle.merge(
               TextStyle(
-                color: Default_Theme.primaryColor1.withValues(alpha: 0.35),
+                color: cs.onSurface.withValues(alpha: 0.35),
                 fontSize: 15,
               ),
             ),
             prefixIcon: Icon(
               Icons.search_rounded,
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.4),
+              color: cs.onSurface.withValues(alpha: 0.4),
               size: 22,
             ),
             suffixIcon: ValueListenableBuilder<String>(
@@ -529,8 +530,7 @@ class _SearchBar extends StatelessWidget {
                           key: const ValueKey('clear'),
                           icon: Icon(
                             Icons.close_rounded,
-                            color: Default_Theme.primaryColor1
-                                .withValues(alpha: 0.4),
+                            color: cs.onSurface.withValues(alpha: 0.4),
                             size: 20,
                           ),
                           onPressed: () => controller.clear(),
@@ -565,12 +565,13 @@ class _PlaylistTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        splashColor: Default_Theme.primaryColor1.withValues(alpha: 0.08),
-        highlightColor: Default_Theme.primaryColor1.withValues(alpha: 0.04),
+        splashColor: cs.onSurface.withValues(alpha: 0.08),
+        highlightColor: cs.onSurface.withValues(alpha: 0.04),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -599,8 +600,8 @@ class _PlaylistTile extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Default_Theme.secondoryTextStyleMedium.merge(
-                        const TextStyle(
-                          color: Default_Theme.primaryColor1,
+                        TextStyle(
+                          color: cs.onSurface,
                           fontSize: 15,
                         ),
                       ),
@@ -612,8 +613,7 @@ class _PlaylistTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: Default_Theme.secondoryTextStyle.merge(
                         TextStyle(
-                          color: Default_Theme.primaryColor1
-                              .withValues(alpha: 0.5),
+                          color: cs.onSurface.withValues(alpha: 0.5),
                           fontSize: 13,
                         ),
                       ),
@@ -635,9 +635,8 @@ class _PlaylistTile extends StatelessWidget {
                           padding: const EdgeInsets.all(6),
                           child: CircularProgressIndicator(
                             strokeWidth: 2.4,
-                            color: Default_Theme.accentColor1,
-                            backgroundColor: Default_Theme.primaryColor1
-                                .withValues(alpha: 0.12),
+                            color: AppTheme.accentColor(context),
+                            backgroundColor: cs.onSurface.withValues(alpha: 0.12),
                           ),
                         ),
                       )
@@ -647,13 +646,13 @@ class _PlaylistTile extends StatelessWidget {
                             width: 32,
                             height: 32,
                             decoration: BoxDecoration(
-                              color: Default_Theme.accentColor1
+                              color: AppTheme.accentColor(context)
                                   .withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.check_rounded,
-                              color: Default_Theme.accentColor1,
+                              color: AppTheme.accentColor(context),
                               size: 20,
                             ),
                           )
@@ -663,8 +662,7 @@ class _PlaylistTile extends StatelessWidget {
                             height: 32,
                             child: Icon(
                               Icons.add_rounded,
-                              color: Default_Theme.primaryColor1
-                                  .withValues(alpha: 0.4),
+                              color: cs.onSurface.withValues(alpha: 0.4),
                               size: 24,
                             ),
                           ),

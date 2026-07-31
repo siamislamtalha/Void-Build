@@ -502,16 +502,15 @@ class _FloatingSearchBarSliver extends StatelessWidget {
                           }
                           return const SizedBox(width: 16);
                         },
-                      )
+                      ),
                     ],
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildAnimatedSearchLeadingIcon() {
@@ -1197,10 +1196,10 @@ class _EntitySuggestionTile extends StatelessWidget {
           child: Row(
             children: [
               isArtist
-                  ? ClipOval(child: _buildThumb(thumbnailUrl))
+                  ? ClipOval(child: _buildThumb(context, thumbnailUrl))
                   : ClipRRect(
                       borderRadius: BorderRadius.circular(6),
-                      child: _buildThumb(thumbnailUrl)),
+                      child: _buildThumb(context, thumbnailUrl)),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -1253,24 +1252,24 @@ class _EntitySuggestionTile extends StatelessWidget {
     );
   }
 
-  Widget _buildThumb(String? url) {
+  Widget _buildThumb(BuildContext context, String? url) {
     if (url != null) {
       return CachedNetworkImage(
           imageUrl: url,
           width: 42,
           height: 42,
           fit: BoxFit.cover,
-          errorWidget: (_, __, ___) => _placeholder());
+          errorWidget: (_, __, ___) => _placeholder(context));
     }
-    return _placeholder();
+    return _placeholder(context);
   }
 
-  Widget _placeholder() => Container(
+  Widget _placeholder(BuildContext context) => Container(
       width: 42,
       height: 42,
       color: Default_Theme.primaryColor2.withValues(alpha: 0.15),
       child: Icon(MingCute.search_line,
-          size: 18, color: Default_Theme.primaryColor1.withValues(alpha: 0.4)));
+          size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)));
 }
 
 class _ContentSliver extends StatelessWidget {

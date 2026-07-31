@@ -143,7 +143,7 @@ class _SegmentsSheetBodyState extends State<_SegmentsSheetBody> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Default_Theme.primaryColor1.withValues(alpha: 0.3),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -151,8 +151,8 @@ class _SegmentsSheetBodyState extends State<_SegmentsSheetBody> {
               padding: const EdgeInsets.all(16),
               child: Text(
                 l10n.segmentsSheetTitle,
-                style: const TextStyle(
-                  color: Default_Theme.primaryColor1,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ).merge(Default_Theme.secondoryTextStyle),
@@ -168,7 +168,7 @@ class _SegmentsSheetBodyState extends State<_SegmentsSheetBody> {
                           child: Text(
                             l10n.segmentsSheetEmpty,
                             style: TextStyle(
-                              color: Default_Theme.primaryColor1
+                              color: Theme.of(context).colorScheme.onSurface
                                   .withValues(alpha: 0.5),
                               fontSize: 14,
                             ).merge(Default_Theme.secondoryTextStyle),
@@ -182,20 +182,20 @@ class _SegmentsSheetBodyState extends State<_SegmentsSheetBody> {
                             return ListTile(
                               leading: Icon(
                                 _segmentIcon(segment.segmentType),
-                                color: Default_Theme.primaryColor1,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 size: 22,
                               ),
                               title: Text(
                                 segment.title ?? l10n.segmentsSheetUntitled,
-                                style: const TextStyle(
-                                  color: Default_Theme.primaryColor1,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 14,
                                 ),
                               ),
                               subtitle: Text(
                                 '${_formatDuration(segment.startMs)} – ${_formatDuration(segment.endMs)}',
                                 style: TextStyle(
-                                  color: Default_Theme.primaryColor1
+                                  color: Theme.of(context).colorScheme.onSurface
                                       .withValues(alpha: 0.5),
                                   fontSize: 12,
                                 ),

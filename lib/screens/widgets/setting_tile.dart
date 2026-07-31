@@ -19,17 +19,18 @@ class SettingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return ListTile(
       enabled: onTap != null,
       title: Text(
         title,
-        style: const TextStyle(color: Default_Theme.primaryColor1, fontSize: 16)
+        style: TextStyle(color: colorScheme.onSurface, fontSize: 16)
             .merge(Default_Theme.secondoryTextStyleMedium),
       ),
       subtitle: Text(
         subtitle,
         style: TextStyle(
-                color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
+                color: colorScheme.onSurface.withValues(alpha: 0.55),
                 fontSize: 12)
             .merge(Default_Theme.secondoryTextStyleMedium),
       ),

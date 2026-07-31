@@ -189,8 +189,8 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
               const SizedBox(height: 20),
               Text(
                   AppLocalizations.of(context)!.localMusicStorageAccessRequired,
-                  style: const TextStyle(
-                      color: Default_Theme.primaryColor1,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 20,
                       fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
@@ -211,7 +211,9 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                     AppLocalizations.of(context)!.localMusicGrantPermission),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppTheme.accentColor(context),
-                  foregroundColor: Colors.white,
+                  foregroundColor: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black
+                      : Colors.white,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -337,7 +339,9 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                           AppLocalizations.of(context)!.localMusicAddFolder),
                       style: FilledButton.styleFrom(
                         backgroundColor: AppTheme.accentColor(context),
-                        foregroundColor: Colors.white,
+                        foregroundColor: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.white,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12),
                       ),
@@ -348,7 +352,7 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                   icon: const Icon(MingCute.refresh_2_line, size: 20),
                   label: Text(AppLocalizations.of(context)!.localMusicScanNow),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Default_Theme.primaryColor1,
+                    foregroundColor: Theme.of(context).colorScheme.onSurface,
                     side: BorderSide(
                         color:
                             Default_Theme.primaryColor2.withValues(alpha: 0.2)),
@@ -415,8 +419,8 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
           children: [
             Text(
               AppLocalizations.of(context)!.localMusicFolders,
-              style: const TextStyle(
-                color: Default_Theme.primaryColor1,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -460,8 +464,8 @@ class _LocalMusicScreenState extends State<LocalMusicScreen> {
                                 p.basename(folder),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Default_Theme.primaryColor1,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -694,8 +698,8 @@ class _DeleteConfirmDialogState extends State<_DeleteConfirmDialog> {
                           const SizedBox(width: 6),
                           Text(
                             playlist,
-                            style: const TextStyle(
-                              color: Default_Theme.primaryColor1,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),

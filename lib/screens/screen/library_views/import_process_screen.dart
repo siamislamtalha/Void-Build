@@ -117,7 +117,7 @@ class _ImportProcessScreenState extends State<ImportProcessScreen> {
           ),
         ),
       ),
-      iconTheme: const IconThemeData(color: Default_Theme.primaryColor1),
+      iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
       title: BlocBuilder<ContentImportCubit, ContentImportState>(
         builder: (context, state) {
           final title = state.collectionInfo?.title;
@@ -126,8 +126,8 @@ class _ImportProcessScreenState extends State<ImportProcessScreen> {
                 ? title!
                 : AppLocalizations.of(context)!.importTitle,
             style: Default_Theme.secondoryTextStyleMedium.merge(
-              const TextStyle(
-                color: Default_Theme.primaryColor1,
+              TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
               ),
             ),
@@ -435,8 +435,8 @@ class _CollectionHeader extends StatelessWidget {
                 Text(
                   info.title,
                   style: Default_Theme.secondoryTextStyle.merge(
-                    const TextStyle(
-                      color: Default_Theme.primaryColor1,
+                    TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                     ),
                   ),
@@ -1302,7 +1302,7 @@ class _DoneView extends StatelessWidget {
             TextButton(
               onPressed: onImportMore,
               style: TextButton.styleFrom(
-                  foregroundColor: Default_Theme.primaryColor1),
+                  foregroundColor: Theme.of(context).colorScheme.onSurface),
               child: Text(
                 AppLocalizations.of(context)!.importMore,
                 style:

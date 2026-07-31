@@ -8,8 +8,6 @@ import 'package:voidmusic/screens/screen/home_views/setting_views/audio_settings
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/services/audio/volume_normalization_service.dart';
 import 'package:voidmusic/services/audio/skip_silence_service.dart';
-import 'package:voidmusic/services/audio/gapless_playback_service.dart';
-import 'package:voidmusic/services/player/playback_speed_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';

@@ -7,6 +7,7 @@ import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 import 'song_tile.dart';
 import 'more_bottom_sheet.dart';
@@ -311,7 +312,7 @@ class _CompactHeader extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.queue_music_rounded,
+          Icon(MingCute.playlist_2_line,
               color: iconColor,
               size: 18),
           const SizedBox(width: 8),
@@ -327,7 +328,7 @@ class _CompactHeader extends StatelessWidget {
           AnimatedRotation(
             turns: isExpanded ? 0.5 : 0,
             duration: const Duration(milliseconds: 200),
-            child: Icon(Icons.keyboard_arrow_up_rounded,
+            child: Icon(MingCute.up_line,
                 color: arrowColor,
                 size: 20),
           ),
@@ -409,7 +410,7 @@ class _ClearQueueButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.playlist_remove_rounded,
+              MingCute.delete_3_line,
               size: 15,
               color: textColor,
             ),
@@ -685,7 +686,7 @@ class _QueueItem extends StatelessWidget {
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: 20),
         color: Colors.red.withValues(alpha: 0.8),
-        child: const Icon(Icons.delete, color: Colors.white),
+        child: const Icon(MingCute.delete_2_line, color: Colors.white),
       ),
       onDismissed: (_) => playerCubit.voidMusicPlayer.removeQueueItemAt(index),
       child: Material(
@@ -710,7 +711,7 @@ class _QueueItem extends StatelessWidget {
                       minHeight: 36,
                     ),
                     color: optionsIconColor,
-                    icon: const Icon(Icons.more_horiz_rounded),
+                    icon: const Icon(MingCute.more_2_fill),
                     onPressed: () => showMoreBottomSheet(
                       context,
                       songModel,
@@ -728,7 +729,7 @@ class _QueueItem extends StatelessWidget {
                     // FIX: Slimmer horizontal padding limits the width entirely while maintaining grabability
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                    child: Icon(Icons.drag_handle_rounded,
+                    child: Icon(MingCute.menu_line,
                         color: dragIconColor,
                         size: 20),
                   ),

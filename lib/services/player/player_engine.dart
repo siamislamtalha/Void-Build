@@ -1,10 +1,11 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:media_kit/media_kit.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:voidmusic/services/audio/volume_normalization_service.dart';
 import 'package:voidmusic/services/audio/skip_silence_service.dart';
+import 'package:voidmusic/services/audio/advanced_equalizer_service.dart';
 import 'package:voidmusic/services/audio/audio_effects_service.dart';
 import 'package:voidmusic/services/audio/gapless_playback_service.dart';
 import 'package:voidmusic/services/player/playback_speed_service.dart';
@@ -222,25 +223,16 @@ class PlayerEngine {
   
   bool get isCasting => cast_service.GoogleCastService.instance.isCasting;
   
-  String _getCurrentMediaUrl() {
-    // Placeholder - would need to track current media URL
-    return '';
-  }
-  
-  String _getCurrentMediaTitle() {
-    // Placeholder - would need to track current media title
-    return '';
-  }
-  
-  String _getCurrentMediaArtist() {
-    // Placeholder - would need to track current media artist
-    return '';
-  }
-  
-  String _getCurrentMediaAlbum() {
-    // Placeholder - would need to track current media album
-    return '';
-  }
+  String currentMediaUrl = '';
+  String currentMediaTitle = '';
+  String currentMediaArtist = '';
+  String currentMediaAlbum = '';
+  String currentArtworkUrl = '';
+
+  String _getCurrentMediaUrl() => currentMediaUrl;
+  String _getCurrentMediaTitle() => currentMediaTitle;
+  String _getCurrentMediaArtist() => currentMediaArtist;
+  String _getCurrentMediaAlbum() => currentMediaAlbum;
 
   void _configureNativePlayer(Player player) {
     if (player.platform is NativePlayer) {
@@ -402,6 +394,7 @@ class PlayerEngine {
     setLoadingState();
 
     try {
+      currentMediaUrl = uri.toString();
       await _active.setVolume(_userVolume * 100.0);
       await _active.open(Media(uri.toString(), httpHeaders: httpHeaders),
           play: autoPlay);
@@ -653,16 +646,25 @@ class PlayerEngine {
 
   Future<void> play() async {
     if (_disposed) return;
+    if (isCasting) {
+      await cast_service.GoogleCastService.instance.play();
+    }
     await _active.play();
   }
 
   Future<void> pause() async {
     if (_disposed) return;
+    if (isCasting) {
+      await cast_service.GoogleCastService.instance.pause();
+    }
     await _active.pause();
   }
 
   Future<void> seek(Duration position) async {
     if (_disposed) return;
+    if (isCasting) {
+      await cast_service.GoogleCastService.instance.seek(position);
+    }
     final actualDuration = _active.state.duration;
     if (actualDuration <= Duration.zero) return;
     final clamped = Duration(
@@ -674,6 +676,9 @@ class PlayerEngine {
   Future<void> setVolume(double value) async {
     if (_disposed) return;
     _userVolume = value.clamp(0.0, 1.0);
+    if (isCasting) {
+      await cast_service.GoogleCastService.instance.setVolume(_userVolume);
+    }
     if (!_isTransitioning) {
       final vol = _userVolume * 100.0;
       await Future.wait([_playerA.setVolume(vol), _playerB.setVolume(vol)]);
@@ -825,90 +830,120 @@ class PlayerEngine {
     if (_disposed) return;
     _eqApplyDebounceTimer?.cancel();
     _eqApplyDebounceTimer = Timer(_eqApplyDebounce, () {
-      if (_disposed || !_eqEnabled) return;
-      _applyEqualizer();
+      if (_disposed) return;
+      _applyAudioFilters();
     });
   }
 
-  /// FIX M-09: Applies the EQ filter with context-awareness.
-  /// - During normal playback: apply to active player only.
-  /// - When not transitioning: apply to both players so the standby
-  ///   is ready for preload and crossfade with the correct filter.
-  /// - After a crossfade completes: re-apply to the now-active player
-  ///   via the post-crossfade Timer in crossfadeToPreloaded.
-  Future<void> _applyEqualizer() async {
+  /// Applies combined audio filters (Equalizer, Effects, Volume Normalization)
+  Future<void> _applyAudioFilters() async {
     if (_disposed) return;
     try {
-      final filter = _eqEnabled ? _buildEqualizerFilter() : '';
-      log('Applying EQ filter: ${filter.isEmpty ? '<off>' : filter}',
+      final filter = _buildCombinedAudioFilter();
+      log('Applying combined audio filter: ${filter.isEmpty ? '<off>' : filter}',
           name: 'PlayerEngine');
 
       if (_isTransitioning) {
-        // During crossfade, only update the new active player (post-swap).
-        // The old player is fading out and will be stopped soon anyway.
-        await _applyEqualizerToPlayer(_active);
+        await _applyFilterToPlayer(_active, filter);
       } else {
-        // Outside of transition, apply to both so preloaded standby is ready.
         await Future.wait([
-          _applyEqualizerToPlayer(_playerA),
-          _applyEqualizerToPlayer(_playerB),
+          _applyFilterToPlayer(_playerA, filter),
+          _applyFilterToPlayer(_playerB, filter),
         ]);
       }
     } catch (e) {
-      log('Equalizer apply error: $e', name: 'PlayerEngine');
+      log('Audio filter apply error: $e', name: 'PlayerEngine');
     }
   }
 
-  Future<void> _applyEqualizerToPlayer(Player player) async {
+  Future<void> _applyEqualizer() async {
+    await _applyAudioFilters();
+  }
+
+  Future<void> _applyFilterToPlayer(Player player, String filter) async {
     if (_disposed) return;
     try {
-      final filter = _eqEnabled ? _buildEqualizerFilter() : '';
       final platform = player.platform;
       if (platform is NativePlayer) {
         await platform.setProperty('af', filter);
       }
     } catch (e) {
-      log('Equalizer apply to player error: $e', name: 'PlayerEngine');
+      log('Audio filter apply to player error: $e', name: 'PlayerEngine');
     }
   }
 
-  String _buildEqualizerFilter() {
+  Future<void> _applyEqualizerToPlayer(Player player) async {
+    final filter = _buildCombinedAudioFilter();
+    await _applyFilterToPlayer(player, filter);
+  }
+
+  String _buildCombinedAudioFilter() {
     final parts = <String>[];
-    for (var i = 0; i < _eqBands.length; i++) {
-      final band = _eqBands[i];
-      if (band.gain.abs() < 0.05) continue;
 
-      final width = switch (i) {
-        0 || 1 => 1.8,
-        8 || 9 => 1.6,
-        _ => 1.25,
-      };
-
-      parts.add(
-        'equalizer=f=${band.centerFrequency}:t=o:w=$width:g=${band.gain.toStringAsFixed(2)}',
-      );
+    // 1. Equalizer Filter
+    final advancedEq = AdvancedEqualizerService.instance;
+    final isEqOn = _eqEnabled || advancedEq.isEnabled;
+    if (isEqOn) {
+      if (advancedEq.isEnabled && advancedEq.currentMode == EqualizerMode.advanced31) {
+        for (final band in advancedEq.bands) {
+          if (band.gain.abs() < 0.05) continue;
+          parts.add('equalizer=f=${band.frequency}:t=o:w=${band.bandwidth}:g=${band.gain.toStringAsFixed(2)}');
+        }
+      } else {
+        for (var i = 0; i < _eqBands.length; i++) {
+          final band = _eqBands[i];
+          if (band.gain.abs() < 0.05) continue;
+          final width = switch (i) {
+            0 || 1 => 1.8,
+            8 || 9 => 1.6,
+            _ => 1.25,
+          };
+          parts.add('equalizer=f=${band.centerFrequency}:t=o:w=$width:g=${band.gain.toStringAsFixed(2)}');
+        }
+      }
     }
+
+    // 2. Audio Effects Filters
+    final fx = AudioEffectsService.instance;
+    if (fx.globalEnabled) {
+      final params = fx.getProcessingParameters();
+      if (params.containsKey('bass_gain') && (params['bass_gain'] ?? 0.0) > 0.05) {
+        final bassGain = params['bass_gain']!;
+        final bassFreq = params['bass_frequency'] ?? 100.0;
+        final bassBandwidth = params['bass_bandwidth'] ?? 1.0;
+        parts.add('equalizer=f=$bassFreq:t=q:w=$bassBandwidth:g=${bassGain.toStringAsFixed(2)}');
+      }
+      if (params.containsKey('treble_gain') && (params['treble_gain'] ?? 0.0) > 0.05) {
+        final trebleGain = params['treble_gain']!;
+        final trebleFreq = params['treble_frequency'] ?? 8000.0;
+        final trebleBandwidth = params['treble_bandwidth'] ?? 1.0;
+        parts.add('equalizer=f=$trebleFreq:t=q:w=$trebleBandwidth:g=${trebleGain.toStringAsFixed(2)}');
+      }
+      if (params.containsKey('reverb_mix') && (params['reverb_mix'] ?? 0.0) > 0.05) {
+        final mix = (params['reverb_mix']! * 0.8).toStringAsFixed(2);
+        parts.add('aecho=0.8:$mix:60:0.4');
+      }
+      if (params.containsKey('stereo_width') && (params['stereo_width'] ?? 1.0) != 1.0) {
+        final width = params['stereo_width']!.toStringAsFixed(2);
+        parts.add('extrastereo=m=$width');
+      }
+    }
+
+    // 3. Volume Normalization Filter
+    final norm = VolumeNormalizationService.instance;
+    if (norm.isEnabled) {
+      final gain = norm.preGain;
+      if (gain.abs() > 0.05) {
+        parts.add('volume=${gain.toStringAsFixed(2)}dB');
+      }
+    }
+
     if (parts.isEmpty) return '';
     return 'lavfi=[${parts.join(',')}]';
   }
 
   Future<void> _applyVolumeNormalization() async {
-    // Apply volume normalization from VolumeNormalizationService
-    final normalization = VolumeNormalizationService.instance;
-    
-    if (!normalization.isEnabled) return;
-    
-    // Get current track gain (would need track info)
-    // For now, apply a basic gain adjustment
-    final gain = normalization.preGain;
-    
-    if (gain.abs() > 0.01) {
-      if (_active.platform is NativePlayer) {
-        final native = _active.platform as NativePlayer;
-        // Apply gain filter
-        native.setProperty('af', 'volume=${gain}dB');
-      }
-    }
+    await _applyAudioFilters();
   }
 
   Future<void> dispose() async {

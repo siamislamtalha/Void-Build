@@ -22,6 +22,7 @@ import 'package:voidmusic/services/player/recently_played_tracker.dart';
 import 'package:voidmusic/services/plugin/plugin_service.dart';
 import 'package:voidmusic/services/meta_resolver/smart_track_replacement_service.dart';
 import 'package:voidmusic/services/discord_service.dart';
+import 'package:voidmusic/services/widget/lock_screen_widget_service.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:async/async.dart';
@@ -444,6 +445,14 @@ class VoidMusicPlayer extends BaseAudioHandler
       DiscordService.updatePresence(
           track: currentTrackInfo, isPlaying: playing);
     });
+
+    LockScreenWidgetService.instance.updateWidgetMedia(
+      title: currentTrackInfo.title,
+      artist: currentTrackInfo.artists.map((a) => a.name).join(', '),
+      artworkUrl: currentTrackInfo.thumbnail.url,
+      position: position,
+      isPlaying: playing,
+    );
   }
 
   // ─── Track Identity ───────────────────────────────────────────────────────

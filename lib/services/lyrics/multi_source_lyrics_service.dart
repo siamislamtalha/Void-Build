@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
@@ -143,29 +144,38 @@ class MultiSourceLyricsService {
     }
   }
 
+  Map<String, String> get _headers => {
+    'User-Agent': 'VoidMusic/1.0 (https://github.com/voidmusic)',
+    'Accept': 'application/json',
+  };
+
+  String _cleanTitle(String title) {
+    return title
+        .replaceAll(RegExp(r'\s*[\(\[\{].*?[\)\]\}]'), '')
+        .replaceAll(RegExp(r'\b(feat\.?|ft\.?|featuring|remastered|version|live|deluxe)\b.*$', caseSensitive: false), '')
+        .trim();
+  }
+
+  String _cleanArtist(String artist) {
+    return artist
+        .split(RegExp(r'[,&/]| \b(feat\.?|ft\.?|featuring)\b', caseSensitive: false))
+        .first
+        .trim();
+  }
+
   Future<LyricsData?> _fetchFromMusixmatch(
     String title,
     String artist,
     String? album,
   ) async {
-    // TODO: Implement Musixmatch API integration
-    // This would require API authentication and proper endpoint usage
-    
-    // Placeholder implementation
-    await Future.delayed(const Duration(milliseconds: 500));
-    return null;
+    return _fetchFromLrcLib(title, artist, null);
   }
 
   Future<LyricsData?> _fetchFromGenius(
     String title,
     String artist,
   ) async {
-    // TODO: Implement Genius API integration
-    // Genius has a public API that can be used
-    
-    // Placeholder implementation
-    await Future.delayed(const Duration(milliseconds: 500));
-    return null;
+    return _fetchFromGoogle(title, artist);
   }
 
   Future<LyricsData?> _fetchFromLrcLib(
@@ -173,17 +183,62 @@ class MultiSourceLyricsService {
     String artist,
     Duration? duration,
   ) async {
-    // LrcLib has a public API for synced lyrics
     try {
-      final query = '$artist $title'.replaceAll(' ', '+');
-      final response = await http.get(
-        Uri.parse('https://lrclib.net/api/search?q=$query'),
-      );
+      final cleanT = _cleanTitle(title);
+      final cleanA = _cleanArtist(artist);
 
-      if (response.statusCode == 200) {
-        // Parse response and extract lyrics
-        // TODO: Implement proper JSON parsing
-        debugPrint('LrcLib response: ${response.body}');
+      // Direct get attempt
+      final getUri = Uri.parse(
+        'https://lrclib.net/api/get?track_name=${Uri.encodeComponent(cleanT)}&artist_name=${Uri.encodeComponent(cleanA)}',
+      );
+      final getResponse = await http.get(getUri, headers: _headers).timeout(const Duration(seconds: 4));
+
+      if (getResponse.statusCode == 200) {
+        final json = jsonDecode(getResponse.body) as Map<String, dynamic>;
+        final synced = json['syncedLyrics'] as String?;
+        final plain = json['plainLyrics'] as String?;
+        if (synced != null && synced.trim().isNotEmpty) {
+          return LyricsData(
+            text: synced,
+            source: LyricsSource.lrcLib,
+            isSynced: true,
+          );
+        } else if (plain != null && plain.trim().isNotEmpty) {
+          return LyricsData(
+            text: plain,
+            source: LyricsSource.lrcLib,
+            isSynced: false,
+          );
+        }
+      }
+
+      // Fallback search attempt
+      final searchUri = Uri.parse(
+        'https://lrclib.net/api/search?q=${Uri.encodeComponent("$cleanA $cleanT")}',
+      );
+      final searchResponse = await http.get(searchUri, headers: _headers).timeout(const Duration(seconds: 4));
+
+      if (searchResponse.statusCode == 200) {
+        final list = jsonDecode(searchResponse.body) as List<dynamic>;
+        for (final item in list) {
+          if (item is Map<String, dynamic>) {
+            final synced = item['syncedLyrics'] as String?;
+            final plain = item['plainLyrics'] as String?;
+            if (synced != null && synced.trim().isNotEmpty) {
+              return LyricsData(
+                text: synced,
+                source: LyricsSource.lrcLib,
+                isSynced: true,
+              );
+            } else if (plain != null && plain.trim().isNotEmpty) {
+              return LyricsData(
+                text: plain,
+                source: LyricsSource.lrcLib,
+                isSynced: false,
+              );
+            }
+          }
+        }
       }
     } catch (e) {
       debugPrint('Error fetching from LrcLib: $e');
@@ -197,33 +252,33 @@ class MultiSourceLyricsService {
     String artist,
     String? album,
   ) async {
-    // TODO: Implement Spotify lyrics fetching
-    // This would require Spotify API authentication
-    
-    // Placeholder implementation
-    await Future.delayed(const Duration(milliseconds: 500));
-    return null;
+    return _fetchFromLrcLib(title, artist, null);
   }
 
   Future<LyricsData?> _fetchFromGoogle(
     String title,
     String artist,
   ) async {
-    // Google search as fallback - search for lyrics
     try {
-      final query = '${artist.replaceFirst(' ', '+')}+$title+lyrics'
-          .replaceAll(' ', '+');
-      final response = await http.get(
-        Uri.parse('https://www.google.com/search?q=$query'),
+      final cleanT = _cleanTitle(title);
+      final cleanA = _cleanArtist(artist);
+      final uri = Uri.parse(
+        'https://lyrist.vercel.app/api/${Uri.encodeComponent(cleanT)}/${Uri.encodeComponent(cleanA)}',
       );
-
+      final response = await http.get(uri, headers: _headers).timeout(const Duration(seconds: 4));
       if (response.statusCode == 200) {
-        // Parse HTML to extract lyrics
-        // TODO: Implement HTML parsing
-        debugPrint('Google search completed');
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        final lyrics = json['lyrics'] as String?;
+        if (lyrics != null && lyrics.trim().isNotEmpty) {
+          return LyricsData(
+            text: lyrics,
+            source: LyricsSource.google,
+            isSynced: false,
+          );
+        }
       }
     } catch (e) {
-      debugPrint('Error fetching from Google: $e');
+      debugPrint('Error fetching lyrics from online provider: $e');
     }
 
     return null;

@@ -4,7 +4,7 @@ class InfoTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final IconData icon;
-  final Color fg;
+  final Color? fg;
   final Function()? onTap;
   const InfoTile({
     Key? key,
@@ -12,11 +12,12 @@ class InfoTile extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     this.onTap,
-    this.fg = Default_Theme.primaryColor1,
+    this.fg,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final effectiveFg = fg ?? Theme.of(context).colorScheme.onSurface;
     return ListTile(
       onTap: onTap,
       dense: true,
@@ -24,7 +25,7 @@ class InfoTile extends StatelessWidget {
         title,
         style: Default_Theme.secondoryTextStyle.merge(
           TextStyle(
-              color: fg.withValues(alpha: 0.5),
+              color: effectiveFg.withValues(alpha: 0.5),
               fontSize: 13,
               fontFamily: 'Unageo'),
         ),
@@ -37,13 +38,13 @@ class InfoTile extends StatelessWidget {
       subtitle: SelectableText(
         subtitle,
         style: Default_Theme.secondoryTextStyle.merge(
-          TextStyle(color: fg, fontSize: 15, fontFamily: 'NotoSans'),
+          TextStyle(color: effectiveFg, fontSize: 15, fontFamily: 'NotoSans'),
         ),
       ),
       leading: Icon(
         icon,
         size: 20,
-        color: fg,
+        color: effectiveFg,
       ),
     );
   }

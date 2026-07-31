@@ -354,7 +354,7 @@ class _AlbumViewState extends State<AlbumView> {
                     child: Text(
                       state.error ?? l10n.albumViewLoadFailed,
                       style: TextStyle(
-                              color: Default_Theme.primaryColor1
+                              color: Theme.of(context).colorScheme.onSurface
                                   .withValues(alpha: 0.5))
                           .merge(Default_Theme.secondoryTextStyle),
                     ),
@@ -428,7 +428,7 @@ class _AlbumHeaderContent extends StatelessWidget {
           children: [
             _buildCover(),
             const SizedBox(height: 24),
-            _buildInfo(isCentered: true),
+            _buildInfo(context, isCentered: true),
             const SizedBox(height: 24),
             _buildActions(context, isCentered: true),
           ],
@@ -447,7 +447,7 @@ class _AlbumHeaderContent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfo(isCentered: false),
+                _buildInfo(context, isCentered: false),
                 const SizedBox(height: 24),
                 _buildActions(context, isCentered: false),
               ],
@@ -500,7 +500,8 @@ class _AlbumHeaderContent extends StatelessWidget {
     return heroTag == null ? cover : Hero(tag: heroTag!, child: cover);
   }
 
-  Widget _buildInfo({required bool isCentered}) {
+  Widget _buildInfo(BuildContext context, {required bool isCentered}) {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment:
           isCentered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
@@ -508,8 +509,8 @@ class _AlbumHeaderContent extends StatelessWidget {
         Text(
           title,
           textAlign: isCentered ? TextAlign.center : TextAlign.left,
-          style: const TextStyle(
-            color: Default_Theme.primaryColor1,
+          style: TextStyle(
+            color: cs.onSurface,
             fontSize: 28,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.5,
@@ -522,7 +523,7 @@ class _AlbumHeaderContent extends StatelessWidget {
             artists,
             textAlign: isCentered ? TextAlign.center : TextAlign.left,
             style: TextStyle(
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.8),
+              color: cs.onSurface.withValues(alpha: 0.8),
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ).merge(Default_Theme.secondoryTextStyleMedium),
@@ -534,7 +535,7 @@ class _AlbumHeaderContent extends StatelessWidget {
             meta.toUpperCase(),
             textAlign: isCentered ? TextAlign.center : TextAlign.left,
             style: TextStyle(
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
+              color: cs.onSurface.withValues(alpha: 0.5),
               fontSize: 12,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.2,

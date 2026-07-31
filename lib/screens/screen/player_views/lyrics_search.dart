@@ -172,7 +172,7 @@ class LyricsSearchDelegate extends SearchDelegate {
         IconButton(
           onPressed: () => query = '',
           icon: Icon(MingCute.close_fill,
-              color: Default_Theme.primaryColor1.withValues(alpha: 0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               size: 20),
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
@@ -349,12 +349,13 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
     final hasSynced =
         widget.match.syncType != plugin_models.LyricsSyncType.none;
 
+    final cs = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: Default_Theme.primaryColor1.withValues(alpha: 0.03),
+        color: cs.onSurface.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: Default_Theme.primaryColor1.withValues(alpha: 0.06)),
+            color: cs.onSurface.withValues(alpha: 0.06)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -362,8 +363,8 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
           color: Colors.transparent,
           child: InkWell(
             onTap: _isApplying ? null : _applyDirectly,
-            splashColor: Default_Theme.primaryColor1.withValues(alpha: 0.06),
-            highlightColor: Default_Theme.primaryColor1.withValues(alpha: 0.04),
+            splashColor: cs.onSurface.withValues(alpha: 0.06),
+            highlightColor: cs.onSurface.withValues(alpha: 0.04),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
               child: Row(
@@ -377,7 +378,7 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
                     decoration: BoxDecoration(
                       color: hasSynced
                           ? AppTheme.accentColor(context).withValues(alpha: 0.12)
-                          : Default_Theme.primaryColor1.withValues(alpha: 0.05),
+                          : cs.onSurface.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: hasSynced
@@ -399,8 +400,7 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
                                   : MingCute.document_line,
                               color: hasSynced
                                   ? AppTheme.accentColor(context)
-                                  : Default_Theme.primaryColor1
-                                      .withValues(alpha: 0.6),
+                                  : cs.onSurface.withValues(alpha: 0.6),
                               size: 22,
                             ),
                     ),
@@ -480,25 +480,22 @@ class _LyricsResultCardState extends State<_LyricsResultCard> {
                         onTap: _isApplying ? null : _openPreview,
                         borderRadius: BorderRadius.circular(10),
                         splashColor:
-                            Default_Theme.primaryColor1.withValues(alpha: 0.1),
+                            cs.onSurface.withValues(alpha: 0.1),
                         highlightColor:
-                            Default_Theme.primaryColor1.withValues(alpha: 0.05),
+                            cs.onSurface.withValues(alpha: 0.05),
                         child: Container(
                           width: 38,
                           height: 38,
                           decoration: BoxDecoration(
-                            color: Default_Theme.primaryColor1
-                                .withValues(alpha: 0.05),
+                            color: cs.onSurface.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                                color: Default_Theme.primaryColor1
-                                    .withValues(alpha: 0.05)),
+                                color: cs.onSurface.withValues(alpha: 0.05)),
                           ),
                           child: Icon(
                             MingCute.eye_2_line,
                             size: 18,
-                            color: Default_Theme.primaryColor1
-                                .withValues(alpha: 0.8),
+                            color: cs.onSurface.withValues(alpha: 0.8),
                           ),
                         ),
                       ),
@@ -600,11 +597,10 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
               child: Container(
                 padding: const EdgeInsets.fromLTRB(20, 12, 12, 12),
                 decoration: BoxDecoration(
-                  color: Default_Theme.primaryColor1.withValues(alpha: 0.02),
+                  color: AppTheme.glassColor(context),
                   border: Border(
                       bottom: BorderSide(
-                          color: Default_Theme.primaryColor1
-                              .withValues(alpha: 0.08))),
+                          color: AppTheme.glassBorder(context))),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -615,7 +611,7 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
                         color:
-                            Default_Theme.primaryColor1.withValues(alpha: 0.2),
+                            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -652,7 +648,7 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
                         ),
                         IconButton(
                           icon: Icon(MingCute.close_fill,
-                              color: Default_Theme.primaryColor1
+                              color: Theme.of(context).colorScheme.onSurface
                                   .withValues(alpha: 0.6),
                               size: 24),
                           onPressed: () => Navigator.pop(context),
@@ -703,11 +699,11 @@ class _LyricsPreviewModalState extends State<_LyricsPreviewModal> {
               padding: EdgeInsets.fromLTRB(
                   24, 16, 24, MediaQuery.of(context).padding.bottom + 24),
               decoration: BoxDecoration(
-                  color: Default_Theme.themeColor,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   border: Border(
                       top: BorderSide(
-                          color: Default_Theme.primaryColor1
-                              .withValues(alpha: 0.05))),
+                          color: Theme.of(context).colorScheme.onSurface
+                              .withValues(alpha: 0.08))),
                   boxShadow: [
                     BoxShadow(
                         color: Colors.black.withValues(alpha: 0.3),

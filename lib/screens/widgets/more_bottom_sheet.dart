@@ -272,7 +272,7 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
                                   .isDownloaded(song.id);
                               return _CompactTile(
                                 icon: isDownloaded
-                                    ? Icons.offline_pin_rounded
+                                    ? MingCute.check_circle_fill
                                     : MingCute.download_2_line,
                                 title: isDownloaded
                                     ? l10n.menuAvailableOffline
@@ -375,7 +375,7 @@ class _Header extends StatelessWidget {
           ),
           IconButton(
             onPressed: onClose,
-            icon: Icon(Icons.close_rounded,
+            icon: Icon(MingCute.close_line,
                 color: cs.onSurface.withValues(alpha: 0.72)),
             tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
             visualDensity: VisualDensity.compact,
@@ -510,7 +510,7 @@ class _CompactTile extends StatelessWidget {
                 ),
               ),
               Icon(
-                Icons.chevron_right_rounded,
+                MingCute.right_line,
                 size: 18,
                 color: cs.onSurface.withValues(alpha: 0.22),
               ),
