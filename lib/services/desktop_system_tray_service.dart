@@ -17,6 +17,7 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
   MiniPlayerCubit? _miniPlayerCubit;
   SettingsCubit? _settingsCubit;
   bool _initialized = false;
+  bool _isHiddenToTray = false;
 
   static bool get isDesktop =>
       !kIsWeb &&
@@ -41,6 +42,7 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
 
       await _initSystemTray();
       _initialized = true;
+      debugPrint('DesktopSystemTrayService initialized successfully');
     } catch (e) {
       debugPrint('Failed to initialize DesktopSystemTrayService: $e');
     }
@@ -79,6 +81,7 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
       );
 
       await trayManager.setContextMenu(menu);
+      debugPrint('System tray icon and menu set up successfully');
     } catch (e) {
       debugPrint('Failed to set up system tray icon/menu: $e');
     }
@@ -90,11 +93,23 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
     final isPlaying = _miniPlayerCubit?.state.isPlaying ?? false;
     final hasTrack = _miniPlayerCubit?.state.track != null;
 
-    // Minimize/hide to system tray if setting enabled and a track is playing/loaded
-    if (closeToTray && (isPlaying || hasTrack)) {
-      await windowManager.hide();
+    debugPrint('Window close requested - closeToTray: $closeToTray, isPlaying: $isPlaying, hasTrack: $hasTrack');
+
+    // Always minimize to tray if closeToTray is enabled, regardless of playback state
+    if (closeToTray) {
+      await _hideToTray();
     } else {
       await windowManager.destroy();
+    }
+  }
+
+  Future<void> _hideToTray() async {
+    try {
+      await windowManager.hide();
+      _isHiddenToTray = true;
+      debugPrint('Window hidden to system tray');
+    } catch (e) {
+      debugPrint('Failed to hide window to tray: $e');
     }
   }
 
@@ -128,18 +143,34 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
         _playerCubit?.voidMusicPlayer.skipToNext();
         break;
       case 'exit_app':
-        await windowManager.destroy();
+        await _exitApp();
         break;
     }
   }
 
   Future<void> _showWindow() async {
-    final isMinimized = await windowManager.isMinimized();
-    if (isMinimized) {
-      await windowManager.restore();
+    try {
+      final isMinimized = await windowManager.isMinimized();
+      if (isMinimized) {
+        await windowManager.restore();
+      }
+      await windowManager.show();
+      await windowManager.focus();
+      _isHiddenToTray = false;
+      debugPrint('Window shown from system tray');
+    } catch (e) {
+      debugPrint('Failed to show window from tray: $e');
     }
-    await windowManager.show();
-    await windowManager.focus();
+  }
+
+  Future<void> _exitApp() async {
+    try {
+      // Clean up before exit
+      await DesktopCleanupService.cleanup();
+      await windowManager.destroy();
+    } catch (e) {
+      debugPrint('Failed to exit app: $e');
+    }
   }
 
   void dispose() {
@@ -147,5 +178,55 @@ class DesktopSystemTrayService with WindowListener, TrayListener {
     windowManager.removeListener(this);
     trayManager.removeListener(this);
     _initialized = false;
+  }
+}
+
+/// Service to handle cleanup of app data on uninstall/exit
+class DesktopCleanupService {
+  static Future<void> cleanup() async {
+    if (!kIsWeb && (io.Platform.isWindows || io.Platform.isLinux || io.Platform.isMacOS)) {
+      try {
+        debugPrint('Starting desktop cleanup...');
+        
+        // Clear tray icon
+        try {
+          await trayManager.destroy();
+          debugPrint('Tray icon destroyed');
+        } catch (e) {
+          debugPrint('Failed to destroy tray icon: $e');
+        }
+        
+        // Note: Actual deletion of app data directories should be handled by the uninstaller
+        // This service is for cleanup that needs to happen during app runtime
+        // For Windows, the uninstaller should handle registry and file cleanup
+        
+        debugPrint('Desktop cleanup completed');
+      } catch (e) {
+        debugPrint('Error during desktop cleanup: $e');
+      }
+    }
+  }
+  
+  /// Get the paths that should be cleaned on uninstall
+  static Map<String, String> getAppDataPaths() {
+    if (!kIsWeb) {
+      if (io.Platform.isWindows) {
+        return {
+          'appData': io.Platform.environment['APPDATA'] ?? '',
+          'localAppData': io.Platform.environment['LOCALAPPDATA'] ?? '',
+        };
+      } else if (io.Platform.isMacOS) {
+        return {
+          'home': io.Platform.environment['HOME'] ?? '',
+        };
+      } else if (io.Platform.isLinux) {
+        return {
+          'home': io.Platform.environment['HOME'] ?? '',
+          'xdgConfigHome': io.Platform.environment['XDG_CONFIG_HOME'] ?? '',
+          'xdgDataHome': io.Platform.environment['XDG_DATA_HOME'] ?? '',
+        };
+      }
+    }
+    return {};
   }
 }
