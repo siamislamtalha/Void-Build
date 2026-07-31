@@ -296,7 +296,7 @@ class _SearchScreenState extends State<SearchScreen> {
           _closeSuggestionPanel();
         },
         child: Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: Colors.transparent,
           resizeToAvoidBottomInset: false,
           body: Stack(
             fit: StackFit.expand,
@@ -420,14 +420,14 @@ class _FloatingSearchBarSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
     return SliverAppBar(
       floating: true,
       snap: true,
-      backgroundColor: colorScheme.surface,
+      backgroundColor: Colors.transparent,
       shadowColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
       titleSpacing: 16,
       toolbarHeight: 70,
       title: Focus(
@@ -436,17 +436,19 @@ class _FloatingSearchBarSliver extends StatelessWidget {
           builder: (context) {
             final onSurface = Theme.of(context).colorScheme.onSurface;
             return ClipRRect(
-              borderRadius: BorderRadius.circular(18),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: colorScheme.outline.withValues(alpha: 0.3),
-                    width: 1,
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: AppTheme.glassBlur,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.glassColor(context),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: AppTheme.glassBorder(context),
+                      width: 1,
+                    ),
                   ),
-                ),
-                child: Row(
+                  child: Row(
                     children: [
                       const SizedBox(width: 16),
                       _buildAnimatedSearchLeadingIcon(),
@@ -506,11 +508,12 @@ class _FloatingSearchBarSliver extends StatelessWidget {
                     ],
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
-      );
+      ),
+    );
   }
 
   Widget _buildAnimatedSearchLeadingIcon() {
@@ -1505,11 +1508,17 @@ class _NebulaBackground extends StatelessWidget {
   List<Color> _getReactiveGradientColors(ContentState state) {
     if (state.searchStatus != SearchStatus.loaded &&
         state.searchStatus != SearchStatus.loadingMore) {
-      return [Colors.transparent, Colors.transparent];
+      return [
+        const Color(0xFF2C1C4D),
+        const Color(0xFF132B4F),
+      ];
     }
     final items = state.searchResults?.items;
     if (items == null || items.isEmpty) {
-      return [Colors.transparent, Colors.transparent];
+      return [
+        const Color(0xFF2C1C4D),
+        const Color(0xFF132B4F),
+      ];
     }
 
     String seedString = "";

@@ -80,12 +80,17 @@ class GaplessPlaybackService {
     debugPrint('Crossfade curve set to: $curve');
   }
 
+  void Function(Duration duration)? onCrossfadeDurationChanged;
+
   void setCrossfadeDuration(Duration duration) {
     _crossfadeDuration = _clampDuration(
       duration,
       _minCrossfadeDuration,
       _maxCrossfadeDuration,
     );
+    if (_isEnabled) {
+      onCrossfadeDurationChanged?.call(_crossfadeDuration);
+    }
     debugPrint('Crossfade duration set to: $_crossfadeDuration');
   }
 
@@ -104,6 +109,9 @@ class GaplessPlaybackService {
     if (!enabled) {
       _cancelCrossfade();
       _cancelPrebuffer();
+      onCrossfadeDurationChanged?.call(Duration.zero);
+    } else {
+      onCrossfadeDurationChanged?.call(_crossfadeDuration);
     }
     debugPrint('Gapless playback ${enabled ? "enabled" : "disabled"}');
   }

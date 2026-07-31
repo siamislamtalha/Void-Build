@@ -175,6 +175,8 @@ class AudioEffectsService {
   String? get currentPresetName => _currentPresetName;
   Stream<Map<String, double>> get parameterStream => _parameterController.stream;
 
+  void Function()? onSettingsChanged;
+
   void initialize() {
     // Initialize all available effects
     for (final type in AudioEffectType.values) {
@@ -186,6 +188,7 @@ class AudioEffectsService {
 
   void setGlobalEnabled(bool enabled) {
     _globalEnabled = enabled;
+    onSettingsChanged?.call();
     debugPrint('Audio effects globally ${enabled ? "enabled" : "disabled"}');
   }
 
@@ -336,6 +339,7 @@ class AudioEffectsService {
 
   void _notifyParameterChange() {
     _parameterController.add(getProcessingParameters());
+    onSettingsChanged?.call();
   }
 
   // Get audio processing parameters for the current effects

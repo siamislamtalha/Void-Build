@@ -52,6 +52,10 @@ class VolumeNormalizationService {
   bool get preventClipping => _preventClipping;
   bool get isEnabled => _normalizationEnabled;
 
+  /// Called whenever any normalization setting changes so the engine
+  /// can immediately re-apply the MPV audio filter chain.
+  void Function()? onSettingsChanged;
+
   void setEnabled(bool enabled) {
     _normalizationEnabled = enabled;
     if (!enabled) {
@@ -60,11 +64,13 @@ class VolumeNormalizationService {
       _currentMode = NormalizationMode.track;
     }
     _startCacheCleanup();
+    onSettingsChanged?.call();
     debugPrint('Volume normalization enabled: $enabled');
   }
 
   void setMode(NormalizationMode mode) {
     _currentMode = mode;
+    onSettingsChanged?.call();
     debugPrint('Volume normalization mode set to: $mode');
   }
 

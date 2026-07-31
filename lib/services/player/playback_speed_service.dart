@@ -26,12 +26,20 @@ class PlaybackSpeedService {
     debugPrint('Playback speed service: Player set');
   }
 
+  void Function(double speed)? onSpeedChanged;
+
+  void recordSpeed(double speed) {
+    _currentSpeed = speed.clamp(0.25, 4.0);
+  }
+
   void setSpeed(double speed) {
-    _currentSpeed = speed.clamp(0.5, 2.0);
+    _currentSpeed = speed.clamp(0.25, 4.0);
     
     if (_player != null) {
       _player!.setRate(_currentSpeed);
     }
+
+    onSpeedChanged?.call(_currentSpeed);
     
     debugPrint('Playback speed set to: $_currentSpeed');
   }

@@ -13,7 +13,6 @@ import 'package:voidmusic/services/plugin/plugin_load_state_service.dart';
 import 'package:voidmusic/services/plugin/plugin_service.dart';
 import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
 import 'package:voidmusic/src/rust/api/plugin/types.dart';
-import 'package:voidmusic/utils/country_info.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
@@ -106,8 +105,8 @@ class PluginBootstrapService {
 
     onProgress(const PluginBootstrapProgress(8));
 
-    final countryCode = await _resolveBootstrapCountryCode(settingsDao);
-    log('Bootstrap policy country: ${countryCode.isEmpty ? '<unset>' : countryCode}',
+    // Country restrictions removed - all plugins available to all countries
+    log('Bootstrap policy country: <all countries allowed>',
         name: 'PluginBootstrap');
 
     List<_HostedRepoEntry> entries;
@@ -196,22 +195,9 @@ class PluginBootstrapService {
         }
 
         // Country restrictions removed - all plugins available to all countries
-        // if (!plugin.isAllowedInCountry(countryCode)) {
-        //   if (plugin.countryAllowlist.isNotEmpty) {
-        //     log(
-        //       'Skipped by allowlist: ${plugin.id} country=$countryCode allowlist=${plugin.countryAllowlist}',
-        //       name: 'PluginBootstrap',
-        //     );
-        //   }
-        //   processedPlugins++;
-        //   continue;
-        // }
-
         bootstrapTargetIds.add(plugin.id);
 
         bool installed = false;
-        String? errorType;
-        String? reason;
         String? lastError;
 
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
@@ -224,7 +210,7 @@ class PluginBootstrapService {
             final result = await pluginService.installPlugin(
               packedFilePath: file.path,
               shouldLoad: true,
-              policyCountryCode: countryCode,
+              policyCountryCode: "", // Empty string removes country restrictions
             );
 
             final ok = result.status == PluginInstallStatus.installed ||
@@ -235,28 +221,10 @@ class PluginBootstrapService {
               installed = true;
               installedIds.add(plugin.id);
             } else {
-              errorType = 'Failed to install';
-              reason = 'Installation returned status ${result.status.name}';
-              lastError = result.error != null ? ' — ${result.error}' : '';
+              lastError =
+                  'Install returned status: ${result.status.name}${result.error != null ? ' — ${result.error}' : ''}';
             }
           } catch (e) {
-            final errorStr = e.toString();
-            if (errorStr.contains('HTTP')) {
-              errorType = 'Failed to download';
-              reason = 'HTTP error';
-            } else if (errorStr.contains('SocketException')) {
-              errorType = 'Failed to download';
-              reason = 'Network connection failed';
-            } else if (errorStr.contains('TimeoutException')) {
-              errorType = 'Failed to download';
-              reason = 'Request timed out';
-            } else if (errorStr.contains('FileSystemException')) {
-              errorType = 'Failed to install';
-              reason = 'File system error';
-            } else {
-              errorType = 'Failed to install';
-              reason = 'Unknown error';
-            }
             lastError = e.toString();
           }
 
@@ -266,9 +234,8 @@ class PluginBootstrapService {
           if (installed) break;
         }
 
-        // Country restrictions removed - always add error if installation failed
         if (!installed) {
-          errors.add('$errorType "${plugin.name}" because $reason$lastError');
+          errors.add('Could not install "${plugin.name}": $lastError');
         }
 
         processedPlugins++;
@@ -420,11 +387,8 @@ class PluginBootstrapService {
     required SettingsDAO settingsDao,
   }) async {
     try {
-      final countryCode =
-          await CountryInfoService.resolveCountryCodeForPolicyCheck(
-        settingsDao: settingsDao,
-      );
-      log('Sync policy country: ${countryCode.isEmpty ? '<unset>' : countryCode}',
+      // Country restrictions removed - all plugins available to all countries
+      log('Sync policy country: <all countries allowed>',
           name: 'PluginBootstrap');
       final hostedEntries = await _fetchHostedEntries();
       await repositoryService.ensureRepositoryUrls(
@@ -459,9 +423,6 @@ class PluginBootstrapService {
             continue;
           }
           // Country restrictions removed - all plugins available to all countries
-          // if (!remote.isAllowedInCountry(countryCode)) {
-          //   continue;
-          // }
           final existing = remoteLatestById[remote.id];
           if (existing == null ||
               _compareVersions(remote.version, existing.version) > 0) {
@@ -505,7 +466,6 @@ class PluginBootstrapService {
             pluginService: pluginService,
             plugin: remote,
             retries: maxRetries,
-            countryCode: countryCode,
             shouldLoad: false,
           );
 
@@ -526,9 +486,6 @@ class PluginBootstrapService {
           // Add to auto-load list if updated.
           final loadStateService = PluginLoadStateService(settingsDao);
           await loadStateService.addAutoLoadPluginIds(<String>[pluginId]);
-        // Country restrictions removed - no longer catch PluginCountryRestrictedException
-        // } on PluginCountryRestrictedException {
-        //   continue;
         } catch (e) {
           log('Auto-update failed for $pluginId: $e', name: 'PluginBootstrap');
         }
@@ -550,7 +507,6 @@ class PluginBootstrapService {
     required PluginService pluginService,
     required RemotePluginModel plugin,
     required int retries,
-    required String countryCode,
     bool shouldLoad = true,
   }) async {
     String? lastError;
@@ -565,7 +521,7 @@ class PluginBootstrapService {
         final result = await pluginService.installPlugin(
           packedFilePath: file.path,
           shouldLoad: shouldLoad,
-          policyCountryCode: countryCode,
+          policyCountryCode: "", // Empty string removes country restrictions
         );
 
         final ok = result.status == PluginInstallStatus.installed ||
@@ -677,18 +633,6 @@ class PluginBootstrapService {
       return await pluginService.getAvailablePlugins();
     } catch (_) {
       return [];
-    }
-  }
-
-  static Future<String> _resolveBootstrapCountryCode(
-    SettingsDAO settingsDao,
-  ) async {
-    try {
-      return await CountryInfoService.resolveCountryCodeForPolicyCheck(
-        settingsDao: settingsDao,
-      );
-    } catch (_) {
-      return '';
     }
   }
 

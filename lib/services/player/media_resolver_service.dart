@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' as dev;
 
 import 'package:voidmusic/core/events/global_event_bus.dart';
 import 'package:voidmusic/core/constants/setting_keys.dart';
@@ -62,14 +62,14 @@ class MediaResolverService {
     try {
       final down = await _downloadDao.getDownloadRecord(track.id);
       if (down != null) {
-        log('Playing Offline: ${track.title}', name: 'MediaResolverService');
+        dev.log('Playing Offline: ${track.title}', name: 'MediaResolverService');
         return ResolvedMediaSource(
           uri: Uri.file('${down.filePath}/${down.fileName}'),
           isOffline: true,
         );
       }
     } catch (e) {
-      log('Download check failed: $e', name: 'MediaResolverService');
+      dev.log('Download check failed: $e', name: 'MediaResolverService');
       // Non-fatal — continue to online resolution
     }
 
@@ -92,7 +92,7 @@ class MediaResolverService {
       );
     }
 
-    log(
+    dev.log(
         'Resolving streams for "${track.title}" '
         '(plugin: ${parts.pluginId}, id: ${parts.localId})',
         name: 'MediaResolverService');
@@ -108,7 +108,7 @@ class MediaResolverService {
           )
           .timeout(const Duration(seconds: 12));
     } on TimeoutException catch (e) {
-      log('Stream resolution timeout for "${track.title}": $e', name: 'MediaResolverService');
+      dev.log('Stream resolution timeout for "${track.title}": $e', name: 'MediaResolverService');
       GlobalEventBus.instance.emitError(
         AppError.pluginError(
           pluginId: parts.pluginId,
@@ -177,7 +177,7 @@ class MediaResolverService {
           );
         }
 
-        log('Resolved stream: $streamUrl', name: 'MediaResolverService');
+        dev.log('Resolved stream: $streamUrl', name: 'MediaResolverService');
         return ResolvedMediaSource(
           uri: uri,
           isOffline: false,

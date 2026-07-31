@@ -1,11 +1,3 @@
-import 'package:voidmusic/services/audio/volume_normalization_service.dart';
-import 'package:voidmusic/services/audio/skip_silence_service.dart';
-import 'package:voidmusic/services/audio/advanced_equalizer_service.dart';
-import 'package:voidmusic/services/audio/audio_effects_service.dart';
-import 'package:voidmusic/services/audio/gapless_playback_service.dart';
-import 'package:voidmusic/services/audio/audio_routing_service.dart';
-import 'package:voidmusic/services/bluetooth/bluetooth_codec_service.dart';
-import 'package:voidmusic/services/display/high_refresh_rate_service.dart';
 import 'package:voidmusic/services/player/playback_speed_service.dart';
 import 'package:voidmusic/services/haptic/haptic_service.dart';
 import 'package:voidmusic/services/lyrics/advanced_lyrics_scrolling_service.dart';
@@ -29,7 +21,7 @@ import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'dart:io';
+import 'package:voidmusic/screens/screen/home_views/setting_views/audio_settings.dart';
 
 class AdvancedFeaturesSettings extends StatefulWidget {
   const AdvancedFeaturesSettings({super.key});
@@ -78,75 +70,18 @@ class _AdvancedFeaturesSettingsState extends State<AdvancedFeaturesSettings> {
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
-          // Audio Features
-          const SettingSectionHeader(label: 'Audio Features'),
+          // Core Audio Link
+          const SettingSectionHeader(label: 'Core Audio Engine'),
           SettingCard(
             children: [
-              SettingToggleTile(
-                icon: MingCute.volume_line,
-                title: 'Volume Normalization',
-                subtitle: 'ReplayGain volume leveling',
-                value: VolumeNormalizationService.instance.isEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    VolumeNormalizationService.instance.setEnabled(value);
-                  });
-                },
-              ),
-              SettingToggleTile(
-                icon: MingCute.skip_forward_line,
-                title: 'Skip Silence',
-                subtitle: 'Auto-skip silent sections',
-                value: SkipSilenceService.instance.isEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    SkipSilenceService.instance.setEnabled(value);
-                  });
-                },
-              ),
-              SettingToggleTile(
-                icon: MingCute.music_2_line,
-                title: 'Advanced Equalizer',
-                subtitle: '31-band parametric EQ',
-                value: AdvancedEqualizerService.instance.isEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    AdvancedEqualizerService.instance.setEnabled(value);
-                  });
-                },
-              ),
-              SettingToggleTile(
-                icon: MingCute.magic_1_line,
-                title: 'Audio Effects',
-                subtitle: 'Reverb, bass boost, etc.',
-                value: AudioEffectsService.instance.globalEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    AudioEffectsService.instance.setGlobalEnabled(value);
-                  });
-                },
-              ),
-              SettingToggleTile(
-                icon: MingCute.wifi_line,
-                title: 'Gapless Playback',
-                subtitle: 'Seamless track transitions',
-                value: GaplessPlaybackService.instance.isEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    GaplessPlaybackService.instance.setEnabled(value);
-                  });
-                },
-              ),
-              SettingToggleTile(
-                icon: MingCute.display_line,
-                title: 'High Refresh Rate',
-                subtitle: '120Hz+ display support',
-                value: HighRefreshRateService.instance.preferHighRefreshRate,
-                onChanged: (value) {
-                  setState(() {
-                    HighRefreshRateService.instance.setPreferHighRefreshRate(value);
-                  });
-                },
+              SettingNavTile(
+                icon: MingCute.music_2_fill,
+                title: 'Audio Engine & DSP Settings',
+                subtitle: 'Volume normalization, EQ, audio effects & routing',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AudioSettings()),
+                ),
               ),
             ],
           ),
@@ -360,47 +295,6 @@ class _AdvancedFeaturesSettingsState extends State<AdvancedFeaturesSettings> {
               ),
             ],
           ),
-
-          // Platform-specific features
-          if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) ...[
-            const SizedBox(height: 28),
-            const SettingSectionHeader(label: 'Desktop'),
-            SettingCard(
-              children: [
-                SettingToggleTile(
-                  icon: MingCute.device_line,
-                  title: 'Audio Routing',
-                  subtitle: 'Select output device',
-                  value: AudioRoutingService.instance.isEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      AudioRoutingService.instance.setEnabled(value);
-                    });
-                  },
-                ),
-              ],
-            ),
-          ],
-
-          if (Platform.isAndroid) ...[
-            const SizedBox(height: 28),
-            const SettingSectionHeader(label: 'Android'),
-            SettingCard(
-              children: [
-                SettingToggleTile(
-                  icon: MingCute.bluetooth_line,
-                  title: 'Bluetooth Codec',
-                  subtitle: 'High-quality audio codec',
-                  value: BluetoothCodecService.instance.isHighQualityEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      BluetoothCodecService.instance.setHighQualityEnabled(value);
-                    });
-                  },
-                ),
-              ],
-            ),
-          ],
 
           const SizedBox(height: 28),
 

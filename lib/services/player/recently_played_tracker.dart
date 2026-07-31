@@ -1,5 +1,5 @@
 ﻿import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' as dev;
 
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/services/player/player_engine.dart';
@@ -107,9 +107,9 @@ class RecentlyPlayedTracker {
         final trackDao = TrackDAO(DBProvider.db);
         final historyDao = HistoryDAO(DBProvider.db, trackDao);
         await historyDao.recordPlay(track);
-        log('Tracked play for ${track.id}', name: 'RecentlyPlayedTracker');
+        dev.log('Tracked play for ${track.id}', name: 'RecentlyPlayedTracker');
       } catch (e) {
-        log('Failed to record play: $e', name: 'RecentlyPlayedTracker');
+        dev.log('Failed to record play: $e', name: 'RecentlyPlayedTracker');
       }
     }
   }

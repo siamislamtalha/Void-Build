@@ -262,6 +262,8 @@ class AdvancedEqualizerService {
     ];
   }
 
+  void Function()? onSettingsChanged;
+
   void setMode(EqualizerMode mode) {
     if (_currentMode == mode) return;
     
@@ -269,11 +271,13 @@ class AdvancedEqualizerService {
     _initializeBands();
     _initializePresets();
     _currentPreset = null;
+    onSettingsChanged?.call();
     debugPrint('Equalizer mode set to: $mode');
   }
 
   void setEnabled(bool enabled) {
     _isEnabled = enabled;
+    onSettingsChanged?.call();
     debugPrint('Equalizer ${enabled ? "enabled" : "disabled"}');
   }
 
@@ -281,12 +285,14 @@ class AdvancedEqualizerService {
     if (index >= 0 && index < _bands.length) {
       _bands[index].gain = gain.clamp(-15.0, 15.0);
       _currentPreset = null; // Clear preset when manually adjusting
+      onSettingsChanged?.call();
     }
   }
 
   void setBandBandwidth(int index, double bandwidth) {
     if (index >= 0 && index < _bands.length) {
       _bands[index].bandwidth = bandwidth.clamp(0.1, 5.0);
+      onSettingsChanged?.call();
     }
   }
 
@@ -301,6 +307,7 @@ class AdvancedEqualizerService {
     }
     
     _currentPreset = preset;
+    onSettingsChanged?.call();
     debugPrint('Applied preset: ${preset.name}');
   }
 
@@ -310,6 +317,7 @@ class AdvancedEqualizerService {
       band.bandwidth = 1.0;
     }
     _currentPreset = null;
+    onSettingsChanged?.call();
     debugPrint('Equalizer reset to flat');
   }
 

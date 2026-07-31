@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:voidmusic/services/voidmusic_player.dart';
+import 'package:voidmusic/services/player/player_engine.dart';
 
 enum FadeCurve {
   linear,
@@ -60,6 +61,9 @@ class AdvancedSleepTimerService {
       _instance ??= AdvancedSleepTimerService._();
   
   AdvancedSleepTimerService._();
+
+  /// Exposed so [timer_view.dart] can hook up the engine reference.
+  PlayerEngine? _engine;
 
   Timer? _timer;
   Timer? _fadeTimer;
@@ -139,22 +143,28 @@ class AdvancedSleepTimerService {
     debugPrint('Custom profile set: ${profile.name}');
   }
 
+  /// Call this from the UI to attach the engine for volume control.
+  void attachPlayer(VoidMusicPlayer player) {
+    _engine = player.engine;
+    // Capture the current engine volume as our baseline.
+    _originalVolume = player.engine.volume;
+    debugPrint('AdvancedSleepTimerService: player attached, volume=$_originalVolume');
+  }
+
   void startTimer({
     required Duration duration,
     TimerProfile profile = TimerProfile.custom,
     VoidMusicPlayer? player,
   }) {
-    final mediaItem = player?.mediaItem.valueOrNull;
-    if (mediaItem == null || (mediaItem.playable != null && !mediaItem.playable!)) {
-      debugPrint('No playable media, timer not started');
-      return;
+    // Attach player engine if provided
+    if (player != null) {
+      attachPlayer(player);
     }
 
     _cancelTimers();
     _currentProfile = profile;
     _totalDuration = duration;
     _remainingTime = duration;
-    _originalVolume = 1.0;
     _isFading = false;
 
     debugPrint('Sleep timer started: $duration, profile: $profile');
@@ -175,30 +185,39 @@ class AdvancedSleepTimerService {
   }
 
   void _startFade(VoidMusicPlayer? player) {
-    if (_isFading || player == null) return;
+    if (_isFading) return;
+    // Need at least the engine reference to change volume
+    final engine = _engine ?? player?.engine;
+    if (engine == null) {
+      debugPrint('AdvancedSleepTimerService: no engine reference, fade skipped');
+      return;
+    }
 
     _isFading = true;
-    debugPrint('Starting volume fade: $_fadeDuration');
+    // Refresh the original volume from the engine at the moment fade begins
+    _originalVolume = engine.volume;
+    debugPrint('Starting volume fade: $_fadeDuration from vol=$_originalVolume');
 
-    const fadeSteps = 50;
+    const fadeSteps = 60;
     final stepDuration = _fadeDuration.inMilliseconds / fadeSteps;
     var currentStep = 0;
 
     _fadeTimer = Timer.periodic(
-      Duration(milliseconds: stepDuration.round()),
+      Duration(milliseconds: stepDuration.round().clamp(16, 5000)),
       (timer) {
         currentStep++;
         final progress = currentStep / fadeSteps;
         final easedProgress = _applyFadeCurve(progress);
-        final newVolume = _originalVolume - 
+        final newVolume = _originalVolume -
             ((_originalVolume - _minVolume) * easedProgress);
 
-        // TODO: Implement volume control via player
-        // player.setVolume(newVolume.clamp(_minVolume, 1.0));
-        debugPrint('Volume would be: ${newVolume.clamp(_minVolume, 1.0)}');
+        // Actually apply volume to the engine
+        engine.setVolume(newVolume.clamp(_minVolume, 1.0));
+        debugPrint('[SleepTimer] Volume fade: ${(newVolume * 100).toStringAsFixed(1)}%');
 
         if (currentStep >= fadeSteps) {
           timer.cancel();
+          _isFading = false;
           debugPrint('Volume fade completed');
         }
       },

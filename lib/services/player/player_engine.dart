@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' as dev;
+import 'dart:math';
 
 import 'package:media_kit/media_kit.dart';
 import 'package:rxdart/rxdart.dart';
@@ -178,22 +179,42 @@ class PlayerEngine {
 
   void _initializeAudioServices() {
     // Set player instances for audio services
-    VolumeNormalizationService.instance;
     SkipSilenceService.instance.setPlayer(_active);
-    AudioEffectsService.instance;
     GaplessPlaybackService.instance.setPlayer(_active);
-    PlaybackSpeedService.instance;
-    
-    // Initialize services that need to be started
-    if (SkipSilenceService.instance.isEnabled) {
-      SkipSilenceService.instance.setPlayer(_active);
-    }
-    if (GaplessPlaybackService.instance.isEnabled) {
-      GaplessPlaybackService.instance.setPlayer(_active);
-    }
-    
+
+    // Register callbacks so when any audio service setting changes,
+    // we immediately re-apply the combined MPV audio filter chain.
+    VolumeNormalizationService.instance.onSettingsChanged = () {
+      _scheduleAudioFilterApply();
+    };
+    AudioEffectsService.instance.onSettingsChanged = () {
+      _scheduleAudioFilterApply();
+    };
+    AdvancedEqualizerService.instance.onSettingsChanged = () {
+      _scheduleAudioFilterApply();
+    };
+    GaplessPlaybackService.instance.onCrossfadeDurationChanged = (duration) {
+      crossfadeDuration = duration;
+    };
+    PlaybackSpeedService.instance.onSpeedChanged = (spd) {
+      setSpeed(spd);
+    };
+
     // Initialize Google Cast service
     cast_service.GoogleCastService.instance.initialize();
+  }
+
+  /// Public entry point so audio settings UI can trigger filter re-application
+  /// after toggling any feature (EQ mode, audio effects, normalization, etc.).
+  Future<void> applyAudioFilters() => _applyAudioFilters();
+
+  void _scheduleAudioFilterApply() {
+    if (_disposed) return;
+    _eqApplyDebounceTimer?.cancel();
+    _eqApplyDebounceTimer = Timer(_eqApplyDebounce, () {
+      if (_disposed) return;
+      _applyAudioFilters();
+    });
   }
   
   // ── Google Cast Integration ───────────────────────────────────────────────
@@ -272,7 +293,7 @@ class PlayerEngine {
           final pos = _positionSubject.value;
           final dur = _durationSubject.value;
           if (dur > Duration.zero && (dur - pos) > const Duration(seconds: 2)) {
-            log('Abnormal EOF detected (pos: $pos, dur: $dur). Routing to error handler.',
+            dev.log('Abnormal EOF detected (pos: $pos, dur: $dur). Routing to error handler.',
                 name: 'PlayerEngine');
             _triggerEngineFailure(
                 'Abnormal EOF: Connection dropped prematurely');
@@ -285,7 +306,7 @@ class PlayerEngine {
         if (!_isTransitioning) _volumeSubject.add((v / 100.0).clamp(0.0, 1.0));
       }),
       _activePlayerSubject.switchMap((p) => p.stream.error).listen((error) {
-        log('Engine error: $error', name: 'PlayerEngine');
+        dev.log('Engine error: $error', name: 'PlayerEngine');
         _triggerEngineFailure(error);
       }),
       _playerA.stream.volume.listen((v) => _playerAVolume = v),
@@ -450,7 +471,7 @@ class PlayerEngine {
         try {
           await newPlayer.play();
         } catch (e) {
-          log('Socket dropped while idle on standby. Executing fallback re-open.',
+          dev.log('Socket dropped while idle on standby. Executing fallback re-open.',
               name: 'PlayerEngine');
           await newPlayer.open(
               Media(nextUri.toString(), httpHeaders: nextHeaders),
@@ -530,7 +551,7 @@ class PlayerEngine {
       try {
         await newPlayer.play();
       } catch (e) {
-        log('Socket dropped while idle on standby. Executing fallback re-open.',
+        dev.log('Socket dropped while idle on standby. Executing fallback re-open.',
             name: 'PlayerEngine');
         await newPlayer.open(
             Media(nextUri.toString(), httpHeaders: nextHeaders),
@@ -638,7 +659,7 @@ class PlayerEngine {
       final vol = _userVolume * 100.0;
       await Future.wait([_playerA.setVolume(vol), _playerB.setVolume(vol)]);
     } catch (e) {
-      log('Stop error: $e', name: 'PlayerEngine');
+      dev.log('Stop error: $e', name: 'PlayerEngine');
     }
 
     if (!keepLoadingState) _stateSubject.add(EngineState.idle);
@@ -696,19 +717,23 @@ class PlayerEngine {
   }
   
   double _getNormalizationGain() {
-    // Placeholder for getting the current normalization gain
-    // This would be implemented based on the current track's gain value
-    return 1.0;
+    // Convert the normalization service's pre-gain from dB to linear scale.
+    // Formula: linear = 10^(dB / 20)
+    final preGainDb = VolumeNormalizationService.instance.preGain;
+    if (preGainDb == 0.0) return 1.0;
+    return pow(10.0, preGainDb / 20.0).toDouble().clamp(0.1, 4.0);
   }
 
   Future<void> setSpeed(double speed) async {
     if (_disposed) return;
-    final adjustedSpeed = PlaybackSpeedService.instance.currentSpeed;
-    await _active.setRate(adjustedSpeed);
-    _speedSubject.add(adjustedSpeed);
-    
-    // Update playback speed service
-    PlaybackSpeedService.instance.setSpeed(speed);
+    final clamped = speed.clamp(0.25, 4.0);
+    // Update the speed service record (fire-and-forget, no player ref needed)
+    PlaybackSpeedService.instance.recordSpeed(clamped);
+    await Future.wait([
+      _playerA.setRate(clamped),
+      _playerB.setRate(clamped),
+    ]);
+    _speedSubject.add(clamped);
   }
 
   Future<void> setLoopMode(LoopMode mode) async {
@@ -745,10 +770,10 @@ class PlayerEngine {
       _standbyPreloaded = true;
       _pendingPreloadUri = null;
       _pendingPreloadHeaders = null;
-      log('Preloaded next track: $uri', name: 'PlayerEngine');
+      dev.log('Preloaded next track: $uri', name: 'PlayerEngine');
       return true;
     } catch (e) {
-      log('Preload failed: $e', name: 'PlayerEngine');
+      dev.log('Preload failed: $e', name: 'PlayerEngine');
       _preloadedNextUri = null;
       _preloadedNextHeaders = null;
       _standbyPreloaded = false;
@@ -827,12 +852,7 @@ class PlayerEngine {
   }
 
   void _scheduleEqualizerApply() {
-    if (_disposed) return;
-    _eqApplyDebounceTimer?.cancel();
-    _eqApplyDebounceTimer = Timer(_eqApplyDebounce, () {
-      if (_disposed) return;
-      _applyAudioFilters();
-    });
+    _scheduleAudioFilterApply();
   }
 
   /// Applies combined audio filters (Equalizer, Effects, Volume Normalization)
@@ -840,7 +860,7 @@ class PlayerEngine {
     if (_disposed) return;
     try {
       final filter = _buildCombinedAudioFilter();
-      log('Applying combined audio filter: ${filter.isEmpty ? '<off>' : filter}',
+      dev.log('Applying combined audio filter: ${filter.isEmpty ? '<off>' : filter}',
           name: 'PlayerEngine');
 
       if (_isTransitioning) {
@@ -852,7 +872,7 @@ class PlayerEngine {
         ]);
       }
     } catch (e) {
-      log('Audio filter apply error: $e', name: 'PlayerEngine');
+      dev.log('Audio filter apply error: $e', name: 'PlayerEngine');
     }
   }
 
@@ -868,7 +888,7 @@ class PlayerEngine {
         await platform.setProperty('af', filter);
       }
     } catch (e) {
-      log('Audio filter apply to player error: $e', name: 'PlayerEngine');
+      dev.log('Audio filter apply to player error: $e', name: 'PlayerEngine');
     }
   }
 

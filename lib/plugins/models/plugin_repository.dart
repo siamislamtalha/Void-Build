@@ -58,7 +58,7 @@ class RemotePluginModel {
   }
 
   bool isAllowedInCountry(String countryCode) {
-    // Country restrictions removed - all plugins available to all countries
+    // Country restrictions removed - all plugins available to all countries regardless of location
     return true;
   }
 }

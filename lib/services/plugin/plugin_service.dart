@@ -4,8 +4,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:voidmusic/plugins/errors/plugin_exceptions.dart';
-import 'package:voidmusic/services/db/dao/settings_dao.dart';
-import 'package:voidmusic/services/db/db_provider.dart';
 import 'package:voidmusic/src/rust/api/bridge.dart' as bridge;
 import 'package:voidmusic/src/rust/api/plugin/commands.dart';
 import 'package:voidmusic/src/rust/api/plugin/manifest.dart';
@@ -193,23 +191,12 @@ class PluginService {
     String? policyCountryCode,
   }) async {
     try {
+      // Validate the plugin manifest before installation
       await _readPackedManifest(packedFilePath);
-      var countryCode =
-          CountryInfoService.normalizeCountryCode(policyCountryCode);
-      if (countryCode.isEmpty) {
-        countryCode = await CountryInfoService.resolveCountryCodeForPolicyCheck(
-          settingsDao: SettingsDAO(DBProvider.db),
-        );
-      }
-
+      
       // Country restrictions removed - all plugins available to all countries
-      // if (false) {
-      //   throw PluginCountryRestrictedException(
-      //     pluginId: 'unknown',
-      //     countryCode: countryCode,
-      //     allowlist: const [],
-      //   );
-      // }
+      // No country code checking needed
+      final countryCode = policyCountryCode ?? "";
 
       final tempDir = (await getTemporaryDirectory()).path;
       final pluginsDir = await bridge.getPluginsDir(manager: manager);
@@ -219,19 +206,9 @@ class PluginService {
         pluginsDir: pluginsDir,
         tempDir: tempDir,
         shouldLoad: shouldLoad,
-        policyCountryCode: countryCode,
+        policyCountryCode: countryCode, // Empty string removes country restrictions
         manager: manager,
       );
-
-      // Country restrictions removed - no longer throw PluginCountryRestrictedException
-      // if (result.status == PluginInstallStatus.failed &&
-      //     (result.error?.contains('country') ?? false)) {
-      //   throw PluginCountryRestrictedException(
-      //     pluginId: result.pluginId,
-      //     countryCode: countryCode,
-      //     allowlist: const [],
-      //   );
-      // }
 
       log('Installed plugin: ${result.pluginId} (status: ${result.status})',
           name: 'PluginService');
@@ -461,10 +438,12 @@ Future<_PackedPluginManifest> _readPackedManifest(String packedFilePath) async {
 
   final json = Map<String, dynamic>.from(decoded);
   final pluginId = json['id']?.toString() ?? 'unknown';
+  
+  // Country restrictions removed - we still read country_allowlist for compatibility
+  // but don't use it for restrictions
   final countryAllowlist = (json['country_allowlist'] as List<dynamic>? ??
           const [])
-      .map(
-          (value) => CountryInfoService.normalizeCountryCode(value?.toString()))
+      .map((value) => CountryInfoService.normalizeCountryCode(value?.toString()))
       .where((value) => value.isNotEmpty)
       .toSet()
       .toList()

@@ -132,21 +132,8 @@ pub async fn install_packed_plugin(
         });
     }
 
-    if !manifest.country_allowlist.is_empty() {
-        let normalized = policy_country_code.to_uppercase();
-        if normalized.is_empty() || !manifest.country_allowlist.contains(&normalized) {
-            cleanup().await;
-            return Ok(PluginInstallResult {
-                status: PluginInstallStatus::Failed,
-                plugin_id: manifest.id,
-                error: Some(format!(
-                    "country restriction: requires {}, got '{}'",
-                    manifest.country_allowlist.join(","),
-                    if normalized.is_empty() { "<unset>" } else { &normalized }
-                )),
-            });
-        }
-    }
+    // Country restrictions removed - all plugins available to all countries
+    // No country code checking needed - plugins install regardless of location
 
     if let Some(plugin_mgr) = manager {
         if let Some(plugin_type) = get_plugin_type_from_string(manifest.plugin_type()) {

@@ -137,12 +137,15 @@ class LyricsCubit extends Cubit<LyricsState> {
 
       if (multiResult != null && multiResult.text.isNotEmpty) {
         final isSynced = multiResult.isSynced;
+        final plainFromSynced = isSynced
+            ? multiResult.text.replaceAll(RegExp(r'\[\d{2}:\d{2}\.\d{2,3}\]'), '').trim()
+            : multiResult.text;
         final lyricsObj = Lyrics(
           id: track.id,
           artist: _artistStr(track),
           title: track.title,
           album: track.album?.title,
-          lyricsPlain: isSynced ? '' : multiResult.text,
+          lyricsPlain: plainFromSynced.isNotEmpty ? plainFromSynced : multiResult.text,
           lyricsSynced: isSynced ? multiResult.text : null,
           provider: LyricsProvider.none,
           mediaID: track.id,

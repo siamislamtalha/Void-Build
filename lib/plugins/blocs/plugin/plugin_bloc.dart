@@ -309,6 +309,7 @@ class PluginBloc extends Bloc<PluginEvent, PluginState> {
       PluginInstallResult result = await _pluginService.installPlugin(
         packedFilePath: event.packedFilePath,
         shouldLoad: event.shouldLoad,
+        policyCountryCode: "", // Empty string removes country restrictions
       );
 
       if (result.status == PluginInstallStatus.pluginLoaded) {
@@ -338,6 +339,7 @@ class PluginBloc extends Bloc<PluginEvent, PluginState> {
           result = await _pluginService.installPlugin(
             packedFilePath: event.packedFilePath,
             shouldLoad: event.shouldLoad,
+            policyCountryCode: "", // Empty string removes country restrictions
           );
 
           log('Install result after unload: ${result.pluginId} — ${result.status}',

@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:developer' as dev;
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/plugins/utils/media_id.dart';
 import 'package:voidmusic/core/constants/setting_keys.dart';
@@ -33,7 +33,7 @@ class RelatedSongsManager {
     required int currentPlayingIdx,
     required LoopMode loopMode,
   }) async {
-    log("Checking for related songs: ${queue.isNotEmpty && (queue.length - currentPlayingIdx) < 2}",
+    dev.log("Checking for related songs: ${queue.isNotEmpty && (queue.length - currentPlayingIdx) < 2}",
         name: "RelatedSongsManager");
 
     final autoPlay =
@@ -151,7 +151,7 @@ class RelatedSongsManager {
 
           if (uniqueTracks.isNotEmpty) {
             relatedSongs.add([...relatedSongs.value, ...uniqueTracks]);
-            log(
+            dev.log(
               'Buffered ${uniqueTracks.length} related songs',
               name: 'RelatedSongsManager',
             );
@@ -183,7 +183,7 @@ class RelatedSongsManager {
         ack: () {},
       );
     } catch (e) {
-      log('Failed to get related songs: $e', name: 'RelatedSongsManager');
+      dev.log('Failed to get related songs: $e', name: 'RelatedSongsManager');
     } finally {
       _isFetching = false;
     }

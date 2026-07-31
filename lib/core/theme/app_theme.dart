@@ -13,15 +13,15 @@ class AppTheme {
   static Color glassColor(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return isDark
-        ? Colors.white.withValues(alpha: 0.12)
-        : Colors.black.withValues(alpha: 0.12);
+        ? Colors.white.withValues(alpha: 0.10)
+        : Colors.white.withValues(alpha: 0.55);
   }
 
   static Color glassBorder(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return isDark
-        ? Colors.white.withValues(alpha: 0.20)
-        : Colors.black.withValues(alpha: 0.16);
+        ? Colors.white.withValues(alpha: 0.18)
+        : Colors.black.withValues(alpha: 0.08);
   }
   // ── Text Styles ─────────────────────────────────────────────────────────────
   static const primaryTextStyle = TextStyle(

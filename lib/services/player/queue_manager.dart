@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as dev;
 
 import 'package:voidmusic/core/constants/setting_keys.dart';
 import 'package:voidmusic/services/db/dao/settings_dao.dart';
@@ -155,7 +155,7 @@ class QueueManager {
   /// Jump directly to a queue index.
   void jumpTo(int index) {
     if (index < 0 || index >= _queue.value.length) {
-      log('jumpTo: index $index out of bounds (len: ${_queue.value.length})',
+      dev.log('jumpTo: index $index out of bounds (len: ${_queue.value.length})',
           name: 'QueueManager');
       return;
     }
@@ -439,7 +439,7 @@ class QueueManager {
 
   void _ensureShuffleListValid() {
     if (_shuffleList.isEmpty || _shuffleList.length != _queue.value.length) {
-      log('Shuffle list invalid, regenerating', name: 'QueueManager');
+      dev.log('Shuffle list invalid, regenerating', name: 'QueueManager');
       _shuffleList = generateRandomIndices(_queue.value.length);
       _shuffleIndex = _shuffleList.indexOf(_currentIndex);
       if (_shuffleIndex == -1) _shuffleIndex = 0;
@@ -475,7 +475,7 @@ class QueueManager {
       await dao.putSettingStr(
           SettingKeys.lastQueueState, jsonEncode(queueData));
     } catch (e) {
-      log('Failed to persist queue: $e', name: 'QueueManager');
+      dev.log('Failed to persist queue: $e', name: 'QueueManager');
     }
   }
 
@@ -503,7 +503,7 @@ class QueueManager {
           final track = await trackDao.getTrackByMediaId(id);
           if (track != null) tracks.add(track);
         } catch (e) {
-          log('Skipping track $id: $e', name: 'QueueManager');
+          dev.log('Skipping track $id: $e', name: 'QueueManager');
         }
       }
       if (tracks.isEmpty) return false;
@@ -517,7 +517,7 @@ class QueueManager {
       return true;
     } catch (e) {
       _isRestoring = false;
-      log('Failed to restore queue: $e', name: 'QueueManager');
+      dev.log('Failed to restore queue: $e', name: 'QueueManager');
       return false;
     }
   }
