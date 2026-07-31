@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 enum AudioEffectType {
@@ -564,7 +565,7 @@ class AudioEffectsService {
   Future<void> _loadCustomPresets() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final presetFile = File('${directory.path}/audio_effects_presets.json');
+      final presetFile = File(p.join(directory.path, 'audio_effects_presets.json'));
       
       if (await presetFile.exists()) {
         final jsonString = await presetFile.readAsString();
@@ -605,7 +606,7 @@ class AudioEffectsService {
   Future<void> _persistCustomPresets() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final presetFile = File('${directory.path}/audio_effects_presets.json');
+      final presetFile = File(p.join(directory.path, 'audio_effects_presets.json'));
       
       final presetData = <String, dynamic>{};
       _customPresets.forEach((name, effects) {

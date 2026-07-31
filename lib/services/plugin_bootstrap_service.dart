@@ -14,6 +14,7 @@ import 'package:voidmusic/services/plugin/plugin_service.dart';
 import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
 import 'package:voidmusic/src/rust/api/plugin/types.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 class _HostedRepoEntry {
@@ -204,7 +205,7 @@ class PluginBootstrapService {
           try {
             final bytes = await _downloadBytes(plugin.downloadUrl);
             final tmpDir = await getTemporaryDirectory();
-            final file = File('${tmpDir.path}/${plugin.assetName}');
+            final file = File(p.join(tmpDir.path, plugin.assetName));
             await file.writeAsBytes(bytes, flush: true);
 
             final result = await pluginService.installPlugin(
@@ -260,29 +261,22 @@ class PluginBootstrapService {
           name: 'PluginBootstrap');
     }
 
-    if (errors.isEmpty) {
-      // Ensure all installed plugins (the ones we just installed/updated)
-      // are added to the auto-load list so they are actually used.
-      try {
-        final loadStateService = PluginLoadStateService(settingsDao);
+    // Ensure all installed/available plugins are added to auto-load list
+    try {
+      final loadStateService = PluginLoadStateService(settingsDao);
+      final available = await _safeGetAvailable(pluginService);
+      final availableIds = available.map((p) => p.manifest.id).toSet();
 
-        // Ensure everything that is "available" and part of our bootstrap
-        // is in the auto-load list.
-        final available = await _safeGetAvailable(pluginService);
-        final bootstrapIds = available
-            .where((p) => installedIds.contains(p.manifest.id))
-            .map((p) => p.manifest.id)
-            .toSet();
-
-        if (bootstrapIds.isNotEmpty) {
-          await loadStateService.addAutoLoadPluginIds(bootstrapIds);
-          log('Added ${bootstrapIds.length} plugins to auto-load list',
-              name: 'PluginBootstrap');
-        }
-      } catch (e) {
-        log('Failed to update auto-load list: $e', name: 'PluginBootstrap');
+      if (availableIds.isNotEmpty) {
+        await loadStateService.addAutoLoadPluginIds(availableIds);
+        log('Added ${availableIds.length} available plugins to auto-load list',
+            name: 'PluginBootstrap');
       }
+    } catch (e) {
+      log('Failed to update auto-load list: $e', name: 'PluginBootstrap');
+    }
 
+    if (errors.isEmpty) {
       await _markDone(settingsDao);
       log('Plugin bootstrap completed successfully.', name: 'PluginBootstrap');
     } else {
@@ -515,7 +509,7 @@ class PluginBootstrapService {
       try {
         final bytes = await _downloadBytes(plugin.downloadUrl);
         final tmpDir = await getTemporaryDirectory();
-        final file = File('${tmpDir.path}/${plugin.assetName}');
+        final file = File(p.join(tmpDir.path, plugin.assetName));
         await file.writeAsBytes(bytes, flush: true);
 
         final result = await pluginService.installPlugin(

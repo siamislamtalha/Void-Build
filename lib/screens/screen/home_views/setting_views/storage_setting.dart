@@ -11,6 +11,7 @@ import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -621,7 +622,7 @@ Future<String?> _savePickedFileToInternalDir(PlatformFile picked) async {
     final safeName = picked.name.replaceAll(RegExp(r'[^A-Za-z0-9_.-]'), '_');
     final filename =
         'voidmusic_restore_${DateTime.now().millisecondsSinceEpoch}_$safeName';
-    final dest = File('${docs.path}/$filename');
+    final dest = File(p.join(docs.path, filename));
 
     if (picked.bytes != null) {
       await dest.writeAsBytes(picked.bytes!, flush: true);

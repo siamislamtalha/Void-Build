@@ -64,7 +64,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 
   /// Only loads home sections when both settings are ready and plugins are loaded.
-  /// Loads immediately with the best available plugin — no waiting for preferred.
+  /// If the user's preferred plugin is installed but not yet loaded, waits for it
+  /// to avoid flashing the wrong plugin's home page on startup.
   void _tryLoadHomeSections() {
     final settingsState = context.read<SettingsCubit>().state;
     if (!settingsState.settingsReady) return;
@@ -72,6 +73,21 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final pluginState = context.read<PluginBloc>().state;
     final contentResolvers = pluginState.loadedContentResolvers;
     if (contentResolvers.isEmpty) return;
+
+    // If the user's preferred plugin(s) are installed but not yet loaded, wait
+    // for them. This prevents flashing the wrong plugin's home page on startup.
+    final preferredIds = settingsState.homePluginIds;
+    if (preferredIds.isNotEmpty) {
+      for (final preferredId in preferredIds) {
+        final isAlreadyLoaded =
+            contentResolvers.any((p) => p.manifest.id == preferredId);
+        if (!isAlreadyLoaded) {
+          final isInstalled = pluginState.availablePlugins
+              .any((p) => p.manifest.id == preferredId);
+          if (isInstalled) return; // Preferred plugin is loading — wait for it
+        }
+      }
+    }
 
     final pluginId = _effectiveHomePluginId(contentResolvers);
 
@@ -88,7 +104,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final preferredIds = context.read<SettingsCubit>().state.homePluginIds;
     if (preferredIds.isNotEmpty) {
       for (final preferredId in preferredIds) {
-        final hasPreferred = loadedResolvers.any((plugin) => plugin.manifest.id == preferredId);
+        final hasPreferred =
+            loadedResolvers.any((plugin) => plugin.manifest.id == preferredId);
         if (hasPreferred) return preferredId;
       }
     }

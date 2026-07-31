@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -82,7 +83,7 @@ class _RepositoryDetailScreenState extends State<RepositoryDetailScreen> {
       }
 
       final tempDir = await getTemporaryDirectory();
-      final file = File('${tempDir.path}/${plugin.assetName}');
+      final file = File(p.join(tempDir.path, plugin.assetName));
       await file.writeAsBytes(response.bodyBytes, flush: true);
 
       if (!context.mounted) return;

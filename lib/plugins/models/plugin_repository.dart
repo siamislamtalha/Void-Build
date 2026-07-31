@@ -84,20 +84,46 @@ class PluginRepositoryModel {
 
   factory PluginRepositoryModel.fromJson(
       String url, Map<String, dynamic> json) {
-    return PluginRepositoryModel(
-      url: url,
-      schemaVersion: json['schema_version']?.toString() ?? '',
-      name: json['name']?.toString() ?? 'Unknown Repository',
-      description: json['description']?.toString() ?? '',
-      thumbnailUrl: json['thumbnail_url']?.toString(),
-      plugins: (json['plugins'] as List?)
-              ?.map((p) =>
-                  RemotePluginModel.fromJson(Map<String, dynamic>.from(p)))
-              .toList() ??
-          [],
-      generatedAt: json['generated_at'] != null
-          ? DateTime.tryParse(json['generated_at'].toString())
-          : null,
-    );
+    // Handle both standard repository format and bex-factory format
+    // bex-factory format has generated_at and plugins, but may not have plugin_count
+    final isBexFactoryFormat = json.containsKey('generated_at') && 
+                               json.containsKey('plugins') &&
+                               !json.containsKey('schema_version');
+    
+    if (isBexFactoryFormat) {
+      // bex-factory format: has generated_at, plugins
+      return PluginRepositoryModel(
+        url: url,
+        schemaVersion: '1.0', // Default for bex-factory
+        name: 'Void Factory',
+        description: 'Void Music Plugin Factory',
+        thumbnailUrl: json['thumbnail_url']?.toString(),
+        plugins: (json['plugins'] as List?)
+                ?.map((p) =>
+                    RemotePluginModel.fromJson(Map<String, dynamic>.from(p)))
+                .toList() ??
+            [],
+        generatedAt: json['generated_at'] != null
+            ? DateTime.tryParse(json['generated_at'].toString())
+            : null,
+      );
+    } else {
+      // Standard repository format: has schema_version, name, description
+      return PluginRepositoryModel(
+        url: url,
+        schemaVersion: json['schema_version']?.toString() ?? '',
+        name: json['name']?.toString() ?? 'Unknown Repository',
+        description: json['description']?.toString() ?? '',
+        thumbnailUrl: json['thumbnail_url']?.toString(),
+        plugins: (json['plugins'] as List?)
+                ?.map((p) =>
+                    RemotePluginModel.fromJson(Map<String, dynamic>.from(p)))
+                .toList() ??
+            [],
+        generatedAt: json['generated_at'] != null
+            ? DateTime.tryParse(json['generated_at'].toString())
+            : null,
+      );
+    }
   }
 }

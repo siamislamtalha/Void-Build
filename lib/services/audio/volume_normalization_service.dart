@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:voidmusic/src/rust/api/plugin/models.dart';
 
@@ -376,7 +377,7 @@ class VolumeNormalizationService {
   Future<void> _loadPersistedCache() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final cacheFile = File('${directory.path}/normalization_cache.json');
+      final cacheFile = File(p.join(directory.path, 'normalization_cache.json'));
       
       if (await cacheFile.exists()) {
         final jsonString = await cacheFile.readAsString();
@@ -405,7 +406,7 @@ class VolumeNormalizationService {
   Future<void> _persistCache() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final cacheFile = File('${directory.path}/normalization_cache.json');
+      final cacheFile = File(p.join(directory.path, 'normalization_cache.json'));
       
       final cacheData = {
         'trackGainCache': _trackGainCache,

@@ -166,8 +166,18 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
   }
 
   void _handleItemTap(BuildContext context, MediaItem item) {
-    final loadedPluginIds = context.read<PluginBloc>().state.loadedPluginIds;
-    if (!requirePlugin(widget.pluginId, loadedPluginIds)) {
+    final pluginState = context.read<PluginBloc>().state;
+    final loadedPluginIds = pluginState.loadedPluginIds;
+    
+    // Effective plugin ID fallback if widget.pluginId is empty or unloaded
+    String effectivePluginId = widget.pluginId;
+    if (effectivePluginId.isEmpty || !loadedPluginIds.contains(effectivePluginId)) {
+      if (pluginState.loadedContentResolvers.isNotEmpty) {
+        effectivePluginId = pluginState.loadedContentResolvers.first.manifest.id;
+      }
+    }
+
+    if (!requirePlugin(effectivePluginId, loadedPluginIds)) {
       return;
     }
 
@@ -195,7 +205,7 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => AlbumView(album: album, pluginId: widget.pluginId),
+            builder: (_) => AlbumView(album: album, pluginId: effectivePluginId),
           ),
         );
       },
@@ -204,7 +214,7 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
           context,
           MaterialPageRoute(
             builder: (_) =>
-                ArtistView(artist: artist, pluginId: widget.pluginId),
+                ArtistView(artist: artist, pluginId: effectivePluginId),
           ),
         );
       },
@@ -213,7 +223,7 @@ class _HorizontalCardViewState extends State<HorizontalCardView> {
           context,
           MaterialPageRoute(
             builder: (_) =>
-                OnlPlaylistView(playlist: playlist, pluginId: widget.pluginId),
+                OnlPlaylistView(playlist: playlist, pluginId: effectivePluginId),
           ),
         );
       },
