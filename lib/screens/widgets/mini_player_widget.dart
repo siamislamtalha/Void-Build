@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'dart:ui' show lerpDouble;
+import 'dart:ui' show lerpDouble, ImageFilter;
 
 import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
@@ -11,8 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-
-import 'package:voidmusic/core/theme/app_theme.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
   /// The navigation branch index currently active in the shell.
@@ -182,9 +180,6 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
     final thumbUrl = song.thumbnail.urlLow ?? song.thumbnail.url;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final glassColor = AppTheme.glassColor(context);
-    final glassBorder = AppTheme.glassBorder(context);
-
     return GestureDetector(
       onTap: () {
         HapticFeedback.selectionClick();
@@ -201,99 +196,222 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeInOutQuart,
           padding: EdgeInsets.symmetric(
-            horizontal: isDesktop ? 16 : 0,
+            // Desktop: outer _GlassFooterOverlay container handles all
+            // horizontal spacing. Inner padding removed to avoid double-inset.
+            horizontal: 0,
             vertical: widget.isCompact ? 0 : 4,
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: BackdropFilter(
-              filter: AppTheme.glassBlur,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeInOutQuart,
-                height: widget.isCompact ? 58 : double.infinity,
-                width: isDesktop ? double.infinity : null,
-                decoration: BoxDecoration(
-                  color: glassColor,
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: glassBorder,
-                    width: 1.0,
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    AnimatedPadding(
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeInOutQuart,
-                      padding: EdgeInsets.only(
-                        left: widget.isCompact ? 8 : 10,
-                        right: widget.isCompact ? 4 : 6,
+          child: isDesktop
+              ? Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black
+                            .withValues(alpha: isDark ? 0.35 : 0.12),
+                        blurRadius: 20,
+                        spreadRadius: -4,
+                        offset: const Offset(0, 8),
                       ),
-                      child: Row(
-                        children: [
-                          // ── Album Art ──
-                          _Artwork(
-                            imageUrl: thumbUrl,
-                            fallbackUrl: song.thumbnail.url,
-                            size: widget.isCompact ? 36 : _artworkSize,
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOutQuart,
+                        height: widget.isCompact ? 58 : double.infinity,
+                        decoration: BoxDecoration(
+                          color: (isDark ? Colors.black : Colors.white)
+                              .withValues(alpha: isDark ? 0.20 : 0.35),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Colors.white
+                                .withValues(alpha: isDark ? 0.12 : 0.20),
+                            width: 0.75,
                           ),
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeInOutQuart,
-                            width: widget.isCompact ? 6 : 10,
-                          ),
-                          // ── Song Info ──
-                          Expanded(
-                            child: _TrackInfo(
-                              song: song,
-                              waveController: _waveController,
-                              isPlaying: widget.state.isPlaying,
-                              isDark: isDark,
-                              isCompact: widget.isCompact,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          // ── Controls ──
-                          _ControlsCapsule(
-                            state: widget.state,
-                            isDesktop: isDesktop,
-                            song: song,
-                            isDark: isDark,
-                            isCompact: widget.isCompact,
-                          ),
-                          // ── Close Button (smoothly shrinks and fades when compact) ──
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeInOutQuart,
-                            width: widget.isCompact ? 0 : 34,
-                            child: AnimatedOpacity(
-                              duration: const Duration(milliseconds: 300),
+                        ),
+                        child: Stack(
+                          children: [
+                            AnimatedPadding(
+                              duration: const Duration(milliseconds: 500),
                               curve: Curves.easeInOutQuart,
-                              opacity: widget.isCompact ? 0.0 : 1.0,
-                              child: ClipRRect(
-                                child: OverflowBox(
-                                  maxWidth: 34,
-                                  child: _CloseButton(isDark: isDark),
-                                ),
+                              padding: EdgeInsets.only(
+                                left: widget.isCompact ? 8 : 10,
+                                right: widget.isCompact ? 4 : 6,
+                              ),
+                              child: Row(
+                                children: [
+                                  // ── Album Art ──
+                                  _Artwork(
+                                    imageUrl: thumbUrl,
+                                    fallbackUrl: song.thumbnail.url,
+                                    size: widget.isCompact ? 36 : _artworkSize,
+                                  ),
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.easeInOutQuart,
+                                    width: widget.isCompact ? 6 : 10,
+                                  ),
+                                  // ── Song Info ──
+                                  Expanded(
+                                    child: _TrackInfo(
+                                      song: song,
+                                      waveController: _waveController,
+                                      isPlaying: widget.state.isPlaying,
+                                      isDark: isDark,
+                                      isCompact: widget.isCompact,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  // ── Controls ──
+                                  _ControlsCapsule(
+                                    state: widget.state,
+                                    isDesktop: isDesktop,
+                                    song: song,
+                                    isDark: isDark,
+                                    isCompact: widget.isCompact,
+                                  ),
+                                  // ── Close Button ──
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.easeInOutQuart,
+                                    width: widget.isCompact ? 0 : 34,
+                                    child: AnimatedOpacity(
+                                      duration: const Duration(milliseconds: 300),
+                                      curve: Curves.easeInOutQuart,
+                                      opacity: widget.isCompact ? 0.0 : 1.0,
+                                      child: ClipRRect(
+                                        child: OverflowBox(
+                                          maxWidth: 34,
+                                          child: _CloseButton(isDark: isDark),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                            if (!widget.state.isCompleted)
+                              AnimatedOpacity(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOutQuart,
+                                opacity: widget.isCompact ? 0.0 : 1.0,
+                                child: _GlowingProgressBar(isDark: isDark),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
-                    if (!widget.state.isCompleted)
-                      AnimatedOpacity(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOutQuart,
-                        opacity: widget.isCompact ? 0.0 : 1.0,
-                        child: _GlowingProgressBar(isDark: isDark),
+                  ),
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black
+                            .withValues(alpha: isDark ? 0.35 : 0.12),
+                        blurRadius: 20,
+                        spreadRadius: -4,
+                        offset: const Offset(0, 8),
                       ),
-                  ],
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOutQuart,
+                        height: widget.isCompact ? 58 : double.infinity,
+                        decoration: BoxDecoration(
+                          color: (isDark ? Colors.black : Colors.white)
+                              .withValues(alpha: isDark ? 0.20 : 0.35),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Colors.white
+                                .withValues(alpha: isDark ? 0.12 : 0.20),
+                            width: 0.75,
+                          ),
+                        ),
+                        child: Stack(
+                          children: [
+                            AnimatedPadding(
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeInOutQuart,
+                              padding: EdgeInsets.only(
+                                left: widget.isCompact ? 8 : 10,
+                                right: widget.isCompact ? 4 : 6,
+                              ),
+                              child: Row(
+                                children: [
+                                  // ── Album Art ──
+                                  _Artwork(
+                                    imageUrl: thumbUrl,
+                                    fallbackUrl: song.thumbnail.url,
+                                    size: widget.isCompact ? 36 : _artworkSize,
+                                  ),
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.easeInOutQuart,
+                                    width: widget.isCompact ? 6 : 10,
+                                  ),
+                                  // ── Song Info ──
+                                  Expanded(
+                                    child: _TrackInfo(
+                                      song: song,
+                                      waveController: _waveController,
+                                      isPlaying: widget.state.isPlaying,
+                                      isDark: isDark,
+                                      isCompact: widget.isCompact,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  // ── Controls ──
+                                  _ControlsCapsule(
+                                    state: widget.state,
+                                    isDesktop: isDesktop,
+                                    song: song,
+                                    isDark: isDark,
+                                    isCompact: widget.isCompact,
+                                  ),
+                                  // ── Close Button ──
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.easeInOutQuart,
+                                    width: widget.isCompact ? 0 : 34,
+                                    child: AnimatedOpacity(
+                                      duration: const Duration(milliseconds: 300),
+                                      curve: Curves.easeInOutQuart,
+                                      opacity: widget.isCompact ? 0.0 : 1.0,
+                                      child: ClipRRect(
+                                        child: OverflowBox(
+                                          maxWidth: 34,
+                                          child: _CloseButton(isDark: isDark),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (!widget.state.isCompleted)
+                              AnimatedOpacity(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOutQuart,
+                                opacity: widget.isCompact ? 0.0 : 1.0,
+                                child: _GlowingProgressBar(isDark: isDark),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
         ),
       ),
     );

@@ -8,20 +8,17 @@ import 'package:flutter/material.dart';
 /// imports are being migrated.
 class AppTheme {
   // ── Glass & Blur Design System ──────────────────────────────────────────────
-  static ImageFilter get glassBlur => ImageFilter.blur(sigmaX: 20, sigmaY: 20);
+  static ImageFilter get glassBlur => ImageFilter.blur(sigmaX: 25, sigmaY: 25);
 
   static Color glassColor(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return isDark
-        ? Colors.white.withValues(alpha: 0.10)
-        : Colors.white.withValues(alpha: 0.55);
+    return (isDark ? Colors.black : Colors.white)
+        .withValues(alpha: isDark ? 0.20 : 0.35);
   }
 
   static Color glassBorder(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return isDark
-        ? Colors.white.withValues(alpha: 0.18)
-        : Colors.black.withValues(alpha: 0.08);
+    return Colors.white.withValues(alpha: isDark ? 0.12 : 0.20);
   }
   // ── Text Styles ─────────────────────────────────────────────────────────────
   static const primaryTextStyle = TextStyle(
