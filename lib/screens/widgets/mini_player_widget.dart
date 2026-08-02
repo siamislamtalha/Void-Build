@@ -19,7 +19,15 @@ class MiniPlayerWidget extends StatelessWidget {
   /// Passed through to [PlayerOverlayCubit.showPlayer] so the down-arrow
   /// button on the full-screen player can return the user to this page.
   final int? currentPageIndex;
-  const MiniPlayerWidget({Key? key, this.currentPageIndex}) : super(key: key);
+
+  /// Whether the player is collapsed into the center pill of the 3-pill row on mobile.
+  final bool isCompact;
+
+  const MiniPlayerWidget({
+    Key? key,
+    this.currentPageIndex,
+    this.isCompact = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +57,7 @@ class MiniPlayerWidget extends StatelessWidget {
                   key: const ValueKey('mini_player'),
                   state: state,
                   currentPageIndex: currentPageIndex,
+                  isCompact: isCompact,
                 )
               : const SizedBox.shrink(key: ValueKey('empty')),
         );
@@ -60,7 +69,14 @@ class MiniPlayerWidget extends StatelessWidget {
 class MiniPlayerCard extends StatefulWidget {
   final MiniPlayerState state;
   final int? currentPageIndex;
-  const MiniPlayerCard({super.key, required this.state, this.currentPageIndex});
+  final bool isCompact;
+
+  const MiniPlayerCard({
+    super.key,
+    required this.state,
+    this.currentPageIndex,
+    this.isCompact = false,
+  });
 
   @override
   State<MiniPlayerCard> createState() => _MiniPlayerCardState();
@@ -73,7 +89,6 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
   late final AnimationController _snapController;
   late final AnimationController _waveController;
 
-  static const double _cardHeight = 64;
   static const double _artworkSize = 46;
   static const double _swipeThreshold = 80;
 
@@ -182,14 +197,21 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
       onVerticalDragEnd: _onVerticalDragEnd,
       child: Transform.translate(
         offset: Offset(_dragOffset, 0),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: isDesktop ? 16 : 0, vertical: 4),
+        child: AnimatedPadding(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOutQuart,
+          padding: EdgeInsets.symmetric(
+            horizontal: isDesktop ? 16 : 0,
+            vertical: widget.isCompact ? 0 : 4,
+          ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
             child: BackdropFilter(
               filter: AppTheme.glassBlur,
-              child: Container(
-                height: _cardHeight,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeInOutQuart,
+                height: widget.isCompact ? 58 : double.infinity,
                 width: isDesktop ? double.infinity : null,
                 decoration: BoxDecoration(
                   color: glassColor,
@@ -201,50 +223,81 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                 ),
                 child: Stack(
                   children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 6),
-                  child: Row(
-                    children: [
-                      // ── Album Art ──
-                      _Artwork(
-                        imageUrl: thumbUrl,
-                        fallbackUrl: song.thumbnail.url,
-                        size: _artworkSize,
+                    AnimatedPadding(
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOutQuart,
+                      padding: EdgeInsets.only(
+                        left: widget.isCompact ? 8 : 10,
+                        right: widget.isCompact ? 4 : 6,
                       ),
-                      const SizedBox(width: 10),
-                      // ── Song Info ──
-                      Expanded(
-                        child: _TrackInfo(
-                          song: song,
-                          waveController: _waveController,
-                          isPlaying: widget.state.isPlaying,
-                          isDark: isDark,
-                        ),
+                      child: Row(
+                        children: [
+                          // ── Album Art ──
+                          _Artwork(
+                            imageUrl: thumbUrl,
+                            fallbackUrl: song.thumbnail.url,
+                            size: widget.isCompact ? 36 : _artworkSize,
+                          ),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeInOutQuart,
+                            width: widget.isCompact ? 6 : 10,
+                          ),
+                          // ── Song Info ──
+                          Expanded(
+                            child: _TrackInfo(
+                              song: song,
+                              waveController: _waveController,
+                              isPlaying: widget.state.isPlaying,
+                              isDark: isDark,
+                              isCompact: widget.isCompact,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          // ── Controls ──
+                          _ControlsCapsule(
+                            state: widget.state,
+                            isDesktop: isDesktop,
+                            song: song,
+                            isDark: isDark,
+                            isCompact: widget.isCompact,
+                          ),
+                          // ── Close Button (smoothly shrinks and fades when compact) ──
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeInOutQuart,
+                            width: widget.isCompact ? 0 : 34,
+                            child: AnimatedOpacity(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOutQuart,
+                              opacity: widget.isCompact ? 0.0 : 1.0,
+                              child: ClipRRect(
+                                child: OverflowBox(
+                                  maxWidth: 34,
+                                  child: _CloseButton(isDark: isDark),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 6),
-                      // ── Controls ──
-                      _ControlsCapsule(
-                        state: widget.state,
-                        isDesktop: isDesktop,
-                        song: song,
-                        isDark: isDark,
+                    ),
+                    if (!widget.state.isCompleted)
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOutQuart,
+                        opacity: widget.isCompact ? 0.0 : 1.0,
+                        child: _GlowingProgressBar(isDark: isDark),
                       ),
-                      // ── Close Button ──
-                      _CloseButton(isDark: isDark),
-                    ],
-                  ),
+                  ],
                 ),
-                if (!widget.state.isCompleted)
-                  _GlowingProgressBar(isDark: isDark),
-              ],
+              ),
             ),
           ),
         ),
       ),
-    ),
-  ),
-);
-}
+    );
+  }
 }
 
 /// Glass capsule containing play/pause + skip controls (like the reference image)
@@ -253,18 +306,18 @@ class _ControlsCapsule extends StatelessWidget {
   final bool isDesktop;
   final dynamic song;
   final bool isDark;
+  final bool isCompact;
 
   const _ControlsCapsule({
     required this.state,
     required this.isDesktop,
     required this.song,
     required this.isDark,
+    this.isCompact = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Controls capsule: frosted glass without BackdropFilter for same reason
-    // as the footer nav bar — reliability across all screens.
     final capsuleColor = isDark
         ? Colors.white.withValues(alpha: 0.10)
         : Colors.black.withValues(alpha: 0.08);
@@ -273,15 +326,22 @@ class _ControlsCapsule extends StatelessWidget {
         : Colors.black.withValues(alpha: 0.10);
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeInOutCubic,
+        padding: EdgeInsets.symmetric(
+          horizontal: isCompact ? 2 : 4,
+          vertical: isCompact ? 2 : 4,
+        ),
         decoration: BoxDecoration(
-          color: capsuleColor,
+          color: isCompact ? Colors.transparent : capsuleColor,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-            color: capsuleBorder,
-            width: 1.0,
-          ),
+          border: isCompact
+              ? null
+              : Border.all(
+                  color: capsuleBorder,
+                  width: 1.0,
+                ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -302,7 +362,7 @@ class _ControlsCapsule extends StatelessWidget {
             _PlayPauseButton(state: state, isDark: isDark),
             _ControlButton(
               icon: FontAwesome.forward_step_solid,
-              size: 16,
+              size: isCompact ? 14 : 16,
               isDark: isDark,
               onPressed: () {
                 HapticFeedback.lightImpact();
@@ -332,7 +392,9 @@ class _Artwork extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeInOutCubic,
       width: size,
       height: size,
       decoration: BoxDecoration(
@@ -355,12 +417,14 @@ class _TrackInfo extends StatelessWidget {
   final AnimationController waveController;
   final bool isPlaying;
   final bool isDark;
+  final bool isCompact;
 
   const _TrackInfo({
     required this.song,
     required this.waveController,
     required this.isPlaying,
     required this.isDark,
+    this.isCompact = false,
   });
 
   @override
@@ -376,20 +440,24 @@ class _TrackInfo extends StatelessWidget {
           children: [
             if (isPlaying) ...[
               _NowPlayingWave(controller: waveController, color: titleColor),
-              const SizedBox(width: 7),
+              const SizedBox(width: 5),
             ],
             Expanded(
-              child: Text(
-                song.title,
+              child: AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 420),
+                curve: Curves.easeInOutCubic,
                 style: TextStyle(
                   fontFamily: 'Unageo',
-                  fontSize: 14,
+                  fontSize: isCompact ? 12.5 : 14,
                   fontWeight: FontWeight.w700,
                   color: titleColor,
                   letterSpacing: 0.2,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                child: Text(
+                  song.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
           ],
@@ -400,7 +468,7 @@ class _TrackInfo extends StatelessWidget {
           style: TextStyle(
             fontFamily: 'Unageo',
             fontWeight: FontWeight.w600,
-            fontSize: 11.5,
+            fontSize: isCompact ? 10.5 : 11.5,
             color: subtitleColor,
             letterSpacing: 0.1,
           ),
