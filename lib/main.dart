@@ -67,6 +67,7 @@ import 'package:voidmusic/services/onboarding_service.dart';
 import 'package:voidmusic/services/plugin_bootstrap_service.dart';
 import 'package:voidmusic/plugins/services/plugin_repository_service.dart';
 import 'package:voidmusic/services/shared_url_resolver_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void processIncomingIntent(SharedMedia sharedMedia) {
   if (sharedMedia.content != null && isUrl(sharedMedia.content!)) {
@@ -340,202 +341,203 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     final playlistDao = PlaylistDAO(DBProvider.db, trackDao);
     final historyDao = HistoryDAO(DBProvider.db, trackDao);
 
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => PluginBloc(
-            pluginService: ServiceLocator.pluginService,
-            eventBus: ServiceLocator.pluginEventBus,
-            repositoryService: ServiceLocator.pluginRepositoryService,
-            settingsDao: SettingsDAO(DBProvider.db),
-          )..add(const InitializePluginSystem()),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => voidMusicPlayerCubit,
-          lazy: false,
-        ),
-        BlocProvider(
-            create: (context) =>
-                MiniPlayerCubit(playerCubit: voidMusicPlayerCubit),
-            lazy: true),
-        BlocProvider(
-          create: (context) => SettingsCubit(
-            VoidMusicSettingsRepository(SettingsDAO(DBProvider.db)),
+    return ProviderScope(
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => PluginBloc(
+              pluginService: ServiceLocator.pluginService,
+              eventBus: ServiceLocator.pluginEventBus,
+              repositoryService: ServiceLocator.pluginRepositoryService,
+              settingsDao: SettingsDAO(DBProvider.db),
+            )..add(const InitializePluginSystem()),
+            lazy: false,
           ),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => NotificationCubit(
-            notificationDao: NotificationDAO(DBProvider.db),
+          BlocProvider(
+            create: (context) => voidMusicPlayerCubit,
+            lazy: false,
           ),
-          lazy: false,
-        ),
-        BlocProvider(
-            create: (context) => TimerBloc(
-                ticker: const Ticker(), voidMusicPlayer: voidMusicPlayerCubit)),
-        BlocProvider(
-          create: (context) => ConnectivityCubit(),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => CurrentPlaylistCubit(playlistDao: playlistDao),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => RecentlyCubit(historyDao),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => HistoryCubit(historyDao: historyDao),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => LibraryItemsCubit(
-            playlistDao: playlistDao,
-            libraryDao: LibraryDAO(DBProvider.db),
-          ),
-        ),
-        BlocProvider(
-          create: (context) => ContentImportCubit(),
-          lazy: true,
-        ),
-        BlocProvider(
-          create: (context) => AddToPlaylistCubit(),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => SearchSuggestionBloc(
-            searchHistoryDao: SearchHistoryDAO(DBProvider.db),
-            pluginService: ServiceLocator.pluginService,
-            settingsDao: SettingsDAO(DBProvider.db),
-          ),
-        ),
-        BlocProvider(
-          create: (context) => LyricsCubit(
-            voidMusicPlayerCubit,
-            lyricsDao: LyricsDAO(DBProvider.db),
-            settingsDao: SettingsDAO(DBProvider.db),
-            pluginService: ServiceLocator.pluginService,
-          ),
-        ),
-        BlocProvider(
-          create: (context) => LastdotfmCubit(
-            playerCubit: voidMusicPlayerCubit,
-            cacheDao: CacheDAO(DBProvider.db),
-            settingsDao: SettingsDAO(DBProvider.db),
-            pluginService: ServiceLocator.pluginService,
-          ),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => DownloaderCubit(
-            connectivityCubit: context.read<ConnectivityCubit>(),
-            libraryItemsCubit: context.read<LibraryItemsCubit>(),
-            downloadRepo: VoidMusicDownloadRepository(
-              DownloadDAO(DBProvider.db, trackDao, playlistDao),
+          BlocProvider(
+              create: (context) =>
+                  MiniPlayerCubit(playerCubit: voidMusicPlayerCubit),
+              lazy: true),
+          BlocProvider(
+            create: (context) => SettingsCubit(
+              VoidMusicSettingsRepository(SettingsDAO(DBProvider.db)),
             ),
-            settingsDao: SettingsDAO(DBProvider.db),
-            pluginService: ServiceLocator.pluginService,
+            lazy: false,
           ),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => GlobalEventsCubit(
-            settingsDao: SettingsDAO(DBProvider.db),
+          BlocProvider(
+            create: (context) => NotificationCubit(
+              notificationDao: NotificationDAO(DBProvider.db),
+            ),
+            lazy: false,
           ),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => PlayerOverlayCubit(),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => ShortcutIndicatorCubit(),
-          lazy: false,
-        ),
-        BlocProvider(
-          create: (context) => LocalMusicCubit(),
-          lazy: true,
-        ),
-      ],
-      child: BlocBuilder<VoidMusicPlayerCubit, VoidMusicPlayerState>(
-        builder: (context, state) {
-          if (state is VoidMusicPlayerInitial) {
-            return Center(
-              child: SizedBox(
-                width: 50,
-                height: 50,
-                child: CircularProgressIndicator(
-                  color: AppTheme.accentColor(context),
-                ),
+          BlocProvider(
+              create: (context) => TimerBloc(
+                  ticker: const Ticker(), voidMusicPlayer: voidMusicPlayerCubit)),
+          BlocProvider(
+            create: (context) => ConnectivityCubit(),
+            lazy: false,
+          ),
+          BlocProvider(
+            create: (context) => CurrentPlaylistCubit(playlistDao: playlistDao),
+            lazy: false,
+          ),
+          BlocProvider(
+            create: (context) => RecentlyCubit(historyDao),
+            lazy: false,
+          ),
+          BlocProvider(
+            create: (context) => HistoryCubit(historyDao: historyDao),
+            lazy: false,
+          ),
+          BlocProvider(
+            create: (context) => LibraryItemsCubit(
+              playlistDao: playlistDao,
+              libraryDao: LibraryDAO(DBProvider.db),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => ContentImportCubit(),
+            lazy: true,
+          ),
+          BlocProvider(
+            create: (context) => AddToPlaylistCubit(),
+            lazy: false,
+          ),
+          BlocProvider(
+            create: (context) => SearchSuggestionBloc(
+              searchHistoryDao: SearchHistoryDAO(DBProvider.db),
+              pluginService: ServiceLocator.pluginService,
+              settingsDao: SettingsDAO(DBProvider.db),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => LyricsCubit(
+              voidMusicPlayerCubit,
+              lyricsDao: LyricsDAO(DBProvider.db),
+              settingsDao: SettingsDAO(DBProvider.db),
+              pluginService: ServiceLocator.pluginService,
+            ),
+          ),
+          BlocProvider(
+            create: (context) => LastdotfmCubit(
+              playerCubit: voidMusicPlayerCubit,
+              cacheDao: CacheDAO(DBProvider.db),
+              settingsDao: SettingsDAO(DBProvider.db),
+              pluginService: ServiceLocator.pluginService,
+            ),
+            lazy: false,
+          ),
+          BlocProvider(
+            create: (context) => DownloaderCubit(
+              connectivityCubit: context.read<ConnectivityCubit>(),
+              libraryItemsCubit: context.read<LibraryItemsCubit>(),
+              downloadRepo: VoidMusicDownloadRepository(
+                DownloadDAO(DBProvider.db, trackDao, playlistDao),
               ),
-            );
-          } else {
-            return BlocBuilder<SettingsCubit, SettingsState>(
-              builder: (context, settingsState) {
-                final locale = settingsState.languageCode.isEmpty
-                    ? null
-                    : Locale(settingsState.languageCode);
+              settingsDao: SettingsDAO(DBProvider.db),
+              pluginService: ServiceLocator.pluginService,
+            ),
+            lazy: false,
+          ),
+          BlocProvider(
+            create: (context) => GlobalEventsCubit(
+              settingsDao: SettingsDAO(DBProvider.db),
+            ),
+            lazy: false,
+          ),
+          BlocProvider(
+            create: (context) => PlayerOverlayCubit(),
+            lazy: false,
+          ),
+          BlocProvider(
+            create: (context) => ShortcutIndicatorCubit(),
+            lazy: false,
+          ),
+          BlocProvider(
+            create: (context) => LocalMusicCubit(),
+            lazy: true,
+          ),
+        ],
+        child: BlocBuilder<VoidMusicPlayerCubit, VoidMusicPlayerState>(
+          builder: (context, state) {
+            if (state is VoidMusicPlayerInitial) {
+              return Center(
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CircularProgressIndicator(
+                    color: AppTheme.accentColor(context),
+                  ),
+                ),
+              );
+            } else {
+              return BlocBuilder<SettingsCubit, SettingsState>(
+                builder: (context, settingsState) {
+                  final locale = settingsState.languageCode.isEmpty
+                      ? null
+                      : Locale(settingsState.languageCode);
 
-                // Resolve ThemeMode from persisted preference.
-                final ThemeMode resolvedThemeMode;
-                switch (settingsState.themeMode) {
-                  case 'light':
-                    resolvedThemeMode = ThemeMode.light;
-                    break;
-                  case 'dark':
-                    resolvedThemeMode = ThemeMode.dark;
-                    break;
-                  default:
-                    resolvedThemeMode = ThemeMode.system;
-                }
+                  // Resolve ThemeMode from persisted preference.
+                  final ThemeMode resolvedThemeMode;
+                  switch (settingsState.themeMode) {
+                    case 'light':
+                      resolvedThemeMode = ThemeMode.light;
+                      break;
+                    case 'dark':
+                      resolvedThemeMode = ThemeMode.dark;
+                      break;
+                    default:
+                      resolvedThemeMode = ThemeMode.system;
+                  }
 
-                return KeyboardShortcutsHandler(
-                  child: ShortcutIndicatorOverlay(
-                    child: MaterialApp.router(
-                      localizationsDelegates:
-                          AppLocalizations.localizationsDelegates,
-                      supportedLocales: AppLocalizations.supportedLocales,
-                      locale: locale,
-                      builder: (context, child) {
-                        // Determine brightness from resolved theme mode
-                        final isDark = resolvedThemeMode == ThemeMode.dark ||
-                            (resolvedThemeMode == ThemeMode.system &&
-                                MediaQuery.platformBrightnessOf(context) ==
-                                    Brightness.dark);
-                        SystemChrome.setSystemUIOverlayStyle(
-                          SystemUiOverlayStyle(
-                            statusBarColor: Colors.transparent,
-                            systemNavigationBarColor: Colors.transparent,
-                            statusBarIconBrightness:
-                                isDark ? Brightness.light : Brightness.dark,
-                            statusBarBrightness:
-                                isDark ? Brightness.dark : Brightness.light,
-                          ),
-                        );
-                        return ResponsiveBreakpoints.builder(
-                          breakpoints: [
-                            const Breakpoint(start: 0, end: 450, name: MOBILE),
-                            const Breakpoint(start: 451, end: 800, name: TABLET),
-                            const Breakpoint(
-                                start: 801, end: 1920, name: DESKTOP),
-                            const Breakpoint(
-                                start: 1921, end: double.infinity, name: '4K'),
-                          ],
-                          child: GlobalEventListener(
-                            navigatorKey: GlobalRoutes.globalRouterKey,
-                            child: child!,
-                          ),
-                        );
-                      },
-                      scaffoldMessengerKey: SnackbarService.messengerKey,
-                      routerConfig: GlobalRoutes.globalRouter,
-                      theme: Default_Theme().lightThemeData,
-                      darkTheme: Default_Theme().defaultThemeData,
-                      themeMode: resolvedThemeMode,
-                      scrollBehavior: CustomScrollBehavior(),
-                      debugShowCheckedModeBanner: false,
+                  return KeyboardShortcutsHandler(
+                    child: ShortcutIndicatorOverlay(
+                      child: MaterialApp.router(
+                        localizationsDelegates:
+                            AppLocalizations.localizationsDelegates,
+                        supportedLocales: AppLocalizations.supportedLocales,
+                        locale: locale,
+                        builder: (context, child) {
+                          // Determine brightness from resolved theme mode
+                          final isDark = resolvedThemeMode == ThemeMode.dark ||
+                              (resolvedThemeMode == ThemeMode.system &&
+                                  MediaQuery.platformBrightnessOf(context) ==
+                                      Brightness.dark);
+                          SystemChrome.setSystemUIOverlayStyle(
+                            SystemUiOverlayStyle(
+                              statusBarColor: Colors.transparent,
+                              systemNavigationBarColor: Colors.transparent,
+                              statusBarIconBrightness:
+                                  isDark ? Brightness.light : Brightness.dark,
+                              statusBarBrightness:
+                                  isDark ? Brightness.dark : Brightness.light,
+                            ),
+                          );
+                          return ResponsiveBreakpoints.builder(
+                            breakpoints: [
+                              const Breakpoint(start: 0, end: 450, name: MOBILE),
+                              const Breakpoint(start: 451, end: 800, name: TABLET),
+                              const Breakpoint(
+                                  start: 801, end: 1920, name: DESKTOP),
+                              const Breakpoint(
+                                  start: 1921, end: double.infinity, name: '4K'),
+                            ],
+                            child: GlobalEventListener(
+                              navigatorKey: GlobalRoutes.globalRouterKey,
+                              child: child!,
+                            ),
+                          );
+                        },
+                        scaffoldMessengerKey: SnackbarService.messengerKey,
+                        routerConfig: GlobalRoutes.globalRouter,
+                        theme: Default_Theme().lightThemeData,
+                        darkTheme: Default_Theme().defaultThemeData,
+                        themeMode: resolvedThemeMode,
+                        scrollBehavior: CustomScrollBehavior(),
+                        debugShowCheckedModeBanner: false,
                     ),
                   ),
                 );

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -29,8 +30,9 @@ import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
 import 'package:voidmusic/src/rust/api/plugin/models.dart' as plugin_models;
 import 'package:voidmusic/screens/widgets/source_badge.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
+import 'package:voidmusic/providers/search_provider.dart';
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends ConsumerStatefulWidget {
   final String searchQuery;
   const SearchScreen({
     Key? key,
@@ -38,10 +40,10 @@ class SearchScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends ConsumerState<SearchScreen> {
   late final ContentBloc _contentBloc;
   final TextEditingController _textEditingController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
@@ -58,6 +60,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   List<({String query, ContentSearchFilter filter})>
       _currentCombinedSuggestions = [];
+  
+  bool _hasInitializedFromFooter = false;
 
   @override
   void initState() {
@@ -71,6 +75,18 @@ class _SearchScreenState extends State<SearchScreen> {
         context
             .read<SearchSuggestionBloc>()
             .add(SearchSuggestionFetch(_textEditingController.text));
+      }
+    });
+
+    // Listen to footer search query changes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final footerSearchQuery = ref.read(searchQueryProvider);
+        if (footerSearchQuery.isNotEmpty && !_hasInitializedFromFooter) {
+          _hasInitializedFromFooter = true;
+          _textEditingController.text = footerSearchQuery;
+          _doSearch(footerSearchQuery);
+        }
       }
     });
 
@@ -169,6 +185,8 @@ class _SearchScreenState extends State<SearchScreen> {
       text: query,
       selection: TextSelection.collapsed(offset: query.length),
     );
+    // Sync with footer search provider
+    ref.read(searchQueryProvider.notifier).state = query;
   }
 
   void _closeSuggestionPanel() {
