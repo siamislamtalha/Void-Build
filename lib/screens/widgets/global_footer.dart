@@ -23,7 +23,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voidmusic/widgets/muzo_footer.dart';
-import 'package:voidmusic/providers/navigation_provider.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
 import 'package:voidmusic/screens/widgets/player_overlay_wrapper.dart';
@@ -61,7 +60,7 @@ class GlobalFooter extends StatefulWidget {
 
   @override
   State<GlobalFooter> createState() => _GlobalFooterState();
-}*/
+}
 
 class _GlobalFooterState extends State<GlobalFooter>
     with SingleTickerProviderStateMixin {
@@ -214,7 +213,8 @@ class _GlobalFooterState extends State<GlobalFooter>
       await SystemNavigator.pop();
     }
   }
-}*/
+}
+*/
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ORIGINAL BODY WRAPPER (COMMENTED OUT)
@@ -1193,30 +1193,6 @@ class _NavItemButton extends StatelessWidget {
     );
   }
 }*/
-
-// ─────────────────────────────────────────────────────────────────────────────
-// NAV ITEM DATA (needed for desktop sidebar)
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _NavItemData {
-  final int branchIndex;
-
-  /// Filled / solid icon — shown when this item is **selected**.
-  final IconData icon;
-
-  /// Line / outline icon — shown when this item is **idle**.
-  /// Falls back to [icon] if not provided.
-  final IconData? iconLine;
-
-  final String label;
-
-  const _NavItemData({
-    required this.branchIndex,
-    required this.icon,
-    this.iconLine,
-    required this.label,
-  });
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NEW GLOBAL FOOTER - USING MUZO'S FOOTER

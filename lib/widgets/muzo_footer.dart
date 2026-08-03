@@ -257,8 +257,8 @@ class MuzoFooter extends ConsumerWidget {
         _buildNavItem(
           context,
           ref,
-          FluentIcons.music_24_regular,
-          FluentIcons.music_24_filled,
+          FluentIcons.music_note_1_24_regular,
+          FluentIcons.music_note_1_24_filled,
           "Local",
           3, // LocalMusicScreen
           selectedIndex,
@@ -267,8 +267,8 @@ class MuzoFooter extends ConsumerWidget {
         _buildNavItem(
           context,
           ref,
-          FluentIcons.folder_download_24_regular,
-          FluentIcons.folder_download_24_filled,
+          FluentIcons.arrow_download_24_regular,
+          FluentIcons.arrow_download_24_filled,
           "Offline",
           4, // OfflineScreen
           selectedIndex,

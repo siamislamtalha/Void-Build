@@ -538,13 +538,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                         themeMode: resolvedThemeMode,
                         scrollBehavior: CustomScrollBehavior(),
                         debugShowCheckedModeBanner: false,
+                      ),
                     ),
-                  ),
-                );
-              },
-            );
-          }
-        },
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
     );
   }
