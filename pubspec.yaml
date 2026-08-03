@@ -95,7 +95,7 @@ dependencies:
   
 
 dependency_overrides:
-  ffi: ^1.1.2  # Override to make dart_discord_rpc work
+  ffi: ^2.2.0  # Updated for Flutter 3.41.0 compatibility
 
 
 dev_dependencies:
