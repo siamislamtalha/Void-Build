@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:ui';
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/services.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
@@ -13,6 +13,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 // ─── Collapse animation ──────────────────────────────────────────────────────
 // Matches the Apple Music iOS 26 reference exactly.
@@ -272,24 +273,41 @@ class _GlobalFooterState extends State<GlobalFooter>
                     ),
                   ),
                   // ── Floating footer overlay ─────────────────────────────
-                  // We skip SafeArea and instead manually add the device bottom
-                  // inset so the glass pills sit just above the home indicator /
-                  // gesture bar, while the BackdropFilter blur visually extends
-                  // all the way to the true screen edge (no opaque black strip).
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: _GlassFooterOverlay(
-                      isMobile: isMobile,
-                      isMiniMode: _isMiniMode,
-                      collapseAnimation: _collapseAnimation,
-                      navigationShell: widget.navigationShell,
-                      onExpandFooter: _expandFooter,
+                  // Desktop: precisely positioned over content area (right of
+                  // sidebar) with exact height so MiniPlayerWidget gets bounded.
+                  // Mobile: full-width anchor at bottom:0 for the animated
+                  // pill Stack layout.
+                  if (isMobile)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: _GlassFooterOverlay(
+                        isMobile: isMobile,
+                        isMiniMode: _isMiniMode,
+                        collapseAnimation: _collapseAnimation,
+                        navigationShell: widget.navigationShell,
+                        onExpandFooter: _expandFooter,
+                      ),
+                    )
+                  else
+                    Positioned(
+                      left: _kDesktopSidebarWidth + 8.0,
+                      right: 8.0,
+                      bottom: MediaQuery.of(context).viewPadding.bottom +
+                          _kOuterBottomPadding,
+                      height: 64,
+                      child: _GlassFooterOverlay(
+                        isMobile: isMobile,
+                        isMiniMode: _isMiniMode,
+                        collapseAnimation: _collapseAnimation,
+                        navigationShell: widget.navigationShell,
+                        onExpandFooter: _expandFooter,
+                      ),
                     ),
-                  ),
                 ],
               ),
+
             ),
           ),
         ),
@@ -436,75 +454,56 @@ class _GlassFooterOverlay extends StatelessWidget {
     if (!isMobile) {
       // ── Desktop layout: mini player floating above content ────────────────
       //
-      // Fix 1: BlocBuilder — only render when a track is loaded; avoids an
-      //         empty Container with no height sitting in the overlay.
+      // IMPORTANT: This widget is returned as the child of a Positioned in the
+      // main Stack (in GlobalFooter.build). Do NOT wrap in another Positioned
+      // here — the outer Positioned already handles left/right/bottom/height.
       //
-      // Fix 2: SizedBox(height:64) — gives MiniPlayerCard a BOUNDED height
-      //         so its internal `height: double.infinity` resolves correctly
-      //         instead of collapsing to 0 in an unconstrained Positioned.
-      //
-      // Fix 3: Outer ClipRRect+BackdropFilter — provides the glass blur even
-      //         when there is sparse content behind the mini player (avoids
-      //         the "white" look that occurs when BackdropFilter has nothing
-      //         to sample from a transparent/empty area).
+      // The RepaintBoundary is placed OUTSIDE BackdropFilter so the GPU blur
+      // texture is cached by the compositor and never re-sampled. The fallback
+      // scaffoldFill color ensures BackdropFilter always has pixels to sample
+      // (prevents the white flash when content behind is transparent).
       return BlocBuilder<MiniPlayerCubit, MiniPlayerState>(
         builder: (context, miniState) {
           if (!miniState.isVisible) return const SizedBox.shrink();
 
           final isDark = Theme.of(context).brightness == Brightness.dark;
-          // Fallback fill color so BackdropFilter has something to sample even
-          // when the scaffold content area is transparent/empty (prevents the
-          // "white" desktop mini-player bug).
+          // Solid fallback so BackdropFilter never samples an empty buffer.
           final scaffoldFill = Theme.of(context).scaffoldBackgroundColor;
 
-          return Padding(
-            padding: EdgeInsets.only(
-              left: _kDesktopSidebarWidth + 8.0,
-              right: 8.0,
-              bottom: bottomInset + _kOuterBottomPadding,
-            ),
-            child: SizedBox(
-              height: 64,
-              // RepaintBoundary isolates the blur layer so it is cached by the
-              // compositor and not re-sampled on every animation frame.
-              child: RepaintBoundary(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(28),
-                    // Fallback opaque fill BEHIND the blur so the filter always
-                    // has pixels to sample from (fixes white flash on desktop).
-                    color: scaffoldFill,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black
-                            .withValues(alpha: isDark ? 0.35 : 0.14),
-                        blurRadius: 20,
-                        spreadRadius: -4,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(28),
-                    // Muzo-matched blur: sigmaX/Y 25, black@0.20 / white@0.35,
-                    // border white @ 0.12/0.20 @ 0.75 px.
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: (isDark ? Colors.black : Colors.white)
-                              .withValues(alpha: isDark ? 0.20 : 0.35),
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(
-                            color: Colors.white
-                                .withValues(alpha: isDark ? 0.12 : 0.20),
-                            width: 0.75,
-                          ),
-                        ),
-                        child: MiniPlayerWidget(
-                          currentPageIndex: navigationShell.currentIndex,
-                        ),
-                      ),
+          return SizedBox(
+            height: 64,
+            child: RepaintBoundary(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  // Opaque fallback BEHIND blur — prevents white flash.
+                  color: scaffoldFill,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black
+                          .withValues(alpha: isDark ? 0.35 : 0.14),
+                      blurRadius: 20,
+                      spreadRadius: -4,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(28),
+                  child: GlassContainer(
+                    useOwnLayer: true,
+                    settings: LiquidGlassSettings(
+                      thickness: 30,
+                      blur: 25,
+                      glassColor: (isDark ? Colors.black : Colors.white)
+                          .withValues(alpha: isDark ? 0.20 : 0.35),
+                      ambientRim: 0.2,
+                      fresnelStrength: 1.0,
+                      specularSharpness: GlassSpecularSharpness.medium,
+                    ),
+                    shape: LiquidRoundedSuperellipse(borderRadius: 28),
+                    child: MiniPlayerWidget(
+                      currentPageIndex: navigationShell.currentIndex,
                     ),
                   ),
                 ),
@@ -599,13 +598,19 @@ class _GlassFooterOverlay extends StatelessWidget {
                 ),
               ),
 
-              // ── Mini player ──────────────────────────────────────────────
-              // AnimatedPositioned smoothly moves between its two positions:
-              //   • Normal: full-width pill floating above the nav bar.
-              //   • Collapsed: narrow pill inline with the two nav circles.
-              // RepaintBoundary wraps the entire mini player so its inner
-              // BackdropFilter blur is compositor-cached and never re-sampled
-              // while AnimatedPositioned is changing position/size each frame.
+              // ── Mini player with advanced liquid glass effects ─────────────
+              // Architecture for blur stability:
+              //
+              //   AnimatedPositioned (changes position/size)
+              //     └─ RepaintBoundary (compositor caches this subtree)
+              //          └─ Container (shadow, borderRadius)
+              //               └─ ClipRRect (static, never re-clips)
+              //                    └─ GlassContainer (advanced liquid glass)
+              //                         └─ MiniPlayerWidget (content only)
+              //
+              // The GlassContainer is OUTSIDE AnimatedPositioned's animated
+              // dimension, so the GPU blur texture is never invalidated — no
+              // flicker during expand/collapse/reposition.
               if (hasMiniPlayer)
                 AnimatedPositioned(
                   duration: _kCollapseAnimDuration,
@@ -615,12 +620,47 @@ class _GlassFooterOverlay extends StatelessWidget {
                   bottom: miniBottom,
                   height: miniHeight,
                   child: RepaintBoundary(
-                    child: MiniPlayerWidget(
-                      currentPageIndex: navigationShell.currentIndex,
-                      isCompact: isCollapsed,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(
+                                alpha:
+                                    Theme.of(context).brightness == Brightness.dark
+                                        ? 0.35
+                                        : 0.12),
+                            blurRadius: 20,
+                            spreadRadius: -4,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: GlassContainer(
+                          useOwnLayer: true,
+                          settings: LiquidGlassSettings(
+                            thickness: 30,
+                            blur: 25,
+                            glassColor: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.black.withValues(alpha: 0.20)
+                                : Colors.white.withValues(alpha: 0.35),
+                            ambientRim: 0.2,
+                            fresnelStrength: 1.0,
+                            specularSharpness: GlassSpecularSharpness.medium,
+                          ),
+                          shape: LiquidRoundedSuperellipse(borderRadius: 30),
+                          child: MiniPlayerWidget(
+                            currentPageIndex: navigationShell.currentIndex,
+                            isCompact: isCollapsed,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
+
             ],
           ),
         );
@@ -702,13 +742,6 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
     final inactiveIconColor = isDark
         ? Colors.white.withValues(alpha: 0.85)
         : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
-    final selectedPillColor = isDark
-        ? Colors.white.withValues(alpha: 0.16)
-        : Colors.black.withValues(alpha: 0.08);
-    final selectedPillBorder = isDark
-        ? Colors.white.withValues(alpha: 0.28)
-        : Colors.black.withValues(alpha: 0.14);
-
     final capsuleItems = [
       _NavItemData(
           branchIndex: 0, icon: MingCute.home_4_fill, label: l10n.navHome),
@@ -732,66 +765,107 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
     );
     final selectedIndex = activeItemIndex >= 0 ? activeItemIndex : 0;
 
-    // ── The capsule itself uses a fixed outer ClipRRect so the
-    // BackdropFilter blur is never re-clipped during the width animation.
-    // Only a transparent inner layer carries the animated width change.
+    // ── BLUR-STABLE CAPSULE ─────────────────────────────────────────────────
+    // The blur texture must NEVER be invalidated while the collapse animation
+    // runs. We achieve this by keeping ClipRRect+BackdropFilter in a STATIC
+    // SizedBox(width: fullWidth) that never changes size.
+    //
+    // Only an inner AnimatedContainer changes width (using a transparent bg
+    // for the hidden region). The BackdropFilter samples its texture once and
+    // the compositor caches it — no flicker, no re-sample.
+    //
+    // Shadow is on the outer SizedBox so it also doesn't re-paint.
     return SizedBox(
+      width: widget.fullWidth,
       height: _kNavBarH,
-      child: AnimatedContainer(
-        duration: _kCollapseAnimDuration,
-        curve: _kCollapseAnimCurve,
-        width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
-        height: _kNavBarH,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-              blurRadius: 20,
-              spreadRadius: -4,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: BackdropFilter(
-            // Muzo-matched: sigmaX/Y 25
-            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-            child: Container(
+      child: Stack(
+        clipBehavior: Clip.hardEdge,
+        children: [
+          // ── Static glass layer with advanced liquid glass effects ──
+          Positioned.fill(
+            child: DecoratedBox(
               decoration: BoxDecoration(
-                color: (isDark ? Colors.black : Colors.white)
-                    .withValues(alpha: isDark ? 0.20 : 0.35),
                 borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
-                  width: 0.75,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
+                    blurRadius: 20,
+                    spreadRadius: -4,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: RepaintBoundary(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
+                  child: GlassContainer(
+                    useOwnLayer: true,
+                    settings: LiquidGlassSettings(
+                      thickness: 30,
+                      blur: 25,
+                      glassColor: (isDark ? Colors.black : Colors.white)
+                          .withValues(alpha: isDark ? 0.20 : 0.35),
+                      ambientRim: 0.2,
+                      fresnelStrength: 1.0,
+                      specularSharpness: GlassSpecularSharpness.medium,
+                    ),
+                    shape: LiquidRoundedSuperellipse(borderRadius: 30),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                  ),
                 ),
               ),
+            ),
+          ),
+
+          // ── Animated clipping mask: hides the right portion when collapsing ──
+          // This is a plain color rect that slides in from the right. No blur
+          // is involved — it's just an opaque overlay on the transparent area
+          // so the "invisible" part truly disappears.
+          AnimatedPositioned(
+            duration: _kCollapseAnimDuration,
+            curve: _kCollapseAnimCurve,
+            left: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
+            top: 0,
+            bottom: 0,
+            right: 0,
+            child: const SizedBox.shrink(),
+          ),
+
+          // ── Animated visible content area ──────────────────────────────────
+          // The ClipRect here clips the CONTENT (icons/pill) to the animated
+          // width, but never touches the BackdropFilter above.
+          AnimatedPositioned(
+            duration: _kCollapseAnimDuration,
+            curve: _kCollapseAnimCurve,
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
+            child: ClipRect(
               child: Stack(
                 children: [
                   // ── Expanded nav content ──────────────────────────────────
                   AnimatedOpacity(
-                    duration: const Duration(milliseconds: 280),
-                    curve: Curves.easeInOutCubic,
+                    duration: const Duration(milliseconds: 200),
                     opacity: widget.isMiniMode ? 0.0 : 1.0,
                     child: IgnorePointer(
                       ignoring: widget.isMiniMode,
                       child: LayoutBuilder(
                         builder: (context, constraints) {
+                          // constraints.maxWidth tracks the animated width
                           final availableW = constraints.maxWidth - 12;
                           final slotW = availableW / capsuleItems.length;
-                          // Base pill width; grows during press/drag
                           const double basePillW = 68.0;
                           const double pressedPillW = 80.0;
 
-                          // During drag: pill center = finger position
-                          // At rest: pill centered on selected slot
                           final targetLeft =
                               6 + (selectedIndex * slotW) + (slotW - basePillW) / 2;
 
                           return GestureDetector(
-                            // ── Long-press starts the expand animation ────
                             onLongPressStart: (details) {
                               HapticFeedback.selectionClick();
                               setState(() => _isPressing = true);
@@ -805,7 +879,6 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                               setState(() => _isPressing = false);
                               _pressController.reverse();
                             },
-                            // ── Drag tracks finger ────────────────────────
                             onHorizontalDragStart: (details) {
                               setState(() {
                                 _isDragging = true;
@@ -826,9 +899,7 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                               if (newIdx != oldIdx) {
                                 HapticFeedback.selectionClick();
                               }
-                              setState(() {
-                                _dragPositionX = newDx;
-                              });
+                              setState(() => _dragPositionX = newDx);
                             },
                             onHorizontalDragEnd: (details) {
                               if (_dragPositionX != null) {
@@ -850,17 +921,14 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                             child: AnimatedBuilder(
                               animation: _pressAnim,
                               builder: (context, _) {
-                                // Recompute inside AnimatedBuilder so pill
-                                // re-renders every frame during press spring
                                 double animPillW;
                                 double animLeft;
                                 if (_isDragging && _dragPositionX != null) {
                                   animPillW = basePillW +
                                       (pressedPillW - basePillW) *
                                           _pressAnim.value;
-                                  animLeft =
-                                      (_dragPositionX! - animPillW / 2).clamp(
-                                          6.0,
+                                  animLeft = (_dragPositionX! - animPillW / 2)
+                                      .clamp(6.0,
                                           constraints.maxWidth - 6 - animPillW);
                                 } else if (_isPressing) {
                                   animPillW = basePillW +
@@ -876,15 +944,14 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
 
                                 return Stack(
                                   children: [
-                                    // ── Liquid glass highlight pill ───────
+                                    // ── Liquid glass highlight pill ────────
                                     AnimatedPositioned(
-                                      // Zero duration while dragging so pill
-                                      // follows finger without delay; smooth
-                                      // slide otherwise.
-                                      duration: (_isDragging || _isPressing)
+                                      duration: _isDragging
                                           ? Duration.zero
-                                          : const Duration(milliseconds: 320),
-                                      curve: Curves.fastOutSlowIn,
+                                          : const Duration(milliseconds: 380),
+                                      curve: _isDragging
+                                          ? Curves.linear
+                                          : Curves.easeOutBack,
                                       left: animLeft,
                                       top: 5,
                                       width: animPillW,
@@ -893,19 +960,29 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(24),
-                                          color: selectedPillColor,
+                                          // Muzo-style RadialGradient: accent
+                                          // color at center → transparent at edge
+                                          gradient: RadialGradient(
+                                            center: Alignment.center,
+                                            radius: 0.85,
+                                            colors: [
+                                              activeAccentColor.withValues(
+                                                  alpha: isDark ? 0.28 : 0.18),
+                                              activeAccentColor.withValues(
+                                                  alpha: 0.0),
+                                            ],
+                                          ),
                                           border: Border.all(
-                                            color: selectedPillBorder,
+                                            color: activeAccentColor.withValues(
+                                                alpha: isDark ? 0.38 : 0.26),
                                             width: 1.0,
                                           ),
                                           boxShadow: [
+                                            // Accent-tinted glow (Muzo)
                                             BoxShadow(
-                                              color: isDark
-                                                  ? Colors.black
-                                                      .withValues(alpha: 0.22)
-                                                  : Colors.black
-                                                      .withValues(alpha: 0.06),
-                                              blurRadius: 12,
+                                              color: activeAccentColor.withValues(
+                                                  alpha: isDark ? 0.22 : 0.12),
+                                              blurRadius: 16,
                                               spreadRadius: -2,
                                             ),
                                           ],
@@ -921,8 +998,7 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceEvenly,
-                                          children:
-                                              capsuleItems.map((item) {
+                                          children: capsuleItems.map((item) {
                                             final isSelected = currentIndex ==
                                                 item.branchIndex;
                                             return _NavItemButton(
@@ -930,10 +1006,6 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                                               isSelected: isSelected,
                                               activeColor: activeAccentColor,
                                               inactiveColor: inactiveIconColor,
-                                              selectedPillColor:
-                                                  Colors.transparent,
-                                              selectedPillBorder:
-                                                  Colors.transparent,
                                               onTap: () {
                                                 HapticFeedback.selectionClick();
                                                 widget.navigationShell.goBranch(
@@ -954,10 +1026,9 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                     ),
                   ),
 
-                  // ── Collapsed mode single active icon ─────────────────────
+                  // ── Collapsed mode: single active icon ─────────────────────
                   AnimatedOpacity(
-                    duration: const Duration(milliseconds: 280),
-                    curve: Curves.easeInOutCubic,
+                    duration: const Duration(milliseconds: 200),
                     opacity: widget.isMiniMode ? 1.0 : 0.0,
                     child: IgnorePointer(
                       ignoring: !widget.isMiniMode,
@@ -984,7 +1055,7 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -1034,50 +1105,52 @@ class _SearchCircleButton extends StatelessWidget {
         ],
       ),
       child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-          child: GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              navigationShell.goBranch(2);
-            },
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              width: _kSearchCircleW,
-              height: _kNavBarH,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: (isDark ? Colors.black : Colors.white)
-                    .withValues(alpha: isDark ? 0.20 : 0.35),
-                border: Border.all(
-                  color: isSearchSelected
-                      ? selectedPillBorder
-                      : Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
-                  width: 0.75,
+        child: RepaintBoundary(
+          child: GlassContainer(
+            useOwnLayer: true,
+            settings: LiquidGlassSettings(
+              thickness: 30,
+              blur: 25,
+              glassColor: (isDark ? Colors.black : Colors.white)
+                  .withValues(alpha: isDark ? 0.20 : 0.35),
+              ambientRim: isSearchSelected ? 0.3 : 0.2,
+              fresnelStrength: 1.0,
+              specularSharpness: GlassSpecularSharpness.medium,
+            ),
+            shape: LiquidOval(),
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                navigationShell.goBranch(2);
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                width: _kSearchCircleW,
+                height: _kNavBarH,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
                 ),
-              ),
-              child: Center(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  curve: Curves.easeOutCubic,
-                  width: isSearchSelected ? 48 : 42,
-                  height: isSearchSelected ? 48 : 42,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isSearchSelected
-                        ? selectedPillColor
-                        : Colors.transparent,
-                    border: isSearchSelected
-                        ? Border.all(color: selectedPillBorder, width: 1.0)
-                        : null,
-                  ),
-                  child: Center(
-                    child: Icon(
-                      MingCute.search_2_line,
-                      size: 24,
+                child: Center(
+                  child: Container(
+                    width: isSearchSelected ? 48 : 42,
+                    height: isSearchSelected ? 48 : 42,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
                       color: isSearchSelected
-                          ? activeAccentColor
-                          : inactiveIconColor,
+                          ? selectedPillColor
+                          : Colors.transparent,
+                      border: isSearchSelected
+                          ? Border.all(color: selectedPillBorder, width: 1.0)
+                          : null,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        MingCute.search_2_line,
+                        size: 24,
+                        color: isSearchSelected
+                            ? activeAccentColor
+                            : inactiveIconColor,
+                      ),
                     ),
                   ),
                 ),
@@ -1319,8 +1392,6 @@ class HorizontalNavBar extends StatelessWidget {
                         isSelected: isSelected,
                         activeColor: activeAccentColor,
                         inactiveColor: inactiveIconColor,
-                        selectedPillColor: selectedPillColor,
-                        selectedPillBorder: selectedPillBorder,
                         onTap: () {
                           HapticFeedback.selectionClick();
                           navigationShell.goBranch(item.branchIndex);
@@ -1399,15 +1470,14 @@ class HorizontalNavBar extends StatelessWidget {
 // SHARED NAV ITEM BUTTON
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Individual nav item with its own oval-pill glass background (matching the
-/// desired reference image — wider than tall, like a stadium capsule).
+/// Nav item button — icon only, color animated by shared sliding pill.
+/// The shared RadialGradient pill (AnimatedPositioned in _CollapsibleNavCapsule)
+/// handles all selection indication; this widget just renders the icon.
 class _NavItemButton extends StatelessWidget {
   final _NavItemData item;
   final bool isSelected;
   final Color activeColor;
   final Color inactiveColor;
-  final Color selectedPillColor;
-  final Color selectedPillBorder;
   final VoidCallback onTap;
 
   const _NavItemButton({
@@ -1415,53 +1485,34 @@ class _NavItemButton extends StatelessWidget {
     required this.isSelected,
     required this.activeColor,
     required this.inactiveColor,
-    required this.selectedPillColor,
-    required this.selectedPillBorder,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    // The shared sliding RadialGradient pill in _CollapsibleNavCapsule is
+    // the sole selection indicator. _NavItemButton renders ONLY the icon
+    // (and label) with animated color — no per-item background or border.
+    // This removes the double-pill z-fighting of the old design.
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        // Selected: wider oval (72 px) gives a clear stadium/capsule pill.
-        // Unselected: narrower to not crowd items.
-        width: isSelected ? 72 : 54,
+      child: SizedBox(
+        // Fixed slot width — pill sizing is handled by the parent AnimatedPositioned
+        width: 54,
         height: 48,
-        decoration: BoxDecoration(
-          // borderRadius = half of height → perfect stadium pill (fully rounded ends)
-          borderRadius: BorderRadius.circular(24),
-          color: isSelected ? selectedPillColor : Colors.transparent,
-          border: isSelected
-              ? Border.all(
-                  color: selectedPillBorder,
-                  width: 1.0,
-                )
-              : null,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
+        child: Center(
+          child: AnimatedScale(
+            // Subtle micro-scale: selected icon pops 8% larger (Muzo feel)
+            scale: isSelected ? 1.08 : 1.0,
+            duration: const Duration(milliseconds: 260),
+            curve: Curves.easeOutBack,
+            child: Icon(
               item.icon,
-              size: 20,
+              size: 22,
               color: isSelected ? activeColor : inactiveColor,
             ),
-            const SizedBox(height: 2),
-            Text(
-              item.label,
-              style: TextStyle(
-                fontSize: 9.5,
-                fontFamily: 'Gilroy',
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                color: isSelected ? activeColor : inactiveColor,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

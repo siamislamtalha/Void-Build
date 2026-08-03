@@ -48,6 +48,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:voidmusic/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
 import 'package:voidmusic/blocs/library/cubit/library_items_cubit.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:voidmusic/plugins/blocs/import/content_import_cubit.dart';
 import 'package:voidmusic/routes/app_router.dart';
 import 'package:voidmusic/screens/screen/library_views/cubit/current_playlist_cubit.dart';
@@ -161,7 +162,9 @@ Future<void> main() async {
   setHighRefreshRate();
   await setupPlayerCubit();
   DiscordService.initialize();
-  runApp(const MyApp());
+  // Initialize liquid glass widgets for advanced glass effects
+  await LiquidGlassWidgets.initialize();
+  runApp(LiquidGlassWidgets.wrap(child: const MyApp()));
 }
 
 class MyApp extends StatefulWidget {

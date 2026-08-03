@@ -229,7 +229,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playlistNoMatchSearch => 'Ninguna lista coincide con tu búsqueda';
 
   @override
-  String get playlistCreateNew => 'Crear nueva lista 😍';
+  String get playlistCreateNew => 'Crear nueva lista';
 
   @override
   String get playlistCreateFirstOne =>
@@ -1039,7 +1039,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get storageLocationAndroid =>
-      'Las copias se guardan en:\n\n1. Directorio de Descargas\n2. Android/data/ls.bloomee.musicplayer/data\n\nCopia el archivo desde cualquiera de esas rutas.';
+      'Las copias se guardan en:\n\n1. Directorio de Descargas\n2. Android/data/ls.voidmusic.musicplayer/data\n\nCopia el archivo desde cualquiera de esas rutas.';
 
   @override
   String get storageLocationOther =>
@@ -1194,7 +1194,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get timerFinishedMessage =>
-      'La música se ha detenido. ¡Que descanses! 🥰';
+      'La música se ha detenido. ¡Que descanses!';
 
   @override
   String get timerGotIt => 'Entendido';
@@ -1630,7 +1630,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get importVoidMusicFiles => 'Importar archivos Void Music';
-
 
   @override
   String get importM3UFiles => 'Importar lista M3U';

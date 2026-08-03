@@ -75,6 +75,10 @@ dependencies:
   flutter_slidable: ^3.0.0
   fl_chart: ^0.65.0
   translator: ^1.0.0
+  
+  # Liquid glass widgets for advanced glass effects
+  liquid_glass_widgets:
+    path: liquid_glass_widgets-main
 
   # audio service dependencies
   audio_service: ^0.18.18
