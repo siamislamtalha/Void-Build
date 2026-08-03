@@ -413,10 +413,10 @@ packages:
     dependency: "direct overridden"
     description:
       name: ffi
-      sha256: "13a6ccf6a459a125b3fcdb6ec73bd5ff90822e071207c663bfd1f70062d51d18"
+      sha256: "6d7fd89431262d8f3125e81b50d3847a091d846eafcd4fdb88dd06f36d705a45"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.1"
+    version: "2.2.0"
   file:
     dependency: transitive
     description:
@@ -799,10 +799,11 @@ packages:
   liquid_glass_widgets:
     dependency: "direct main"
     description:
-      path: liquid_glass_widgets-main
-      relative: true
-    source: path
-    version: "0.28.0"
+      name: liquid_glass_widgets
+      sha256: "7429526cb08a283110d2c32619607700fe0e9dc2935c1fe44d13630537629d1b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.28.1"
   logging:
     dependency: transitive
     description:

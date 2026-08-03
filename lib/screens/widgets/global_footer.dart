@@ -501,7 +501,7 @@ class _GlassFooterOverlay extends StatelessWidget {
                       fresnelStrength: 1.0,
                       specularSharpness: GlassSpecularSharpness.medium,
                     ),
-                    shape: LiquidRoundedSuperellipse(borderRadius: 28),
+                    shape: const LiquidRoundedSuperellipse(borderRadius: 28),
                     child: MiniPlayerWidget(
                       currentPageIndex: navigationShell.currentIndex,
                     ),
@@ -598,17 +598,18 @@ class _GlassFooterOverlay extends StatelessWidget {
                 ),
               ),
 
-              // ── Mini player with advanced liquid glass effects ─────────────
+              // ── Mini player — Muzo-style BackdropFilter glass ─────────────
               // Architecture for blur stability:
               //
               //   AnimatedPositioned (changes position/size)
               //     └─ RepaintBoundary (compositor caches this subtree)
-              //          └─ Container (shadow, borderRadius)
+              //          └─ Container (shadow)
               //               └─ ClipRRect (static, never re-clips)
-              //                    └─ GlassContainer (advanced liquid glass)
-              //                         └─ MiniPlayerWidget (content only)
+              //                    └─ BackdropFilter (blur, sampled once)
+              //                         └─ Container (translucent fill+border)
+              //                              └─ MiniPlayerWidget (content only)
               //
-              // The GlassContainer is OUTSIDE AnimatedPositioned's animated
+              // BackdropFilter is OUTSIDE AnimatedPositioned's animated
               // dimension, so the GPU blur texture is never invalidated — no
               // flicker during expand/collapse/reposition.
               if (hasMiniPlayer)
@@ -638,22 +639,25 @@ class _GlassFooterOverlay extends StatelessWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(30),
-                        child: GlassContainer(
-                          useOwnLayer: true,
-                          settings: LiquidGlassSettings(
-                            thickness: 30,
-                            blur: 25,
-                            glassColor: Theme.of(context).brightness == Brightness.dark
-                                ? Colors.black.withValues(alpha: 0.20)
-                                : Colors.white.withValues(alpha: 0.35),
-                            ambientRim: 0.2,
-                            fresnelStrength: 1.0,
-                            specularSharpness: GlassSpecularSharpness.medium,
-                          ),
-                          shape: LiquidRoundedSuperellipse(borderRadius: 30),
-                          child: MiniPlayerWidget(
-                            currentPageIndex: navigationShell.currentIndex,
-                            isCompact: isCollapsed,
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: (Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.black
+                                      : Colors.white)
+                                  .withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.20 : 0.35),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: Colors.white.withValues(
+                                    alpha: Theme.of(context).brightness == Brightness.dark ? 0.12 : 0.20),
+                                width: 0.75,
+                              ),
+                            ),
+                            child: MiniPlayerWidget(
+                              currentPageIndex: navigationShell.currentIndex,
+                              isCompact: isCollapsed,
+                            ),
                           ),
                         ),
                       ),
@@ -781,7 +785,7 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
       child: Stack(
         clipBehavior: Clip.hardEdge,
         children: [
-          // ── Static glass layer with advanced liquid glass effects ──
+          // ── Static glass layer — Muzo-style BackdropFilter ──
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -798,21 +802,18 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
               child: RepaintBoundary(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(30),
-                  child: GlassContainer(
-                    useOwnLayer: true,
-                    settings: LiquidGlassSettings(
-                      thickness: 30,
-                      blur: 25,
-                      glassColor: (isDark ? Colors.black : Colors.white)
-                          .withValues(alpha: isDark ? 0.20 : 0.35),
-                      ambientRim: 0.2,
-                      fresnelStrength: 1.0,
-                      specularSharpness: GlassSpecularSharpness.medium,
-                    ),
-                    shape: LiquidRoundedSuperellipse(borderRadius: 30),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
                     child: Container(
                       decoration: BoxDecoration(
+                        color: (isDark ? Colors.black : Colors.white)
+                            .withValues(alpha: isDark ? 0.20 : 0.35),
                         borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: Colors.white
+                              .withValues(alpha: isDark ? 0.12 : 0.20),
+                          width: 0.75,
+                        ),
                       ),
                     ),
                   ),
@@ -944,7 +945,9 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
 
                                 return Stack(
                                   children: [
-                                    // ── Liquid glass highlight pill ────────
+                                    // ── Icon selector pill — Muzo style ────
+                                    // Clean solid fill + subtle border; no
+                                    // gradient glow. Matches Muzo exactly.
                                     AnimatedPositioned(
                                       duration: _isDragging
                                           ? Duration.zero
@@ -960,32 +963,13 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(24),
-                                          // Muzo-style RadialGradient: accent
-                                          // color at center → transparent at edge
-                                          gradient: RadialGradient(
-                                            center: Alignment.center,
-                                            radius: 0.85,
-                                            colors: [
-                                              activeAccentColor.withValues(
-                                                  alpha: isDark ? 0.28 : 0.18),
-                                              activeAccentColor.withValues(
-                                                  alpha: 0.0),
-                                            ],
-                                          ),
+                                          color: activeAccentColor.withValues(
+                                              alpha: isDark ? 0.18 : 0.12),
                                           border: Border.all(
                                             color: activeAccentColor.withValues(
-                                                alpha: isDark ? 0.38 : 0.26),
+                                                alpha: isDark ? 0.30 : 0.20),
                                             width: 1.0,
                                           ),
-                                          boxShadow: [
-                                            // Accent-tinted glow (Muzo)
-                                            BoxShadow(
-                                              color: activeAccentColor.withValues(
-                                                  alpha: isDark ? 0.22 : 0.12),
-                                              blurRadius: 16,
-                                              spreadRadius: -2,
-                                            ),
-                                          ],
                                         ),
                                       ),
                                     ),
@@ -1083,13 +1067,10 @@ class _SearchCircleButton extends StatelessWidget {
     final inactiveIconColor = isDark
         ? Colors.white.withValues(alpha: 0.85)
         : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
-    final selectedPillColor = isDark
-        ? Colors.white.withValues(alpha: 0.14)
-        : Colors.black.withValues(alpha: 0.06);
-    final selectedPillBorder = isDark
-        ? Colors.white.withValues(alpha: 0.26)
-        : Colors.black.withValues(alpha: 0.12);
 
+    // Search circle — Muzo-style BackdropFilter glass.
+    // No inner pill/indicator per design requirement: search button
+    // should not get the icon selector pill treatment.
     return Container(
       width: _kSearchCircleW,
       height: _kNavBarH,
@@ -1106,18 +1087,8 @@ class _SearchCircleButton extends StatelessWidget {
       ),
       child: ClipOval(
         child: RepaintBoundary(
-          child: GlassContainer(
-            useOwnLayer: true,
-            settings: LiquidGlassSettings(
-              thickness: 30,
-              blur: 25,
-              glassColor: (isDark ? Colors.black : Colors.white)
-                  .withValues(alpha: isDark ? 0.20 : 0.35),
-              ambientRim: isSearchSelected ? 0.3 : 0.2,
-              fresnelStrength: 1.0,
-              specularSharpness: GlassSpecularSharpness.medium,
-            ),
-            shape: LiquidOval(),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
             child: GestureDetector(
               onTap: () {
                 HapticFeedback.selectionClick();
@@ -1129,29 +1100,21 @@ class _SearchCircleButton extends StatelessWidget {
                 height: _kNavBarH,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
+                  color: (isDark ? Colors.black : Colors.white)
+                      .withValues(alpha: isDark ? 0.20 : 0.35),
+                  border: Border.all(
+                    color: Colors.white
+                        .withValues(alpha: isDark ? 0.12 : 0.20),
+                    width: 0.75,
+                  ),
                 ),
                 child: Center(
-                  child: Container(
-                    width: isSearchSelected ? 48 : 42,
-                    height: isSearchSelected ? 48 : 42,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isSearchSelected
-                          ? selectedPillColor
-                          : Colors.transparent,
-                      border: isSearchSelected
-                          ? Border.all(color: selectedPillBorder, width: 1.0)
-                          : null,
-                    ),
-                    child: Center(
-                      child: Icon(
-                        MingCute.search_2_line,
-                        size: 24,
-                        color: isSearchSelected
-                            ? activeAccentColor
-                            : inactiveIconColor,
-                      ),
-                    ),
+                  child: Icon(
+                    MingCute.search_2_line,
+                    size: 24,
+                    color: isSearchSelected
+                        ? activeAccentColor
+                        : inactiveIconColor,
                   ),
                 ),
               ),

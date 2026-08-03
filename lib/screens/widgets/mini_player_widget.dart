@@ -285,30 +285,20 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                           fresnelStrength: 1.0,
                           specularSharpness: GlassSpecularSharpness.medium,
                         ),
-                        shape: LiquidRoundedSuperellipse(borderRadius: 30),
+                        shape: const LiquidRoundedSuperellipse(borderRadius: 30),
                         child: innerContent,
                       ),
                     ),
                   ),
                 )
-              // ── Mobile: blur-stable card ───────────────────────────────────
-              // The glass layer (ClipRRect + BackdropFilter) lives in the static
-              // RepaintBoundary wrapper in _GlassFooterOverlay so it is NEVER
-              // invalidated when AnimatedPositioned changes position/size.
-              // This card just provides the inner colored surface + content.
-              : Container(
-                  decoration: BoxDecoration(
-                    color: (isDark ? Colors.black : Colors.white)
-                        .withValues(alpha: isDark ? 0.20 : 0.35),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(
-                      color:
-                          Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
-                      width: 0.75,
-                    ),
-                  ),
-                  child: innerContent,
-                ),
+              // ── Mobile: transparent inner card ──────────────────────────────
+              // Glass effect (BackdropFilter blur + translucent Container) lives
+              // in the static RepaintBoundary wrapper in _GlassFooterOverlay so
+              // it is NEVER invalidated when AnimatedPositioned changes size.
+              // This card is fully transparent — it just provides content layout.
+              // No inner background color: that would create a double-layer white
+              // overlay on top of the outer BackdropFilter glass.
+              : SizedBox.expand(child: innerContent),
         ),
       ),
     );
