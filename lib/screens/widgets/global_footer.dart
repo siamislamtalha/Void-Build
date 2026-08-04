@@ -13,7 +13,6 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 // ─── Collapse animation ──────────────────────────────────────────────────────
 // Matches the Apple Music iOS 26 reference exactly.
@@ -453,10 +452,6 @@ class _GlassFooterOverlay extends StatelessWidget {
           if (!miniState.isVisible) return const SizedBox.shrink();
 
           final isDark = Theme.of(context).brightness == Brightness.dark;
-          // Fallback fill color so BackdropFilter has something to sample even
-          // when the scaffold content area is transparent/empty (prevents the
-          // "white" desktop mini-player bug).
-          final scaffoldFill = Theme.of(context).scaffoldBackgroundColor;
 
           return Padding(
             padding: EdgeInsets.only(
@@ -474,7 +469,9 @@ class _GlassFooterOverlay extends StatelessWidget {
                     borderRadius: BorderRadius.circular(28),
                     // Fallback fill so the shader always has pixels to sample
                     // from (fixes white flash on desktop with sparse content).
-                    color: scaffoldFill,
+                    color: isDark
+                        ? Colors.black.withValues(alpha: 0.35)
+                        : Colors.black.withValues(alpha: 0.45),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black
@@ -679,12 +676,8 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
 
     final activeAccentColor = AppTheme.accentColor(context);
     final inactiveIconColor = isDark
-        ? Colors.white.withValues(alpha: 0.85)
-        : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
-    // Muzo pill: white 0.16/black 0.08 fill, 0.28/0.14 border
-    final selectedPillColor = isDark
-        ? Colors.white.withValues(alpha: 0.16)
-        : Colors.black.withValues(alpha: 0.08);
+        ? Colors.white.withValues(alpha: 0.70)
+        : const Color(0xFF1C1C1E).withValues(alpha: 0.70);
 
     final capsuleItems = [
       _NavItemData(
@@ -737,8 +730,9 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
             filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
             child: Container(
               decoration: BoxDecoration(
-                color: (isDark ? Colors.black : Colors.white)
-                    .withValues(alpha: isDark ? 0.20 : 0.35),
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.35)
+                    : Colors.black.withValues(alpha: 0.45),
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(
                   color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
@@ -746,85 +740,140 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
                 ),
               ),
               child: Stack(
-                  children: [
-                    // ── Expanded nav content with Liquid Glass Segmented Pill ──
-                    AnimatedOpacity(
-                      duration: const Duration(milliseconds: 280),
-                      curve: Curves.easeInOutCubic,
-                      opacity: widget.isMiniMode ? 0.0 : 1.0,
-                      child: IgnorePointer(
-                        ignoring: widget.isMiniMode,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                          child: GlassSegmentedControl(
-                            backgroundColor: Colors.transparent,
-                            indicatorColor: isDark
-                                ? Colors.white.withValues(alpha: 0.16)
-                                : Colors.black.withValues(alpha: 0.08),
-                            indicatorBorderRadius: 24,
-                            borderRadius: 28,
-                            indicatorExpansion: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            indicatorPinchStrength: 0.35,
-                            indicatorSettings: LiquidGlassSettings(
-                              thickness: 20,
-                              blur: 0,
-                              refractiveIndex: 1.15,
-                              lightIntensity: 1.8,
-                              chromaticAberration: 0.4,
-                              saturation: 1.4,
-                              glassColor: selectedPillColor,
-                            ),
-                            segments: capsuleItems.map((item) {
-                              return GlassSegment(
-                                label: item.label,
-                                icon: Icon(
-                                  item.icon,
-                                  size: 18,
-                                  color: currentIndex == item.branchIndex
-                                      ? activeAccentColor
-                                      : inactiveIconColor,
-                                ),
-                              );
-                            }).toList(),
-                            selectedIndex: selectedIndex,
-                            onSegmentSelected: (index) {
-                              HapticFeedback.selectionClick();
-                              widget.navigationShell
-                                  .goBranch(capsuleItems[index].branchIndex);
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
+                children: [
+                  // ── Expanded nav content ──────────────────────────────────
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 280),
+                    curve: Curves.easeInOutCubic,
+                    opacity: widget.isMiniMode ? 0.0 : 1.0,
+                    child: IgnorePointer(
+                      ignoring: widget.isMiniMode,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final totalW = constraints.maxWidth;
+                          final itemW = totalW / capsuleItems.length;
+                          // Pill size: height = 47 (covers icon + page name label completely),
+                          // width = slightly less than tab slot width for spacing
+                          final pillW = (itemW - 6.0).clamp(52.0, 84.0);
+                          final pillLeft = (selectedIndex * itemW) + (itemW - pillW) / 2;
 
-                    // ── Collapsed mode single active icon ─────────────────────
-                    AnimatedOpacity(
-                      duration: const Duration(milliseconds: 280),
-                      curve: Curves.easeInOutCubic,
-                      opacity: widget.isMiniMode ? 1.0 : 0.0,
-                      child: IgnorePointer(
-                        ignoring: !widget.isMiniMode,
-                        child: GestureDetector(
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            widget.onTapCollapsed?.call();
-                            widget.navigationShell.goBranch(currentIndex);
-                          },
-                          behavior: HitTestBehavior.opaque,
-                          child: SizedBox.expand(
-                            child: Center(
-                              child: Icon(
-                                activeItem.icon,
-                                size: 24,
-                                color: activeAccentColor,
+                          return Stack(
+                            children: [
+                              // ── Sliding Indicator Pill (Encloses BOTH Icon & Page Name) ──
+                              AnimatedPositioned(
+                                duration: const Duration(milliseconds: 280),
+                                curve: Curves.easeOutCubic,
+                                left: pillLeft,
+                                top: 4.5,
+                                width: pillW,
+                                height: 47,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(24),
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.16)
+                                        : Colors.black.withValues(alpha: 0.12),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? Colors.white.withValues(alpha: 0.28)
+                                          : Colors.black.withValues(alpha: 0.14),
+                                      width: 1.0,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
+                                        blurRadius: 10,
+                                        spreadRadius: -1,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
+
+                              // ── Icons & Labels Row ──
+                              Positioned.fill(
+                                child: Row(
+                                  children: capsuleItems.map((item) {
+                                    final isSelected =
+                                        currentIndex == item.branchIndex;
+                                    return Expanded(
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () {
+                                          HapticFeedback.lightImpact();
+                                          widget.navigationShell
+                                              .goBranch(item.branchIndex);
+                                        },
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              item.icon,
+                                              size: 19,
+                                              color: isSelected
+                                                  ? activeAccentColor
+                                                  : inactiveIconColor,
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              item.label,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 9.5,
+                                                fontFamily: 'Gilroy',
+                                                fontWeight: isSelected
+                                                    ? FontWeight.w700
+                                                    : FontWeight.w600,
+                                                color: isSelected
+                                                    ? activeAccentColor
+                                                    : inactiveIconColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+
+                  // ── Collapsed mode single active icon ─────────────────────
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 280),
+                    curve: Curves.easeInOutCubic,
+                    opacity: widget.isMiniMode ? 1.0 : 0.0,
+                    child: IgnorePointer(
+                      ignoring: !widget.isMiniMode,
+                      child: GestureDetector(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          widget.onTapCollapsed?.call();
+                          widget.navigationShell.goBranch(currentIndex);
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: SizedBox.expand(
+                          child: Center(
+                            child: Icon(
+                              activeItem.icon,
+                              size: 24,
+                              color: activeAccentColor,
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
