@@ -92,7 +92,7 @@ dependencies:
   
 
 dependency_overrides:
-  ffi: ^1.1.2  # Override to make dart_discord_rpc work
+  ffi: ^2.1.3  # Override to support ffi 2.x for modern packages while allowing dart_discord_rpc
 
 
 dev_dependencies:
