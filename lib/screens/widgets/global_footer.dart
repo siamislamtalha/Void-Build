@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
+import 'package:voidmusic/blocs/timer/timer_bloc.dart';
 import 'package:voidmusic/screens/widgets/player_overlay_wrapper.dart';
 import 'package:voidmusic/screens/widgets/mini_player_widget.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
@@ -259,7 +260,7 @@ class _GlobalFooterState extends State<GlobalFooter>
               body: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // ── Main navigation body ────────────────────────────────
+                  // ── Layer 1: Main navigation body ───────────────────────
                   // NotificationListener intercepts scroll events from any
                   // active tab without touching individual screens.
                   // On desktop it is a no-op (returns false always).
@@ -271,7 +272,11 @@ class _GlobalFooterState extends State<GlobalFooter>
                       navigationShell: widget.navigationShell,
                     ),
                   ),
-                  // ── Floating footer overlay ─────────────────────────────
+                  // ── Layer 2: Full-screen loading overlay (Muzo-exact) ───
+                  // Shown when the mini-player engine is loading/buffering.
+                  // Sits above page content but below all floating pills.
+                  _buildLoadingOverlay(context),
+                  // ── Layer 3: Floating footer overlay ────────────────────
                   // We skip SafeArea and instead manually add the device bottom
                   // inset so the glass pills sit just above the home indicator /
                   // gesture bar, while the BackdropFilter blur visually extends
@@ -288,12 +293,41 @@ class _GlobalFooterState extends State<GlobalFooter>
                       onExpandFooter: _expandFooter,
                     ),
                   ),
+                  // ── Layer 5: Floating sleep timer chip (Muzo-exact) ─────
+                  // Draggable glassmorphic chip shown only when timer is
+                  // running. Sits above everything, including the nav pill.
+                  const _FloatingSleepTimer(),
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // LAYER 2 — LOADING OVERLAY (Muzo-exact)
+  // Muzo: ValueListenableBuilder on isLoadingStream + isLoadingNotifier.
+  // Void:  BlocBuilder on MiniPlayerCubit.isLoading (same semantic signal).
+  // Shows a semi-transparent scrim + white spinner while audio is loading.
+  // Returns SizedBox.shrink() when idle so the overlay has zero paint cost.
+  // ────────────────────────────────────────────────────────────────────────────
+  Widget _buildLoadingOverlay(BuildContext context) {
+    return BlocBuilder<MiniPlayerCubit, MiniPlayerState>(
+      builder: (context, miniState) {
+        if (!miniState.isLoading && !miniState.isResolving) {
+          return const SizedBox.shrink();
+        }
+        return Container(
+          color: Theme.of(context)
+              .scaffoldBackgroundColor
+              .withValues(alpha: 0.5),
+          child: const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        );
+      },
     );
   }
 
@@ -324,8 +358,149 @@ class _GlobalFooterState extends State<GlobalFooter>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BODY WRAPPER
+// ───────────────────────────────────────────────────────────────────────────────
+// LAYER 5 — FLOATING SLEEP TIMER CHIP (Muzo-exact)
+// ───────────────────────────────────────────────────────────────────────────────
+
+/// Muzo-exact draggable sleep-timer chip.
+///
+/// Glass recipe: blur 8×8, black@0.55 / white@0.70, border 0.5 px.
+/// Shown only while [TimerBloc] is in [TimerRunInProgress] state.
+/// User can drag it anywhere on-screen; position is clamped to stay visible.
+/// Tapping the chip opens [TimerView] via the Settings tab (branch 3).
+/// Tapping ✕ cancels the timer (emits [TimerStopped]).
+class _FloatingSleepTimer extends StatefulWidget {
+  const _FloatingSleepTimer();
+
+  @override
+  State<_FloatingSleepTimer> createState() => _FloatingSleepTimerState();
+}
+
+class _FloatingSleepTimerState extends State<_FloatingSleepTimer> {
+  // Initial position matches Muzo: Offset(20, 100).
+  Offset _position = const Offset(20, 100);
+
+  /// Formats seconds into MM:SS or H:MM:SS, same as Muzo.
+  String _formatDuration(int totalSeconds) {
+    final d = Duration(seconds: totalSeconds);
+    final minutes =
+        d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds =
+        d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    if (d.inHours > 0) {
+      return '${d.inHours}:$minutes:$seconds';
+    }
+    return '$minutes:$seconds';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TimerBloc, TimerState>(
+      builder: (context, timerState) {
+        // Only show the chip while the timer is actively counting down.
+        if (timerState is! TimerRunInProgress) return const SizedBox.shrink();
+
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final screenSize = MediaQuery.of(context).size;
+
+        // Muzo-exact: clamp position to screen bounds so chip never goes off-screen.
+        final clampedX = _position.dx.clamp(0.0, screenSize.width - 140);
+        final clampedY = _position.dy.clamp(
+          MediaQuery.of(context).padding.top + 8,
+          screenSize.height - 200,
+        );
+
+        return Positioned(
+          left: clampedX,
+          top: clampedY,
+          child: GestureDetector(
+            // Dragging updates position in real-time (Muzo-exact).
+            onPanUpdate: (details) {
+              setState(() {
+                _position = Offset(
+                  _position.dx + details.delta.dx,
+                  _position.dy + details.delta.dy,
+                );
+              });
+            },
+            // Tap chip body → nothing (Muzo opens SleepTimerDialog;
+            // Void's dialog lives in Settings > timer_view which the user
+            // navigates to naturally. No tap action keeps it non-blocking).
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: BackdropFilter(
+                // Muzo-exact: blur 8×8 (softer than the nav pill).
+                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    // Muzo-exact fill: black@0.55 dark / white@0.70 light
+                    color: isDark
+                        ? Colors.black.withValues(alpha: 0.55)
+                        : Colors.white.withValues(alpha: 0.70),
+                    borderRadius: BorderRadius.circular(24),
+                    // Muzo-exact border: 0.5 px, white/black @ 0.12
+                    border: Border.all(
+                      color: (isDark ? Colors.white : Colors.black)
+                          .withValues(alpha: 0.12),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Muzo-exact: timer_24_filled icon, size 18
+                      Icon(
+                        MingCute.alarm_2_fill,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      // Muzo-exact: fontSize 15, w700, tabular figures
+                      Text(
+                        _formatDuration(timerState.duration),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          fontFeatures: const [
+                            FontFeature.tabularFigures(),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      // Muzo-exact: dismiss_circle icon, size 18, opacity 0.4
+                      GestureDetector(
+                        onTap: () {
+                          context
+                              .read<TimerBloc>()
+                              .add(const TimerStopped());
+                        },
+                        child: Icon(
+                          MingCute.close_circle_fill,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.4),
+                          size: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
 // Injects extra bottom padding into MediaQuery so scrollable children
 // automatically add bottom padding to avoid content being hidden behind
 // the floating footer. Unchanged from original.
@@ -697,11 +872,6 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
       orElse: () => capsuleItems[0],
     );
 
-    final activeItemIndex = capsuleItems.indexWhere(
-      (item) => item.branchIndex == currentIndex,
-    );
-    final selectedIndex = activeItemIndex >= 0 ? activeItemIndex : 0;
-
     // Muzo-exact glass recipe: ClipRRect + BackdropFilter(25,25)
     // AnimatedContainer drives width collapse; no shader re-clip.
     return SizedBox(
@@ -711,8 +881,7 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
         curve: _kCollapseAnimCurve,
         width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
         height: _kNavBarH,
-        // Muzo-exact glass recipe: ClipRRect + BackdropFilter(25,25)
-        // Border 0.75, radius 28, shadow blurRadius 20 spreadRadius -4.
+        // Muzo-exact glass recipe: border 0.75, radius 28, shadow blurRadius 20 spreadRadius -4.
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
@@ -730,9 +899,9 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
             filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
             child: Container(
               decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.black.withValues(alpha: 0.35)
-                    : Colors.black.withValues(alpha: 0.45),
+                // Muzo-exact fill: black@0.20 dark / white@0.35 light
+                color: (isDark ? Colors.black : Colors.white)
+                    .withValues(alpha: isDark ? 0.20 : 0.35),
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(
                   color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
@@ -742,106 +911,58 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
               child: Stack(
                 children: [
                   // ── Expanded nav content ──────────────────────────────────
+                  // AnimatedSwitcher matches Muzo's pill content fade+scale transition.
                   AnimatedOpacity(
                     duration: const Duration(milliseconds: 280),
                     curve: Curves.easeInOutCubic,
                     opacity: widget.isMiniMode ? 0.0 : 1.0,
                     child: IgnorePointer(
                       ignoring: widget.isMiniMode,
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final totalW = constraints.maxWidth;
-                          final itemW = totalW / capsuleItems.length;
-                          // Pill size: height = 47 (covers icon + page name label completely),
-                          // width = slightly less than tab slot width for spacing
-                          final pillW = (itemW - 6.0).clamp(52.0, 84.0);
-                          final pillLeft = (selectedIndex * itemW) + (itemW - pillW) / 2;
-
-                          return Stack(
-                            children: [
-                              // ── Sliding Indicator Pill (Encloses BOTH Icon & Page Name) ──
-                              AnimatedPositioned(
-                                duration: const Duration(milliseconds: 280),
-                                curve: Curves.easeOutCubic,
-                                left: pillLeft,
-                                top: 4.5,
-                                width: pillW,
-                                height: 47,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(24),
-                                    color: isDark
-                                        ? Colors.white.withValues(alpha: 0.16)
-                                        : Colors.black.withValues(alpha: 0.12),
-                                    border: Border.all(
-                                      color: isDark
-                                          ? Colors.white.withValues(alpha: 0.28)
-                                          : Colors.black.withValues(alpha: 0.14),
-                                      width: 1.0,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
-                                        blurRadius: 10,
-                                        spreadRadius: -1,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-
-                              // ── Icons & Labels Row ──
-                              Positioned.fill(
-                                child: Row(
-                                  children: capsuleItems.map((item) {
-                                    final isSelected =
-                                        currentIndex == item.branchIndex;
-                                    return Expanded(
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: () {
-                                          HapticFeedback.lightImpact();
-                                          widget.navigationShell
-                                              .goBranch(item.branchIndex);
-                                        },
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              item.icon,
-                                              size: 19,
-                                              color: isSelected
-                                                  ? activeAccentColor
-                                                  : inactiveIconColor,
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              item.label,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: 9.5,
-                                                fontFamily: 'Gilroy',
-                                                fontWeight: isSelected
-                                                    ? FontWeight.w700
-                                                    : FontWeight.w600,
-                                                color: isSelected
-                                                    ? activeAccentColor
-                                                    : inactiveIconColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            ],
+                      // ── Muzo-style: AnimatedSwitcher with fade+scale on tab change ──
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: ScaleTransition(
+                              scale: Tween<double>(begin: 0.96, end: 1.0)
+                                  .animate(animation),
+                              child: child,
+                            ),
                           );
                         },
+                        // ValueKey on currentIndex triggers the switcher animation
+                        // whenever the active tab changes.
+                        child: KeyedSubtree(
+                          key: ValueKey<int>(currentIndex),
+                          child: Row(
+                            key: const ValueKey('nav_buttons_row'),
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: capsuleItems.map((item) {
+                              final isSelected =
+                                  currentIndex == item.branchIndex;
+                              return Expanded(
+                                child: _NavItemButton(
+                                  item: item,
+                                  isSelected: isSelected,
+                                  activeColor: activeAccentColor,
+                                  inactiveColor: inactiveIconColor,
+                                  // Muzo: RadialGradient on selected, nothing on others.
+                                  // These two params are no longer used for the pill
+                                  // background — _NavItemButton draws the RadialGradient
+                                  // itself based on isSelected.
+                                  selectedPillColor: Colors.transparent,
+                                  selectedPillBorder: Colors.transparent,
+                                  onTap: () {
+                                    HapticFeedback.lightImpact();
+                                    widget.navigationShell
+                                        .goBranch(item.branchIndex);
+                                  },
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -906,6 +1027,8 @@ class _SearchCircleButton extends StatelessWidget {
         : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
 
     // Muzo-exact glass circle: ClipOval + BackdropFilter(25,25)
+    // Fill: black@0.20 dark / white@0.35 light. Border: white@0.12/0.20, width 0.75.
+    // AnimatedSwitcher (300ms scale+fade) swaps the icon when search activates.
     return Container(
       width: _kSearchCircleW,
       height: _kNavBarH,
@@ -934,6 +1057,7 @@ class _SearchCircleButton extends StatelessWidget {
               height: _kNavBarH,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
+                // Muzo-exact fill: black@0.20 dark / white@0.35 light
                 color: (isDark ? Colors.black : Colors.white)
                     .withValues(alpha: isDark ? 0.20 : 0.35),
                 border: Border.all(
@@ -942,12 +1066,23 @@ class _SearchCircleButton extends StatelessWidget {
                 ),
               ),
               child: Center(
-                child: Icon(
-                  MingCute.search_2_line,
-                  size: 22,
-                  color: isSearchSelected
-                      ? activeAccentColor
-                      : inactiveIconColor,
+                // Muzo-style: AnimatedSwitcher scale+fade on icon change
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) {
+                    return ScaleTransition(
+                      scale: animation,
+                      child: FadeTransition(opacity: animation, child: child),
+                    );
+                  },
+                  child: Icon(
+                    MingCute.search_2_line,
+                    key: ValueKey<bool>(isSearchSelected),
+                    size: 22,
+                    color: isSearchSelected
+                        ? activeAccentColor
+                        : inactiveIconColor,
+                  ),
                 ),
               ),
             ),
