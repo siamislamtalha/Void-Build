@@ -139,12 +139,6 @@ flutter:
     - assets/icons/svg/
     - svg/
 
-  shaders:
-    - liquid_glass_widgets-main/shaders/lightweight_glass.frag
-    - liquid_glass_widgets-main/shaders/interactive_indicator.frag
-    - liquid_glass_widgets-main/shaders/liquid_glass_geometry_blended.frag
-    - liquid_glass_widgets-main/shaders/liquid_glass_final_render.frag
-    - liquid_glass_widgets-main/shaders/progressive_blur.frag
 
     
   fonts:
