@@ -13,7 +13,7 @@ import 'package:voidmusic/blocs/library/cubit/library_items_cubit.dart';
 import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/constants/route_paths.dart';
 import 'package:voidmusic/core/models/exported.dart';
-import 'package:voidmusic/core/theme/app_theme.dart';
+
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/screens/widgets/smart_replace_dialog.dart';
@@ -105,20 +105,42 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
           maxHeight: maxHeight,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
             child: DecoratedBox(
-              decoration: AppTheme.liquidGlassDecoration(
-                borderRadius: 24,
-                glassColor: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xF50A040C)
-                    : Colors.white.withValues(alpha: 0.85),
-                borderColor: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0x3BFFFFFF)
-                    : Colors.black.withValues(alpha: 0.10),
-                borderWidth: 1,
+              decoration: BoxDecoration(
+                color: (Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF1C1C1E)
+                        : const Color(0xFFE5E5EA))
+                    .withValues(
+                        alpha: Theme.of(context).brightness == Brightness.dark
+                            ? 0.65
+                            : 0.85),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: (Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black)
+                      .withValues(
+                          alpha: Theme.of(context).brightness == Brightness.dark
+                              ? 0.12
+                              : 0.18),
+                  width: 1.0,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                        alpha: Theme.of(context).brightness == Brightness.dark
+                            ? 0.35
+                            : 0.12),
+                    blurRadius: 20,
+                    spreadRadius: -4,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
+
               child: Column(
                 // FIX: Ensure it only takes needed height so top taps can dismiss
                 mainAxisSize: MainAxisSize.min,

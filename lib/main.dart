@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:io' as io;
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+
 import 'package:voidmusic/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:voidmusic/blocs/global_events/global_events_cubit.dart';
 import 'package:voidmusic/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
@@ -152,6 +154,7 @@ Future<void> setupPlayerCubit() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await LiquidGlassWidgets.initialize();
   GestureBinding.instance.resamplingEnabled = true;
   MediaKit.ensureInitialized();
   // Enable edge-to-edge rendering so the system navigation bar area is
@@ -161,8 +164,9 @@ Future<void> main() async {
   setHighRefreshRate();
   await setupPlayerCubit();
   DiscordService.initialize();
-  runApp(const MyApp());
+  runApp(LiquidGlassWidgets.wrap(child: const MyApp()));
 }
+
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});

@@ -87,7 +87,7 @@ dependencies:
     path: rust_builder
   flutter_rust_bridge: 2.12.0
   freezed_annotation: ^3.1.0
-  async: ^2.12.0
+  liquid_glass_widgets: ^0.28.0
 
   
 
@@ -138,6 +138,14 @@ flutter:
     - assets/icons/VoidMusicLogoFG.png
     - assets/icons/svg/
     - svg/
+
+  shaders:
+    - liquid_glass_widgets-main/shaders/lightweight_glass.frag
+    - liquid_glass_widgets-main/shaders/interactive_indicator.frag
+    - liquid_glass_widgets-main/shaders/liquid_glass_geometry_blended.frag
+    - liquid_glass_widgets-main/shaders/liquid_glass_final_render.frag
+    - liquid_glass_widgets-main/shaders/progressive_blur.frag
+
     
   fonts:
     - family: Unageo

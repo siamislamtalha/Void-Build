@@ -89,26 +89,34 @@ class VoidMusicDialogSurface extends StatelessWidget {
     final maxW = mq.width > 560 ? 480.0 : mq.width * 0.9;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final glassColor = isDark 
-        ? const Color(0xF5161618) 
-        : Theme.of(context).colorScheme.surface.withValues(alpha: 0.96);
-    final borderColor = isDark 
-        ? const Color(0x3BFFFFFF) 
-        : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2);
+        ? const Color(0xFF1C1C1E).withValues(alpha: 0.65) 
+        : const Color(0xFFE5E5EA).withValues(alpha: 0.85);
+    final borderColor = (isDark ? Colors.white : Colors.black).withValues(alpha: isDark ? 0.12 : 0.18);
 
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             constraints: BoxConstraints(maxWidth: maxW),
-            decoration: AppTheme.liquidGlassDecoration(
-              borderRadius: 24,
-              glassColor: glassColor,
-              borderColor: borderColor,
-              borderWidth: 1,
+            decoration: BoxDecoration(
+              color: glassColor,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: borderColor,
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
+                  blurRadius: 20,
+                  spreadRadius: -4,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -128,6 +136,7 @@ class VoidMusicDialogSurface extends StatelessWidget {
         ),
       ),
     );
+
   }
 
   Widget _header(BuildContext context) {

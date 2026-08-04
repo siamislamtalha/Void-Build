@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
@@ -13,6 +14,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
+import 'package:liquid_glass_widgets/utils/draggable_indicator_physics.dart';
 
 // ─── Collapse animation ──────────────────────────────────────────────────────
 // Matches the Apple Music iOS 26 reference exactly.
@@ -659,15 +661,23 @@ class _CollapsibleNavCapsule extends StatefulWidget {
 }
 
 class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   // ── Drag / press tracking ──────────────────────────────────────────────────
   double? _dragPositionX;
   bool _isDragging = false;
   bool _isPressing = false;
 
+  double _dragVelocityX = 0.0;
+  double? _lastDragX;
+  DateTime? _lastDragTime;
+
   // Spring controller for press-expand animation on the pill
   late final AnimationController _pressController;
   late final Animation<double> _pressAnim;
+
+  // Jello spring controller for physics water-spring bounce
+  late final AnimationController _jelloController;
+  late final Animation<double> _jelloAnim;
 
   @override
   void initState() {
@@ -680,11 +690,30 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
       parent: _pressController,
       curve: Curves.easeOutBack,
     );
+
+    _jelloController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _jelloAnim = CurvedAnimation(
+      parent: _jelloController,
+      curve: Curves.elasticOut,
+    );
+  }
+
+  @override
+  void didUpdateWidget(_CollapsibleNavCapsule oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.navigationShell.currentIndex !=
+        widget.navigationShell.currentIndex) {
+      _jelloController.forward(from: 0.0);
+    }
   }
 
   @override
   void dispose() {
     _pressController.dispose();
+    _jelloController.dispose();
     super.dispose();
   }
 
@@ -805,16 +834,30 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                               setState(() => _isPressing = false);
                               _pressController.reverse();
                             },
-                            // ── Drag tracks finger ────────────────────────
+                            // ── Drag tracks finger with velocity math ─────
                             onHorizontalDragStart: (details) {
                               setState(() {
                                 _isDragging = true;
                                 _dragPositionX = details.localPosition.dx;
+                                _lastDragX = details.localPosition.dx;
+                                _lastDragTime = DateTime.now();
+                                _dragVelocityX = 0.0;
                               });
                               _pressController.forward();
                             },
                             onHorizontalDragUpdate: (details) {
+                              final now = DateTime.now();
                               final newDx = details.localPosition.dx;
+                              if (_lastDragX != null && _lastDragTime != null) {
+                                final dt = now.difference(_lastDragTime!).inMicroseconds /
+                                    1000000.0;
+                                if (dt > 0) {
+                                  _dragVelocityX = (newDx - _lastDragX!) / dt;
+                                }
+                              }
+                              _lastDragX = newDx;
+                              _lastDragTime = now;
+
                               final oldIdx = _dragPositionX != null
                                   ? _getNearestIndex(
                                       _dragPositionX! - 6,
@@ -844,16 +887,21 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                                 _isDragging = false;
                                 _isPressing = false;
                                 _dragPositionX = null;
+                                _lastDragX = null;
+                                _lastDragTime = null;
                               });
                               _pressController.reverse();
+                              _jelloController.forward(from: 0.0);
                             },
-                            child: AnimatedBuilder(
-                              animation: _pressAnim,
+                            child: ListenableBuilder(
+                              listenable: Listenable.merge([_pressAnim, _jelloAnim]),
                               builder: (context, _) {
-                                // Recompute inside AnimatedBuilder so pill
-                                // re-renders every frame during press spring
+                                // Recompute inside ListenableBuilder so pill
+                                // re-renders every frame during press & spring
                                 double animPillW;
                                 double animLeft;
+                                double animTop;
+                                double animHeight;
                                 if (_isDragging && _dragPositionX != null) {
                                   animPillW = basePillW +
                                       (pressedPillW - basePillW) *
@@ -862,6 +910,8 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                                       (_dragPositionX! - animPillW / 2).clamp(
                                           6.0,
                                           constraints.maxWidth - 6 - animPillW);
+                                  animTop = 5 + (3 * _pressAnim.value);
+                                  animHeight = 48 - (6 * _pressAnim.value);
                                 } else if (_isPressing) {
                                   animPillW = basePillW +
                                       (pressedPillW - basePillW) *
@@ -869,46 +919,81 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                                   animLeft = 6 +
                                       (selectedIndex * slotW) +
                                       (slotW - animPillW) / 2;
+                                  animTop = 5 + (3 * _pressAnim.value);
+                                  animHeight = 48 - (6 * _pressAnim.value);
                                 } else {
                                   animPillW = basePillW;
                                   animLeft = targetLeft;
+                                  animTop = 5;
+                                  animHeight = 48;
                                 }
+
+                                // ── Organic jello spring velocity matrix calculation ──
+                                Offset jellyVelocity;
+                                if (_isDragging && _dragVelocityX.abs() > 1.0) {
+                                  jellyVelocity = Offset(_dragVelocityX, 0.0);
+                                } else if (_isPressing) {
+                                  jellyVelocity = Offset(0.0, 350.0 * _pressAnim.value);
+                                } else if (_jelloController.isAnimating) {
+                                  final t = _jelloAnim.value;
+                                  final springFactor =
+                                      (1.0 - t) * 500.0 * math.sin(t * math.pi * 2.5);
+                                  jellyVelocity = Offset(springFactor, 0.0);
+                                } else {
+                                  jellyVelocity = Offset.zero;
+                                }
+
+                                final jellyTransform =
+                                    DraggableIndicatorPhysics.buildJellyTransform(
+                                  velocity: jellyVelocity,
+                                  maxDistortion: 0.65,
+                                  velocityScale: 450.0,
+                                );
 
                                 return Stack(
                                   children: [
-                                    // ── Liquid glass highlight pill ───────
+                                    // ── Physics-driven jello water spring pill ───────
                                     AnimatedPositioned(
-                                      // Zero duration while dragging so pill
-                                      // follows finger without delay; smooth
-                                      // slide otherwise.
                                       duration: (_isDragging || _isPressing)
                                           ? Duration.zero
                                           : const Duration(milliseconds: 320),
                                       curve: Curves.fastOutSlowIn,
                                       left: animLeft,
-                                      top: 5,
+                                      top: animTop,
                                       width: animPillW,
-                                      height: 48,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(24),
-                                          color: selectedPillColor,
-                                          border: Border.all(
-                                            color: selectedPillBorder,
-                                            width: 1.0,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: isDark
-                                                  ? Colors.black
-                                                      .withValues(alpha: 0.22)
-                                                  : Colors.black
-                                                      .withValues(alpha: 0.06),
-                                              blurRadius: 12,
-                                              spreadRadius: -2,
+                                      height: animHeight,
+                                      child: Transform(
+                                        alignment: Alignment.center,
+                                        transform: jellyTransform,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(24),
+                                            gradient: RadialGradient(
+                                              colors: [
+                                                activeAccentColor.withValues(
+                                                    alpha: isDark ? 0.28 : 0.18),
+                                                selectedPillColor,
+                                              ],
+                                              radius: 0.85,
                                             ),
-                                          ],
+                                            color: selectedPillColor,
+                                            border: Border.all(
+                                              color: selectedPillBorder,
+                                              width: 1.0,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: isDark
+                                                    ? Colors.black
+                                                        .withValues(alpha: 0.30)
+                                                    : Colors.black
+                                                        .withValues(alpha: 0.10),
+                                                blurRadius: 16,
+                                                spreadRadius: -2,
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -936,6 +1021,7 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                                                   Colors.transparent,
                                               onTap: () {
                                                 HapticFeedback.selectionClick();
+                                                _jelloController.forward(from: 0.0);
                                                 widget.navigationShell.goBranch(
                                                     item.branchIndex);
                                               },
