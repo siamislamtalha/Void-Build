@@ -88,10 +88,17 @@ class VoidMusicDialogSurface extends StatelessWidget {
     final mq = MediaQuery.of(context).size;
     final maxW = mq.width > 560 ? 480.0 : mq.width * 0.9;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final glassColor = isDark 
-        ? const Color(0xFF1C1C1E).withValues(alpha: 0.65) 
-        : const Color(0xFFE5E5EA).withValues(alpha: 0.85);
-    final borderColor = (isDark ? Colors.white : Colors.black).withValues(alpha: isDark ? 0.12 : 0.18);
+    // Muzo-exact frosted glass fill:
+    // Dark:  #1C1C1E @ 0.72 — richer, more opaque glass body
+    // Light: #F2F2F7 @ 0.80 — lighter Apple system surface tone
+    final glassColor = isDark
+        ? const Color(0xFF1C1C1E).withValues(alpha: 0.72)
+        : const Color(0xFFF2F2F7).withValues(alpha: 0.80);
+    // Muzo-exact specular rim:
+    // Dark:  white @ 0.15 — more visible edge highlight
+    // Light: black @ 0.12 — subtle separator
+    final borderColor = (isDark ? Colors.white : Colors.black)
+        .withValues(alpha: isDark ? 0.15 : 0.12);
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -99,6 +106,7 @@ class VoidMusicDialogSurface extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
+          // Muzo-exact: 20 px blur
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             constraints: BoxConstraints(maxWidth: maxW),
@@ -107,13 +115,16 @@ class VoidMusicDialogSurface extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: borderColor,
+                // Muzo-exact: 1 px subtle border
                 width: 1.0,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-                  blurRadius: 20,
-                  spreadRadius: -4,
+                  // Muzo-exact shadow: wider + softer
+                  color: Colors.black
+                      .withValues(alpha: isDark ? 0.35 : 0.12),
+                  blurRadius: 24,
+                  spreadRadius: -2,
                   offset: const Offset(0, 8),
                 ),
               ],

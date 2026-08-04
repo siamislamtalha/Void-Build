@@ -84,7 +84,7 @@ jobs:
 
               with:
 
-                flutter-version: '3.35.4'
+                flutter-version: '3.41.0'
 
                 channel: 'stable'
 
@@ -452,7 +452,7 @@ jobs:
 
               with:
 
-                flutter-version: '3.35.4'
+                flutter-version: '3.41.0'
 
                 channel: 'stable'
 
@@ -550,7 +550,7 @@ jobs:
 
               with:
 
-                flutter-version: '3.35.4'
+                flutter-version: '3.41.0'
 
                 channel: 'stable'
 

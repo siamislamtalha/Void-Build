@@ -107,35 +107,44 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
+            // Muzo-exact: 20 px blur
             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
             child: DecoratedBox(
               decoration: BoxDecoration(
+                // Muzo-exact frosted glass fill:
+                // Dark:  #1C1C1E @ 0.72 — richer glass body
+                // Light: #F2F2F7 @ 0.80 — lighter Apple system tone
                 color: (Theme.of(context).brightness == Brightness.dark
                         ? const Color(0xFF1C1C1E)
-                        : const Color(0xFFE5E5EA))
+                        : const Color(0xFFF2F2F7))
                     .withValues(
                         alpha: Theme.of(context).brightness == Brightness.dark
-                            ? 0.65
-                            : 0.85),
+                            ? 0.72
+                            : 0.80),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
+                  // Muzo-exact specular rim:
+                  // Dark: white @ 0.15 — visible edge highlight
+                  // Light: black @ 0.12 — subtle separator
                   color: (Theme.of(context).brightness == Brightness.dark
                           ? Colors.white
                           : Colors.black)
                       .withValues(
                           alpha: Theme.of(context).brightness == Brightness.dark
-                              ? 0.12
-                              : 0.18),
+                              ? 0.15
+                              : 0.12),
+                  // Muzo-exact: 1 px subtle border
                   width: 1.0,
                 ),
                 boxShadow: [
                   BoxShadow(
+                    // Muzo-exact shadow: wider + softer
                     color: Colors.black.withValues(
                         alpha: Theme.of(context).brightness == Brightness.dark
                             ? 0.35
                             : 0.12),
-                    blurRadius: 20,
-                    spreadRadius: -4,
+                    blurRadius: 24,
+                    spreadRadius: -2,
                     offset: const Offset(0, 8),
                   ),
                 ],

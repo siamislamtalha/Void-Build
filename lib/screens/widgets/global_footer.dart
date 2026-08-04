@@ -15,6 +15,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
 import 'package:liquid_glass_widgets/utils/draggable_indicator_physics.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 // ─── Collapse animation ──────────────────────────────────────────────────────
 // Matches the Apple Music iOS 26 reference exactly.
@@ -467,45 +468,53 @@ class _GlassFooterOverlay extends StatelessWidget {
             ),
             child: SizedBox(
               height: 64,
-              // RepaintBoundary isolates the blur layer so it is cached by the
-              // compositor and not re-sampled on every animation frame.
+              // RepaintBoundary isolates the shader layer so it is cached by
+              // the compositor and not re-sampled on every animation frame.
               child: RepaintBoundary(
-                child: Container(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(28),
-                    // Fallback opaque fill BEHIND the blur so the filter always
-                    // has pixels to sample from (fixes white flash on desktop).
+                    // Fallback fill so the shader always has pixels to sample
+                    // from (fixes white flash on desktop with sparse content).
                     color: scaffoldFill,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black
                             .withValues(alpha: isDark ? 0.35 : 0.14),
-                        blurRadius: 20,
-                        spreadRadius: -4,
+                        blurRadius: 24,
+                        spreadRadius: -2,
                         offset: const Offset(0, 8),
                       ),
                     ],
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(28),
-                    // Muzo-matched blur: sigmaX/Y 25, black@0.20 / white@0.35,
-                    // border white @ 0.12/0.20 @ 0.75 px.
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: (isDark ? Colors.black : Colors.white)
-                              .withValues(alpha: isDark ? 0.20 : 0.35),
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(
-                            color: Colors.white
-                                .withValues(alpha: isDark ? 0.12 : 0.20),
-                            width: 0.75,
-                          ),
+                  // LightweightLiquidGlass: real shader-based refraction,
+                  // ambient light passthrough, and specular edge highlights
+                  // matching Muzo's frosted-glass capsule aesthetic.
+                  child: LightweightLiquidGlass(
+                    shape: const LiquidRoundedSuperellipse(borderRadius: 28),
+                    settings: LiquidGlassSettings(
+                      thickness: 30,
+                      blur: 3,
+                      refractiveIndex: 1.59,
+                      saturation: 0.7,
+                      lightIntensity: 0.6,
+                      chromaticAberration: 0.3,
+                      glassColor: (isDark ? Colors.black : Colors.white)
+                          .withValues(alpha: isDark ? 0.20 : 0.35),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: (isDark ? Colors.black : Colors.white)
+                            .withValues(alpha: isDark ? 0.20 : 0.35),
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(
+                          color: Colors.white
+                              .withValues(alpha: isDark ? 0.15 : 0.20),
+                          width: 1.0,
                         ),
-                        child: MiniPlayerWidget(
-                          currentPageIndex: navigationShell.currentIndex,
-                        ),
+                      ),
+                      child: MiniPlayerWidget(
+                        currentPageIndex: navigationShell.currentIndex,
                       ),
                     ),
                   ),
@@ -761,9 +770,9 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
     );
     final selectedIndex = activeItemIndex >= 0 ? activeItemIndex : 0;
 
-    // ── The capsule itself uses a fixed outer ClipRRect so the
-    // BackdropFilter blur is never re-clipped during the width animation.
-    // Only a transparent inner layer carries the animated width change.
+    // ── The capsule uses AdaptiveLiquidGlassLayer-compatible LightweightLiquidGlass
+    // for real shader-based refraction. The AnimatedContainer drives width only;
+    // the glass surface is not re-clipped during collapse animation.
     return SizedBox(
       height: _kNavBarH,
       child: AnimatedContainer(
@@ -771,33 +780,41 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
         curve: _kCollapseAnimCurve,
         width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
         height: _kNavBarH,
+        // Shader-based glass surface — real refraction + specular highlights.
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-              blurRadius: 20,
-              spreadRadius: -4,
+              blurRadius: 24,
+              spreadRadius: -2,
               offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: BackdropFilter(
-            // Muzo-matched: sigmaX/Y 25
-            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-            child: Container(
-              decoration: BoxDecoration(
-                color: (isDark ? Colors.black : Colors.white)
-                    .withValues(alpha: isDark ? 0.20 : 0.35),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
-                  width: 0.75,
-                ),
+        child: LightweightLiquidGlass(
+          shape: const LiquidRoundedSuperellipse(borderRadius: 30),
+          settings: LiquidGlassSettings(
+            thickness: 30,
+            blur: 3,
+            refractiveIndex: 1.59,
+            saturation: 0.7,
+            lightIntensity: 0.6,
+            chromaticAberration: 0.3,
+            glassColor: (isDark ? Colors.black : Colors.white)
+                .withValues(alpha: isDark ? 0.20 : 0.35),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: (isDark ? Colors.black : Colors.white)
+                  .withValues(alpha: isDark ? 0.20 : 0.35),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.20),
+                width: 1.0,
               ),
-              child: Stack(
+            ),
+            child: Stack(
                 children: [
                   // ── Expanded nav content ──────────────────────────────────
                   AnimatedOpacity(
@@ -929,15 +946,18 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                                 }
 
                                 // ── Organic jello spring velocity matrix calculation ──
+                                // Tightened coefficients for a more dramatic
+                                // water-bubble organic snap (Muzo-matched).
                                 Offset jellyVelocity;
                                 if (_isDragging && _dragVelocityX.abs() > 1.0) {
                                   jellyVelocity = Offset(_dragVelocityX, 0.0);
                                 } else if (_isPressing) {
-                                  jellyVelocity = Offset(0.0, 350.0 * _pressAnim.value);
+                                  jellyVelocity = Offset(0.0, 400.0 * _pressAnim.value);
                                 } else if (_jelloController.isAnimating) {
                                   final t = _jelloAnim.value;
+                                  // Raised spring factor 500→600 for more dramatic snap
                                   final springFactor =
-                                      (1.0 - t) * 500.0 * math.sin(t * math.pi * 2.5);
+                                      (1.0 - t) * 600.0 * math.sin(t * math.pi * 2.5);
                                   jellyVelocity = Offset(springFactor, 0.0);
                                 } else {
                                   jellyVelocity = Offset.zero;
@@ -946,13 +966,20 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                                 final jellyTransform =
                                     DraggableIndicatorPhysics.buildJellyTransform(
                                   velocity: jellyVelocity,
-                                  maxDistortion: 0.65,
-                                  velocityScale: 450.0,
+                                  maxDistortion: 0.75,
+                                  velocityScale: 500.0,
                                 );
+
+                                // Accent glow active while jello is animating
+                                final bool pillIsAnimating =
+                                    _jelloController.isAnimating || _isDragging;
 
                                 return Stack(
                                   children: [
                                     // ── Physics-driven jello water spring pill ───────
+                                    // Wrapped in LightweightLiquidGlass so the pill
+                                    // itself has real shader refraction + specular edge
+                                    // highlights matching Muzo's glass indicator.
                                     AnimatedPositioned(
                                       duration: (_isDragging || _isPressing)
                                           ? Duration.zero
@@ -965,34 +992,56 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                                       child: Transform(
                                         alignment: Alignment.center,
                                         transform: jellyTransform,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(24),
-                                            gradient: RadialGradient(
-                                              colors: [
-                                                activeAccentColor.withValues(
-                                                    alpha: isDark ? 0.28 : 0.18),
-                                                selectedPillColor,
-                                              ],
-                                              radius: 0.85,
-                                            ),
-                                            color: selectedPillColor,
-                                            border: Border.all(
-                                              color: selectedPillBorder,
-                                              width: 1.0,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: isDark
-                                                    ? Colors.black
-                                                        .withValues(alpha: 0.30)
-                                                    : Colors.black
-                                                        .withValues(alpha: 0.10),
-                                                blurRadius: 16,
-                                                spreadRadius: -2,
+                                        child: LightweightLiquidGlass(
+                                          shape: const LiquidRoundedSuperellipse(
+                                              borderRadius: 24),
+                                          settings: LiquidGlassSettings(
+                                            thickness: 20,
+                                            blur: 0,
+                                            refractiveIndex: 1.15,
+                                            lightIntensity: 2.0,
+                                            chromaticAberration: 0.5,
+                                            saturation: 1.5,
+                                            glassColor: selectedPillColor,
+                                          ),
+                                          indicatorWeight: 1.0,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(24),
+                                              gradient: RadialGradient(
+                                                colors: [
+                                                  activeAccentColor.withValues(
+                                                      alpha: isDark ? 0.28 : 0.18),
+                                                  selectedPillColor,
+                                                ],
+                                                radius: 0.85,
                                               ),
-                                            ],
+                                              color: selectedPillColor,
+                                              border: Border.all(
+                                                color: selectedPillBorder,
+                                                width: 1.0,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: isDark
+                                                      ? Colors.black
+                                                          .withValues(alpha: 0.30)
+                                                      : Colors.black
+                                                          .withValues(alpha: 0.10),
+                                                  blurRadius: 16,
+                                                  spreadRadius: -2,
+                                                ),
+                                                // Accent glow ring matching Muzo indicator
+                                                if (pillIsAnimating)
+                                                  BoxShadow(
+                                                    color: activeAccentColor
+                                                        .withValues(alpha: 0.25),
+                                                    blurRadius: 12,
+                                                    spreadRadius: 0,
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -1071,8 +1120,7 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -1113,58 +1161,68 @@ class _SearchCircleButton extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-            blurRadius: 20,
-            spreadRadius: -4,
+            blurRadius: 24,
+            spreadRadius: -2,
             offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-          child: GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              navigationShell.goBranch(2);
-            },
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              width: _kSearchCircleW,
-              height: _kNavBarH,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: (isDark ? Colors.black : Colors.white)
-                    .withValues(alpha: isDark ? 0.20 : 0.35),
-                border: Border.all(
-                  color: isSearchSelected
-                      ? selectedPillBorder
-                      : Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
-                  width: 0.75,
-                ),
+      // LightweightLiquidGlass circle: shader refraction + specular rim
+      // matching Muzo's search button glass aesthetic.
+      child: LightweightLiquidGlass(
+        shape: const LiquidRoundedSuperellipse(borderRadius: 9999),
+        settings: LiquidGlassSettings(
+          thickness: 30,
+          blur: 3,
+          refractiveIndex: 1.59,
+          saturation: 0.7,
+          lightIntensity: 0.6,
+          chromaticAberration: 0.3,
+          glassColor: (isDark ? Colors.black : Colors.white)
+              .withValues(alpha: isDark ? 0.20 : 0.35),
+        ),
+        child: GestureDetector(
+          onTap: () {
+            HapticFeedback.selectionClick();
+            navigationShell.goBranch(2);
+          },
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: _kSearchCircleW,
+            height: _kNavBarH,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: (isDark ? Colors.black : Colors.white)
+                  .withValues(alpha: isDark ? 0.20 : 0.35),
+              border: Border.all(
+                color: isSearchSelected
+                    ? selectedPillBorder
+                    : Colors.white.withValues(alpha: isDark ? 0.15 : 0.20),
+                width: 1.0,
               ),
-              child: Center(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  curve: Curves.easeOutCubic,
-                  width: isSearchSelected ? 48 : 42,
-                  height: isSearchSelected ? 48 : 42,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                width: isSearchSelected ? 48 : 42,
+                height: isSearchSelected ? 48 : 42,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isSearchSelected
+                      ? selectedPillColor
+                      : Colors.transparent,
+                  border: isSearchSelected
+                      ? Border.all(color: selectedPillBorder, width: 1.0)
+                      : null,
+                ),
+                child: Center(
+                  child: Icon(
+                    MingCute.search_2_line,
+                    size: 24,
                     color: isSearchSelected
-                        ? selectedPillColor
-                        : Colors.transparent,
-                    border: isSearchSelected
-                        ? Border.all(color: selectedPillBorder, width: 1.0)
-                        : null,
-                  ),
-                  child: Center(
-                    child: Icon(
-                      MingCute.search_2_line,
-                      size: 24,
-                      color: isSearchSelected
-                          ? activeAccentColor
-                          : inactiveIconColor,
-                    ),
+                        ? activeAccentColor
+                        : inactiveIconColor,
                   ),
                 ),
               ),

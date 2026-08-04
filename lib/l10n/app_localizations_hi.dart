@@ -229,7 +229,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'आपकी खोज से मेल खाने वाली कोई प्लेलिस्ट नहीं है';
 
   @override
-  String get playlistCreateNew => 'नई प्लेलिस्ट बनाएँ 😍';
+  String get playlistCreateNew => 'नई प्लेलिस्ट बनाएँ';
 
   @override
   String get playlistCreateFirstOne =>
@@ -1194,7 +1194,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get timerStop => 'टाइमर रोकें';
 
   @override
-  String get timerFinishedMessage => 'संगीत बंद हो गया है। शुभ रात्रि 🥰।';
+  String get timerFinishedMessage => 'संगीत बंद हो गया है। शुभ रात्रि।';
 
   @override
   String get timerGotIt => 'समझ गया!';
@@ -1635,7 +1635,6 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get importVoidMusicFiles => 'Void Music फ़ाइलें इम्पोर्ट करें';
 
-
   @override
   String get importM3UFiles => 'M3U प्लेलिस्ट इम्पोर्ट करें';
 
@@ -1989,7 +1988,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String updateAvailableBody(String ver, String build) {
-    return 'Bloomee🌸 का नया वर्शन आ गया है!\n\nवर्शन: $ver+$build';
+    return 'Void Music का नया वर्शन आ गया है!\n\nवर्शन: $ver+$build';
   }
 
   @override
@@ -2008,7 +2007,7 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get pluginBootstrapTitle => 'Bloomee को तैयार किया जा रहा है';
+  String get pluginBootstrapTitle => 'Void Music को तैयार किया जा रहा है';
 
   @override
   String pluginBootstrapProgress(int percent) {
@@ -2023,7 +2022,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get pluginBootstrapErrorBody =>
-      'कुछ प्लगइन्स इंस्टॉल नहीं हो सके। आप फिर भी Bloomee का उपयोग कर सकते हैं — ऐप दोबारा खुलने पर इन्हें इंस्टॉल करने की कोशिश की जाएगी।';
+      'कुछ प्लगइन्स इंस्टॉल नहीं हो सके। आप फिर भी Void Music का उपयोग कर सकते हैं — ऐप दोबारा खुलने पर इन्हें इंस्टॉल करने की कोशिश की जाएगी।';
 
   @override
   String get pluginBootstrapContinue => 'फिर भी आगे बढ़ें';
