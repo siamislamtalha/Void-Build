@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
@@ -14,7 +13,6 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
-import 'package:liquid_glass_widgets/utils/draggable_indicator_physics.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 // ─── Collapse animation ──────────────────────────────────────────────────────
@@ -480,41 +478,33 @@ class _GlassFooterOverlay extends StatelessWidget {
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black
-                            .withValues(alpha: isDark ? 0.35 : 0.14),
-                        blurRadius: 24,
-                        spreadRadius: -2,
+                            .withValues(alpha: isDark ? 0.35 : 0.12),
+                        blurRadius: 20,
+                        spreadRadius: -4,
                         offset: const Offset(0, 8),
                       ),
                     ],
                   ),
-                  // LightweightLiquidGlass: real shader-based refraction,
-                  // ambient light passthrough, and specular edge highlights
-                  // matching Muzo's frosted-glass capsule aesthetic.
-                  child: LightweightLiquidGlass(
-                    shape: const LiquidRoundedSuperellipse(borderRadius: 28),
-                    settings: LiquidGlassSettings(
-                      thickness: 30,
-                      blur: 3,
-                      refractiveIndex: 1.59,
-                      saturation: 0.7,
-                      lightIntensity: 0.6,
-                      chromaticAberration: 0.3,
-                      glassColor: (isDark ? Colors.black : Colors.white)
-                          .withValues(alpha: isDark ? 0.20 : 0.35),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: (isDark ? Colors.black : Colors.white)
-                            .withValues(alpha: isDark ? 0.20 : 0.35),
-                        borderRadius: BorderRadius.circular(28),
-                        border: Border.all(
-                          color: Colors.white
-                              .withValues(alpha: isDark ? 0.15 : 0.20),
-                          width: 1.0,
+                  // Muzo-exact glass recipe: ClipRRect + BackdropFilter
+                  // sigmaX/Y:25, black/white 0.20/0.35 fill, border 0.75.
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: (isDark ? Colors.black : Colors.white)
+                              .withValues(alpha: isDark ? 0.20 : 0.35),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: Colors.white
+                                .withValues(alpha: isDark ? 0.12 : 0.20),
+                            width: 0.75,
+                          ),
                         ),
-                      ),
-                      child: MiniPlayerWidget(
-                        currentPageIndex: navigationShell.currentIndex,
+                        child: MiniPlayerWidget(
+                          currentPageIndex: navigationShell.currentIndex,
+                        ),
                       ),
                     ),
                   ),
@@ -647,8 +637,7 @@ class _GlassFooterOverlay extends StatelessWidget {
 /// The left navigation pill that collapses from full-width to a single-icon circle.
 ///
 /// When [isMiniMode] is false the full nav row is shown.
-/// When [isMiniMode] is true the pill shrinks to [_kSearchCircleW] and only the
-/// active-tab icon is shown.
+/// When [isMiniMode] is true the pill shrinks to [_kSearchCircleW].
 ///
 /// Left edge is anchored by the parent [Positioned]; only the right edge (width)
 /// changes so the pill collapses inward from the right.
@@ -669,66 +658,18 @@ class _CollapsibleNavCapsule extends StatefulWidget {
   State<_CollapsibleNavCapsule> createState() => _CollapsibleNavCapsuleState();
 }
 
-class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
-    with TickerProviderStateMixin {
-  // ── Drag / press tracking ──────────────────────────────────────────────────
-  double? _dragPositionX;
-  bool _isDragging = false;
-  bool _isPressing = false;
-
-  double _dragVelocityX = 0.0;
-  double? _lastDragX;
-  DateTime? _lastDragTime;
-
-  // Spring controller for press-expand animation on the pill
-  late final AnimationController _pressController;
-  late final Animation<double> _pressAnim;
-
-  // Jello spring controller for physics water-spring bounce
-  late final AnimationController _jelloController;
-  late final Animation<double> _jelloAnim;
+class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
 
   @override
   void initState() {
     super.initState();
-    _pressController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 180),
-    );
-    _pressAnim = CurvedAnimation(
-      parent: _pressController,
-      curve: Curves.easeOutBack,
-    );
-
-    _jelloController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _jelloAnim = CurvedAnimation(
-      parent: _jelloController,
-      curve: Curves.elasticOut,
-    );
-  }
-
-  @override
-  void didUpdateWidget(_CollapsibleNavCapsule oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.navigationShell.currentIndex !=
-        widget.navigationShell.currentIndex) {
-      _jelloController.forward(from: 0.0);
-    }
   }
 
   @override
   void dispose() {
-    _pressController.dispose();
-    _jelloController.dispose();
     super.dispose();
   }
 
-  int _getNearestIndex(double dx, int itemCount, double slotWidth) {
-    return (dx / slotWidth).floor().clamp(0, itemCount - 1);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -740,12 +681,10 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
     final inactiveIconColor = isDark
         ? Colors.white.withValues(alpha: 0.85)
         : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
+    // Muzo pill: white 0.16/black 0.08 fill, 0.28/0.14 border
     final selectedPillColor = isDark
         ? Colors.white.withValues(alpha: 0.16)
         : Colors.black.withValues(alpha: 0.08);
-    final selectedPillBorder = isDark
-        ? Colors.white.withValues(alpha: 0.28)
-        : Colors.black.withValues(alpha: 0.14);
 
     final capsuleItems = [
       _NavItemData(
@@ -770,9 +709,8 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
     );
     final selectedIndex = activeItemIndex >= 0 ? activeItemIndex : 0;
 
-    // ── The capsule uses AdaptiveLiquidGlassLayer-compatible LightweightLiquidGlass
-    // for real shader-based refraction. The AnimatedContainer drives width only;
-    // the glass surface is not re-clipped during collapse animation.
+    // Muzo-exact glass recipe: ClipRRect + BackdropFilter(25,25)
+    // AnimatedContainer drives width collapse; no shader re-clip.
     return SizedBox(
       height: _kNavBarH,
       child: AnimatedContainer(
@@ -780,347 +718,118 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
         curve: _kCollapseAnimCurve,
         width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
         height: _kNavBarH,
-        // Shader-based glass surface — real refraction + specular highlights.
+        // Muzo-exact glass recipe: ClipRRect + BackdropFilter(25,25)
+        // Border 0.75, radius 28, shadow blurRadius 20 spreadRadius -4.
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-              blurRadius: 24,
-              spreadRadius: -2,
+              blurRadius: 20,
+              spreadRadius: -4,
               offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: LightweightLiquidGlass(
-          shape: const LiquidRoundedSuperellipse(borderRadius: 30),
-          settings: LiquidGlassSettings(
-            thickness: 30,
-            blur: 3,
-            refractiveIndex: 1.59,
-            saturation: 0.7,
-            lightIntensity: 0.6,
-            chromaticAberration: 0.3,
-            glassColor: (isDark ? Colors.black : Colors.white)
-                .withValues(alpha: isDark ? 0.20 : 0.35),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: (isDark ? Colors.black : Colors.white)
-                  .withValues(alpha: isDark ? 0.20 : 0.35),
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.20),
-                width: 1.0,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+            child: Container(
+              decoration: BoxDecoration(
+                color: (isDark ? Colors.black : Colors.white)
+                    .withValues(alpha: isDark ? 0.20 : 0.35),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
+                  width: 0.75,
+                ),
               ),
-            ),
-            child: Stack(
-                children: [
-                  // ── Expanded nav content ──────────────────────────────────
-                  AnimatedOpacity(
-                    duration: const Duration(milliseconds: 280),
-                    curve: Curves.easeInOutCubic,
-                    opacity: widget.isMiniMode ? 0.0 : 1.0,
-                    child: IgnorePointer(
-                      ignoring: widget.isMiniMode,
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final availableW = constraints.maxWidth - 12;
-                          final slotW = availableW / capsuleItems.length;
-                          // Base pill width; grows during press/drag
-                          const double basePillW = 68.0;
-                          const double pressedPillW = 80.0;
-
-                          // During drag: pill center = finger position
-                          // At rest: pill centered on selected slot
-                          final targetLeft =
-                              6 + (selectedIndex * slotW) + (slotW - basePillW) / 2;
-
-                          return GestureDetector(
-                            // ── Long-press starts the expand animation ────
-                            onLongPressStart: (details) {
-                              HapticFeedback.selectionClick();
-                              setState(() => _isPressing = true);
-                              _pressController.forward();
-                            },
-                            onLongPressEnd: (_) {
-                              setState(() => _isPressing = false);
-                              _pressController.reverse();
-                            },
-                            onLongPressCancel: () {
-                              setState(() => _isPressing = false);
-                              _pressController.reverse();
-                            },
-                            // ── Drag tracks finger with velocity math ─────
-                            onHorizontalDragStart: (details) {
-                              setState(() {
-                                _isDragging = true;
-                                _dragPositionX = details.localPosition.dx;
-                                _lastDragX = details.localPosition.dx;
-                                _lastDragTime = DateTime.now();
-                                _dragVelocityX = 0.0;
-                              });
-                              _pressController.forward();
-                            },
-                            onHorizontalDragUpdate: (details) {
-                              final now = DateTime.now();
-                              final newDx = details.localPosition.dx;
-                              if (_lastDragX != null && _lastDragTime != null) {
-                                final dt = now.difference(_lastDragTime!).inMicroseconds /
-                                    1000000.0;
-                                if (dt > 0) {
-                                  _dragVelocityX = (newDx - _lastDragX!) / dt;
-                                }
-                              }
-                              _lastDragX = newDx;
-                              _lastDragTime = now;
-
-                              final oldIdx = _dragPositionX != null
-                                  ? _getNearestIndex(
-                                      _dragPositionX! - 6,
-                                      capsuleItems.length,
-                                      slotW)
-                                  : selectedIndex;
-                              final newIdx = _getNearestIndex(
-                                  newDx - 6, capsuleItems.length, slotW);
-                              if (newIdx != oldIdx) {
-                                HapticFeedback.selectionClick();
-                              }
-                              setState(() {
-                                _dragPositionX = newDx;
-                              });
-                            },
-                            onHorizontalDragEnd: (details) {
-                              if (_dragPositionX != null) {
-                                final idx = _getNearestIndex(
-                                    _dragPositionX! - 6,
-                                    capsuleItems.length,
-                                    slotW);
-                                HapticFeedback.selectionClick();
-                                widget.navigationShell
-                                    .goBranch(capsuleItems[idx].branchIndex);
-                              }
-                              setState(() {
-                                _isDragging = false;
-                                _isPressing = false;
-                                _dragPositionX = null;
-                                _lastDragX = null;
-                                _lastDragTime = null;
-                              });
-                              _pressController.reverse();
-                              _jelloController.forward(from: 0.0);
-                            },
-                            child: ListenableBuilder(
-                              listenable: Listenable.merge([_pressAnim, _jelloAnim]),
-                              builder: (context, _) {
-                                // Recompute inside ListenableBuilder so pill
-                                // re-renders every frame during press & spring
-                                double animPillW;
-                                double animLeft;
-                                double animTop;
-                                double animHeight;
-                                if (_isDragging && _dragPositionX != null) {
-                                  animPillW = basePillW +
-                                      (pressedPillW - basePillW) *
-                                          _pressAnim.value;
-                                  animLeft =
-                                      (_dragPositionX! - animPillW / 2).clamp(
-                                          6.0,
-                                          constraints.maxWidth - 6 - animPillW);
-                                  animTop = 5 + (3 * _pressAnim.value);
-                                  animHeight = 48 - (6 * _pressAnim.value);
-                                } else if (_isPressing) {
-                                  animPillW = basePillW +
-                                      (pressedPillW - basePillW) *
-                                          _pressAnim.value;
-                                  animLeft = 6 +
-                                      (selectedIndex * slotW) +
-                                      (slotW - animPillW) / 2;
-                                  animTop = 5 + (3 * _pressAnim.value);
-                                  animHeight = 48 - (6 * _pressAnim.value);
-                                } else {
-                                  animPillW = basePillW;
-                                  animLeft = targetLeft;
-                                  animTop = 5;
-                                  animHeight = 48;
-                                }
-
-                                // ── Organic jello spring velocity matrix calculation ──
-                                // Tightened coefficients for a more dramatic
-                                // water-bubble organic snap (Muzo-matched).
-                                Offset jellyVelocity;
-                                if (_isDragging && _dragVelocityX.abs() > 1.0) {
-                                  jellyVelocity = Offset(_dragVelocityX, 0.0);
-                                } else if (_isPressing) {
-                                  jellyVelocity = Offset(0.0, 400.0 * _pressAnim.value);
-                                } else if (_jelloController.isAnimating) {
-                                  final t = _jelloAnim.value;
-                                  // Raised spring factor 500→600 for more dramatic snap
-                                  final springFactor =
-                                      (1.0 - t) * 600.0 * math.sin(t * math.pi * 2.5);
-                                  jellyVelocity = Offset(springFactor, 0.0);
-                                } else {
-                                  jellyVelocity = Offset.zero;
-                                }
-
-                                final jellyTransform =
-                                    DraggableIndicatorPhysics.buildJellyTransform(
-                                  velocity: jellyVelocity,
-                                  maxDistortion: 0.75,
-                                  velocityScale: 500.0,
-                                );
-
-                                // Accent glow active while jello is animating
-                                final bool pillIsAnimating =
-                                    _jelloController.isAnimating || _isDragging;
-
-                                return Stack(
-                                  children: [
-                                    // ── Physics-driven jello water spring pill ───────
-                                    // Wrapped in LightweightLiquidGlass so the pill
-                                    // itself has real shader refraction + specular edge
-                                    // highlights matching Muzo's glass indicator.
-                                    AnimatedPositioned(
-                                      duration: (_isDragging || _isPressing)
-                                          ? Duration.zero
-                                          : const Duration(milliseconds: 320),
-                                      curve: Curves.fastOutSlowIn,
-                                      left: animLeft,
-                                      top: animTop,
-                                      width: animPillW,
-                                      height: animHeight,
-                                      child: Transform(
-                                        alignment: Alignment.center,
-                                        transform: jellyTransform,
-                                        child: LightweightLiquidGlass(
-                                          shape: const LiquidRoundedSuperellipse(
-                                              borderRadius: 24),
-                                          settings: LiquidGlassSettings(
-                                            thickness: 20,
-                                            blur: 0,
-                                            refractiveIndex: 1.15,
-                                            lightIntensity: 2.0,
-                                            chromaticAberration: 0.5,
-                                            saturation: 1.5,
-                                            glassColor: selectedPillColor,
-                                          ),
-                                          indicatorWeight: 1.0,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(24),
-                                              gradient: RadialGradient(
-                                                colors: [
-                                                  activeAccentColor.withValues(
-                                                      alpha: isDark ? 0.28 : 0.18),
-                                                  selectedPillColor,
-                                                ],
-                                                radius: 0.85,
-                                              ),
-                                              color: selectedPillColor,
-                                              border: Border.all(
-                                                color: selectedPillBorder,
-                                                width: 1.0,
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: isDark
-                                                      ? Colors.black
-                                                          .withValues(alpha: 0.30)
-                                                      : Colors.black
-                                                          .withValues(alpha: 0.10),
-                                                  blurRadius: 16,
-                                                  spreadRadius: -2,
-                                                ),
-                                                // Accent glow ring matching Muzo indicator
-                                                if (pillIsAnimating)
-                                                  BoxShadow(
-                                                    color: activeAccentColor
-                                                        .withValues(alpha: 0.25),
-                                                    blurRadius: 12,
-                                                    spreadRadius: 0,
-                                                  ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-
-                                    // ── Icons row ────────────────────────
-                                    SizedBox.expand(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 6),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children:
-                                              capsuleItems.map((item) {
-                                            final isSelected = currentIndex ==
-                                                item.branchIndex;
-                                            return _NavItemButton(
-                                              item: item,
-                                              isSelected: isSelected,
-                                              activeColor: activeAccentColor,
-                                              inactiveColor: inactiveIconColor,
-                                              selectedPillColor:
-                                                  Colors.transparent,
-                                              selectedPillBorder:
-                                                  Colors.transparent,
-                                              onTap: () {
-                                                HapticFeedback.selectionClick();
-                                                _jelloController.forward(from: 0.0);
-                                                widget.navigationShell.goBranch(
-                                                    item.branchIndex);
-                                              },
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
+              child: Stack(
+                  children: [
+                    // ── Expanded nav content with Liquid Glass Segmented Pill ──
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 280),
+                      curve: Curves.easeInOutCubic,
+                      opacity: widget.isMiniMode ? 0.0 : 1.0,
+                      child: IgnorePointer(
+                        ignoring: widget.isMiniMode,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                          child: GlassSegmentedControl(
+                            backgroundColor: Colors.transparent,
+                            indicatorColor: isDark
+                                ? Colors.white.withValues(alpha: 0.16)
+                                : Colors.black.withValues(alpha: 0.08),
+                            indicatorBorderRadius: 24,
+                            borderRadius: 28,
+                            indicatorExpansion: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            indicatorPinchStrength: 0.35,
+                            indicatorSettings: LiquidGlassSettings(
+                              thickness: 20,
+                              blur: 0,
+                              refractiveIndex: 1.15,
+                              lightIntensity: 1.8,
+                              chromaticAberration: 0.4,
+                              saturation: 1.4,
+                              glassColor: selectedPillColor,
                             ),
-                          );
-                        },
+                            segments: capsuleItems.map((item) {
+                              return GlassSegment(
+                                label: item.label,
+                                icon: Icon(
+                                  item.icon,
+                                  size: 18,
+                                  color: currentIndex == item.branchIndex
+                                      ? activeAccentColor
+                                      : inactiveIconColor,
+                                ),
+                              );
+                            }).toList(),
+                            selectedIndex: selectedIndex,
+                            onSegmentSelected: (index) {
+                              HapticFeedback.selectionClick();
+                              widget.navigationShell
+                                  .goBranch(capsuleItems[index].branchIndex);
+                            },
+                          ),
+                        ),
                       ),
                     ),
-                  ),
 
-                  // ── Collapsed mode single active icon ─────────────────────
-                  AnimatedOpacity(
-                    duration: const Duration(milliseconds: 280),
-                    curve: Curves.easeInOutCubic,
-                    opacity: widget.isMiniMode ? 1.0 : 0.0,
-                    child: IgnorePointer(
-                      ignoring: !widget.isMiniMode,
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          widget.onTapCollapsed?.call();
-                          widget.navigationShell.goBranch(currentIndex);
-                        },
-                        behavior: HitTestBehavior.opaque,
-                        child: SizedBox.expand(
-                          child: Center(
-                            child: Icon(
-                              activeItem.icon,
-                              size: 24,
-                              color: activeAccentColor,
+                    // ── Collapsed mode single active icon ─────────────────────
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 280),
+                      curve: Curves.easeInOutCubic,
+                      opacity: widget.isMiniMode ? 1.0 : 0.0,
+                      child: IgnorePointer(
+                        ignoring: !widget.isMiniMode,
+                        child: GestureDetector(
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            widget.onTapCollapsed?.call();
+                            widget.navigationShell.goBranch(currentIndex);
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: SizedBox.expand(
+                            child: Center(
+                              child: Icon(
+                                activeItem.icon,
+                                size: 24,
+                                color: activeAccentColor,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 }
 
@@ -1146,13 +855,8 @@ class _SearchCircleButton extends StatelessWidget {
     final inactiveIconColor = isDark
         ? Colors.white.withValues(alpha: 0.85)
         : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
-    final selectedPillColor = isDark
-        ? Colors.white.withValues(alpha: 0.14)
-        : Colors.black.withValues(alpha: 0.06);
-    final selectedPillBorder = isDark
-        ? Colors.white.withValues(alpha: 0.26)
-        : Colors.black.withValues(alpha: 0.12);
 
+    // Muzo-exact glass circle: ClipOval + BackdropFilter(25,25)
     return Container(
       width: _kSearchCircleW,
       height: _kNavBarH,
@@ -1161,69 +865,40 @@ class _SearchCircleButton extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-            blurRadius: 24,
-            spreadRadius: -2,
+            blurRadius: 20,
+            spreadRadius: -4,
             offset: const Offset(0, 8),
           ),
         ],
       ),
-      // LightweightLiquidGlass circle: shader refraction + specular rim
-      // matching Muzo's search button glass aesthetic.
-      child: LightweightLiquidGlass(
-        shape: const LiquidRoundedSuperellipse(borderRadius: 9999),
-        settings: LiquidGlassSettings(
-          thickness: 30,
-          blur: 3,
-          refractiveIndex: 1.59,
-          saturation: 0.7,
-          lightIntensity: 0.6,
-          chromaticAberration: 0.3,
-          glassColor: (isDark ? Colors.black : Colors.white)
-              .withValues(alpha: isDark ? 0.20 : 0.35),
-        ),
-        child: GestureDetector(
-          onTap: () {
-            HapticFeedback.selectionClick();
-            navigationShell.goBranch(2);
-          },
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            width: _kSearchCircleW,
-            height: _kNavBarH,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: (isDark ? Colors.black : Colors.white)
-                  .withValues(alpha: isDark ? 0.20 : 0.35),
-              border: Border.all(
-                color: isSearchSelected
-                    ? selectedPillBorder
-                    : Colors.white.withValues(alpha: isDark ? 0.15 : 0.20),
-                width: 1.0,
-              ),
-            ),
-            child: Center(
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                width: isSearchSelected ? 48 : 42,
-                height: isSearchSelected ? 48 : 42,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isSearchSelected
-                      ? selectedPillColor
-                      : Colors.transparent,
-                  border: isSearchSelected
-                      ? Border.all(color: selectedPillBorder, width: 1.0)
-                      : null,
+      child: ClipOval(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+          child: GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              navigationShell.goBranch(2);
+            },
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: _kSearchCircleW,
+              height: _kNavBarH,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: (isDark ? Colors.black : Colors.white)
+                    .withValues(alpha: isDark ? 0.20 : 0.35),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
+                  width: 0.75,
                 ),
-                child: Center(
-                  child: Icon(
-                    MingCute.search_2_line,
-                    size: 24,
-                    color: isSearchSelected
-                        ? activeAccentColor
-                        : inactiveIconColor,
-                  ),
+              ),
+              child: Center(
+                child: Icon(
+                  MingCute.search_2_line,
+                  size: 22,
+                  color: isSearchSelected
+                      ? activeAccentColor
+                      : inactiveIconColor,
                 ),
               ),
             ),
@@ -1569,39 +1244,41 @@ class _NavItemButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        // Selected: wider oval (72 px) gives a clear stadium/capsule pill.
-        // Unselected: narrower to not crowd items.
-        width: isSelected ? 72 : 54,
+      child: Container(
         height: 48,
+        alignment: Alignment.center,
+        constraints: const BoxConstraints(minWidth: 58),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
-          // borderRadius = half of height → perfect stadium pill (fully rounded ends)
-          borderRadius: BorderRadius.circular(24),
-          color: isSelected ? selectedPillColor : Colors.transparent,
-          border: isSelected
-              ? Border.all(
-                  color: selectedPillBorder,
-                  width: 1.0,
+          // Muzo: RadialGradient glow when selected, nothing when not.
+          gradient: isSelected
+              ? RadialGradient(
+                  colors: [
+                    activeColor.withValues(alpha: 0.15),
+                    activeColor.withValues(alpha: 0.0),
+                  ],
+                  radius: 0.85,
                 )
               : null,
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               item.icon,
-              size: 20,
+              size: 18,
               color: isSelected ? activeColor : inactiveColor,
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 0.5),
             Text(
               item.label,
+              maxLines: 1,
               style: TextStyle(
-                fontSize: 9.5,
+                fontSize: 8.5,
                 fontFamily: 'Gilroy',
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                fontWeight: FontWeight.bold,
                 color: isSelected ? activeColor : inactiveColor,
               ),
             ),
