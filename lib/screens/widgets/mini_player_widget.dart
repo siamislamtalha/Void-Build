@@ -224,13 +224,11 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                         curve: Curves.easeInOutQuart,
                         height: widget.isCompact ? 58 : double.infinity,
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.black.withValues(alpha: 0.35)
-                              : Colors.black.withValues(alpha: 0.45),
+                          color: Colors.white.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(
                             color: Colors.white
-                                .withValues(alpha: isDark ? 0.12 : 0.20),
+                                .withValues(alpha: isDark ? 0.15 : 0.25),
                             width: 0.75,
                           ),
                         ),
@@ -330,13 +328,11 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                         curve: Curves.easeInOutQuart,
                         height: widget.isCompact ? 58 : double.infinity,
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.black.withValues(alpha: 0.35)
-                              : Colors.black.withValues(alpha: 0.45),
+                          color: Colors.white.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(
                             color: Colors.white
-                                .withValues(alpha: isDark ? 0.12 : 0.20),
+                                .withValues(alpha: isDark ? 0.15 : 0.25),
                             width: 0.75,
                           ),
                         ),

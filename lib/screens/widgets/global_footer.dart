@@ -14,6 +14,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 // ─── Collapse animation ──────────────────────────────────────────────────────
 // Matches the Apple Music iOS 26 reference exactly.
@@ -665,12 +666,13 @@ class _GlassFooterOverlay extends StatelessWidget {
                       filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: (isDark ? Colors.black : Colors.white)
-                              .withValues(alpha: isDark ? 0.20 : 0.35),
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.10)
+                              : Colors.white.withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(28),
                           border: Border.all(
                             color: Colors.white
-                                .withValues(alpha: isDark ? 0.12 : 0.20),
+                                .withValues(alpha: isDark ? 0.15 : 0.25),
                             width: 0.75,
                           ),
                         ),
@@ -830,18 +832,25 @@ class _CollapsibleNavCapsule extends StatefulWidget {
   State<_CollapsibleNavCapsule> createState() => _CollapsibleNavCapsuleState();
 }
 
-class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
+class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _liquidController;
 
   @override
   void initState() {
     super.initState();
+    // Liquid distortion animation — slow oscillating skew like the user's sample.
+    _liquidController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
+    _liquidController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -872,8 +881,11 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
       orElse: () => capsuleItems[0],
     );
 
-    // Muzo-exact glass recipe: ClipRRect + BackdropFilter(25,25)
-    // AnimatedContainer drives width collapse; no shader re-clip.
+    // ── Liquid glass nav capsule ─────────────────────────────────────────────
+    // Uses AdaptiveGlass from liquid_glass_widgets with a very low blur so the
+    // surface is translucent (clear) rather than frosted, matching the user's
+    // sample code (blur=0, glassColor transparent, high refractiveIndex).
+    // The liquid Matrix4 distortion is animated by _liquidController.
     return SizedBox(
       height: _kNavBarH,
       child: AnimatedContainer(
@@ -881,121 +893,305 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
         curve: _kCollapseAnimCurve,
         width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
         height: _kNavBarH,
-        // Muzo-exact glass recipe: border 0.75, radius 28, shadow blurRadius 20 spreadRadius -4.
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-              blurRadius: 20,
+              color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.10),
+              blurRadius: 24,
               spreadRadius: -4,
-              offset: const Offset(0, 8),
+              offset: const Offset(0, 6),
             ),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(28),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-            child: Container(
-              decoration: BoxDecoration(
-                // Muzo-exact fill: black@0.20 dark / white@0.35 light
-                color: (isDark ? Colors.black : Colors.white)
-                    .withValues(alpha: isDark ? 0.20 : 0.35),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
-                  width: 0.75,
+        // ShaderMask refraction overlay matching user snippet
+        child: ShaderMask(
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.2),
+                Colors.transparent,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.srcATop,
+          // LiquidDistortion matrix transformation matching user snippet
+          child: AnimatedBuilder(
+            animation: _liquidController,
+            builder: (_, child) {
+              final t = _liquidController.value;
+              final m = Matrix4.identity()
+                ..setEntry(0, 1, 0.015 * (1 + t))
+                ..setEntry(1, 0, 0.02 * (1 - t));
+              return ImageFiltered(
+                imageFilter: ImageFilter.matrix(m.storage),
+                child: child,
+              );
+            },
+            // buildBlurGlass translucent 25px blur card matching user snippet
+            // Matching the user's exact code: white@0.10 fill for true translucency
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                child: Container(
+                  decoration: BoxDecoration(
+                    // Exact match to user's code: Colors.white.withOpacity(0.1)
+                    // Translucent — not frosted — matching the given snippet
+                    color: Colors.white.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.30),
+                      width: 0.75,
+                    ),
+                  ),
+                  child: _NavCapsuleContent(
+                    isMiniMode: widget.isMiniMode,
+                    currentIndex: currentIndex,
+                    capsuleItems: capsuleItems,
+                    activeItem: activeItem,
+                    activeAccentColor: activeAccentColor,
+                    inactiveIconColor: inactiveIconColor,
+                    navigationShell: widget.navigationShell,
+                    onTapCollapsed: widget.onTapCollapsed,
+                  ),
                 ),
               ),
-              child: Stack(
-                children: [
-                  // ── Expanded nav content ──────────────────────────────────
-                  // AnimatedSwitcher matches Muzo's pill content fade+scale transition.
-                  AnimatedOpacity(
-                    duration: const Duration(milliseconds: 280),
-                    curve: Curves.easeInOutCubic,
-                    opacity: widget.isMiniMode ? 0.0 : 1.0,
-                    child: IgnorePointer(
-                      ignoring: widget.isMiniMode,
-                      // ── Muzo-style: AnimatedSwitcher with fade+scale on tab change ──
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder: (child, animation) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: ScaleTransition(
-                              scale: Tween<double>(begin: 0.96, end: 1.0)
-                                  .animate(animation),
-                              child: child,
-                            ),
-                          );
-                        },
-                        // ValueKey on currentIndex triggers the switcher animation
-                        // whenever the active tab changes.
-                        child: KeyedSubtree(
-                          key: ValueKey<int>(currentIndex),
-                          child: Row(
-                            key: const ValueKey('nav_buttons_row'),
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: capsuleItems.map((item) {
-                              final isSelected =
-                                  currentIndex == item.branchIndex;
-                              return Expanded(
-                                child: _NavItemButton(
-                                  item: item,
-                                  isSelected: isSelected,
-                                  activeColor: activeAccentColor,
-                                  inactiveColor: inactiveIconColor,
-                                  // Muzo: RadialGradient on selected, nothing on others.
-                                  // These two params are no longer used for the pill
-                                  // background — _NavItemButton draws the RadialGradient
-                                  // itself based on isSelected.
-                                  selectedPillColor: Colors.transparent,
-                                  selectedPillBorder: Colors.transparent,
-                                  onTap: () {
-                                    HapticFeedback.lightImpact();
-                                    widget.navigationShell
-                                        .goBranch(item.branchIndex);
-                                  },
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
-                  // ── Collapsed mode single active icon ─────────────────────
-                  AnimatedOpacity(
-                    duration: const Duration(milliseconds: 280),
-                    curve: Curves.easeInOutCubic,
-                    opacity: widget.isMiniMode ? 1.0 : 0.0,
-                    child: IgnorePointer(
-                      ignoring: !widget.isMiniMode,
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          widget.onTapCollapsed?.call();
-                          widget.navigationShell.goBranch(currentIndex);
-                        },
-                        behavior: HitTestBehavior.opaque,
-                        child: SizedBox.expand(
-                          child: Center(
-                            child: Icon(
-                              activeItem.icon,
-                              size: 24,
-                              color: activeAccentColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+// ── Nav capsule content (extracted so AdaptiveGlass child is pure) ───────────
+class _NavCapsuleContent extends StatelessWidget {
+  const _NavCapsuleContent({
+    required this.isMiniMode,
+    required this.currentIndex,
+    required this.capsuleItems,
+    required this.activeItem,
+    required this.activeAccentColor,
+    required this.inactiveIconColor,
+    required this.navigationShell,
+    this.onTapCollapsed,
+  });
+
+  final bool isMiniMode;
+  final int currentIndex;
+  final List<_NavItemData> capsuleItems;
+  final _NavItemData activeItem;
+  final Color activeAccentColor;
+  final Color inactiveIconColor;
+  final StatefulNavigationShell navigationShell;
+  final VoidCallback? onTapCollapsed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // ── Expanded nav content ────────────────────────────────────────────
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeInOutCubic,
+          opacity: isMiniMode ? 0.0 : 1.0,
+          child: IgnorePointer(
+            ignoring: isMiniMode,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: Tween<double>(begin: 0.96, end: 1.0)
+                        .animate(animation),
+                    child: child,
                   ),
-                ],
+                );
+              },
+              child: KeyedSubtree(
+                key: ValueKey<int>(currentIndex),
+                child: Row(
+                  key: const ValueKey('nav_buttons_row'),
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: capsuleItems.map((item) {
+                    final isSelected = currentIndex == item.branchIndex;
+                    return Expanded(
+                      child: _NavItemButton(
+                        item: item,
+                        isSelected: isSelected,
+                        activeColor: activeAccentColor,
+                        inactiveColor: inactiveIconColor,
+                        selectedPillColor: Colors.transparent,
+                        selectedPillBorder: Colors.transparent,
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          navigationShell.goBranch(item.branchIndex);
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
+          ),
+        ),
+
+        // ── Collapsed single active icon ────────────────────────────────────
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeInOutCubic,
+          opacity: isMiniMode ? 1.0 : 0.0,
+          child: IgnorePointer(
+            ignoring: !isMiniMode,
+            child: _CollapsedActiveIcon(
+              activeItem: activeItem,
+              activeAccentColor: activeAccentColor,
+              onTap: () {
+                HapticFeedback.selectionClick();
+                onTapCollapsed?.call();
+                navigationShell.goBranch(currentIndex);
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CollapsedActiveIcon extends StatefulWidget {
+  final _NavItemData activeItem;
+  final Color activeAccentColor;
+  final VoidCallback onTap;
+
+  const _CollapsedActiveIcon({
+    required this.activeItem,
+    required this.activeAccentColor,
+    required this.onTap,
+  });
+
+  @override
+  State<_CollapsedActiveIcon> createState() => _CollapsedActiveIconState();
+}
+
+class _CollapsedActiveIconState extends State<_CollapsedActiveIcon>
+    with SingleTickerProviderStateMixin {
+  OverlayEntry? _chipOverlay;
+  Timer? _chipDismissTimer;
+  late AnimationController _bounceController;
+  late Animation<double> _bounceAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _bounceAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _bounceController,
+        curve: Curves.elasticOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _chipDismissTimer?.cancel();
+    _removeChipOverlay();
+    _bounceController.dispose();
+    super.dispose();
+  }
+
+  void _removeChipOverlay() {
+    _chipOverlay?.remove();
+    _chipOverlay = null;
+  }
+
+  void _showGlassChip(BuildContext context) {
+    HapticFeedback.mediumImpact();
+    _removeChipOverlay();
+    _chipDismissTimer?.cancel();
+
+    final RenderBox? box = context.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final Offset globalPos = box.localToGlobal(Offset.zero);
+    final Size boxSize = box.size;
+
+    final double chipLeft = globalPos.dx + boxSize.width / 2 - 60;
+    final double chipBottom =
+        MediaQuery.of(context).size.height - globalPos.dy + 8;
+
+    _bounceController.forward(from: 0.0);
+
+    _chipOverlay = OverlayEntry(
+      builder: (overlayContext) => Positioned(
+        left: chipLeft.clamp(
+            8.0, MediaQuery.of(overlayContext).size.width - 128),
+        bottom: chipBottom,
+        child: AnimatedBuilder(
+          animation: _bounceAnimation,
+          builder: (_, child) => Transform.scale(
+            scale: _bounceAnimation.value,
+            alignment: Alignment.bottomCenter,
+            child: child,
+          ),
+          child: GlassChip(
+            label: widget.activeItem.label,
+            icon: Icon(widget.activeItem.icon, size: 16),
+            useOwnLayer: true,
+            quality: GlassQuality.standard,
+            interactionScale: 1.08,
+            stretch: 0.6,
+            glowRadius: 1.2,
+            anchorStretch: true,
+            settings: const LiquidGlassSettings(
+              blur: 3,
+              thickness: 28,
+              refractiveIndex: 1.45,
+              lightIntensity: 0.25,
+              chromaticAberration: 0.08,
+              saturation: 1.1,
+              fresnelStrength: 0.0,
+            ),
+            onTap: () {
+              _removeChipOverlay();
+              widget.onTap();
+            },
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(_chipOverlay!);
+
+    _chipDismissTimer = Timer(const Duration(milliseconds: 2500), () {
+      if (mounted) {
+        _removeChipOverlay();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _removeChipOverlay();
+        widget.onTap();
+      },
+      onLongPress: () => _showGlassChip(context),
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox.expand(
+        child: Center(
+          child: Icon(
+            widget.activeItem.icon,
+            size: 24,
+            color: widget.activeAccentColor,
           ),
         ),
       ),
@@ -1007,17 +1203,128 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule> {
 // SEARCH CIRCLE BUTTON
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Standalone search circle pill — extracted from [HorizontalNavBar] so it
-/// can be placed as an independent [Positioned] element in the animated Stack.
-/// Visual appearance, glass style, and behaviour are identical to the original.
-class _SearchCircleButton extends StatelessWidget {
+/// Standalone search circle pill — liquid glass translucent circle.
+/// Uses AdaptiveGlass with LiquidOval shape for the true circular glass effect.
+class _SearchCircleButton extends StatefulWidget {
   const _SearchCircleButton({required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
   @override
+  State<_SearchCircleButton> createState() => _SearchCircleButtonState();
+}
+
+class _SearchCircleButtonState extends State<_SearchCircleButton>
+    with TickerProviderStateMixin {
+  late final AnimationController _liquidController;
+  late final AnimationController _bounceController;
+  late final Animation<double> _bounceAnimation;
+
+  OverlayEntry? _chipOverlay;
+  Timer? _chipDismissTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _liquidController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _bounceAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _bounceController,
+        curve: Curves.elasticOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _chipDismissTimer?.cancel();
+    _removeChipOverlay();
+    _liquidController.dispose();
+    _bounceController.dispose();
+    super.dispose();
+  }
+
+  void _removeChipOverlay() {
+    _chipOverlay?.remove();
+    _chipOverlay = null;
+  }
+
+  void _showGlassChip(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    HapticFeedback.mediumImpact();
+    _removeChipOverlay();
+    _chipDismissTimer?.cancel();
+
+    final RenderBox? box = context.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final Offset globalPos = box.localToGlobal(Offset.zero);
+    final Size boxSize = box.size;
+
+    final double chipLeft = globalPos.dx + boxSize.width / 2 - 60;
+    final double chipBottom =
+        MediaQuery.of(context).size.height - globalPos.dy + 8;
+
+    _bounceController.forward(from: 0.0);
+
+    _chipOverlay = OverlayEntry(
+      builder: (overlayContext) => Positioned(
+        left: chipLeft.clamp(
+            8.0, MediaQuery.of(overlayContext).size.width - 128),
+        bottom: chipBottom,
+        child: AnimatedBuilder(
+          animation: _bounceAnimation,
+          builder: (_, child) => Transform.scale(
+            scale: _bounceAnimation.value,
+            alignment: Alignment.bottomCenter,
+            child: child,
+          ),
+          child: GlassChip(
+            label: l10n.navSearch,
+            icon: const Icon(MingCute.search_2_line, size: 16),
+            useOwnLayer: true,
+            quality: GlassQuality.standard,
+            interactionScale: 1.08,
+            stretch: 0.6,
+            glowRadius: 1.2,
+            anchorStretch: true,
+            settings: const LiquidGlassSettings(
+              blur: 3,
+              thickness: 28,
+              refractiveIndex: 1.45,
+              lightIntensity: 0.25,
+              chromaticAberration: 0.08,
+              saturation: 1.1,
+              fresnelStrength: 0.0,
+            ),
+            onTap: () {
+              _removeChipOverlay();
+              widget.navigationShell.goBranch(2);
+            },
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(_chipOverlay!);
+
+    _chipDismissTimer = Timer(const Duration(milliseconds: 2500), () {
+      if (mounted) {
+        _removeChipOverlay();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final currentIndex = navigationShell.currentIndex;
+    final currentIndex = widget.navigationShell.currentIndex;
     final isSearchSelected = currentIndex == 2;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -1026,9 +1333,6 @@ class _SearchCircleButton extends StatelessWidget {
         ? Colors.white.withValues(alpha: 0.85)
         : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
 
-    // Muzo-exact glass circle: ClipOval + BackdropFilter(25,25)
-    // Fill: black@0.20 dark / white@0.35 light. Border: white@0.12/0.20, width 0.75.
-    // AnimatedSwitcher (300ms scale+fade) swaps the icon when search activates.
     return Container(
       width: _kSearchCircleW,
       height: _kNavBarH,
@@ -1036,52 +1340,75 @@ class _SearchCircleButton extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-            blurRadius: 20,
+            color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.10),
+            blurRadius: 24,
             spreadRadius: -4,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-          child: GestureDetector(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              navigationShell.goBranch(2);
+      child: GestureDetector(
+        onTap: () {
+          _removeChipOverlay();
+          HapticFeedback.lightImpact();
+          widget.navigationShell.goBranch(2);
+        },
+        onLongPress: () => _showGlassChip(context),
+        behavior: HitTestBehavior.opaque,
+        child: ShaderMask(
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.2),
+                Colors.transparent,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.srcATop,
+          child: AnimatedBuilder(
+            animation: _liquidController,
+            builder: (_, child) {
+              final t = _liquidController.value;
+              final m = Matrix4.identity()
+                ..setEntry(0, 1, 0.015 * (1 + t))
+                ..setEntry(1, 0, 0.02 * (1 - t));
+              return ImageFiltered(
+                imageFilter: ImageFilter.matrix(m.storage),
+                child: child,
+              );
             },
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              width: _kSearchCircleW,
-              height: _kNavBarH,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                // Muzo-exact fill: black@0.20 dark / white@0.35 light
-                color: (isDark ? Colors.black : Colors.white)
-                    .withValues(alpha: isDark ? 0.20 : 0.35),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
-                  width: 0.75,
-                ),
-              ),
-              child: Center(
-                // Muzo-style: AnimatedSwitcher scale+fade on icon change
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) {
-                    return ScaleTransition(
-                      scale: animation,
-                      child: FadeTransition(opacity: animation, child: child),
-                    );
-                  },
-                  child: Icon(
-                    MingCute.search_2_line,
-                    key: ValueKey<bool>(isSearchSelected),
-                    size: 22,
-                    color: isSearchSelected
-                        ? activeAccentColor
-                        : inactiveIconColor,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(29),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    // Exact match to user's code: white@0.10 translucent
+                    color: Colors.white.withValues(alpha: 0.10),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.30),
+                      width: 0.75,
+                    ),
+                  ),
+                  child: Center(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      transitionBuilder: (child, animation) {
+                        return ScaleTransition(
+                          scale: animation,
+                          child: FadeTransition(opacity: animation, child: child),
+                        );
+                      },
+                      child: Icon(
+                        MingCute.search_2_line,
+                        key: ValueKey<bool>(isSearchSelected),
+                        size: 22,
+                        color: isSearchSelected ? activeAccentColor : inactiveIconColor,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -1266,9 +1593,6 @@ class HorizontalNavBar extends StatelessWidget {
     final currentIndex = navigationShell.currentIndex;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final glassColor = AppTheme.glassColor(context);
-    final glassBorder = AppTheme.glassBorder(context);
-
     final activeAccentColor = AppTheme.accentColor(context);
     final inactiveIconColor = isDark
         ? Colors.white.withValues(alpha: 0.85)
@@ -1300,36 +1624,53 @@ class HorizontalNavBar extends StatelessWidget {
       children: [
         // ── Main Left Nav Capsule (Home, Library, Local, Offline) ──
         Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Container(
-                height: 58,
-                decoration: BoxDecoration(
-                  color: glassColor,
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: glassBorder, width: 1.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: capsuleItems.map((item) {
-                      final isSelected = currentIndex == item.branchIndex;
-                      return _NavItemButton(
-                        item: item,
-                        isSelected: isSelected,
-                        activeColor: activeAccentColor,
-                        inactiveColor: inactiveIconColor,
-                        selectedPillColor: selectedPillColor,
-                        selectedPillBorder: selectedPillBorder,
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          navigationShell.goBranch(item.branchIndex);
-                        },
-                      );
-                    }).toList(),
+          child: ShaderMask(
+            shaderCallback: (bounds) {
+              return LinearGradient(
+                colors: [
+                  Colors.white.withValues(alpha: 0.2),
+                  Colors.transparent,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ).createShader(bounds);
+            },
+            blendMode: BlendMode.srcATop,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                child: Container(
+                  height: 58,
+                  decoration: BoxDecoration(
+                    color: (isDark ? Colors.white : Colors.white)
+                        .withValues(alpha: isDark ? 0.10 : 0.18),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
+                      width: 0.75,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: capsuleItems.map((item) {
+                        final isSelected = currentIndex == item.branchIndex;
+                        return _NavItemButton(
+                          item: item,
+                          isSelected: isSelected,
+                          activeColor: activeAccentColor,
+                          inactiveColor: inactiveIconColor,
+                          selectedPillColor: selectedPillColor,
+                          selectedPillBorder: selectedPillBorder,
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            navigationShell.goBranch(item.branchIndex);
+                          },
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
               ),
@@ -1345,46 +1686,62 @@ class HorizontalNavBar extends StatelessWidget {
             navigationShell.goBranch(2);
           },
           behavior: HitTestBehavior.opaque,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(29),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Container(
-                width: 58,
-                height: 58,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: glassColor,
-                  border: Border.all(
-                    color: isSearchSelected ? selectedPillBorder : glassBorder,
-                    width: 1.0,
-                  ),
-                ),
-                child: Center(
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOutCubic,
-                    width: isSearchSelected ? 48 : 42,
-                    height: isSearchSelected ? 48 : 42,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+          child: ShaderMask(
+            shaderCallback: (bounds) {
+              return LinearGradient(
+                colors: [
+                  Colors.white.withValues(alpha: 0.2),
+                  Colors.transparent,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ).createShader(bounds);
+            },
+            blendMode: BlendMode.srcATop,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(29),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                child: Container(
+                  width: 58,
+                  height: 58,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: (isDark ? Colors.white : Colors.white)
+                        .withValues(alpha: isDark ? 0.10 : 0.18),
+                    border: Border.all(
                       color: isSearchSelected
-                          ? selectedPillColor
-                          : Colors.transparent,
-                      border: isSearchSelected
-                          ? Border.all(
-                              color: selectedPillBorder,
-                              width: 1.0,
-                            )
-                          : null,
+                          ? selectedPillBorder
+                          : Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
+                      width: 0.75,
                     ),
-                    child: Center(
-                      child: Icon(
-                        MingCute.search_2_line,
-                        size: 24,
+                  ),
+                  child: Center(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOutCubic,
+                      width: isSearchSelected ? 48 : 42,
+                      height: isSearchSelected ? 48 : 42,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
                         color: isSearchSelected
-                            ? activeAccentColor
-                            : inactiveIconColor,
+                            ? selectedPillColor
+                            : Colors.transparent,
+                        border: isSearchSelected
+                            ? Border.all(
+                                color: selectedPillBorder,
+                                width: 1.0,
+                              )
+                            : null,
+                      ),
+                      child: Center(
+                        child: Icon(
+                          MingCute.search_2_line,
+                          size: 24,
+                          color: isSearchSelected
+                              ? activeAccentColor
+                              : inactiveIconColor,
+                        ),
                       ),
                     ),
                   ),
@@ -1404,7 +1761,8 @@ class HorizontalNavBar extends StatelessWidget {
 
 /// Individual nav item with its own oval-pill glass background (matching the
 /// desired reference image — wider than tall, like a stadium capsule).
-class _NavItemButton extends StatelessWidget {
+/// Long-press shows a Muzo-style GlassChip with jello physics from liquid_glass_widgets.
+class _NavItemButton extends StatefulWidget {
   final _NavItemData item;
   final bool isSelected;
   final Color activeColor;
@@ -1424,9 +1782,123 @@ class _NavItemButton extends StatelessWidget {
   });
 
   @override
+  State<_NavItemButton> createState() => _NavItemButtonState();
+}
+
+class _NavItemButtonState extends State<_NavItemButton>
+    with SingleTickerProviderStateMixin {
+  // Overlay entry for the Muzo-style long-press GlassChip
+  OverlayEntry? _chipOverlay;
+  Timer? _chipDismissTimer;
+
+  // Bounce/jello animation controller for the chip appearance
+  late AnimationController _bounceController;
+  late Animation<double> _bounceAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    // Elastic bounce curve — jello effect like Muzo
+    _bounceAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _bounceController,
+        curve: Curves.elasticOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _chipDismissTimer?.cancel();
+    _removeChipOverlay();
+    _bounceController.dispose();
+    super.dispose();
+  }
+
+  void _removeChipOverlay() {
+    _chipOverlay?.remove();
+    _chipOverlay = null;
+  }
+
+  void _showGlassChip(BuildContext context) {
+    HapticFeedback.mediumImpact();
+    _removeChipOverlay();
+    _chipDismissTimer?.cancel();
+
+    // Find the render box of this button to position the chip above it
+    final RenderBox? box = context.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final Offset globalPos = box.localToGlobal(Offset.zero);
+    final Size boxSize = box.size;
+
+    // Chip appears centered above the icon
+    final double chipLeft = globalPos.dx + boxSize.width / 2 - 60;
+    final double chipBottom = MediaQuery.of(context).size.height - globalPos.dy + 8;
+
+    _bounceController.forward(from: 0.0);
+
+    _chipOverlay = OverlayEntry(
+      builder: (overlayContext) => Positioned(
+        left: chipLeft.clamp(8.0, MediaQuery.of(overlayContext).size.width - 128),
+        bottom: chipBottom,
+        child: AnimatedBuilder(
+          animation: _bounceAnimation,
+          builder: (_, child) => Transform.scale(
+            scale: _bounceAnimation.value,
+            alignment: Alignment.bottomCenter,
+            child: child,
+          ),
+          // GlassChip from liquid_glass_widgets with jello stretch physics
+          child: GlassChip(
+            label: widget.item.label,
+            icon: Icon(widget.item.icon, size: 16),
+            useOwnLayer: true,
+            quality: GlassQuality.standard,
+            // Jello physics: high stretch + elastic scale
+            interactionScale: 1.08,
+            stretch: 0.6,
+            glowRadius: 1.2,
+            anchorStretch: true,
+            settings: const LiquidGlassSettings(
+              blur: 3,
+              thickness: 28,
+              refractiveIndex: 1.45,
+              lightIntensity: 0.25,
+              chromaticAberration: 0.08,
+              saturation: 1.1,
+              fresnelStrength: 0.0,
+            ),
+            onTap: () {
+              _removeChipOverlay();
+              widget.onTap();
+            },
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(_chipOverlay!);
+
+    // Auto-dismiss after 2.5 seconds (Muzo behaviour)
+    _chipDismissTimer = Timer(const Duration(milliseconds: 2500), () {
+      if (mounted) {
+        _removeChipOverlay();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        _removeChipOverlay();
+        widget.onTap();
+      },
+      onLongPress: () => _showGlassChip(context),
       behavior: HitTestBehavior.opaque,
       child: Container(
         height: 48,
@@ -1435,11 +1907,11 @@ class _NavItemButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           // Muzo: RadialGradient glow when selected, nothing when not.
-          gradient: isSelected
+          gradient: widget.isSelected
               ? RadialGradient(
                   colors: [
-                    activeColor.withValues(alpha: 0.15),
-                    activeColor.withValues(alpha: 0.0),
+                    widget.activeColor.withValues(alpha: 0.15),
+                    widget.activeColor.withValues(alpha: 0.0),
                   ],
                   radius: 0.85,
                 )
@@ -1451,19 +1923,19 @@ class _NavItemButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              item.icon,
+              widget.item.icon,
               size: 18,
-              color: isSelected ? activeColor : inactiveColor,
+              color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
             ),
             const SizedBox(height: 0.5),
             Text(
-              item.label,
+              widget.item.label,
               maxLines: 1,
               style: TextStyle(
                 fontSize: 8.5,
                 fontFamily: 'Gilroy',
                 fontWeight: FontWeight.bold,
-                color: isSelected ? activeColor : inactiveColor,
+                color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
               ),
             ),
           ],
