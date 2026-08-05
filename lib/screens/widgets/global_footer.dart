@@ -14,7 +14,6 @@ import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
-import 'package:flutter/rendering.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart' as lgr;
 
@@ -62,11 +61,6 @@ class _GlobalFooterState extends State<GlobalFooter>
 
   /// Debounce timer — prevents rapid scroll direction changes from jittering.
   Timer? _debounceTimer;
-
-  /// Set true by [UserScrollNotification]; false when scroll goes idle.
-  /// Filters out programmatic animateTo() calls (billboard, carousel, etc.)
-  /// so only genuine user gestures trigger the footer collapse.
-  bool _userScrollActive = false;
 
   /// Single animation controller driving the entire collapse morph.
   /// All child measurements derive from [_collapseAnimation.value] inside
@@ -126,79 +120,9 @@ class _GlobalFooterState extends State<GlobalFooter>
     _collapseController.reverse();
   }
 
-  /// Intercepts [ScrollNotification]s that bubble up from any tab's scrollable.
-  /// Returns false so notifications continue to propagate upward.
-  ///
-  /// Three-layer filter to only react to genuine user vertical scrolls:
-  ///   1. **Axis filter** — ignores horizontal carousels / PageViews.
-  ///   2. **[UserScrollNotification] gate** — this notification type is NEVER
-  ///      fired by programmatic [ScrollController.animateTo] calls, so billboard
-  ///      auto-scroll, carousel timers, and any other code-driven scroll is
-  ///      completely transparent to the footer collapse logic.
-  ///   3. **100 ms debounce** — only commits the new state after the scroll
-  ///      direction has been stable for 100 ms, eliminating jitter on rapid
-  ///      direction reversals without waiting for a full animation cycle.
-  ///
-  ///   Pixel hysteresis (collapse > 50 px, expand < 25 px) is preserved on
-  ///   top of all three filters to prevent oscillation near the threshold.
-  double _scrollDeltaAccum = 0.0;
-  // ── Sweet-spot thresholds ────────────────────────────────────────────────
-  // Collapse: 20 px of intentional downward scroll triggers shrink.
-  // Expand  : 25 px of upward scroll anywhere on page triggers grow-back.
-  // Expand is fractionally longer than shrink as requested.
-  static const double _kCollapseDeltaThreshold = 20.0;
-  static const double _kExpandDeltaThreshold = 25.0;
-
   bool _onScrollNotification(ScrollNotification notification) {
-    final metrics = notification.metrics;
-
-    if (metrics.axis != Axis.vertical) return false;
-
-    if (notification is UserScrollNotification) {
-      _userScrollActive = notification.direction != ScrollDirection.idle;
-      if (!_userScrollActive) {
-        _scrollDeltaAccum = 0.0;
-      }
-      return false;
-    }
-
-    if (notification is! ScrollUpdateNotification) return false;
-    if (!_userScrollActive) return false;
-
-    final double delta = notification.scrollDelta ?? 0.0;
-    if (delta == 0.0) return false;
-
-    // Reset accumulated delta if scroll direction reverses
-    if ((delta > 0 && _scrollDeltaAccum < 0) ||
-        (delta < 0 && _scrollDeltaAccum > 0)) {
-      _scrollDeltaAccum = 0.0;
-    }
-
-    _scrollDeltaAccum += delta;
-
-    bool? targetMini;
-    if (!_isMiniMode && _scrollDeltaAccum > _kCollapseDeltaThreshold) {
-      targetMini = true;
-    } else if (_isMiniMode && _scrollDeltaAccum < -_kExpandDeltaThreshold) {
-      targetMini = false;
-    }
-
-    if (targetMini == null || targetMini == _isMiniMode) {
-      return false;
-    }
-
-    final bool shouldCollapse = targetMini;
-    _scrollDeltaAccum = 0.0;
-    _debounceTimer?.cancel();
-    if (mounted) {
-      setState(() => _isMiniMode = shouldCollapse);
-      if (shouldCollapse) {
-        _collapseController.forward();
-      } else {
-        _collapseController.reverse();
-      }
-    }
-
+    // Keep footer navigation pill permanently fixed in position at the bottom of the screen.
+    // Ignores scroll notifications so the footer pill never moves up/down or collapses.
     return false;
   }
 
@@ -1222,8 +1146,7 @@ class _SearchCircleButton extends StatefulWidget {
 }
 
 class _SearchCircleButtonState extends State<_SearchCircleButton>
-    with TickerProviderStateMixin {
-  late final AnimationController _liquidController;
+    with SingleTickerProviderStateMixin {
   late final AnimationController _bounceController;
   late final Animation<double> _bounceAnimation;
 
@@ -1233,11 +1156,6 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
   @override
   void initState() {
     super.initState();
-    _liquidController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -1254,7 +1172,6 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
   void dispose() {
     _chipDismissTimer?.cancel();
     _removeChipOverlay();
-    _liquidController.dispose();
     _bounceController.dispose();
     super.dispose();
   }
@@ -1360,52 +1277,47 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
         },
         onLongPress: () => _showGlassChip(context),
         behavior: HitTestBehavior.opaque,
-        child: lgr.LiquidGlassBlendGroup(
-          blend: 10,
-          child: lgr.LiquidGlass.grouped(
-            shape: const lgr.LiquidOval(),
-            child: AnimatedBuilder(
-              animation: _liquidController,
-              builder: (_, child) {
-                final t = _liquidController.value;
-                // Subtle liquid distortion for search circle
-                final distortion = Matrix4.identity()
-                  ..setEntry(0, 1, 0.006 * math.sin(t * math.pi * 2 + math.pi / 4))
-                  ..setEntry(1, 0, 0.006 * math.cos(t * math.pi * 2 + math.pi / 4));
-                
-                return Transform(
-                  transform: distortion,
-                  child: child,
-                );
-              },
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(29),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.10),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.30),
-                        width: 0.75,
-                      ),
-                    ),
-                  child: Center(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      transitionBuilder: (child, animation) {
-                        return ScaleTransition(
-                          scale: animation,
-                          child: FadeTransition(opacity: animation, child: child),
-                        );
-                      },
-                      child: Icon(
-                        MingCute.search_2_line,
-                        key: ValueKey<bool>(isSearchSelected),
-                        size: 22,
-                        color: isSearchSelected ? activeAccentColor : inactiveIconColor,
-                      ),
+        child: ShaderMask(
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.22),
+                Colors.transparent,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.srcATop,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(29),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: (isDark ? Colors.black : Colors.white)
+                      .withValues(alpha: isDark ? 0.20 : 0.35),
+                  border: Border.all(
+                    color: Colors.white
+                        .withValues(alpha: isDark ? 0.15 : 0.25),
+                    width: 0.75,
+                  ),
+                ),
+                child: Center(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder: (child, animation) {
+                      return ScaleTransition(
+                        scale: animation,
+                        child: FadeTransition(opacity: animation, child: child),
+                      );
+                    },
+                    child: Icon(
+                      MingCute.search_2_line,
+                      key: ValueKey<bool>(isSearchSelected),
+                      size: 22,
+                      color: isSearchSelected ? activeAccentColor : inactiveIconColor,
                     ),
                   ),
                 ),
@@ -1414,7 +1326,6 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
           ),
         ),
       ),
-    ),
     );
   }
 }
