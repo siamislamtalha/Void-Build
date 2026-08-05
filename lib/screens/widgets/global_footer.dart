@@ -1316,9 +1316,7 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
         ? Colors.white.withValues(alpha: 0.85)
         : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
 
-    // Exact pattern from flutter_liquid_glass-main example _ExtraButton (bottom_bar.dart):
-    // LiquidGlassBlendGroup → LiquidGlass.grouped(shape: LiquidOval()) → GlassGlow → content
-    // The parent LiquidGlassLayer in _GlassFooterOverlay provides the rendering surface.
+    // Using LiquidGlass.auto pattern from liquid_glass_demo profile circle
     return GestureDetector(
       onTap: () {
         _removeChipOverlay();
@@ -1327,27 +1325,28 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
       },
       onLongPress: () => _showGlassChip(context),
       behavior: HitTestBehavior.opaque,
-      child: lgr.LiquidGlassBlendGroup(
-        blend: 10,
-        child: lgr.LiquidGlass.grouped(
-          shape: const lgr.LiquidOval(),
-          child: lgr.GlassGlow(
-            child: SizedBox(
-              width: _kSearchCircleW,
-              height: _kNavBarH,
-              child: Center(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) => ScaleTransition(
-                    scale: animation,
-                    child: FadeTransition(opacity: animation, child: child),
-                  ),
-                  child: Icon(
-                    MingCute.search_2_line,
-                    key: ValueKey<bool>(isSearchSelected),
-                    size: 22,
-                    color: isSearchSelected ? activeAccentColor : inactiveIconColor,
-                  ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: lgr.LiquidGlass.auto(
+          shape: const lgr.LiquidRoundedSuperellipse(
+            borderRadius: 40,
+          ),
+          glassContainsChild: false,
+          child: SizedBox(
+            width: _kSearchCircleW,
+            height: _kNavBarH,
+            child: Center(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (child, animation) => ScaleTransition(
+                  scale: animation,
+                  child: FadeTransition(opacity: animation, child: child),
+                ),
+                child: Icon(
+                  MingCute.search_2_line,
+                  key: ValueKey<bool>(isSearchSelected),
+                  size: 22,
+                  color: isSearchSelected ? activeAccentColor : inactiveIconColor,
                 ),
               ),
             ),
@@ -1617,69 +1616,41 @@ class HorizontalNavBar extends StatelessWidget {
         ),
         const SizedBox(width: 10),
 
-        // ── Separate Right Floating Search Circle Button (Branch 2) ──
+        // ── Separate Right Floating Circle Button (Branch 2) ──
+        // Profile-circle code from liquid_glass_demo dashboard_page.dart
         GestureDetector(
           onTap: () {
             HapticFeedback.selectionClick();
             navigationShell.goBranch(2);
           },
           behavior: HitTestBehavior.opaque,
-          child: ShaderMask(
-            shaderCallback: (bounds) {
-              return LinearGradient(
-                colors: [
-                  Colors.white.withValues(alpha: 0.2),
-                  Colors.transparent,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(bounds);
-            },
-            blendMode: BlendMode.srcATop,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(29),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                child: Container(
+          child: Hero(
+            tag: 'profile_button',
+            child: Material(
+              type: MaterialType.transparency,
+              child: lgr.LiquidGlass.auto(
+                settings: const lgr.LiquidGlassSettings(
+                  blur: 3,
+                  ambientStrength: 0.5,
+                  lightAngle: 0.2 * math.pi,
+                  glassColor: Colors.white12,
+                ),
+                shape: const lgr.LiquidRoundedSuperellipse(
+                  borderRadius: 40,
+                ),
+                glassContainsChild: false,
+                child: SizedBox(
                   width: 58,
                   height: 58,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: (isDark ? Colors.white : Colors.white)
-                        .withValues(alpha: isDark ? 0.10 : 0.18),
-                    border: Border.all(
-                      color: isSearchSelected
-                          ? selectedPillBorder
-                          : Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
-                      width: 0.75,
-                    ),
-                  ),
                   child: Center(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 220),
-                      curve: Curves.easeOutCubic,
-                      width: isSearchSelected ? 48 : 42,
-                      height: isSearchSelected ? 48 : 42,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Icon(
+                        MingCute.search_2_line,
+                        size: 24,
                         color: isSearchSelected
-                            ? selectedPillColor
-                            : Colors.transparent,
-                        border: isSearchSelected
-                            ? Border.all(
-                                color: selectedPillBorder,
-                                width: 1.0,
-                              )
-                            : null,
-                      ),
-                      child: Center(
-                        child: Icon(
-                          MingCute.search_2_line,
-                          size: 24,
-                          color: isSearchSelected
-                              ? activeAccentColor
-                              : inactiveIconColor,
-                        ),
+                            ? activeAccentColor
+                            : inactiveIconColor,
                       ),
                     ),
                   ),
