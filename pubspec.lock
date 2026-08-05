@@ -796,6 +796,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  liquid_glass_renderer:
+    dependency: "direct main"
+    description:
+      path: "flutter_liquid_glass-main/packages/liquid_glass_renderer"
+      relative: true
+    source: path
+    version: "0.2.0-dev.4"
   liquid_glass_widgets:
     dependency: "direct main"
     description:
@@ -924,6 +931,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  motor:
+    dependency: transitive
+    description:
+      name: motor
+      sha256: cbd49f21b00e568c2b1a55f134ed803614a107782f4fea7769693bca32940c58
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   nested:
     dependency: transitive
     description:

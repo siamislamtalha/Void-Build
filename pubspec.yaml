@@ -88,6 +88,8 @@ dependencies:
   flutter_rust_bridge: 2.12.0
   freezed_annotation: ^3.1.0
   liquid_glass_widgets: ^0.28.0
+  liquid_glass_renderer:
+    path: flutter_liquid_glass-main/packages/liquid_glass_renderer
 
   
 

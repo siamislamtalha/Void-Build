@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:flutter/services.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
@@ -15,6 +16,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart' as lgr;
 
 // ─── Collapse animation ──────────────────────────────────────────────────────
 // Matches the Apple Music iOS 26 reference exactly.
@@ -278,20 +280,21 @@ class _GlobalFooterState extends State<GlobalFooter>
                   // Sits above page content but below all floating pills.
                   _buildLoadingOverlay(context),
                   // ── Layer 3: Floating footer overlay ────────────────────
-                  // We skip SafeArea and instead manually add the device bottom
-                  // inset so the glass pills sit just above the home indicator /
-                  // gesture bar, while the BackdropFilter blur visually extends
-                  // all the way to the true screen edge (no opaque black strip).
+                  // Fixed position at bottom to prevent subtle movement
+                  // Using Transform.translate for absolute positioning
                   Positioned(
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    child: _GlassFooterOverlay(
-                      isMobile: isMobile,
-                      isMiniMode: _isMiniMode,
-                      collapseAnimation: _collapseAnimation,
-                      navigationShell: widget.navigationShell,
-                      onExpandFooter: _expandFooter,
+                    child: Transform.translate(
+                      offset: Offset.zero,
+                      child: _GlassFooterOverlay(
+                        isMobile: isMobile,
+                        isMiniMode: _isMiniMode,
+                        collapseAnimation: _collapseAnimation,
+                        navigationShell: widget.navigationShell,
+                        onExpandFooter: _expandFooter,
+                      ),
                     ),
                   ),
                   // ── Layer 5: Floating sleep timer chip (Muzo-exact) ─────
@@ -608,26 +611,14 @@ class _GlassFooterOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     // Bottom inset = device home indicator / gesture bar height.
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (!isMobile) {
       // ── Desktop layout: mini player floating above content ────────────────
-      //
-      // Fix 1: BlocBuilder — only render when a track is loaded; avoids an
-      //         empty Container with no height sitting in the overlay.
-      //
-      // Fix 2: SizedBox(height:64) — gives MiniPlayerCard a BOUNDED height
-      //         so its internal `height: double.infinity` resolves correctly
-      //         instead of collapsing to 0 in an unconstrained Positioned.
-      //
-      // Fix 3: Outer ClipRRect+BackdropFilter — provides the glass blur even
-      //         when there is sparse content behind the mini player (avoids
-      //         the "white" look that occurs when BackdropFilter has nothing
-      //         to sample from a transparent/empty area).
+      // Enhanced with liquid glass renderer for Muzo-like refraction and distortion
       return BlocBuilder<MiniPlayerCubit, MiniPlayerState>(
         builder: (context, miniState) {
           if (!miniState.isVisible) return const SizedBox.shrink();
-
-          final isDark = Theme.of(context).brightness == Brightness.dark;
 
           return Padding(
             padding: EdgeInsets.only(
@@ -637,47 +628,58 @@ class _GlassFooterOverlay extends StatelessWidget {
             ),
             child: SizedBox(
               height: 64,
-              // RepaintBoundary isolates the shader layer so it is cached by
-              // the compositor and not re-sampled on every animation frame.
               child: RepaintBoundary(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(28),
-                    // Fallback fill so the shader always has pixels to sample
-                    // from (fixes white flash on desktop with sparse content).
-                    color: isDark
+                child: lgr.LiquidGlassLayer(
+                  settings: lgr.LiquidGlassSettings(
+                    refractiveIndex: 1.21,
+                    thickness: 30,
+                    blur: 8,
+                    saturation: 1.5,
+                    lightIntensity: isDark ? .7 : 1,
+                    ambientStrength: isDark ? .2 : .5,
+                    lightAngle: math.pi / 4,
+                    glassColor: isDark
                         ? Colors.black.withValues(alpha: 0.35)
                         : Colors.black.withValues(alpha: 0.45),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black
-                            .withValues(alpha: isDark ? 0.35 : 0.12),
-                        blurRadius: 20,
-                        spreadRadius: -4,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
                   ),
-                  // Muzo-exact glass recipe: ClipRRect + BackdropFilter
-                  // sigmaX/Y:25, black/white 0.20/0.35 fill, border 0.75.
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(28),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                  child: lgr.LiquidGlassBlendGroup(
+                    blend: 10,
+                    child: lgr.LiquidGlass.grouped(
+                      shape: const lgr.LiquidRoundedSuperellipse(borderRadius: 28),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.10)
-                              : Colors.white.withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(28),
-                          border: Border.all(
-                            color: Colors.white
-                                .withValues(alpha: isDark ? 0.15 : 0.25),
-                            width: 0.75,
-                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black
+                                  .withValues(alpha: isDark ? 0.35 : 0.12),
+                              blurRadius: 20,
+                              spreadRadius: -4,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
                         ),
-                        child: MiniPlayerWidget(
-                          currentPageIndex: navigationShell.currentIndex,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(28),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.10)
+                                    : Colors.white.withValues(alpha: 0.18),
+                                borderRadius: BorderRadius.circular(28),
+                                border: Border.all(
+                                  color: Colors.white
+                                      .withValues(alpha: isDark ? 0.15 : 0.25),
+                                  width: 0.75,
+                                ),
+                              ),
+                              child: MiniPlayerWidget(
+                                currentPageIndex: navigationShell.currentIndex,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -690,7 +692,7 @@ class _GlassFooterOverlay extends StatelessWidget {
       );
     }
 
-    // ── Mobile: animated collapse Stack layout ──────────────────────────────
+    // ── Mobile: animated collapse Stack layout with liquid glass ─────────────
     return BlocBuilder<MiniPlayerCubit, MiniPlayerState>(
       builder: (context, miniState) {
         final hasMiniPlayer = miniState.isVisible;
@@ -732,71 +734,86 @@ class _GlassFooterOverlay extends StatelessWidget {
         final double leftCapsuleFullW =
             screenW - _kFooterHPad * 2 - _kPillGap - _kSearchCircleW;
 
-        return SizedBox(
-          height: sizedBoxH,
-          child: Stack(
-            // Clip.none lets the AnimatedPositioned animate out of the SizedBox
-            // bounds without visual clipping during the transition.
-            clipBehavior: Clip.none,
-            children: [
-              // ── Left nav capsule ────────────────────────────────────────
-              // Left-edge is anchored at _kFooterHPad.
-              // Width shrinks from fullWidth → _kSearchCircleW (right side moves in).
-              // RepaintBoundary freezes the BackdropFilter blur texture so the
-              // compositor does not re-sample it on every AnimatedContainer frame.
-              Positioned(
-                left: _kFooterHPad,
-                bottom: navBottomAbs,
-                height: _kNavBarH,
-                child: RepaintBoundary(
-                  child: _CollapsibleNavCapsule(
-                    isMiniMode: isCollapsed,
-                    navigationShell: navigationShell,
-                    fullWidth: leftCapsuleFullW,
-                    onTapCollapsed: () {
-                      HapticFeedback.selectionClick();
-                      onExpandFooter?.call();
-                    },
-                  ),
-                ),
-              ),
-
-              // ── Search circle ────────────────────────────────────────────
-              // Right-edge is anchored at _kFooterHPad. Never moves.
-              // RepaintBoundary caches the blur so it never re-samples.
-              Positioned(
-                right: _kFooterHPad,
-                bottom: navBottomAbs,
-                width: _kSearchCircleW,
-                height: _kNavBarH,
-                child: RepaintBoundary(
-                  child: _SearchCircleButton(navigationShell: navigationShell),
-                ),
-              ),
-
-              // ── Mini player ──────────────────────────────────────────────
-              // AnimatedPositioned smoothly moves between its two positions:
-              //   • Normal: full-width pill floating above the nav bar.
-              //   • Collapsed: narrow pill inline with the two nav circles.
-              // RepaintBoundary wraps the entire mini player so its inner
-              // BackdropFilter blur is compositor-cached and never re-sampled
-              // while AnimatedPositioned is changing position/size each frame.
-              if (hasMiniPlayer)
-                AnimatedPositioned(
-                  duration: _kCollapseAnimDuration,
-                  curve: _kCollapseAnimCurve,
-                  left: miniLeft,
-                  right: miniRight,
-                  bottom: miniBottom,
-                  height: miniHeight,
+        // Enhanced with liquid glass layer for Muzo-like effects
+        return lgr.LiquidGlassLayer(
+          settings: lgr.LiquidGlassSettings(
+            refractiveIndex: 1.21,
+            thickness: 30,
+            blur: 8,
+            saturation: 1.5,
+            lightIntensity: isDark ? .7 : 1,
+            ambientStrength: isDark ? .2 : .5,
+            lightAngle: math.pi / 4,
+            glassColor: isDark
+                ? Colors.black.withValues(alpha: 0.35)
+                : Colors.black.withValues(alpha: 0.45),
+          ),
+          child: SizedBox(
+            height: sizedBoxH,
+            child: Stack(
+              // Clip.none lets the AnimatedPositioned animate out of the SizedBox
+              // bounds without visual clipping during the transition.
+              clipBehavior: Clip.none,
+              children: [
+                // ── Left nav capsule ────────────────────────────────────────
+                // Left-edge is anchored at _kFooterHPad.
+                // Width shrinks from fullWidth → _kSearchCircleW (right side moves in).
+                // RepaintBoundary freezes the BackdropFilter blur texture so the
+                // compositor does not re-sample it on every AnimatedContainer frame.
+                Positioned(
+                  left: _kFooterHPad,
+                  bottom: navBottomAbs,
+                  height: _kNavBarH,
                   child: RepaintBoundary(
-                    child: MiniPlayerWidget(
-                      currentPageIndex: navigationShell.currentIndex,
-                      isCompact: isCollapsed,
+                    child: _CollapsibleNavCapsule(
+                      isMiniMode: isCollapsed,
+                      navigationShell: navigationShell,
+                      fullWidth: leftCapsuleFullW,
+                      onTapCollapsed: () {
+                        HapticFeedback.selectionClick();
+                        onExpandFooter?.call();
+                      },
                     ),
                   ),
                 ),
-            ],
+
+                // ── Search circle ────────────────────────────────────────────
+                // Right-edge is anchored at _kFooterHPad. Never moves.
+                // RepaintBoundary caches the blur so it never re-samples.
+                Positioned(
+                  right: _kFooterHPad,
+                  bottom: navBottomAbs,
+                  width: _kSearchCircleW,
+                  height: _kNavBarH,
+                  child: RepaintBoundary(
+                    child: _SearchCircleButton(navigationShell: navigationShell),
+                  ),
+                ),
+
+                // ── Mini player ──────────────────────────────────────────────
+                // AnimatedPositioned smoothly moves between its two positions:
+                //   • Normal: full-width pill floating above the nav bar.
+                //   • Collapsed: narrow pill inline with the two nav circles.
+                // RepaintBoundary wraps the entire mini player so its inner
+                // BackdropFilter blur is compositor-cached and never re-sampled
+                // while AnimatedPositioned is changing position/size each frame.
+                if (hasMiniPlayer)
+                  AnimatedPositioned(
+                    duration: _kCollapseAnimDuration,
+                    curve: _kCollapseAnimCurve,
+                    left: miniLeft,
+                    right: miniRight,
+                    bottom: miniBottom,
+                    height: miniHeight,
+                    child: RepaintBoundary(
+                      child: MiniPlayerWidget(
+                        currentPageIndex: navigationShell.currentIndex,
+                        isCompact: isCollapsed,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         );
       },
@@ -881,87 +898,79 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
       orElse: () => capsuleItems[0],
     );
 
-    // ── Liquid glass nav capsule ─────────────────────────────────────────────
-    // Uses AdaptiveGlass from liquid_glass_widgets with a very low blur so the
-    // surface is translucent (clear) rather than frosted, matching the user's
-    // sample code (blur=0, glassColor transparent, high refractiveIndex).
-    // The liquid Matrix4 distortion is animated by _liquidController.
+    // ── Enhanced liquid glass nav capsule with Muzo-like effects ─────────────
+    // Uses liquid_glass_renderer for true refraction, distortion, and light effects
     return SizedBox(
       height: _kNavBarH,
-      child: AnimatedContainer(
-        duration: _kCollapseAnimDuration,
-        curve: _kCollapseAnimCurve,
-        width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
-        height: _kNavBarH,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.10),
-              blurRadius: 24,
-              spreadRadius: -4,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        // ShaderMask refraction overlay matching user snippet
-        child: ShaderMask(
-          shaderCallback: (bounds) {
-            return LinearGradient(
-              colors: [
-                Colors.white.withValues(alpha: 0.2),
-                Colors.transparent,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ).createShader(bounds);
-          },
-          blendMode: BlendMode.srcATop,
-          // LiquidDistortion matrix transformation matching user snippet
-          child: AnimatedBuilder(
-            animation: _liquidController,
-            builder: (_, child) {
-              final t = _liquidController.value;
-              final m = Matrix4.identity()
-                ..setEntry(0, 1, 0.015 * (1 + t))
-                ..setEntry(1, 0, 0.02 * (1 - t));
-              return ImageFiltered(
-                imageFilter: ImageFilter.matrix(m.storage),
-                child: child,
-              );
-            },
-            // buildBlurGlass translucent 25px blur card matching user snippet
-            // Matching the user's exact code: white@0.10 fill for true translucency
-            child: ClipRRect(
+      child: AnimatedBuilder(
+        animation: _liquidController,
+        builder: (_, child) {
+          final t = _liquidController.value;
+          
+          return AnimatedContainer(
+            duration: _kCollapseAnimDuration,
+            curve: _kCollapseAnimCurve,
+            width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
+            height: _kNavBarH,
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(28),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                child: Container(
-                  decoration: BoxDecoration(
-                    // Exact match to user's code: Colors.white.withOpacity(0.1)
-                    // Translucent — not frosted — matching the given snippet
-                    color: Colors.white.withValues(alpha: 0.10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.10),
+                  blurRadius: 24,
+                  spreadRadius: -4,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: lgr.LiquidGlassBlendGroup(
+              blend: 10,
+              child: lgr.LiquidGlass.grouped(
+                shape: const lgr.LiquidRoundedSuperellipse(borderRadius: 28),
+                child: AnimatedBuilder(
+                  animation: _liquidController,
+                  builder: (_, child) {
+                    // Subtle liquid distortion animation
+                    final distortion = Matrix4.identity()
+                      ..setEntry(0, 1, 0.008 * math.sin(t * math.pi * 2))
+                      ..setEntry(1, 0, 0.008 * math.cos(t * math.pi * 2));
+                    
+                    return Transform(
+                      transform: distortion,
+                      child: child,
+                    );
+                  },
+                  child: ClipRRect(
                     borderRadius: BorderRadius.circular(28),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.30),
-                      width: 0.75,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.30),
+                            width: 0.75,
+                          ),
+                        ),
+                        child: _NavCapsuleContent(
+                          isMiniMode: widget.isMiniMode,
+                          currentIndex: currentIndex,
+                          capsuleItems: capsuleItems,
+                          activeItem: activeItem,
+                          activeAccentColor: activeAccentColor,
+                          inactiveIconColor: inactiveIconColor,
+                          navigationShell: widget.navigationShell,
+                          onTapCollapsed: widget.onTapCollapsed,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: _NavCapsuleContent(
-                    isMiniMode: widget.isMiniMode,
-                    currentIndex: currentIndex,
-                    capsuleItems: capsuleItems,
-                    activeItem: activeItem,
-                    activeAccentColor: activeAccentColor,
-                    inactiveIconColor: inactiveIconColor,
-                    navigationShell: widget.navigationShell,
-                    onTapCollapsed: widget.onTapCollapsed,
                   ),
                 ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -1155,9 +1164,7 @@ class _CollapsedActiveIconState extends State<_CollapsedActiveIcon>
               thickness: 28,
               refractiveIndex: 1.45,
               lightIntensity: 0.25,
-              chromaticAberration: 0.08,
               saturation: 1.1,
-              fresnelStrength: 0.0,
             ),
             onTap: () {
               _removeChipOverlay();
@@ -1300,9 +1307,7 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
               thickness: 28,
               refractiveIndex: 1.45,
               lightIntensity: 0.25,
-              chromaticAberration: 0.08,
               saturation: 1.1,
-              fresnelStrength: 0.0,
             ),
             onTap: () {
               _removeChipOverlay();
@@ -1355,44 +1360,37 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
         },
         onLongPress: () => _showGlassChip(context),
         behavior: HitTestBehavior.opaque,
-        child: ShaderMask(
-          shaderCallback: (bounds) {
-            return LinearGradient(
-              colors: [
-                Colors.white.withValues(alpha: 0.2),
-                Colors.transparent,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ).createShader(bounds);
-          },
-          blendMode: BlendMode.srcATop,
-          child: AnimatedBuilder(
-            animation: _liquidController,
-            builder: (_, child) {
-              final t = _liquidController.value;
-              final m = Matrix4.identity()
-                ..setEntry(0, 1, 0.015 * (1 + t))
-                ..setEntry(1, 0, 0.02 * (1 - t));
-              return ImageFiltered(
-                imageFilter: ImageFilter.matrix(m.storage),
-                child: child,
-              );
-            },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(29),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    // Exact match to user's code: white@0.10 translucent
-                    color: Colors.white.withValues(alpha: 0.10),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.30),
-                      width: 0.75,
+        child: lgr.LiquidGlassBlendGroup(
+          blend: 10,
+          child: lgr.LiquidGlass.grouped(
+            shape: const lgr.LiquidOval(),
+            child: AnimatedBuilder(
+              animation: _liquidController,
+              builder: (_, child) {
+                final t = _liquidController.value;
+                // Subtle liquid distortion for search circle
+                final distortion = Matrix4.identity()
+                  ..setEntry(0, 1, 0.006 * math.sin(t * math.pi * 2 + math.pi / 4))
+                  ..setEntry(1, 0, 0.006 * math.cos(t * math.pi * 2 + math.pi / 4));
+                
+                return Transform(
+                  transform: distortion,
+                  child: child,
+                );
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(29),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.10),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.30),
+                        width: 0.75,
+                      ),
                     ),
-                  ),
                   child: Center(
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
@@ -1416,6 +1414,7 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
           ),
         ),
       ),
+    ),
     );
   }
 }
@@ -1868,9 +1867,7 @@ class _NavItemButtonState extends State<_NavItemButton>
               thickness: 28,
               refractiveIndex: 1.45,
               lightIntensity: 0.25,
-              chromaticAberration: 0.08,
               saturation: 1.1,
-              fresnelStrength: 0.0,
             ),
             onTap: () {
               _removeChipOverlay();
