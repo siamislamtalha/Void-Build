@@ -1316,44 +1316,39 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
         ? Colors.white.withValues(alpha: 0.85)
         : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
 
-    return SizedBox(
-      width: _kSearchCircleW,
-      height: _kNavBarH,
-      child: GestureDetector(
-        onTap: () {
-          _removeChipOverlay();
-          HapticFeedback.lightImpact();
-          widget.navigationShell.goBranch(2);
-        },
-        onLongPress: () => _showGlassChip(context),
-        behavior: HitTestBehavior.opaque,
-        // Profile-circle style from liquid_glass_demo — LiquidGlass.withOwnLayer
-        // so we can supply settings, glassContainsChild: false frames the icon
-        // without distorting the layout.  No Matrix4 transform → zero idle movement.
-        child: lgr.LiquidGlass.withOwnLayer(
-          settings: lgr.LiquidGlassSettings(
-            blur: 3,
-            ambientStrength: isDark ? 0.3 : 0.5,
-            lightAngle: -0.2 * math.pi,
-            glassColor: isDark ? Colors.white12 : Colors.white24,
-          ),
-          shape: const lgr.LiquidRoundedSuperellipse(
-            borderRadius: 40.0,
-          ),
-          glassContainsChild: false,
-          child: Padding(
-            padding: const EdgeInsets.all(14.0),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, animation) => ScaleTransition(
-                scale: animation,
-                child: FadeTransition(opacity: animation, child: child),
-              ),
-              child: Icon(
-                MingCute.search_2_line,
-                key: ValueKey<bool>(isSearchSelected),
-                size: 22,
-                color: isSearchSelected ? activeAccentColor : inactiveIconColor,
+    // Exact pattern from flutter_liquid_glass-main example _ExtraButton (bottom_bar.dart):
+    // LiquidGlassBlendGroup → LiquidGlass.grouped(shape: LiquidOval()) → GlassGlow → content
+    // The parent LiquidGlassLayer in _GlassFooterOverlay provides the rendering surface.
+    return GestureDetector(
+      onTap: () {
+        _removeChipOverlay();
+        HapticFeedback.lightImpact();
+        widget.navigationShell.goBranch(2);
+      },
+      onLongPress: () => _showGlassChip(context),
+      behavior: HitTestBehavior.opaque,
+      child: lgr.LiquidGlassBlendGroup(
+        blend: 10,
+        child: lgr.LiquidGlass.grouped(
+          shape: const lgr.LiquidOval(),
+          child: lgr.GlassGlow(
+            child: SizedBox(
+              width: _kSearchCircleW,
+              height: _kNavBarH,
+              child: Center(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) => ScaleTransition(
+                    scale: animation,
+                    child: FadeTransition(opacity: animation, child: child),
+                  ),
+                  child: Icon(
+                    MingCute.search_2_line,
+                    key: ValueKey<bool>(isSearchSelected),
+                    size: 22,
+                    color: isSearchSelected ? activeAccentColor : inactiveIconColor,
+                  ),
+                ),
               ),
             ),
           ),
