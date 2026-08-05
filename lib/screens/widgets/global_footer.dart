@@ -893,37 +893,37 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
       orElse: () => capsuleItems[0],
     );
 
-    // ── 1:1 reference: LiquidGlass inside parent LiquidGlassLayer ────────────
-    // Matches liquid_glass_demo dashboard_page.dart search pill (lines 356-398):
-    //   blur:4, ambientStrength:2, lightAngle:0.4π, glassColor:black12, thickness:30
-    //
-    // In the reference, this uses plain LiquidGlass() which automatically uses
-    // the parent LiquidGlassLayer as its compositor. In the local package, this
-    // is achieved with LiquidGlass.withOwnLayer for the search pill settings,
-    // layered ON TOP of the parent layer's settings via LiquidGlassBlendGroup.
-    //
-    // The outer shape uses the parent layer (blur:3, white12) for the glass
-    // surface, while the inner active-tab highlight uses withOwnLayer for its
-    // own darker glass — matching the reference's nested LiquidGlass pattern.
+    // ── Exact match to search circle styling ──────────────────────────────────
+    // Uses same LiquidGlass pattern as _SearchCircleButton:
+    //   LiquidRoundedSuperellipse(borderRadius: 40)
+    //   glassContainsChild: false
+    //   Hero tag for smooth transitions
+    //   Simple clean structure matching search circle
     return AnimatedContainer(
       duration: _kCollapseAnimDuration,
       curve: _kCollapseAnimCurve,
       width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
       height: _kNavBarH,
-      child: lgr.LiquidGlass(
-        shape: const lgr.LiquidRoundedSuperellipse(
-          borderRadius: 40,
-        ),
-        glassContainsChild: false,
-        child: _NavCapsuleContent(
-          isMiniMode: widget.isMiniMode,
-          currentIndex: currentIndex,
-          capsuleItems: capsuleItems,
-          activeItem: activeItem,
-          activeAccentColor: activeAccentColor,
-          inactiveIconColor: inactiveIconColor,
-          navigationShell: widget.navigationShell,
-          onTapCollapsed: widget.onTapCollapsed,
+      child: Hero(
+        tag: 'nav_capsule',
+        child: Material(
+          type: MaterialType.transparency,
+          child: lgr.LiquidGlass(
+            shape: const lgr.LiquidRoundedSuperellipse(
+              borderRadius: 40,
+            ),
+            glassContainsChild: false,
+            child: _NavCapsuleContent(
+              isMiniMode: widget.isMiniMode,
+              currentIndex: currentIndex,
+              capsuleItems: capsuleItems,
+              activeItem: activeItem,
+              activeAccentColor: activeAccentColor,
+              inactiveIconColor: inactiveIconColor,
+              navigationShell: widget.navigationShell,
+              onTapCollapsed: widget.onTapCollapsed,
+            ),
+          ),
         ),
       ),
     );
