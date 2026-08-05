@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
+import 'package:flutter/rendering.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart' as lgr;
 
@@ -61,6 +62,11 @@ class _GlobalFooterState extends State<GlobalFooter>
 
   /// Debounce timer — prevents rapid scroll direction changes from jittering.
   Timer? _debounceTimer;
+
+  /// Set true by [UserScrollNotification]; false when scroll goes idle.
+  /// Filters out programmatic animateTo() calls (billboard, carousel, etc.)
+  /// so only genuine user gestures trigger the footer collapse.
+  bool _userScrollActive = false;
 
   /// Single animation controller driving the entire collapse morph.
   /// All child measurements derive from [_collapseAnimation.value] inside
@@ -120,9 +126,79 @@ class _GlobalFooterState extends State<GlobalFooter>
     _collapseController.reverse();
   }
 
+  /// Intercepts [ScrollNotification]s that bubble up from any tab's scrollable.
+  /// Returns false so notifications continue to propagate upward.
+  ///
+  /// Three-layer filter to only react to genuine user vertical scrolls:
+  ///   1. **Axis filter** — ignores horizontal carousels / PageViews.
+  ///   2. **[UserScrollNotification] gate** — this notification type is NEVER
+  ///      fired by programmatic [ScrollController.animateTo] calls, so billboard
+  ///      auto-scroll, carousel timers, and any other code-driven scroll is
+  ///      completely transparent to the footer collapse logic.
+  ///   3. **100 ms debounce** — only commits the new state after the scroll
+  ///      direction has been stable for 100 ms, eliminating jitter on rapid
+  ///      direction reversals without waiting for a full animation cycle.
+  ///
+  ///   Pixel hysteresis (collapse > 50 px, expand < 25 px) is preserved on
+  ///   top of all three filters to prevent oscillation near the threshold.
+  double _scrollDeltaAccum = 0.0;
+  // ── Sweet-spot thresholds ────────────────────────────────────────────────
+  // Collapse: 20 px of intentional downward scroll triggers shrink.
+  // Expand  : 25 px of upward scroll anywhere on page triggers grow-back.
+  // Expand is fractionally longer than shrink as requested.
+  static const double _kCollapseDeltaThreshold = 20.0;
+  static const double _kExpandDeltaThreshold = 25.0;
+
   bool _onScrollNotification(ScrollNotification notification) {
-    // Keep footer navigation pill permanently fixed in position at the bottom of the screen.
-    // Ignores scroll notifications so the footer pill never moves up/down or collapses.
+    final metrics = notification.metrics;
+
+    if (metrics.axis != Axis.vertical) return false;
+
+    if (notification is UserScrollNotification) {
+      _userScrollActive = notification.direction != ScrollDirection.idle;
+      if (!_userScrollActive) {
+        _scrollDeltaAccum = 0.0;
+      }
+      return false;
+    }
+
+    if (notification is! ScrollUpdateNotification) return false;
+    if (!_userScrollActive) return false;
+
+    final double delta = notification.scrollDelta ?? 0.0;
+    if (delta == 0.0) return false;
+
+    // Reset accumulated delta if scroll direction reverses
+    if ((delta > 0 && _scrollDeltaAccum < 0) ||
+        (delta < 0 && _scrollDeltaAccum > 0)) {
+      _scrollDeltaAccum = 0.0;
+    }
+
+    _scrollDeltaAccum += delta;
+
+    bool? targetMini;
+    if (!_isMiniMode && _scrollDeltaAccum > _kCollapseDeltaThreshold) {
+      targetMini = true;
+    } else if (_isMiniMode && _scrollDeltaAccum < -_kExpandDeltaThreshold) {
+      targetMini = false;
+    }
+
+    if (targetMini == null || targetMini == _isMiniMode) {
+      return false;
+    }
+
+    final bool shouldCollapse = targetMini;
+    _scrollDeltaAccum = 0.0;
+    _debounceTimer?.cancel();
+    if (mounted) {
+      setState(() => _isMiniMode = shouldCollapse);
+      if (shouldCollapse) {
+        _collapseController.forward();
+      } else {
+        _collapseController.reverse();
+      }
+    }
+
     return false;
   }
 
@@ -822,79 +898,57 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
       orElse: () => capsuleItems[0],
     );
 
-    // ── Enhanced liquid glass nav capsule with Muzo-like effects ─────────────
-    // Uses liquid_glass_renderer for true refraction, distortion, and light effects
-    return SizedBox(
+    // ── Liquid glass nav capsule — fixed position, no layout-shifting animations ──
+    // The AnimationController is kept for future use / GlassChip bounce but we
+    // deliberately do NOT apply a Matrix4 transform to the outer container so
+    // that the pill never shifts vertically in idle.
+    return AnimatedContainer(
+      duration: _kCollapseAnimDuration,
+      curve: _kCollapseAnimCurve,
+      width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
       height: _kNavBarH,
-      child: AnimatedBuilder(
-        animation: _liquidController,
-        builder: (_, child) {
-          final t = _liquidController.value;
-          
-          return AnimatedContainer(
-            duration: _kCollapseAnimDuration,
-            curve: _kCollapseAnimCurve,
-            width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
-            height: _kNavBarH,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.10),
-                  blurRadius: 24,
-                  spreadRadius: -4,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: lgr.LiquidGlassBlendGroup(
-              blend: 10,
-              child: lgr.LiquidGlass.grouped(
-                shape: const lgr.LiquidRoundedSuperellipse(borderRadius: 28),
-                child: AnimatedBuilder(
-                  animation: _liquidController,
-                  builder: (_, child) {
-                    // Subtle liquid distortion animation
-                    final distortion = Matrix4.identity()
-                      ..setEntry(0, 1, 0.008 * math.sin(t * math.pi * 2))
-                      ..setEntry(1, 0, 0.008 * math.cos(t * math.pi * 2));
-                    
-                    return Transform(
-                      transform: distortion,
-                      child: child,
-                    );
-                  },
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(28),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.30),
-                            width: 0.75,
-                          ),
-                        ),
-                        child: _NavCapsuleContent(
-                          isMiniMode: widget.isMiniMode,
-                          currentIndex: currentIndex,
-                          capsuleItems: capsuleItems,
-                          activeItem: activeItem,
-                          activeAccentColor: activeAccentColor,
-                          inactiveIconColor: inactiveIconColor,
-                          navigationShell: widget.navigationShell,
-                          onTapCollapsed: widget.onTapCollapsed,
-                        ),
-                      ),
-                    ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.10),
+            blurRadius: 24,
+            spreadRadius: -4,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: lgr.LiquidGlassBlendGroup(
+        blend: 10,
+        child: lgr.LiquidGlass.grouped(
+          shape: const lgr.LiquidRoundedSuperellipse(borderRadius: 28),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.30),
+                    width: 0.75,
                   ),
+                ),
+                child: _NavCapsuleContent(
+                  isMiniMode: widget.isMiniMode,
+                  currentIndex: currentIndex,
+                  capsuleItems: capsuleItems,
+                  activeItem: activeItem,
+                  activeAccentColor: activeAccentColor,
+                  inactiveIconColor: inactiveIconColor,
+                  navigationShell: widget.navigationShell,
+                  onTapCollapsed: widget.onTapCollapsed,
                 ),
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
@@ -1146,7 +1200,8 @@ class _SearchCircleButton extends StatefulWidget {
 }
 
 class _SearchCircleButtonState extends State<_SearchCircleButton>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
+  late final AnimationController _liquidController;
   late final AnimationController _bounceController;
   late final Animation<double> _bounceAnimation;
 
@@ -1156,6 +1211,11 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
   @override
   void initState() {
     super.initState();
+    _liquidController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -1172,6 +1232,7 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
   void dispose() {
     _chipDismissTimer?.cancel();
     _removeChipOverlay();
+    _liquidController.dispose();
     _bounceController.dispose();
     super.dispose();
   }
@@ -1255,20 +1316,9 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
         ? Colors.white.withValues(alpha: 0.85)
         : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
 
-    return Container(
+    return SizedBox(
       width: _kSearchCircleW,
       height: _kNavBarH,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.10),
-            blurRadius: 24,
-            spreadRadius: -4,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
       child: GestureDetector(
         onTap: () {
           _removeChipOverlay();
@@ -1277,50 +1327,33 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
         },
         onLongPress: () => _showGlassChip(context),
         behavior: HitTestBehavior.opaque,
-        child: ShaderMask(
-          shaderCallback: (bounds) {
-            return LinearGradient(
-              colors: [
-                Colors.white.withValues(alpha: 0.22),
-                Colors.transparent,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ).createShader(bounds);
-          },
-          blendMode: BlendMode.srcATop,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(29),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: (isDark ? Colors.black : Colors.white)
-                      .withValues(alpha: isDark ? 0.20 : 0.35),
-                  border: Border.all(
-                    color: Colors.white
-                        .withValues(alpha: isDark ? 0.15 : 0.25),
-                    width: 0.75,
-                  ),
-                ),
-                child: Center(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    transitionBuilder: (child, animation) {
-                      return ScaleTransition(
-                        scale: animation,
-                        child: FadeTransition(opacity: animation, child: child),
-                      );
-                    },
-                    child: Icon(
-                      MingCute.search_2_line,
-                      key: ValueKey<bool>(isSearchSelected),
-                      size: 22,
-                      color: isSearchSelected ? activeAccentColor : inactiveIconColor,
-                    ),
-                  ),
-                ),
+        // Profile-circle style from liquid_glass_demo — LiquidGlass.withOwnLayer
+        // so we can supply settings, glassContainsChild: false frames the icon
+        // without distorting the layout.  No Matrix4 transform → zero idle movement.
+        child: lgr.LiquidGlass.withOwnLayer(
+          settings: lgr.LiquidGlassSettings(
+            blur: 3,
+            ambientStrength: isDark ? 0.3 : 0.5,
+            lightAngle: -0.2 * math.pi,
+            glassColor: isDark ? Colors.white12 : Colors.white24,
+          ),
+          shape: const lgr.LiquidRoundedSuperellipse(
+            borderRadius: 40.0,
+          ),
+          glassContainsChild: false,
+          child: Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) => ScaleTransition(
+                scale: animation,
+                child: FadeTransition(opacity: animation, child: child),
+              ),
+              child: Icon(
+                MingCute.search_2_line,
+                key: ValueKey<bool>(isSearchSelected),
+                size: 22,
+                color: isSearchSelected ? activeAccentColor : inactiveIconColor,
               ),
             ),
           ),
