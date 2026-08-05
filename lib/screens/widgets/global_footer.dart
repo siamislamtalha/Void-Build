@@ -734,69 +734,64 @@ class _GlassFooterOverlay extends StatelessWidget {
         final double leftCapsuleFullW =
             screenW - _kFooterHPad * 2 - _kPillGap - _kSearchCircleW;
 
-        // Enhanced with liquid glass layer for Muzo-like effects
-        return lgr.LiquidGlassLayer(
-          settings: lgr.LiquidGlassSettings(
-            refractiveIndex: 1.21,
-            thickness: 30,
-            blur: 8,
-            saturation: 1.5,
-            lightIntensity: isDark ? .7 : 1,
-            ambientStrength: isDark ? .2 : .5,
-            lightAngle: math.pi / 4,
-            glassColor: isDark
-                ? Colors.black.withValues(alpha: 0.35)
-                : Colors.black.withValues(alpha: 0.45),
-          ),
-          child: SizedBox(
-            height: sizedBoxH,
+        // ── Reference-exact: LiquidGlassLayer wraps the entire nav area ─────
+        // Matches liquid_glass_demo dashboard_page.dart lines 405-525:
+        //   LiquidGlassLayer(blur:3, ambientStrength:0.5, lightAngle:0.2π, white12)
+        //   └─ LiquidGlass.inLayer(shape:radius40) ← nav capsule (uses layer settings)
+        //   └─ LiquidGlass.inLayer(shape:radius40) ← search circle (uses layer settings)
+        // In the local package, LiquidGlass.inLayer = plain LiquidGlass() inside a
+        // parent LiquidGlassLayer. The shared layer compositor is what creates the
+        // authentic light-bending / raised-corner glass illusion.
+        return SizedBox(
+          height: sizedBoxH,
+          child: lgr.LiquidGlassLayer(
+            settings: const lgr.LiquidGlassSettings(
+              blur: 3,
+              ambientStrength: 0.5,
+              lightAngle: 0.2 * math.pi,
+              glassColor: Colors.white12,
+            ),
             child: Stack(
               // Clip.none lets the AnimatedPositioned animate out of the SizedBox
               // bounds without visual clipping during the transition.
               clipBehavior: Clip.none,
               children: [
-                // ── Left nav capsule ────────────────────────────────────────
+                // ── Left nav capsule ──────────────────────────────────────
                 // Left-edge is anchored at _kFooterHPad.
                 // Width shrinks from fullWidth → _kSearchCircleW (right side moves in).
-                // RepaintBoundary freezes the BackdropFilter blur texture so the
-                // compositor does not re-sample it on every AnimatedContainer frame.
+                // Uses plain LiquidGlass() — shares the parent LiquidGlassLayer,
+                // matching reference LiquidGlass.inLayer pattern exactly.
                 Positioned(
                   left: _kFooterHPad,
                   bottom: navBottomAbs,
                   height: _kNavBarH,
-                  child: RepaintBoundary(
-                    child: _CollapsibleNavCapsule(
-                      isMiniMode: isCollapsed,
-                      navigationShell: navigationShell,
-                      fullWidth: leftCapsuleFullW,
-                      onTapCollapsed: () {
-                        HapticFeedback.selectionClick();
-                        onExpandFooter?.call();
-                      },
-                    ),
+                  child: _CollapsibleNavCapsule(
+                    isMiniMode: isCollapsed,
+                    navigationShell: navigationShell,
+                    fullWidth: leftCapsuleFullW,
+                    onTapCollapsed: () {
+                      HapticFeedback.selectionClick();
+                      onExpandFooter?.call();
+                    },
                   ),
                 ),
 
-                // ── Search circle ────────────────────────────────────────────
+                // ── Search circle ──────────────────────────────────────────
                 // Right-edge is anchored at _kFooterHPad. Never moves.
-                // RepaintBoundary caches the blur so it never re-samples.
+                // Uses plain LiquidGlass() — shares the parent LiquidGlassLayer,
+                // matching reference LiquidGlass.inLayer profile button exactly.
                 Positioned(
                   right: _kFooterHPad,
                   bottom: navBottomAbs,
                   width: _kSearchCircleW,
                   height: _kNavBarH,
-                  child: RepaintBoundary(
-                    child: _SearchCircleButton(navigationShell: navigationShell),
-                  ),
+                  child: _SearchCircleButton(navigationShell: navigationShell),
                 ),
 
-                // ── Mini player ──────────────────────────────────────────────
+                // ── Mini player ────────────────────────────────────────────
                 // AnimatedPositioned smoothly moves between its two positions:
                 //   • Normal: full-width pill floating above the nav bar.
                 //   • Collapsed: narrow pill inline with the two nav circles.
-                // RepaintBoundary wraps the entire mini player so its inner
-                // BackdropFilter blur is compositor-cached and never re-sampled
-                // while AnimatedPositioned is changing position/size each frame.
                 if (hasMiniPlayer)
                   AnimatedPositioned(
                     duration: _kCollapseAnimDuration,
@@ -898,56 +893,37 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
       orElse: () => capsuleItems[0],
     );
 
-    // ── Liquid glass nav capsule — fixed position, no layout-shifting animations ──
-    // The AnimationController is kept for future use / GlassChip bounce but we
-    // deliberately do NOT apply a Matrix4 transform to the outer container so
-    // that the pill never shifts vertically in idle.
+    // ── 1:1 reference: LiquidGlass inside parent LiquidGlassLayer ────────────
+    // Matches liquid_glass_demo dashboard_page.dart search pill (lines 356-398):
+    //   blur:4, ambientStrength:2, lightAngle:0.4π, glassColor:black12, thickness:30
+    //
+    // In the reference, this uses plain LiquidGlass() which automatically uses
+    // the parent LiquidGlassLayer as its compositor. In the local package, this
+    // is achieved with LiquidGlass.withOwnLayer for the search pill settings,
+    // layered ON TOP of the parent layer's settings via LiquidGlassBlendGroup.
+    //
+    // The outer shape uses the parent layer (blur:3, white12) for the glass
+    // surface, while the inner active-tab highlight uses withOwnLayer for its
+    // own darker glass — matching the reference's nested LiquidGlass pattern.
     return AnimatedContainer(
       duration: _kCollapseAnimDuration,
       curve: _kCollapseAnimCurve,
       width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
       height: _kNavBarH,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.10),
-            blurRadius: 24,
-            spreadRadius: -4,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: lgr.LiquidGlassBlendGroup(
-        blend: 10,
-        child: lgr.LiquidGlass.grouped(
-          shape: const lgr.LiquidRoundedSuperellipse(borderRadius: 28),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: isDark ? 0.18 : 0.30),
-                    width: 0.75,
-                  ),
-                ),
-                child: _NavCapsuleContent(
-                  isMiniMode: widget.isMiniMode,
-                  currentIndex: currentIndex,
-                  capsuleItems: capsuleItems,
-                  activeItem: activeItem,
-                  activeAccentColor: activeAccentColor,
-                  inactiveIconColor: inactiveIconColor,
-                  navigationShell: widget.navigationShell,
-                  onTapCollapsed: widget.onTapCollapsed,
-                ),
-              ),
-            ),
-          ),
+      child: lgr.LiquidGlass(
+        shape: const lgr.LiquidRoundedSuperellipse(
+          borderRadius: 40,
+        ),
+        glassContainsChild: false,
+        child: _NavCapsuleContent(
+          isMiniMode: widget.isMiniMode,
+          currentIndex: currentIndex,
+          capsuleItems: capsuleItems,
+          activeItem: activeItem,
+          activeAccentColor: activeAccentColor,
+          inactiveIconColor: inactiveIconColor,
+          navigationShell: widget.navigationShell,
+          onTapCollapsed: widget.onTapCollapsed,
         ),
       ),
     );
@@ -1316,7 +1292,18 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
         ? Colors.white.withValues(alpha: 0.85)
         : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
 
-    // Using LiquidGlass.auto pattern from liquid_glass_demo profile circle
+    // 1:1 reference: profile circle from liquid_glass_demo dashboard_page.dart
+    // lines 502-521 (LiquidGlass.inLayer for the profile button).
+    //
+    // Reference uses LiquidGlass.inLayer inside a LiquidGlassLayer — the shape
+    // inherits the layer's settings (blur:3, white12, ambientStrength:0.5).
+    // In the local package, LiquidGlass.inLayer = plain LiquidGlass() inside a
+    // parent LiquidGlassLayer (which is provided by _GlassFooterOverlay above).
+    //
+    // lightAngle: -0.2π matches the reference notification button (right-side icon)
+    // which is the closest analog to our right-side search circle.
+    // This negative angle creates the raised-corner from the upper-right,
+    // producing the light-bending distortion illusion shown in the reference icon.
     return GestureDetector(
       onTap: () {
         _removeChipOverlay();
@@ -1325,28 +1312,31 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
       },
       onLongPress: () => _showGlassChip(context),
       behavior: HitTestBehavior.opaque,
-      child: Material(
-        type: MaterialType.transparency,
-        child: lgr.LiquidGlass.auto(
-          shape: const lgr.LiquidRoundedSuperellipse(
-            borderRadius: 40,
-          ),
-          glassContainsChild: false,
-          child: SizedBox(
-            width: _kSearchCircleW,
-            height: _kNavBarH,
-            child: Center(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (child, animation) => ScaleTransition(
-                  scale: animation,
-                  child: FadeTransition(opacity: animation, child: child),
-                ),
-                child: Icon(
-                  MingCute.search_2_line,
-                  key: ValueKey<bool>(isSearchSelected),
-                  size: 22,
-                  color: isSearchSelected ? activeAccentColor : inactiveIconColor,
+      child: Hero(
+        tag: 'profile_button',
+        child: Material(
+          type: MaterialType.transparency,
+          child: lgr.LiquidGlass(
+            shape: const lgr.LiquidRoundedSuperellipse(
+              borderRadius: 40,
+            ),
+            glassContainsChild: false,
+            child: SizedBox(
+              width: _kSearchCircleW,
+              height: _kNavBarH,
+              child: Center(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) => ScaleTransition(
+                    scale: animation,
+                    child: FadeTransition(opacity: animation, child: child),
+                  ),
+                  child: Icon(
+                    MingCute.search_2_line,
+                    key: ValueKey<bool>(isSearchSelected),
+                    size: 22,
+                    color: isSearchSelected ? activeAccentColor : inactiveIconColor,
+                  ),
                 ),
               ),
             ),
@@ -1561,54 +1551,39 @@ class HorizontalNavBar extends StatelessWidget {
       children: [
         // ── Main Left Nav Capsule (Home, Library, Local, Offline) ──
         Expanded(
-          child: ShaderMask(
-            shaderCallback: (bounds) {
-              return LinearGradient(
-                colors: [
-                  Colors.white.withValues(alpha: 0.2),
-                  Colors.transparent,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(bounds);
-            },
-            blendMode: BlendMode.srcATop,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                child: Container(
-                  height: 58,
-                  decoration: BoxDecoration(
-                    color: (isDark ? Colors.white : Colors.white)
-                        .withValues(alpha: isDark ? 0.10 : 0.18),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
-                      width: 0.75,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: capsuleItems.map((item) {
-                        final isSelected = currentIndex == item.branchIndex;
-                        return _NavItemButton(
-                          item: item,
-                          isSelected: isSelected,
-                          activeColor: activeAccentColor,
-                          inactiveColor: inactiveIconColor,
-                          selectedPillColor: selectedPillColor,
-                          selectedPillBorder: selectedPillBorder,
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            navigationShell.goBranch(item.branchIndex);
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
+          child: lgr.LiquidGlass.withOwnLayer(
+            settings: const lgr.LiquidGlassSettings(
+              blur: 4,
+              ambientStrength: 2,
+              lightAngle: 0.4 * math.pi,
+              glassColor: Colors.black12,
+              thickness: 30,
+            ),
+            shape: const lgr.LiquidRoundedSuperellipse(
+              borderRadius: 40,
+            ),
+            glassContainsChild: false,
+            child: SizedBox(
+              height: 58,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: capsuleItems.map((item) {
+                    final isSelected = currentIndex == item.branchIndex;
+                    return _NavItemButton(
+                      item: item,
+                      isSelected: isSelected,
+                      activeColor: activeAccentColor,
+                      inactiveColor: inactiveIconColor,
+                      selectedPillColor: selectedPillColor,
+                      selectedPillBorder: selectedPillBorder,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        navigationShell.goBranch(item.branchIndex);
+                      },
+                    );
+                  }).toList(),
                 ),
               ),
             ),
@@ -1617,7 +1592,7 @@ class HorizontalNavBar extends StatelessWidget {
         const SizedBox(width: 10),
 
         // ── Separate Right Floating Circle Button (Branch 2) ──
-        // Profile-circle code from liquid_glass_demo dashboard_page.dart
+        // Exact profile-circle structure from liquid_glass_demo dashboard_page.dart:
         GestureDetector(
           onTap: () {
             HapticFeedback.selectionClick();
@@ -1628,7 +1603,7 @@ class HorizontalNavBar extends StatelessWidget {
             tag: 'profile_button',
             child: Material(
               type: MaterialType.transparency,
-              child: lgr.LiquidGlass.auto(
+              child: lgr.LiquidGlass.withOwnLayer(
                 settings: const lgr.LiquidGlassSettings(
                   blur: 3,
                   ambientStrength: 0.5,
