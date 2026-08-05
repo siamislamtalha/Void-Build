@@ -632,16 +632,16 @@ class _GlassFooterOverlay extends StatelessWidget {
               child: RepaintBoundary(
                 child: lgr.LiquidGlassLayer(
                   settings: lgr.LiquidGlassSettings(
-                    refractiveIndex: 1.21,
-                    thickness: 30,
-                    blur: 8,
-                    saturation: 1.5,
-                    lightIntensity: isDark ? .7 : 1,
-                    ambientStrength: isDark ? .2 : .5,
+                    refractiveIndex: 1.28,
+                    thickness: 35,
+                    blur: 10,
+                    saturation: 1.6,
+                    lightIntensity: isDark ? 0.8 : 1.2,
+                    ambientStrength: isDark ? 0.3 : 0.6,
                     lightAngle: math.pi / 4,
                     glassColor: isDark
-                        ? Colors.black.withValues(alpha: 0.35)
-                        : Colors.black.withValues(alpha: 0.45),
+                        ? Colors.black.withValues(alpha: 0.40)
+                        : Colors.black.withValues(alpha: 0.50),
                   ),
                   child: lgr.LiquidGlassBlendGroup(
                     blend: 10,
@@ -730,16 +730,11 @@ class _GlassFooterOverlay extends StatelessWidget {
             _kNavBarH +
             (hasMiniPlayer ? _kMiniPlayerGap + _kMiniPlayerHeight : 0.0);
 
-        // Full width of the left nav capsule (expanded state).
-        final double screenW = MediaQuery.of(context).size.width;
-        final double leftCapsuleFullW =
-            screenW - _kFooterHPad * 2 - _kPillGap - _kSearchCircleW;
+
 
         // ── Reference-exact: LiquidGlassLayer & NativeGlassNavBar Integration ──
-        // On iOS 18+, NativeGlassNavBar provides native iOS Liquid TabBar with
-        // floating tab pill and action button circle.
-        // On fallback (Android/Desktop/Web/older iOS), it renders our custom
-        // LiquidGlassLayer stack with sliding liquid glass selector pill.
+        // Enhanced liquid glass settings to match native_glass_navbar reference
+        // with proper liquid glass refraction, distortion, and raised effect
         final activeAccentColor = AppTheme.accentColor(context);
         final l10n = AppLocalizations.of(context)!;
 
@@ -751,59 +746,121 @@ class _GlassFooterOverlay extends StatelessWidget {
 
         final customFallbackNav = SizedBox(
           height: sizedBoxH,
-          child: lgr.LiquidGlassLayer(
-            settings: const lgr.LiquidGlassSettings(
-              blur: 3,
-              ambientStrength: 0.5,
-              lightAngle: 0.2 * math.pi,
-              glassColor: Colors.white12,
-            ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // ── Left nav capsule ──────────────────────────────────────
-                Positioned(
-                  left: _kFooterHPad,
-                  bottom: navBottomAbs,
-                  height: _kNavBarH,
-                  child: _CollapsibleNavCapsule(
-                    isMiniMode: isCollapsed,
-                    navigationShell: navigationShell,
-                    fullWidth: leftCapsuleFullW,
-                    onTapCollapsed: () {
-                      HapticFeedback.selectionClick();
-                      onExpandFooter?.call();
-                    },
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // ── Liquid Glass Footer - Reference Exact Settings ─────────────
+              Positioned(
+                left: _kFooterHPad,
+                right: _kFooterHPad,
+                bottom: navBottomAbs,
+                height: _kNavBarH,
+                child: lgr.LiquidGlassLayer(
+                  settings: lgr.LiquidGlassSettings(
+                    // Enhanced refraction for liquid glass effect
+                    refractiveIndex: 1.52,
+                    thickness: 40,
+                    blur: 12,
+                    saturation: 1.8,
+                    // Dynamic lighting for raised liquid effect
+                    lightIntensity: isDark ? 0.9 : 1.3,
+                    ambientStrength: isDark ? 0.4 : 0.7,
+                    lightAngle: math.pi / 3.5,
+                    // Glass color matching reference
+                    glassColor: isDark
+                        ? Colors.black.withValues(alpha: 0.35)
+                        : Colors.white.withValues(alpha: 0.45),
                   ),
-                ),
-
-                // ── Search circle ──────────────────────────────────────────
-                Positioned(
-                  right: _kFooterHPad,
-                  bottom: navBottomAbs,
-                  width: _kSearchCircleW,
-                  height: _kNavBarH,
-                  child: _SearchCircleButton(navigationShell: navigationShell),
-                ),
-
-                // ── Mini player ────────────────────────────────────────────
-                if (hasMiniPlayer)
-                  AnimatedPositioned(
-                    duration: _kCollapseAnimDuration,
-                    curve: _kCollapseAnimCurve,
-                    left: miniLeft,
-                    right: miniRight,
-                    bottom: miniBottom,
-                    height: miniHeight,
-                    child: RepaintBoundary(
-                      child: MiniPlayerWidget(
-                        currentPageIndex: navigationShell.currentIndex,
-                        isCompact: isCollapsed,
-                      ),
+                  child: lgr.LiquidGlassBlendGroup(
+                    blend: 15,
+                    child: Row(
+                      children: [
+                        // ── Main Long Pill (Navigation Items) ─────────────────────
+                        AnimatedContainer(
+                          duration: _kCollapseAnimDuration,
+                          curve: _kCollapseAnimCurve,
+                          width: isCollapsed ? _kSearchCircleW : double.infinity,
+                          child: Transform.translate(
+                            offset: Offset(0, isCollapsed ? -2 : 0), // Slight rise when collapsed
+                            child: lgr.LiquidGlass.grouped(
+                              clipBehavior: Clip.none,
+                              shape: const lgr.LiquidRoundedSuperellipse(borderRadius: 32),
+                              child: _LiquidGlassNavPillContent(
+                                navigationShell: navigationShell,
+                                isMiniMode: isCollapsed,
+                                onTapCollapsed: () {
+                                  HapticFeedback.selectionClick();
+                                  onExpandFooter?.call();
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        // ── Gap between pills with liquid merge effect ───────────────
+                        // Small point that merges and demerges with search circle (reference exact)
+                        AnimatedContainer(
+                          duration: _kCollapseAnimDuration,
+                          curve: _kCollapseAnimCurve,
+                          width: isCollapsed ? 0 : _kPillGap,
+                          child: AnimatedOpacity(
+                            duration: _kCollapseAnimDuration,
+                            curve: _kCollapseAnimCurve,
+                            opacity: isCollapsed ? 0.0 : 1.0,
+                            child: Center(
+                              child: Container(
+                                width: 4,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: (isDark ? Colors.white : Colors.black)
+                                      .withValues(alpha: isDark ? 0.25 : 0.15),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        // ── Search Circle Pill (Action Button) ─────────────────────
+                        AnimatedOpacity(
+                          duration: _kCollapseAnimDuration,
+                          curve: _kCollapseAnimCurve,
+                          opacity: isCollapsed ? 0.0 : 1.0,
+                          child: IgnorePointer(
+                            ignoring: isCollapsed,
+                            child: Transform.translate(
+                              offset: Offset(0, isCollapsed ? -2 : 0), // Slight rise when collapsed
+                              child: lgr.LiquidGlass.grouped(
+                                clipBehavior: Clip.none,
+                                shape: const lgr.LiquidRoundedSuperellipse(borderRadius: 32),
+                                child: _LiquidGlassSearchCircle(
+                                  navigationShell: navigationShell,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-              ],
-            ),
+                ),
+              ),
+
+              // ── Mini player ────────────────────────────────────────────
+              if (hasMiniPlayer)
+                AnimatedPositioned(
+                  duration: _kCollapseAnimDuration,
+                  curve: _kCollapseAnimCurve,
+                  left: miniLeft,
+                  right: miniRight,
+                  bottom: miniBottom,
+                  height: miniHeight,
+                  child: RepaintBoundary(
+                    child: MiniPlayerWidget(
+                      currentPageIndex: navigationShell.currentIndex,
+                      isCompact: isCollapsed,
+                    ),
+                  ),
+                ),
+            ],
           ),
         );
 
@@ -838,587 +895,8 @@ class _GlassFooterOverlay extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// COLLAPSIBLE NAV CAPSULE
+// OLD COLLAPSIBLE NAV CAPSULE (Removed - replaced with liquid glass implementation)
 // ─────────────────────────────────────────────────────────────────────────────
-
-/// The left navigation pill that collapses from full-width to a single-icon circle.
-///
-/// When [isMiniMode] is false the full nav row is shown.
-/// When [isMiniMode] is true the pill shrinks to [_kSearchCircleW].
-///
-/// Left edge is anchored by the parent [Positioned]; only the right edge (width)
-/// changes so the pill collapses inward from the right.
-class _CollapsibleNavCapsule extends StatefulWidget {
-  const _CollapsibleNavCapsule({
-    required this.isMiniMode,
-    required this.fullWidth,
-    required this.navigationShell,
-    this.onTapCollapsed,
-  });
-
-  final bool isMiniMode;
-  final double fullWidth;
-  final StatefulNavigationShell navigationShell;
-  final VoidCallback? onTapCollapsed;
-
-  @override
-  State<_CollapsibleNavCapsule> createState() => _CollapsibleNavCapsuleState();
-}
-
-class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _liquidController;
-
-  @override
-  void initState() {
-    super.initState();
-    // Liquid distortion animation — slow oscillating skew like the user's sample.
-    _liquidController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _liquidController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final currentIndex = widget.navigationShell.currentIndex;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final activeAccentColor = AppTheme.accentColor(context);
-    final inactiveIconColor = isDark
-        ? Colors.white.withValues(alpha: 0.70)
-        : const Color(0xFF1C1C1E).withValues(alpha: 0.70);
-
-    final capsuleItems = [
-      _NavItemData(
-          branchIndex: 0, icon: MingCute.home_4_fill, label: l10n.navHome),
-      _NavItemData(
-          branchIndex: 1, icon: MingCute.book_5_fill, label: l10n.navLibrary),
-      _NavItemData(
-          branchIndex: 3, icon: MingCute.music_2_fill, label: l10n.navLocal),
-      _NavItemData(
-          branchIndex: 4,
-          icon: MingCute.folder_download_fill,
-          label: l10n.navOffline),
-    ];
-
-    final activeItem = capsuleItems.firstWhere(
-      (item) => item.branchIndex == currentIndex,
-      orElse: () => capsuleItems[0],
-    );
-
-    // ── 1:1 reference: LiquidGlass inside parent LiquidGlassLayer ────────────
-    // Matches liquid_glass_demo dashboard_page.dart search pill (lines 356-398):
-    //   blur:4, ambientStrength:2, lightAngle:0.4π, glassColor:black12, thickness:30
-    //
-    // In the reference, this uses plain LiquidGlass() which automatically uses
-    // the parent LiquidGlassLayer as its compositor. In the local package, this
-    // is achieved with LiquidGlass.withOwnLayer for the search pill settings,
-    // layered ON TOP of the parent layer's settings via LiquidGlassBlendGroup.
-    //
-    // The outer shape uses the parent layer (blur:3, white12) for the glass
-    // surface, while the inner active-tab highlight uses withOwnLayer for its
-    // own darker glass — matching the reference's nested LiquidGlass pattern.
-    return AnimatedContainer(
-      duration: _kCollapseAnimDuration,
-      curve: _kCollapseAnimCurve,
-      width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
-      height: _kNavBarH,
-      child: lgr.LiquidGlass(
-        shape: const lgr.LiquidRoundedSuperellipse(
-          borderRadius: 40,
-        ),
-        glassContainsChild: false,
-        child: _NavCapsuleContent(
-          isMiniMode: widget.isMiniMode,
-          currentIndex: currentIndex,
-          capsuleItems: capsuleItems,
-          activeItem: activeItem,
-          activeAccentColor: activeAccentColor,
-          inactiveIconColor: inactiveIconColor,
-          navigationShell: widget.navigationShell,
-          onTapCollapsed: widget.onTapCollapsed,
-        ),
-      ),
-    );
-  }
-}
-
-// ── Nav capsule content (extracted so AdaptiveGlass child is pure) ───────────
-class _NavCapsuleContent extends StatelessWidget {
-  const _NavCapsuleContent({
-    required this.isMiniMode,
-    required this.currentIndex,
-    required this.capsuleItems,
-    required this.activeItem,
-    required this.activeAccentColor,
-    required this.inactiveIconColor,
-    required this.navigationShell,
-    this.onTapCollapsed,
-  });
-
-  final bool isMiniMode;
-  final int currentIndex;
-  final List<_NavItemData> capsuleItems;
-  final _NavItemData activeItem;
-  final Color activeAccentColor;
-  final Color inactiveIconColor;
-  final StatefulNavigationShell navigationShell;
-  final VoidCallback? onTapCollapsed;
-
-  @override
-  Widget build(BuildContext context) {
-    final activeIndex = capsuleItems.indexWhere((item) => item.branchIndex == currentIndex);
-    final isTabActive = activeIndex != -1;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Stack(
-      children: [
-        // ── Expanded nav content ────────────────────────────────────────────
-        AnimatedOpacity(
-          duration: const Duration(milliseconds: 280),
-          curve: Curves.easeInOutCubic,
-          opacity: isMiniMode ? 0.0 : 1.0,
-          child: IgnorePointer(
-            ignoring: isMiniMode,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final totalW = constraints.maxWidth;
-                final itemCount = capsuleItems.length;
-                final itemW = itemCount > 0 ? totalW / itemCount : 0.0;
-                final indicatorW = math.max(0.0, itemW - 8.0);
-                final indicatorLeft = isTabActive ? (activeIndex * itemW) + 4.0 : 4.0;
-
-                return Stack(
-                  children: [
-                    // ── Animated Liquid Glass Selection Indicator Pill ──────
-                    // Liquid glass component that raises a bit and slides smoothly between tabs
-                    if (isTabActive)
-                      AnimatedPositioned(
-                        duration: const Duration(milliseconds: 350),
-                        curve: Curves.easeOutBack,
-                        left: indicatorLeft,
-                        top: 4,
-                        width: indicatorW,
-                        height: _kNavBarH - 8,
-                        child: lgr.LiquidGlass.withOwnLayer(
-                          settings: lgr.LiquidGlassSettings(
-                            blur: 6,
-                            thickness: 28,
-                            ambientStrength: 1.6, // Elevated raised rim highlight
-                            lightAngle: 0.35 * math.pi,
-                            glassColor: isDark
-                                ? Colors.white.withValues(alpha: 0.18)
-                                : Colors.black.withValues(alpha: 0.08),
-                            refractiveIndex: 1.25,
-                            saturation: 1.35,
-                          ),
-                          shape: const lgr.LiquidRoundedSuperellipse(
-                            borderRadius: 22,
-                          ),
-                          glassContainsChild: false,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(22),
-                              border: Border.all(
-                                color: (isDark ? Colors.white : Colors.black)
-                                    .withValues(alpha: isDark ? 0.25 : 0.12),
-                                width: 0.75,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(
-                                    alpha: isDark ? 0.40 : 0.15,
-                                  ),
-                                  blurRadius: 12,
-                                  spreadRadius: -2,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-
-                    // ── Buttons Row ─────────────────────────────────────────
-                    Row(
-                      key: const ValueKey('nav_buttons_row'),
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: capsuleItems.map((item) {
-                        final isSelected = currentIndex == item.branchIndex;
-                        return Expanded(
-                          child: _NavItemButton(
-                            item: item,
-                            isSelected: isSelected,
-                            activeColor: activeAccentColor,
-                            inactiveColor: inactiveIconColor,
-                            selectedPillColor: Colors.transparent,
-                            selectedPillBorder: Colors.transparent,
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              navigationShell.goBranch(item.branchIndex);
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
-
-        // ── Collapsed single active icon ────────────────────────────────────
-        AnimatedOpacity(
-          duration: const Duration(milliseconds: 280),
-          curve: Curves.easeInOutCubic,
-          opacity: isMiniMode ? 1.0 : 0.0,
-          child: IgnorePointer(
-            ignoring: !isMiniMode,
-            child: _CollapsedActiveIcon(
-              activeItem: activeItem,
-              activeAccentColor: activeAccentColor,
-              onTap: () {
-                HapticFeedback.selectionClick();
-                onTapCollapsed?.call();
-                navigationShell.goBranch(currentIndex);
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _CollapsedActiveIcon extends StatefulWidget {
-  final _NavItemData activeItem;
-  final Color activeAccentColor;
-  final VoidCallback onTap;
-
-  const _CollapsedActiveIcon({
-    required this.activeItem,
-    required this.activeAccentColor,
-    required this.onTap,
-  });
-
-  @override
-  State<_CollapsedActiveIcon> createState() => _CollapsedActiveIconState();
-}
-
-class _CollapsedActiveIconState extends State<_CollapsedActiveIcon>
-    with SingleTickerProviderStateMixin {
-  OverlayEntry? _chipOverlay;
-  Timer? _chipDismissTimer;
-  late AnimationController _bounceController;
-  late Animation<double> _bounceAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _bounceController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _bounceAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _bounceController,
-        curve: Curves.elasticOut,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _chipDismissTimer?.cancel();
-    _removeChipOverlay();
-    _bounceController.dispose();
-    super.dispose();
-  }
-
-  void _removeChipOverlay() {
-    _chipOverlay?.remove();
-    _chipOverlay = null;
-  }
-
-  void _showGlassChip(BuildContext context) {
-    HapticFeedback.mediumImpact();
-    _removeChipOverlay();
-    _chipDismissTimer?.cancel();
-
-    final RenderBox? box = context.findRenderObject() as RenderBox?;
-    if (box == null) return;
-    final Offset globalPos = box.localToGlobal(Offset.zero);
-    final Size boxSize = box.size;
-
-    final double chipLeft = globalPos.dx + boxSize.width / 2 - 60;
-    final double chipBottom =
-        MediaQuery.of(context).size.height - globalPos.dy + 8;
-
-    _bounceController.forward(from: 0.0);
-
-    _chipOverlay = OverlayEntry(
-      builder: (overlayContext) => Positioned(
-        left: chipLeft.clamp(
-            8.0, MediaQuery.of(overlayContext).size.width - 128),
-        bottom: chipBottom,
-        child: AnimatedBuilder(
-          animation: _bounceAnimation,
-          builder: (_, child) => Transform.scale(
-            scale: _bounceAnimation.value,
-            alignment: Alignment.bottomCenter,
-            child: child,
-          ),
-          child: GlassChip(
-            label: widget.activeItem.label,
-            icon: Icon(widget.activeItem.icon, size: 16),
-            useOwnLayer: true,
-            quality: GlassQuality.standard,
-            interactionScale: 1.08,
-            stretch: 0.6,
-            glowRadius: 1.2,
-            anchorStretch: true,
-            settings: const LiquidGlassSettings(
-              blur: 3,
-              thickness: 28,
-              refractiveIndex: 1.45,
-              lightIntensity: 0.25,
-              saturation: 1.1,
-            ),
-            onTap: () {
-              _removeChipOverlay();
-              widget.onTap();
-            },
-          ),
-        ),
-      ),
-    );
-
-    Overlay.of(context).insert(_chipOverlay!);
-
-    _chipDismissTimer = Timer(const Duration(milliseconds: 2500), () {
-      if (mounted) {
-        _removeChipOverlay();
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        _removeChipOverlay();
-        widget.onTap();
-      },
-      onLongPress: () => _showGlassChip(context),
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox.expand(
-        child: Center(
-          child: Icon(
-            widget.activeItem.icon,
-            size: 24,
-            color: widget.activeAccentColor,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SEARCH CIRCLE BUTTON
-// ─────────────────────────────────────────────────────────────────────────────
-
-/// Standalone search circle pill — liquid glass translucent circle.
-/// Uses AdaptiveGlass with LiquidOval shape for the true circular glass effect.
-class _SearchCircleButton extends StatefulWidget {
-  const _SearchCircleButton({required this.navigationShell});
-
-  final StatefulNavigationShell navigationShell;
-
-  @override
-  State<_SearchCircleButton> createState() => _SearchCircleButtonState();
-}
-
-class _SearchCircleButtonState extends State<_SearchCircleButton>
-    with TickerProviderStateMixin {
-  late final AnimationController _liquidController;
-  late final AnimationController _bounceController;
-  late final Animation<double> _bounceAnimation;
-
-  OverlayEntry? _chipOverlay;
-  Timer? _chipDismissTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    _liquidController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-
-    _bounceController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _bounceAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _bounceController,
-        curve: Curves.elasticOut,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _chipDismissTimer?.cancel();
-    _removeChipOverlay();
-    _liquidController.dispose();
-    _bounceController.dispose();
-    super.dispose();
-  }
-
-  void _removeChipOverlay() {
-    _chipOverlay?.remove();
-    _chipOverlay = null;
-  }
-
-  void _showGlassChip(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    HapticFeedback.mediumImpact();
-    _removeChipOverlay();
-    _chipDismissTimer?.cancel();
-
-    final RenderBox? box = context.findRenderObject() as RenderBox?;
-    if (box == null) return;
-    final Offset globalPos = box.localToGlobal(Offset.zero);
-    final Size boxSize = box.size;
-
-    final double chipLeft = globalPos.dx + boxSize.width / 2 - 60;
-    final double chipBottom =
-        MediaQuery.of(context).size.height - globalPos.dy + 8;
-
-    _bounceController.forward(from: 0.0);
-
-    _chipOverlay = OverlayEntry(
-      builder: (overlayContext) => Positioned(
-        left: chipLeft.clamp(
-            8.0, MediaQuery.of(overlayContext).size.width - 128),
-        bottom: chipBottom,
-        child: AnimatedBuilder(
-          animation: _bounceAnimation,
-          builder: (_, child) => Transform.scale(
-            scale: _bounceAnimation.value,
-            alignment: Alignment.bottomCenter,
-            child: child,
-          ),
-          child: GlassChip(
-            label: l10n.navSearch,
-            icon: const Icon(MingCute.search_2_line, size: 16),
-            useOwnLayer: true,
-            quality: GlassQuality.standard,
-            interactionScale: 1.08,
-            stretch: 0.6,
-            glowRadius: 1.2,
-            anchorStretch: true,
-            settings: const LiquidGlassSettings(
-              blur: 3,
-              thickness: 28,
-              refractiveIndex: 1.45,
-              lightIntensity: 0.25,
-              saturation: 1.1,
-            ),
-            onTap: () {
-              _removeChipOverlay();
-              widget.navigationShell.goBranch(2);
-            },
-          ),
-        ),
-      ),
-    );
-
-    Overlay.of(context).insert(_chipOverlay!);
-
-    _chipDismissTimer = Timer(const Duration(milliseconds: 2500), () {
-      if (mounted) {
-        _removeChipOverlay();
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final currentIndex = widget.navigationShell.currentIndex;
-    final isSearchSelected = currentIndex == 2;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final activeAccentColor = AppTheme.accentColor(context);
-    final inactiveIconColor = isDark
-        ? Colors.white.withValues(alpha: 0.85)
-        : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
-
-    // 1:1 reference: profile circle from liquid_glass_demo dashboard_page.dart
-    // lines 502-521 (LiquidGlass.inLayer for the profile button).
-    //
-    // Reference uses LiquidGlass.inLayer inside a LiquidGlassLayer — the shape
-    // inherits the layer's settings (blur:3, white12, ambientStrength:0.5).
-    // In the local package, LiquidGlass.inLayer = plain LiquidGlass() inside a
-    // parent LiquidGlassLayer (which is provided by _GlassFooterOverlay above).
-    //
-    // lightAngle: -0.2π matches the reference notification button (right-side icon)
-    // which is the closest analog to our right-side search circle.
-    // This negative angle creates the raised-corner from the upper-right,
-    // producing the light-bending distortion illusion shown in the reference icon.
-    return GestureDetector(
-      onTap: () {
-        _removeChipOverlay();
-        HapticFeedback.lightImpact();
-        widget.navigationShell.goBranch(2);
-      },
-      onLongPress: () => _showGlassChip(context),
-      behavior: HitTestBehavior.opaque,
-      child: Hero(
-        tag: 'profile_button',
-        child: Material(
-          type: MaterialType.transparency,
-          child: lgr.LiquidGlass(
-            shape: const lgr.LiquidRoundedSuperellipse(
-              borderRadius: 40,
-            ),
-            glassContainsChild: false,
-            child: SizedBox(
-              width: _kSearchCircleW,
-              height: _kNavBarH,
-              child: Center(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) => ScaleTransition(
-                    scale: animation,
-                    child: FadeTransition(opacity: animation, child: child),
-                  ),
-                  child: Icon(
-                    MingCute.search_2_line,
-                    key: ValueKey<bool>(isSearchSelected),
-                    size: 22,
-                    color: isSearchSelected ? activeAccentColor : inactiveIconColor,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ANIMATED PAGE VIEW
@@ -1894,6 +1372,369 @@ class _NavItemButtonState extends State<_NavItemButton>
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LIQUID GLASS NAV PILL (Main Navigation)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _LiquidGlassNavPillContent extends StatefulWidget {
+  const _LiquidGlassNavPillContent({
+    required this.navigationShell,
+    required this.isMiniMode,
+    required this.onTapCollapsed,
+  });
+
+  final StatefulNavigationShell navigationShell;
+  final bool isMiniMode;
+  final VoidCallback? onTapCollapsed;
+
+  @override
+  State<_LiquidGlassNavPillContent> createState() => _LiquidGlassNavPillContentState();
+}
+
+class _LiquidGlassNavPillContentState extends State<_LiquidGlassNavPillContent> {
+  List<_NavItemData> get capsuleItems {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+        _NavItemData(
+            branchIndex: 0, icon: MingCute.home_4_fill, label: l10n.navHome),
+        _NavItemData(
+            branchIndex: 1, icon: MingCute.book_5_fill, label: l10n.navLibrary),
+        _NavItemData(
+            branchIndex: 3, icon: MingCute.music_2_fill, label: l10n.navLocal),
+        _NavItemData(
+            branchIndex: 4,
+            icon: MingCute.folder_download_fill,
+            label: l10n.navOffline),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentIndex = widget.navigationShell.currentIndex;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeAccentColor = AppTheme.accentColor(context);
+    final inactiveIconColor = isDark
+        ? Colors.white.withValues(alpha: 0.85)
+        : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
+
+    // Calculate which index is selected for the indicator
+    final activeIndex = capsuleItems.indexWhere((item) => item.branchIndex == currentIndex);
+    final isTabActive = activeIndex != -1;
+    final activeItem = capsuleItems.firstWhere(
+      (item) => item.branchIndex == currentIndex,
+      orElse: () => capsuleItems[0],
+    );
+
+    return AnimatedContainer(
+      duration: _kCollapseAnimDuration,
+      curve: _kCollapseAnimCurve,
+      width: widget.isMiniMode ? _kSearchCircleW : double.infinity,
+      height: _kNavBarH,
+      child: Stack(
+        children: [
+          // ── Expanded nav content ────────────────────────────────────────────
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeInOutCubic,
+            opacity: widget.isMiniMode ? 0.0 : 1.0,
+            child: IgnorePointer(
+              ignoring: widget.isMiniMode,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final totalW = constraints.maxWidth;
+                  final itemCount = capsuleItems.length;
+                  final itemW = itemCount > 0 ? totalW / itemCount : 0.0;
+                  final indicatorW = math.max(0.0, itemW - 8.0);
+                  final indicatorLeft = isTabActive ? (activeIndex * itemW) + 4.0 : 4.0;
+
+                  return Stack(
+                    children: [
+                      // ── Animated Liquid Glass Selection Indicator Pill ──────
+                      // Liquid glass component that raises a bit and slides smoothly between tabs
+                      // Reference exact: Icon selector transparent glass that behaves like liquid and raises a bit
+                      if (isTabActive)
+                        AnimatedPositioned(
+                          duration: const Duration(milliseconds: 350),
+                          curve: Curves.easeOutBack,
+                          left: indicatorLeft,
+                          top: 4,
+                          width: indicatorW,
+                          height: _kNavBarH - 8,
+                              child: lgr.LiquidGlass.withOwnLayer(
+                                settings: lgr.LiquidGlassSettings(
+                                  // Enhanced liquid glass settings for raised icon selector
+                                  refractiveIndex: 1.52,
+                                  thickness: 40,
+                                  blur: 12,
+                                  saturation: 1.8,
+                                  lightIntensity: isDark ? 0.9 : 1.3,
+                                  ambientStrength: isDark ? 0.4 : 0.7,
+                                  lightAngle: math.pi / 3.5,
+                                  glassColor: isDark
+                                      ? Colors.white.withValues(alpha: 0.25)
+                                      : Colors.black.withValues(alpha: 0.12),
+                                ),
+                                shape: const lgr.LiquidRoundedSuperellipse(
+                                  borderRadius: 22,
+                                ),
+                                glassContainsChild: false,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(22),
+                                    border: Border.all(
+                                      color: (isDark ? Colors.white : Colors.black)
+                                          .withValues(alpha: isDark ? 0.35 : 0.20),
+                                      width: 1.2,
+                                    ),
+                                    // Enhanced shadow for raised liquid glass effect
+                                    boxShadow: [
+                                      // Main shadow for depth
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: isDark ? 0.60 : 0.25,
+                                        ),
+                                        blurRadius: 20,
+                                        spreadRadius: -4,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                      // Inner glow for liquid effect
+                                      BoxShadow(
+                                        color: (isDark ? Colors.white : Colors.black)
+                                            .withValues(alpha: isDark ? 0.20 : 0.10),
+                                        blurRadius: 12,
+                                        spreadRadius: -3,
+                                        offset: const Offset(0, -3),
+                                      ),
+                                      // Ambient glow
+                                      BoxShadow(
+                                        color: activeAccentColor.withValues(alpha: 0.15),
+                                        blurRadius: 15,
+                                        spreadRadius: -2,
+                                        offset: Offset.zero,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                          ),
+                        ),
+
+                      // ── Buttons Row ─────────────────────────────────────────
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        height: _kNavBarH,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            for (var i = 0; i < capsuleItems.length; i++)
+                              Expanded(
+                                child: _LiquidGlassNavItem(
+                                  tab: capsuleItems[i],
+                                  selected: currentIndex == capsuleItems[i].branchIndex,
+                                  activeColor: activeAccentColor,
+                                  inactiveColor: inactiveIconColor,
+                                  onTap: () {
+                                    HapticFeedback.lightImpact();
+                                    widget.navigationShell.goBranch(capsuleItems[i].branchIndex);
+                                  },
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+
+          // ── Collapsed single active icon ────────────────────────────────────
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeInOutCubic,
+            opacity: widget.isMiniMode ? 1.0 : 0.0,
+            child: IgnorePointer(
+              ignoring: !widget.isMiniMode,
+              child: GestureDetector(
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  widget.onTapCollapsed?.call();
+                  widget.navigationShell.goBranch(currentIndex);
+                },
+                behavior: HitTestBehavior.opaque,
+                child: SizedBox.expand(
+                  child: Center(
+                    child: Icon(
+                      activeItem.icon,
+                      size: 24,
+                      color: activeAccentColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LiquidGlassNavItem extends StatelessWidget {
+  const _LiquidGlassNavItem({
+    required this.tab,
+    required this.selected,
+    required this.activeColor,
+    required this.inactiveColor,
+    required this.onTap,
+  });
+
+  final _NavItemData tab;
+  final bool selected;
+  final Color activeColor;
+  final Color inactiveColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Semantics(
+        button: true,
+        label: tab.label,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                transformAlignment: Alignment.center,
+                curve: Curves.easeOutCirc,
+                transform: selected
+                    ? Matrix4.identity()
+                    : (Matrix4.identity()
+                      // ignore: deprecated_member_use
+                        ..scale(0.9)),
+                child: Icon(
+                  tab.icon,
+                  size: 20,
+                  color: selected ? activeColor : inactiveColor,
+                ),
+              ),
+              const SizedBox(height: 2),
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                opacity: selected ? 1.0 : 0.6,
+                child: Text(
+                  tab.label,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: selected ? activeColor : inactiveColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LIQUID GLASS SEARCH CIRCLE (Action Button)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _LiquidGlassSearchCircle extends StatelessWidget {
+  const _LiquidGlassSearchCircle({
+    required this.navigationShell,
+  });
+
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final currentIndex = navigationShell.currentIndex;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isSearchSelected = currentIndex == 2;
+    final activeAccentColor = AppTheme.accentColor(context);
+
+    return lgr.LiquidGlass.grouped(
+      clipBehavior: Clip.none,
+      shape: const lgr.LiquidRoundedSuperellipse(borderRadius: 32),
+      child: lgr.LiquidGlassLayer(
+        settings: lgr.LiquidGlassSettings(
+          // Enhanced liquid glass settings for the search circle
+          refractiveIndex: 1.52,
+          thickness: 40,
+          blur: 12,
+          saturation: 1.8,
+          lightIntensity: isDark ? 0.9 : 1.3,
+          ambientStrength: isDark ? 0.4 : 0.7,
+          lightAngle: math.pi / 3.5,
+          glassColor: isDark
+              ? Colors.black.withValues(alpha: 0.35)
+              : Colors.white.withValues(alpha: 0.45),
+        ),
+        child: lgr.LiquidGlassBlendGroup(
+          blend: 15,
+          child: GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              navigationShell.goBranch(2);
+            },
+            behavior: HitTestBehavior.opaque,
+            child: Semantics(
+              button: true,
+              label: l10n.navSearch,
+              child: Container(
+                width: _kSearchCircleW,
+                height: _kNavBarH,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(32),
+                  gradient: isSearchSelected
+                      ? RadialGradient(
+                          colors: [
+                            activeAccentColor.withValues(alpha: 0.15),
+                            activeAccentColor.withValues(alpha: 0.0),
+                          ],
+                          radius: 0.85,
+                        )
+                      : null,
+                ),
+                child: Center(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    transformAlignment: Alignment.center,
+                    curve: Curves.easeOutCirc,
+                    transform: isSearchSelected
+                        ? Matrix4.identity()
+                        : (Matrix4.identity()
+                          // ignore: deprecated_member_use
+                            ..scale(0.9)),
+                    child: Icon(
+                      MingCute.search_2_fill,
+                      size: 22,
+                      color: isSearchSelected ? activeAccentColor : (isDark ? Colors.white : Colors.black).withValues(alpha: 0.85),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
