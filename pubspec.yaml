@@ -92,6 +92,8 @@ dependencies:
   liquid_glass_widgets: ^0.28.0
   liquid_glass_renderer:
     path: flutter_liquid_glass-main/packages/liquid_glass_renderer
+  native_glass_navbar:
+    path: native_glass_navbar-main
 
   
 

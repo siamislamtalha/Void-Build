@@ -15,6 +15,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
+import 'package:native_glass_navbar/native_glass_navbar.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart' as lgr;
 
@@ -734,15 +735,21 @@ class _GlassFooterOverlay extends StatelessWidget {
         final double leftCapsuleFullW =
             screenW - _kFooterHPad * 2 - _kPillGap - _kSearchCircleW;
 
-        // ── Reference-exact: LiquidGlassLayer wraps the entire nav area ─────
-        // Matches liquid_glass_demo dashboard_page.dart lines 405-525:
-        //   LiquidGlassLayer(blur:3, ambientStrength:0.5, lightAngle:0.2π, white12)
-        //   └─ LiquidGlass.inLayer(shape:radius40) ← nav capsule (uses layer settings)
-        //   └─ LiquidGlass.inLayer(shape:radius40) ← search circle (uses layer settings)
-        // In the local package, LiquidGlass.inLayer = plain LiquidGlass() inside a
-        // parent LiquidGlassLayer. The shared layer compositor is what creates the
-        // authentic light-bending / raised-corner glass illusion.
-        return SizedBox(
+        // ── Reference-exact: LiquidGlassLayer & NativeGlassNavBar Integration ──
+        // On iOS 18+, NativeGlassNavBar provides native iOS Liquid TabBar with
+        // floating tab pill and action button circle.
+        // On fallback (Android/Desktop/Web/older iOS), it renders our custom
+        // LiquidGlassLayer stack with sliding liquid glass selector pill.
+        final activeAccentColor = AppTheme.accentColor(context);
+        final l10n = AppLocalizations.of(context)!;
+
+        // Map branch index to native navbar item index (excluding search which is action button)
+        int mappedNativeIndex = 0;
+        if (navigationShell.currentIndex == 1) mappedNativeIndex = 1;
+        if (navigationShell.currentIndex == 3) mappedNativeIndex = 2;
+        if (navigationShell.currentIndex == 4) mappedNativeIndex = 3;
+
+        final customFallbackNav = SizedBox(
           height: sizedBoxH,
           child: lgr.LiquidGlassLayer(
             settings: const lgr.LiquidGlassSettings(
@@ -752,15 +759,9 @@ class _GlassFooterOverlay extends StatelessWidget {
               glassColor: Colors.white12,
             ),
             child: Stack(
-              // Clip.none lets the AnimatedPositioned animate out of the SizedBox
-              // bounds without visual clipping during the transition.
               clipBehavior: Clip.none,
               children: [
                 // ── Left nav capsule ──────────────────────────────────────
-                // Left-edge is anchored at _kFooterHPad.
-                // Width shrinks from fullWidth → _kSearchCircleW (right side moves in).
-                // Uses plain LiquidGlass() — shares the parent LiquidGlassLayer,
-                // matching reference LiquidGlass.inLayer pattern exactly.
                 Positioned(
                   left: _kFooterHPad,
                   bottom: navBottomAbs,
@@ -777,9 +778,6 @@ class _GlassFooterOverlay extends StatelessWidget {
                 ),
 
                 // ── Search circle ──────────────────────────────────────────
-                // Right-edge is anchored at _kFooterHPad. Never moves.
-                // Uses plain LiquidGlass() — shares the parent LiquidGlassLayer,
-                // matching reference LiquidGlass.inLayer profile button exactly.
                 Positioned(
                   right: _kFooterHPad,
                   bottom: navBottomAbs,
@@ -789,9 +787,6 @@ class _GlassFooterOverlay extends StatelessWidget {
                 ),
 
                 // ── Mini player ────────────────────────────────────────────
-                // AnimatedPositioned smoothly moves between its two positions:
-                //   • Normal: full-width pill floating above the nav bar.
-                //   • Collapsed: narrow pill inline with the two nav circles.
                 if (hasMiniPlayer)
                   AnimatedPositioned(
                     duration: _kCollapseAnimDuration,
@@ -810,6 +805,32 @@ class _GlassFooterOverlay extends StatelessWidget {
               ],
             ),
           ),
+        );
+
+        return NativeGlassNavBar(
+          tabs: [
+            NativeGlassNavBarItem(label: l10n.navHome, symbol: 'house.fill'),
+            NativeGlassNavBarItem(label: l10n.navLibrary, symbol: 'books.vertical.fill'),
+            NativeGlassNavBarItem(label: l10n.navLocal, symbol: 'music.note'),
+            NativeGlassNavBarItem(label: l10n.navOffline, symbol: 'arrow.down.circle.fill'),
+          ],
+          actionButton: TabBarActionButton(
+            symbol: 'magnifyingglass',
+            onTap: () {
+              HapticFeedback.lightImpact();
+              navigationShell.goBranch(2);
+            },
+          ),
+          currentIndex: mappedNativeIndex,
+          onTap: (index) {
+            final branchTargets = [0, 1, 3, 4];
+            if (index >= 0 && index < branchTargets.length) {
+              HapticFeedback.selectionClick();
+              navigationShell.goBranch(branchTargets[index]);
+            }
+          },
+          tintColor: activeAccentColor,
+          fallback: customFallbackNav,
         );
       },
     );
@@ -954,6 +975,10 @@ class _NavCapsuleContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final activeIndex = capsuleItems.indexWhere((item) => item.branchIndex == currentIndex);
+    final isTabActive = activeIndex != -1;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Stack(
       children: [
         // ── Expanded nav content ────────────────────────────────────────────
@@ -963,42 +988,90 @@ class _NavCapsuleContent extends StatelessWidget {
           opacity: isMiniMode ? 0.0 : 1.0,
           child: IgnorePointer(
             ignoring: isMiniMode,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, animation) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: ScaleTransition(
-                    scale: Tween<double>(begin: 0.96, end: 1.0)
-                        .animate(animation),
-                    child: child,
-                  ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final totalW = constraints.maxWidth;
+                final itemCount = capsuleItems.length;
+                final itemW = itemCount > 0 ? totalW / itemCount : 0.0;
+                final indicatorW = math.max(0.0, itemW - 8.0);
+                final indicatorLeft = isTabActive ? (activeIndex * itemW) + 4.0 : 4.0;
+
+                return Stack(
+                  children: [
+                    // ── Animated Liquid Glass Selection Indicator Pill ──────
+                    // Liquid glass component that raises a bit and slides smoothly between tabs
+                    if (isTabActive)
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 350),
+                        curve: Curves.easeOutBack,
+                        left: indicatorLeft,
+                        top: 4,
+                        width: indicatorW,
+                        height: _kNavBarH - 8,
+                        child: lgr.LiquidGlass.withOwnLayer(
+                          settings: lgr.LiquidGlassSettings(
+                            blur: 6,
+                            thickness: 28,
+                            ambientStrength: 1.6, // Elevated raised rim highlight
+                            lightAngle: 0.35 * math.pi,
+                            glassColor: isDark
+                                ? Colors.white.withValues(alpha: 0.18)
+                                : Colors.black.withValues(alpha: 0.08),
+                            refractiveIndex: 1.25,
+                            saturation: 1.35,
+                          ),
+                          shape: const lgr.LiquidRoundedSuperellipse(
+                            borderRadius: 22,
+                          ),
+                          glassContainsChild: false,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(22),
+                              border: Border.all(
+                                color: (isDark ? Colors.white : Colors.black)
+                                    .withValues(alpha: isDark ? 0.25 : 0.12),
+                                width: 0.75,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(
+                                    alpha: isDark ? 0.40 : 0.15,
+                                  ),
+                                  blurRadius: 12,
+                                  spreadRadius: -2,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    // ── Buttons Row ─────────────────────────────────────────
+                    Row(
+                      key: const ValueKey('nav_buttons_row'),
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: capsuleItems.map((item) {
+                        final isSelected = currentIndex == item.branchIndex;
+                        return Expanded(
+                          child: _NavItemButton(
+                            item: item,
+                            isSelected: isSelected,
+                            activeColor: activeAccentColor,
+                            inactiveColor: inactiveIconColor,
+                            selectedPillColor: Colors.transparent,
+                            selectedPillBorder: Colors.transparent,
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              navigationShell.goBranch(item.branchIndex);
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 );
               },
-              child: KeyedSubtree(
-                key: ValueKey<int>(currentIndex),
-                child: Row(
-                  key: const ValueKey('nav_buttons_row'),
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: capsuleItems.map((item) {
-                    final isSelected = currentIndex == item.branchIndex;
-                    return Expanded(
-                      child: _NavItemButton(
-                        item: item,
-                        isSelected: isSelected,
-                        activeColor: activeAccentColor,
-                        inactiveColor: inactiveIconColor,
-                        selectedPillColor: Colors.transparent,
-                        selectedPillBorder: Colors.transparent,
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          navigationShell.goBranch(item.branchIndex);
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
             ),
           ),
         ),
