@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
@@ -41,8 +40,9 @@ const double _kOuterBottomPadding = 6.0;
 const double _kDesktopSidebarWidth = 80.0;
 
 // Mobile footer element sizes
-const double _kNavBarH = 58.0; // height of the nav bar capsule
-const double _kSearchCircleW = 58.0; // width = height of the search circle
+// Preserve Void Music's established geometry while using Muzo's glass surface.
+const double _kNavBarH = 58.0;
+const double _kSearchCircleW = 58.0;
 const double _kPillGap = 10.0; // gap between left pill and search circle
 const double _kFooterHPad = 12.0; // horizontal padding for the whole footer
 
@@ -205,7 +205,10 @@ class _GlobalFooterState extends State<GlobalFooter>
   @override
   Widget build(BuildContext context) {
     context.watch<PlayerOverlayCubit>();
-    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    // Match Muzo's desktop cutoff directly. The responsive-framework lookup
+    // can classify a phone as desktop when the app is embedded in a window,
+    // which suppresses the mobile footer entirely.
+    final isMobile = MediaQuery.of(context).size.width <= 600;
 
     return PlayerOverlayWrapper(
       child: BackButtonListener(
@@ -697,8 +700,9 @@ class _GlassFooterOverlay extends StatelessWidget {
       builder: (context, miniState) {
         final hasMiniPlayer = miniState.isVisible;
 
-        // Collapse only when a track is playing AND the user has scrolled down.
-        final bool isCollapsed = isMiniMode && hasMiniPlayer;
+        // Muzo keeps the complete navigation pill visible. Keep Void Music's
+        // position and size, but never collapse it to a single icon on scroll.
+        const bool isCollapsed = false;
 
         // ── Absolute positions (pixels from the bottom of the SizedBox) ──────
         // The SizedBox bottom edge == the screen bottom edge (Positioned bottom:0).
@@ -744,18 +748,11 @@ class _GlassFooterOverlay extends StatelessWidget {
         // authentic light-bending / raised-corner glass illusion.
         return SizedBox(
           height: sizedBoxH,
-          child: lgr.LiquidGlassLayer(
-            settings: const lgr.LiquidGlassSettings(
-              blur: 3,
-              ambientStrength: 0.5,
-              lightAngle: 0.2 * math.pi,
-              glassColor: Colors.white12,
-            ),
-            child: Stack(
-              // Clip.none lets the AnimatedPositioned animate out of the SizedBox
-              // bounds without visual clipping during the transition.
-              clipBehavior: Clip.none,
-              children: [
+          child: Stack(
+            // Clip.none lets the AnimatedPositioned animate out of the SizedBox
+            // bounds without visual clipping during the transition.
+            clipBehavior: Clip.none,
+            children: [
                 // ── Left nav capsule ──────────────────────────────────────
                 // Left-edge is anchored at _kFooterHPad.
                 // Width shrinks from fullWidth → _kSearchCircleW (right side moves in).
@@ -807,8 +804,7 @@ class _GlassFooterOverlay extends StatelessWidget {
                       ),
                     ),
                   ),
-              ],
-            ),
+            ],
           ),
         );
       },
@@ -904,15 +900,31 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
       curve: _kCollapseAnimCurve,
       width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
       height: _kNavBarH,
-      child: Hero(
-        tag: 'nav_capsule',
-        child: Material(
-          type: MaterialType.transparency,
-          child: lgr.LiquidGlass(
-            shape: const lgr.LiquidRoundedSuperellipse(
-              borderRadius: 40,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
+            blurRadius: 20,
+            spreadRadius: -4,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+          child: Container(
+            decoration: BoxDecoration(
+              color: (isDark ? Colors.black : Colors.white)
+                  .withValues(alpha: isDark ? 0.20 : 0.35),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
+                width: 0.75,
+              ),
             ),
-            glassContainsChild: false,
             child: _NavCapsuleContent(
               isMiniMode: widget.isMiniMode,
               currentIndex: currentIndex,
@@ -1287,10 +1299,8 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
     final isSearchSelected = currentIndex == 2;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final activeAccentColor = AppTheme.accentColor(context);
-    final inactiveIconColor = isDark
-        ? Colors.white.withValues(alpha: 0.85)
-        : const Color(0xFF1C1C1E).withValues(alpha: 0.85);
+    final iconColor =
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
 
     // 1:1 reference: profile circle from liquid_glass_demo dashboard_page.dart
     // lines 502-521 (LiquidGlass.inLayer for the profile button).
@@ -1312,36 +1322,57 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
       },
       onLongPress: () => _showGlassChip(context),
       behavior: HitTestBehavior.opaque,
-      child: Hero(
-        tag: 'profile_button',
-        child: Material(
-          type: MaterialType.transparency,
-          child: lgr.LiquidGlass(
-            shape: const lgr.LiquidRoundedSuperellipse(
-              borderRadius: 40,
-            ),
-            glassContainsChild: false,
-            child: SizedBox(
-              width: _kSearchCircleW,
-              height: _kNavBarH,
-              child: Center(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) => ScaleTransition(
-                    scale: animation,
-                    child: FadeTransition(opacity: animation, child: child),
+      child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
+                blurRadius: 20,
+                spreadRadius: -4,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: (isDark ? Colors.black : Colors.white)
+                      .withValues(alpha: isDark ? 0.20 : 0.35),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withValues(
+                      alpha: isDark ? 0.12 : 0.20,
+                    ),
+                    width: 0.75,
                   ),
-                  child: Icon(
-                    MingCute.search_2_line,
-                    key: ValueKey<bool>(isSearchSelected),
-                    size: 22,
-                    color: isSearchSelected ? activeAccentColor : inactiveIconColor,
+                ),
+                child: SizedBox(
+                  width: _kSearchCircleW,
+                  height: _kNavBarH,
+                  child: Center(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      transitionBuilder: (child, animation) => ScaleTransition(
+                        scale: animation,
+                        child: FadeTransition(opacity: animation, child: child),
+                      ),
+                      child: Icon(
+                        isSearchSelected
+                            ? MingCute.home_4_fill
+                            : MingCute.search_2_line,
+                        key: ValueKey<bool>(isSearchSelected),
+                        size: 18,
+                        color: iconColor,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
       ),
     );
   }
@@ -1800,27 +1831,34 @@ class _NavItemButtonState extends State<_NavItemButton>
               : null,
           borderRadius: BorderRadius.circular(24),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              widget.item.icon,
-              size: 18,
-              color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
-            ),
-            const SizedBox(height: 0.5),
-            Text(
-              widget.item.label,
-              maxLines: 1,
-              style: TextStyle(
-                fontSize: 8.5,
-                fontFamily: 'Gilroy',
-                fontWeight: FontWeight.bold,
-                color: widget.isSelected ? widget.activeColor : widget.inactiveColor,
+        child: Center(
+          child: SizedBox(
+            height: 48,
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                widget.item.icon,
+                size: 18,
+                color:
+                    widget.isSelected ? widget.activeColor : widget.inactiveColor,
               ),
+              const SizedBox(height: 0.5),
+              Text(
+                widget.item.label,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.bold,
+                  color: widget.isSelected
+                      ? widget.activeColor
+                      : widget.inactiveColor,
+                ),
+              ),
+            ],
             ),
-          ],
+          ),
         ),
       ),
     );
