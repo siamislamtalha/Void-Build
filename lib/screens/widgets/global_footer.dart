@@ -700,9 +700,10 @@ class _GlassFooterOverlay extends StatelessWidget {
       builder: (context, miniState) {
         final hasMiniPlayer = miniState.isVisible;
 
-        // Muzo keeps the complete navigation pill visible. Keep Void Music's
-        // position and size, but never collapse it to a single icon on scroll.
-        const bool isCollapsed = false;
+        // Keep Void Music's legacy geometry, but use the existing expand/shrink
+        // state. The previous implementation hard-coded this to false, which
+        // made the long-press/collapsed glass affordance unreachable on mobile.
+        final bool isCollapsed = isMiniMode;
 
         // ── Absolute positions (pixels from the bottom of the SizedBox) ──────
         // The SizedBox bottom edge == the screen bottom edge (Positioned bottom:0).
@@ -1835,28 +1836,35 @@ class _NavItemButtonState extends State<_NavItemButton>
           child: SizedBox(
             height: 48,
             child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                widget.item.icon,
-                size: 18,
-                color:
-                    widget.isSelected ? widget.activeColor : widget.inactiveColor,
-              ),
-              const SizedBox(height: 0.5),
-              Text(
-                widget.item.label,
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 8.5,
-                  fontWeight: FontWeight.bold,
-                  color: widget.isSelected
-                      ? widget.activeColor
-                      : widget.inactiveColor,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Transform.translate(
+                  // MingCute's glyph box has a slightly high optical baseline.
+                  // Keep the Muzo 48px item geometry, but optically center the
+                  // icon without moving the label or changing pill dimensions.
+                  offset: const Offset(0, 1),
+                  child: Icon(
+                    widget.item.icon,
+                    size: 18,
+                    color: widget.isSelected
+                        ? widget.activeColor
+                        : widget.inactiveColor,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 0.5),
+                Text(
+                  widget.item.label,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 8.5,
+                    fontWeight: FontWeight.bold,
+                    color: widget.isSelected
+                        ? widget.activeColor
+                        : widget.inactiveColor,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
