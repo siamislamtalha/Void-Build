@@ -823,10 +823,11 @@ packages:
   liquid_glass_widgets:
     dependency: "direct main"
     description:
-      path: liquid_glass_widgets-main
-      relative: true
-    source: path
-    version: "0.28.0"
+      name: liquid_glass_widgets
+      sha256: "4df4e820f693d0550f074f668f8fac5ac3c15d6fd4f7f42d64dcb8689b797595"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.29.2"
   logging:
     dependency: transitive
     description:
