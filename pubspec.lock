@@ -457,6 +457,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.65.0"
+  fluentui_system_icons:
+    dependency: "direct main"
+    description:
+      name: fluentui_system_icons
+      sha256: "1592ae32dae75fb66741ab2c0607bc6554ef086f1c457e27ef937fb4901d33da"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.273"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -812,21 +820,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
-  liquid_glass_renderer:
-    dependency: "direct main"
-    description:
-      path: "flutter_liquid_glass-main/packages/liquid_glass_renderer"
-      relative: true
-    source: path
-    version: "0.2.0-dev.4"
   liquid_glass_widgets:
     dependency: "direct main"
     description:
-      name: liquid_glass_widgets
-      sha256: "7429526cb08a283110d2c32619607700fe0e9dc2935c1fe44d13630537629d1b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.28.1"
+      path: liquid_glass_widgets-main
+      relative: true
+    source: path
+    version: "0.28.0"
   logging:
     dependency: transitive
     description:
@@ -948,7 +948,7 @@ packages:
     source: hosted
     version: "3.0.0"
   motor:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: motor
       sha256: cbd49f21b00e568c2b1a55f134ed803614a107782f4fea7769693bca32940c58
@@ -1664,7 +1664,7 @@ packages:
     source: hosted
     version: "1.2.6"
   vector_math:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: vector_math
       sha256: d530bd74fea330e6e364cda7a85019c434070188383e1cd8d9777ee586914c5b
