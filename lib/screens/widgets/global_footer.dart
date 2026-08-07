@@ -618,7 +618,6 @@ class _GlassFooterOverlay extends StatelessWidget {
 
     if (!isMobile) {
       // ── Desktop layout: mini player floating above content ────────────────
-      // Enhanced with liquid glass renderer for Muzo-like refraction and distortion
       return BlocBuilder<MiniPlayerCubit, MiniPlayerState>(
         builder: (context, miniState) {
           if (!miniState.isVisible) return const SizedBox.shrink();
@@ -632,57 +631,37 @@ class _GlassFooterOverlay extends StatelessWidget {
             child: SizedBox(
               height: 64,
               child: RepaintBoundary(
-                child: lgr.LiquidGlassLayer(
-                  settings: lgr.LiquidGlassSettings(
-                    refractiveIndex: 1.21,
-                    thickness: 30,
-                    blur: 8,
-                    saturation: 1.5,
-                    lightIntensity: isDark ? .7 : 1,
-                    ambientStrength: isDark ? .2 : .5,
-                    lightAngle: math.pi / 4,
-                    glassColor: isDark
-                        ? Colors.black.withValues(alpha: 0.35)
-                        : Colors.black.withValues(alpha: 0.45),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black
+                            .withValues(alpha: isDark ? 0.35 : 0.12),
+                        blurRadius: 20,
+                        spreadRadius: -4,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
-                  child: lgr.LiquidGlassBlendGroup(
-                    blend: 10,
-                    child: lgr.LiquidGlass.grouped(
-                      shape: const lgr.LiquidRoundedSuperellipse(borderRadius: 28),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
                       child: Container(
                         decoration: BoxDecoration(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.10)
+                              : Colors.white.withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(28),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black
-                                  .withValues(alpha: isDark ? 0.35 : 0.12),
-                              blurRadius: 20,
-                              spreadRadius: -4,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(28),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? Colors.white.withValues(alpha: 0.10)
-                                    : Colors.white.withValues(alpha: 0.18),
-                                borderRadius: BorderRadius.circular(28),
-                                border: Border.all(
-                                  color: Colors.white
-                                      .withValues(alpha: isDark ? 0.15 : 0.25),
-                                  width: 0.75,
-                                ),
-                              ),
-                              child: MiniPlayerWidget(
-                                currentPageIndex: navigationShell.currentIndex,
-                              ),
-                            ),
+                          border: Border.all(
+                            color: Colors.white
+                                .withValues(alpha: isDark ? 0.15 : 0.25),
+                            width: 0.75,
                           ),
+                        ),
+                        child: MiniPlayerWidget(
+                          currentPageIndex: navigationShell.currentIndex,
                         ),
                       ),
                     ),
@@ -739,19 +718,14 @@ class _GlassFooterOverlay extends StatelessWidget {
         final double leftCapsuleFullW =
             screenW - _kFooterHPad * 2 - _kPillGap - _kSearchCircleW;
 
-        // ── Reference-exact: LiquidGlassLayer wraps the entire nav area ─────
-        // Matches liquid_glass_demo dashboard_page.dart lines 405-525:
-        //   LiquidGlassLayer(blur:3, ambientStrength:0.5, lightAngle:0.2π, white12)
-        //   └─ LiquidGlass.inLayer(shape:radius40) ← nav capsule (uses layer settings)
-        //   └─ LiquidGlass.inLayer(shape:radius40) ← search circle (uses layer settings)
-        // In the local package, LiquidGlass.inLayer = plain LiquidGlass() inside a
-        // parent LiquidGlassLayer. The shared layer compositor is what creates the
-        // authentic light-bending / raised-corner glass illusion.
+        // Muzo's mobile footer is a single native Flutter composition. There
+        // is deliberately no LiquidGlassLayer or blend group here: the
+        // surface is just BackdropFilter + translucent fill + border + shadow.
         return SizedBox(
           height: sizedBoxH,
           child: Stack(
-            // Clip.none lets the AnimatedPositioned animate out of the SizedBox
-            // bounds without visual clipping during the transition.
+            // Clip.none lets the AnimatedPositioned animate out of the
+            // SizedBox bounds without visual clipping during the transition.
             clipBehavior: Clip.none,
             children: [
                 // ── Left nav capsule ──────────────────────────────────────
@@ -778,14 +752,6 @@ class _GlassFooterOverlay extends StatelessWidget {
                 // Right-edge is anchored at _kFooterHPad. Never moves.
                 // Uses plain LiquidGlass() — shares the parent LiquidGlassLayer,
                 // matching reference LiquidGlass.inLayer profile button exactly.
-                Positioned(
-                  right: _kFooterHPad,
-                  bottom: navBottomAbs,
-                  width: _kSearchCircleW,
-                  height: _kNavBarH,
-                  child: _SearchCircleButton(navigationShell: navigationShell),
-                ),
-
                 // ── Mini player ────────────────────────────────────────────
                 // AnimatedPositioned smoothly moves between its two positions:
                 //   • Normal: full-width pill floating above the nav bar.
@@ -868,27 +834,8 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final activeAccentColor = AppTheme.accentColor(context);
-    final inactiveIconColor = isDark
-        ? Colors.white.withValues(alpha: 0.70)
-        : const Color(0xFF1C1C1E).withValues(alpha: 0.70);
-
-    final capsuleItems = [
-      _NavItemData(
-          branchIndex: 0, icon: MingCute.home_4_fill, label: l10n.navHome),
-      _NavItemData(
-          branchIndex: 1, icon: MingCute.book_5_fill, label: l10n.navLibrary),
-      _NavItemData(
-          branchIndex: 3, icon: MingCute.music_2_fill, label: l10n.navLocal),
-      _NavItemData(
-          branchIndex: 4,
-          icon: MingCute.folder_download_fill,
-          label: l10n.navOffline),
-    ];
-
-    final activeItem = capsuleItems.firstWhere(
-      (item) => item.branchIndex == currentIndex,
-      orElse: () => capsuleItems[0],
-    );
+    final branchIndexes = [0, 2, 1, 4];
+    final selectedTab = branchIndexes.indexOf(currentIndex).clamp(0, 3);
 
     // ── Exact match to search circle styling ──────────────────────────────────
     // Uses same LiquidGlass pattern as _SearchCircleButton:
@@ -897,47 +844,119 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
     //   Hero tag for smooth transitions
     //   Simple clean structure matching search circle
     return AnimatedContainer(
-      duration: _kCollapseAnimDuration,
-      curve: _kCollapseAnimCurve,
-      width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
-      height: _kNavBarH,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-            blurRadius: 20,
-            spreadRadius: -4,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-          child: Container(
-            decoration: BoxDecoration(
-              color: (isDark ? Colors.black : Colors.white)
-                  .withValues(alpha: isDark ? 0.20 : 0.35),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.20),
-                width: 0.75,
-              ),
+        duration: _kCollapseAnimDuration,
+        curve: _kCollapseAnimCurve,
+        width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
+        height: _kNavBarH,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
+              blurRadius: 20,
+              spreadRadius: -4,
+              offset: const Offset(0, 8),
             ),
-            child: _NavCapsuleContent(
-              isMiniMode: widget.isMiniMode,
-              currentIndex: currentIndex,
-              capsuleItems: capsuleItems,
-              activeItem: activeItem,
-              activeAccentColor: activeAccentColor,
-              inactiveIconColor: inactiveIconColor,
-              navigationShell: widget.navigationShell,
-              onTapCollapsed: widget.onTapCollapsed,
-            ),
-          ),
+          ],
         ),
+        child: widget.isMiniMode
+            ? _CollapsedActiveIcon(
+                activeItem: _NavItemData(
+                  branchIndex: currentIndex,
+                  icon: currentIndex == 1
+                      ? MingCute.book_5_fill
+                      : currentIndex == 2
+                          ? MingCute.search_2_line
+                      : currentIndex == 3
+                          ? MingCute.music_2_fill
+                          : currentIndex == 4
+                              ? MingCute.folder_download_fill
+                              : MingCute.home_4_fill,
+                  label: l10n.navHome,
+                ),
+                activeAccentColor: activeAccentColor,
+                onTap: widget.onTapCollapsed ?? () {},
+              )
+            : GlassTabBar.bottom(
+                tabs: [
+                  GlassTab(
+                    icon: const Icon(MingCute.home_4_line),
+                    activeIcon: const Icon(MingCute.home_4_fill),
+                    label: l10n.navHome,
+                    glowColor: activeAccentColor,
+                  ),
+                  GlassTab(
+                    icon: const Icon(MingCute.search_2_line),
+                    activeIcon: const Icon(MingCute.search_2_fill),
+                    label: l10n.navSearch,
+                    glowColor: activeAccentColor,
+                  ),
+                  GlassTab(
+                    icon: const Icon(MingCute.book_5_line),
+                    activeIcon: const Icon(MingCute.book_5_fill),
+                    label: l10n.navLibrary,
+                    glowColor: activeAccentColor,
+                  ),
+                  GlassTab(
+                    icon: const Icon(MingCute.folder_download_line),
+                    activeIcon: const Icon(MingCute.folder_download_fill),
+                    label: l10n.navOffline,
+                    glowColor: activeAccentColor,
+                  ),
+                ],
+                selectedIndex: selectedTab,
+                onTabSelected: (tabIndex) {
+                  HapticFeedback.lightImpact();
+                  widget.navigationShell.goBranch(branchIndexes[tabIndex]);
+                },
+                barHeight: _kNavBarH,
+                barBorderRadius: 28,
+                horizontalPadding: 4,
+                verticalPadding: 0,
+                spacing: 0,
+                tabPadding: EdgeInsets.zero,
+                iconLabelSpacing: 0.5,
+                iconSize: 18,
+                labelFontSize: 8.5,
+                selectedIconColor: activeAccentColor,
+                selectedLabelColor: activeAccentColor,
+                unselectedIconColor: isDark
+                    ? Colors.white.withValues(alpha: 0.70)
+                    : const Color(0xFF1C1C1E).withValues(alpha: 0.70),
+                unselectedLabelColor: isDark
+                    ? Colors.white.withValues(alpha: 0.70)
+                    : const Color(0xFF1C1C1E).withValues(alpha: 0.70),
+                settings: LiquidGlassSettings(
+                  blur: 3,
+                  chromaticAberration: 0.08,
+                  thickness: 30,
+                  ambientStrength: 0.5,
+                  lightAngle: 0.2 * math.pi,
+                  lightIntensity: 0.7,
+                  refractiveIndex: 1.45,
+                  saturation: 1.5,
+                  glassColor: Colors.white12,
+                ),
+                indicatorSettings: LiquidGlassSettings(
+                  blur: 3,
+                  chromaticAberration: 0.12,
+                  thickness: 38,
+                  ambientStrength: 0.65,
+                  lightAngle: 0.2 * math.pi,
+                  lightIntensity: 0.9,
+                  refractiveIndex: 1.5,
+                  saturation: 1.6,
+                  glassColor: Colors.black26,
+                ),
+                indicatorExpansion: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                indicatorPinchStrength: 0.4,
+                enableBlend: true,
+                blendAmount: 10,
+                showIndicator: true,
+              ),
       ),
     );
   }
@@ -1153,7 +1172,7 @@ class _CollapsedActiveIconState extends State<_CollapsedActiveIcon>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final item = GestureDetector(
       onTap: () {
         _removeChipOverlay();
         widget.onTap();
@@ -1170,6 +1189,8 @@ class _CollapsedActiveIconState extends State<_CollapsedActiveIcon>
         ),
       ),
     );
+
+    return item;
   }
 }
 
@@ -1807,30 +1828,50 @@ class _NavItemButtonState extends State<_NavItemButton>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final item = GestureDetector(
       onTap: () {
         _removeChipOverlay();
         widget.onTap();
       },
       onLongPress: () => _showGlassChip(context),
       behavior: HitTestBehavior.opaque,
-      child: Container(
+      child: AnimatedContainer(
+        duration: _kCollapseAnimDuration,
+        curve: _kCollapseAnimCurve,
         height: 48,
         alignment: Alignment.center,
         constraints: const BoxConstraints(minWidth: 58),
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
-          // Muzo: RadialGradient glow when selected, nothing when not.
+          // Muzo keeps the inactive items visually quiet and gives the active
+          // item its own dark, raised glass island.
+          color: widget.isSelected ? null : Colors.transparent,
           gradient: widget.isSelected
               ? RadialGradient(
                   colors: [
-                    widget.activeColor.withValues(alpha: 0.15),
-                    widget.activeColor.withValues(alpha: 0.0),
+                    widget.activeColor.withValues(alpha: 0.22),
+                    Colors.black.withValues(alpha: 0.18),
+                    Colors.black.withValues(alpha: 0.08),
                   ],
-                  radius: 0.85,
+                  radius: 0.9,
+                )
+              : null,
+          border: widget.isSelected
+              ? Border.all(
+                  color: Colors.white.withValues(alpha: 0.24),
+                  width: 0.75,
                 )
               : null,
           borderRadius: BorderRadius.circular(24),
+          boxShadow: widget.isSelected
+              ? [
+                  BoxShadow(
+                    color: widget.activeColor.withValues(alpha: 0.18),
+                    blurRadius: 14,
+                    spreadRadius: -4,
+                  ),
+                ]
+              : null,
         ),
         child: Center(
           child: SizedBox(
@@ -1840,9 +1881,6 @@ class _NavItemButtonState extends State<_NavItemButton>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Transform.translate(
-                  // MingCute's glyph box has a slightly high optical baseline.
-                  // Keep the Muzo 48px item geometry, but optically center the
-                  // icon without moving the label or changing pill dimensions.
                   offset: const Offset(0, 1),
                   child: Icon(
                     widget.item.icon,
@@ -1870,6 +1908,8 @@ class _NavItemButtonState extends State<_NavItemButton>
         ),
       ),
     );
+
+    return item;
   }
 }
 
