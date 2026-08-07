@@ -835,7 +835,7 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
 
     final activeAccentColor = AppTheme.accentColor(context);
     final branchIndexes = [0, 2, 1, 4];
-    final selectedTab = branchIndexes.indexOf(currentIndex).clamp(0, 3);
+    final selectedTab = branchIndexes.indexOf(currentIndex).clamp(0, 3).toInt();
 
     // ── Exact match to search circle styling ──────────────────────────────────
     // Uses same LiquidGlass pattern as _SearchCircleButton:
@@ -957,7 +957,6 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
                 blendAmount: 10,
                 showIndicator: true,
               ),
-      ),
     );
   }
 }
