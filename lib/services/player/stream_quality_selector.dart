@@ -4,6 +4,9 @@ enum AudioStreamQualityPreference {
   low,
   medium,
   high,
+  /// Lossless-first preference — used exclusively by Audiophile Mode.
+  /// Maps to Quality.lossless → Quality.high → Quality.medium → Quality.low.
+  lossless,
 }
 
 extension AudioStreamQualityPreferenceX on AudioStreamQualityPreference {
@@ -15,6 +18,8 @@ extension AudioStreamQualityPreferenceX on AudioStreamQualityPreference {
         return 'Medium';
       case AudioStreamQualityPreference.high:
         return 'High';
+      case AudioStreamQualityPreference.lossless:
+        return 'Lossless';
     }
   }
 
@@ -24,6 +29,8 @@ extension AudioStreamQualityPreferenceX on AudioStreamQualityPreference {
         return AudioStreamQualityPreference.low;
       case 'High':
         return AudioStreamQualityPreference.high;
+      case 'Lossless':
+        return AudioStreamQualityPreference.lossless;
       default:
         return AudioStreamQualityPreference.medium;
     }
@@ -56,6 +63,26 @@ String normalizeStoredStreamQualityLabel(
     case '256 kbps':
     case '256kbps':
       return AudioStreamQualityPreference.high.label;
+    // ── Lossless / SpotiFLAC-style quality labels ────────────────────────────
+    case 'lossless':
+    case 'flac':
+    case 'flac_16bit':
+    case 'flac_24bit_96khz':
+    case 'flac_24bit_192khz':
+    case 'hi-res':
+    case 'hi res':
+    case 'hires':
+    case 'hd flac':
+    case 'hd-flac':
+    case 'hdflac':
+    case 'dsd':
+    case 'dsd64':
+    case 'dsd128':
+    case 'master':
+    case 'ultra hd':
+    case 'ultra_hd':
+    case 'ext':     // SpotiFLAC extension format badge
+      return AudioStreamQualityPreference.lossless.label;
     default:
       return fallback;
   }
@@ -99,6 +126,15 @@ class StreamQualitySelector {
       Quality.medium,
       Quality.low,
     ],
+    // Lossless-first: exclusively for Audiophile Mode.
+    // Unlike 'high', this preference does NOT fall back silently — it is
+    // explicitly set when the user has chosen Audiophile / SpotiFLAC mode.
+    AudioStreamQualityPreference.lossless: [
+      Quality.lossless,
+      Quality.high,
+      Quality.medium,
+      Quality.low,
+    ],
   };
 
   static const Map<AudioStreamQualityPreference, List<Quality>>
@@ -116,6 +152,13 @@ class StreamQualitySelector {
       Quality.lossless,
     ],
     AudioStreamQualityPreference.high: [
+      Quality.lossless,
+      Quality.high,
+      Quality.medium,
+      Quality.low,
+    ],
+    // Lossless-first for downloads in Audiophile Mode.
+    AudioStreamQualityPreference.lossless: [
       Quality.lossless,
       Quality.high,
       Quality.medium,

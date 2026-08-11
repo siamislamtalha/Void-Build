@@ -420,7 +420,7 @@ class _PluginManagerScreenState extends State<PluginManagerScreen> {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['bex'],
+        allowedExtensions: ['bex', 'sflx', 'spotiflac-ext'],
         dialogTitle: l10n.pluginManagerSelectPackage,
       );
 

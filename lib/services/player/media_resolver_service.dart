@@ -21,11 +21,23 @@ class ResolvedMediaSource {
   final bool isOffline;
   final Map<String, String>? headers;
 
+  /// Lossless audio metadata — populated only when a lossless stream is
+  /// resolved (Audiophile Mode). Null for standard streams.
+  final int? bitDepth;
+  final int? sampleRate;
+  final String? format;
+
   const ResolvedMediaSource({
     required this.uri,
     required this.isOffline,
     this.headers,
+    this.bitDepth,
+    this.sampleRate,
+    this.format,
   });
+
+  /// Whether this source carries lossless / Hi-Res audio metadata.
+  bool get isLossless => format != null || (bitDepth != null && bitDepth! >= 16);
 }
 
 /// Resolves a [Track] into a playable [Uri].
@@ -107,7 +119,13 @@ class MediaResolverService {
               ContentResolverCommand.getStreams(id: parts.localId),
             ),
           )
-          .timeout(const Duration(seconds: 12));
+          .timeout(
+            // Audiophile mode resolves lossless streams from slower CDNs;
+            // give it more time than standard quality resolution.
+            AudiophileModeService.isAudiophile
+                ? const Duration(seconds: 20)
+                : const Duration(seconds: 12),
+          );
     } on TimeoutException catch (e) {
       dev.log('Stream resolution timeout for "${track.title}": $e', name: 'MediaResolverService');
       GlobalEventBus.instance.emitError(
@@ -152,11 +170,21 @@ class MediaResolverService {
             normalizedQuality,
           );
         }
+
+        // Audiophile Mode always uses the lossless-first preference;
+        // normal mode reads the user's stored quality setting.
         final preference = AudiophileModeService.isAudiophile
-            ? AudioStreamQualityPreference.high
+            ? AudioStreamQualityPreference.lossless
             : AudioStreamQualityPreferenceX.fromStored(
                 normalizedQuality,
               );
+
+        dev.log(
+          'Stream quality preference: ${preference.label}'
+          '${AudiophileModeService.isAudiophile ? " (Audiophile / SpotiFLAC mode)" : ""}',
+          name: 'MediaResolverService',
+        );
+
         final selectedStream = StreamQualitySelector.selectPlaybackStream(
           streams,
           preference: preference,
@@ -180,13 +208,25 @@ class MediaResolverService {
           );
         }
 
-        dev.log('Resolved stream: $streamUrl', name: 'MediaResolverService');
+        dev.log('Resolved stream: $streamUrl '
+            '[quality=${selectedStream?.quality.name} '
+            'format=${selectedStream?.format}]',
+            name: 'MediaResolverService');
+
+        // Derive lossless metadata from the stream format string so the
+        // player UI can display quality badges (FLAC, Hi-Res, DSD, etc.).
+        final resolvedFormat = selectedStream?.format;
+        final losslessMeta = _parseLosslessMetadata(resolvedFormat);
+
         return ResolvedMediaSource(
           uri: uri,
           isOffline: false,
           headers: selectedStream == null
               ? null
               : streamHeadersToMap(selectedStream.headers),
+          bitDepth: losslessMeta.$1,
+          sampleRate: losslessMeta.$2,
+          format: resolvedFormat?.isNotEmpty == true ? resolvedFormat : null,
         );
       },
       trackDetails: (_) =>
@@ -226,4 +266,38 @@ class MediaResolverService {
       ack: () => throw Exception('Unexpected response type: ack'),
     );
   }
+}
+
+/// Parses a stream format string (e.g. "flac", "flac 24bit/96khz", "dsd64")
+/// and returns (bitDepth, sampleRate). Returns (null, null) for unknown formats.
+///
+/// This is used to populate [ResolvedMediaSource.bitDepth] and
+/// [ResolvedMediaSource.sampleRate] for Audiophile Mode UI display.
+(int?, int?) _parseLosslessMetadata(String? format) {
+  if (format == null || format.isEmpty) return (null, null);
+  final f = format.toLowerCase().trim();
+
+  // DSD formats — no conventional bit depth / sample rate
+  if (f.contains('dsd')) return (1, f.contains('128') ? 5644800 : 2822400);
+
+  // Explicit bit-depth / sample-rate patterns: "24bit/96khz", "24/96", etc.
+  final hiResPattern = RegExp(r'(\d+)\s*(?:bit)?\s*/\s*(\d+)\s*(?:khz|k)?');
+  final match = hiResPattern.firstMatch(f);
+  if (match != null) {
+    final bits = int.tryParse(match.group(1) ?? '');
+    final kHz = int.tryParse(match.group(2) ?? '');
+    return (bits, kHz != null ? kHz * 1000 : null);
+  }
+
+  // Known FLAC / lossless keywords — default to CD quality (16-bit / 44.1kHz)
+  if (f.contains('flac') || f.contains('lossless') || f.contains('alac')) {
+    return (16, 44100);
+  }
+
+  // Hi-Res without explicit spec — assume 24-bit / 96kHz
+  if (f.contains('hires') || f.contains('hi-res') || f.contains('hd')) {
+    return (24, 96000);
+  }
+
+  return (null, null);
 }

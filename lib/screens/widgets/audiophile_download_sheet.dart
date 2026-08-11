@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:voidmusic/blocs/downloader/cubit/downloader_cubit.dart';
+import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/di/service_locator.dart';
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';
+import 'package:voidmusic/services/audiophile_mode_service.dart';
+import 'package:voidmusic/services/db/dao/settings_dao.dart';
+import 'package:voidmusic/services/db/db_provider.dart';
+import 'package:voidmusic/services/player/stream_quality_selector.dart';
+import 'package:voidmusic/core/constants/setting_keys.dart';
 
 void showAudiophileDownloadSheet(BuildContext context, Track song) {
   final downloaderCubit = context.read<DownloaderCubit>();
@@ -253,11 +259,40 @@ class __AudiophileDownloadBottomSheetState
           orElse: () => _qualities[1]);
 
   void _startDownload() {
+    final q = _currentQuality;
+    // Persist the selected lossless quality so the download manager
+    // and the bootstrap service can pick it up via SettingKeys.
+    SettingsDAO(DBProvider.db).putSettingStr(
+      SettingKeys.downQuality,
+      q.value,
+    );
     context.read<DownloaderCubit>().downloadSong(widget.song);
     Navigator.pop(context);
-    final q = _currentQuality;
     SnackbarService.showMessage(
-      'Downloading ${widget.song.title} • $_selectedSource • ${q.tag}',
+      '\u2913  Downloading ${widget.song.title} \u2022 $_selectedSource \u2022 ${q.tag}',
+    );
+  }
+
+  void _startStream() {
+    // Persist lossless preference before streaming so MediaResolverService
+    // picks up the correct quality tier for Audiophile Mode.
+    final q = _currentQuality;
+    if (AudiophileModeService.isAudiophile) {
+      SettingsDAO(DBProvider.db).putSettingStr(
+        SettingKeys.strmQuality,
+        AudioStreamQualityPreference.lossless.label,
+      );
+    }
+    // Play the track via VoidMusicPlayerCubit (resolves & streams lossless audio).
+    try {
+      context.read<VoidMusicPlayerCubit>().voidMusicPlayer.updateQueueTracks(
+        [widget.song],
+        doPlay: true,
+      );
+    } catch (_) {}
+    Navigator.pop(context);
+    SnackbarService.showMessage(
+      '\u25B6  Streaming ${widget.song.title} \u2022 $_selectedSource \u2022 ${q.tag}',
     );
   }
 
@@ -544,29 +579,63 @@ class __AudiophileDownloadBottomSheetState
                 ),
                 const SizedBox(height: 18),
 
-                // ── Download button ──
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: _startDownload,
-                    icon: const Icon(MingCute.download_2_line,
-                        color: Colors.black),
-                    label: Text(
-                      'Download  •  $_selectedSource  •  ${_currentQuality.tag}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                // ── Action row: Stream + Download ──
+                Row(
+                  children: [
+                    // Stream button
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _startStream,
+                        icon: const Icon(
+                          MingCute.play_circle_line,
+                          size: 18,
+                        ),
+                        label: Text(
+                          'Stream  \u2022  ${_currentQuality.tag}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          side: BorderSide(
+                            color: _audiophileGold.withValues(alpha: 0.6),
+                            width: 1.5,
+                          ),
+                          foregroundColor: _audiophileGold,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
                       ),
                     ),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: _audiophileGold,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                    const SizedBox(width: 10),
+                    // Download button
+                    Expanded(
+                      flex: 2,
+                      child: FilledButton.icon(
+                        onPressed: _startDownload,
+                        icon: const Icon(MingCute.download_2_line,
+                            color: Colors.black),
+                        label: Text(
+                          'Download  \u2022  ${_currentQuality.tag}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: _audiophileGold,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),

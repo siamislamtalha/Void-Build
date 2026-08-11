@@ -4,7 +4,7 @@ use crate::api::plugin::types::{PluginInstallResult, PluginInstallStatus};
 use anyhow::{Context, Result};
 use std::cmp::Ordering;
 use std::fs::File;
-use std::io::BufReader;
+use std::io::{BufReader, Read};
 use tar::Archive;
 use zstd::stream::read::Decoder;
 
@@ -31,7 +31,7 @@ pub async fn unpack_and_read_manifest(
         now_nanos
     );
 
-    unpack_plugin(archive_path, &temp_plugin_dir, Some("bex")).await?;
+    unpack_plugin(archive_path, &temp_plugin_dir, None).await?;
 
     let manifest_path = format!("{}/manifest.json", temp_plugin_dir);
     let manifest = Manifest::from_file(&manifest_path)
@@ -111,7 +111,7 @@ pub async fn install_packed_plugin(
     plugins_dir: &str,
     temp_dir: &str,
     should_load: bool,
-    policy_country_code: &str,
+    _policy_country_code: &str,
     manager: Option<&crate::api::plugin::plugin::PluginManager>,
 ) -> Result<PluginInstallResult> {
     let (manifest, temp_plugin_dir) = unpack_and_read_manifest(packed_file_path, temp_dir).await?;
@@ -174,6 +174,34 @@ pub async fn install_packed_plugin(
     })
 }
 
+fn unpack_zip(archive_path: &str, output_folder: &str) -> Result<()> {
+    let file = File::open(archive_path)
+        .with_context(|| format!("Failed to open zip archive '{}'", archive_path))?;
+    let mut zip_archive = zip::ZipArchive::new(file)
+        .with_context(|| format!("Failed to parse zip archive '{}'", archive_path))?;
+
+    for i in 0..zip_archive.len() {
+        let mut file = zip_archive.by_index(i)?;
+        let outpath = match file.enclosed_name() {
+            Some(path) => std::path::Path::new(output_folder).join(path),
+            None => continue,
+        };
+
+        if (*file.name()).ends_with('/') {
+            std::fs::create_dir_all(&outpath)?;
+        } else {
+            if let Some(p) = outpath.parent() {
+                if !p.exists() {
+                    std::fs::create_dir_all(p)?;
+                }
+            }
+            let mut outfile = File::create(&outpath)?;
+            std::io::copy(&mut file, &mut outfile)?;
+        }
+    }
+    Ok(())
+}
+
 pub async fn unpack_plugin(
     archive_path: &str,
     output_folder: &str,
@@ -190,13 +218,31 @@ pub async fn unpack_plugin(
 
     if let Some(expected_ext) = expected_extension {
         match path.extension() {
-            Some(ext) if ext == expected_ext => {}
-            Some(ext) => anyhow::bail!(
-                "Expected .{} extension, got .{}",
-                expected_ext,
-                ext.to_string_lossy()
-            ),
-            None => anyhow::bail!("Expected .{} extension, got none", expected_ext),
+            Some(ext) => {
+                let ext_str = ext.to_string_lossy().to_lowercase();
+                let exp_str = expected_ext.to_lowercase();
+                if ext_str != exp_str && ext_str != "bex" && ext_str != "sflx" && ext_str != "spotiflac-ext" {
+                    anyhow::bail!(
+                        "Expected .{} extension, got .{}",
+                        expected_ext,
+                        ext.to_string_lossy()
+                    );
+                }
+            }
+            None => anyhow::bail!("Expected plugin extension, got none"),
+        }
+    } else {
+        match path.extension() {
+            Some(ext) => {
+                let ext_str = ext.to_string_lossy().to_lowercase();
+                if ext_str != "bex" && ext_str != "sflx" && ext_str != "spotiflac-ext" {
+                    anyhow::bail!(
+                        "Expected .bex, .sflx or .spotiflac-ext extension, got .{}",
+                        ext.to_string_lossy()
+                    );
+                }
+            }
+            None => anyhow::bail!("Expected plugin extension, got none"),
         }
     }
 
@@ -207,13 +253,35 @@ pub async fn unpack_plugin(
     let archive_path_owned = archive_path.to_string();
     let output_folder_owned = output_folder.to_string();
     tokio::task::spawn_blocking(move || -> Result<()> {
-        let file = File::open(&archive_path_owned)
-            .with_context(|| format!("Failed to open '{}'", archive_path_owned))?;
-        let decoder =
-            Decoder::new(BufReader::new(file)).with_context(|| "Failed to create decoder")?;
-        Archive::new(decoder)
-            .unpack(&output_folder_owned)
-            .with_context(|| format!("Failed to unpack to '{}'", output_folder_owned))?;
+        let is_zip = if let Ok(mut f) = File::open(&archive_path_owned) {
+            let mut magic = [0u8; 4];
+            if f.read_exact(&mut magic).is_ok() {
+                magic == [0x50, 0x4B, 0x03, 0x04] || magic == [0x50, 0x4B, 0x05, 0x06]
+            } else {
+                false
+            }
+        } else {
+            false
+        };
+
+        if is_zip {
+            unpack_zip(&archive_path_owned, &output_folder_owned)?;
+        } else {
+            let try_zstd = || -> Result<()> {
+                let file = File::open(&archive_path_owned)?;
+                let decoder = Decoder::new(BufReader::new(file))?;
+                Archive::new(decoder).unpack(&output_folder_owned)?;
+                Ok(())
+            };
+            if let Err(zstd_err) = try_zstd() {
+                unpack_zip(&archive_path_owned, &output_folder_owned).with_context(|| {
+                    format!(
+                        "Failed to unpack archive (zstd error: {}; zip fallback also failed)",
+                        zstd_err
+                    )
+                })?;
+            }
+        }
         Ok(())
     })
     .await??;
@@ -228,11 +296,15 @@ pub fn scan_bex_files(directory: &str) -> Result<Vec<String>> {
 
     for path in paths {
         let path = path.with_context(|| "Failed to read entry")?.path();
-        if path.extension().and_then(|s| s.to_str()) == Some("bex") {
-            if let Some(path_str) = path.to_str() {
-                files.push(path_str.to_string());
+        if let Some(ext) = path.extension().and_then(|s| s.to_str()) {
+            let lower_ext = ext.to_lowercase();
+            if lower_ext == "bex" || lower_ext == "sflx" || lower_ext == "spotiflac-ext" {
+                if let Some(path_str) = path.to_str() {
+                    files.push(path_str.to_string());
+                }
             }
         }
     }
     Ok(files)
 }
+
