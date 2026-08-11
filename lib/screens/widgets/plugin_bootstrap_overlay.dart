@@ -390,8 +390,59 @@ class _ErrorBody extends StatelessWidget {
             ),
             if (errors.isNotEmpty) ...[
               const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Error Details (${errors.length})',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () {
+                      final text = errors.join('\n');
+                      Clipboard.setData(ClipboardData(text: text));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Error logs copied to clipboard'),
+                          duration: Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.copy_rounded,
+                            size: 14,
+                            color: _PluginBootstrapOverlayState._successAccent,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            'Copy logs',
+                            style: TextStyle(
+                              color: _PluginBootstrapOverlayState._successAccent,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
               Container(
                 constraints: const BoxConstraints(maxHeight: 150),
+                width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.3),
@@ -404,7 +455,7 @@ class _ErrorBody extends StatelessWidget {
                     children: errors
                         .map((error) => Padding(
                               padding: const EdgeInsets.only(bottom: 6),
-                              child: Text(
+                              child: SelectableText(
                                 '• $error',
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.7),

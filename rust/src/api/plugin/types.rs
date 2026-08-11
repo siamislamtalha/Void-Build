@@ -26,12 +26,20 @@ impl PluginType {
     }
 
     pub fn from_string(s: &str) -> Option<Self> {
-        match s {
-            "content-resolver" => Some(PluginType::ContentResolver),
-            "chart-provider" => Some(PluginType::ChartProvider),
-            "lyrics-provider" => Some(PluginType::LyricsProvider),
-            "search-suggestion-provider" => Some(PluginType::SearchSuggestionProvider),
-            "content-importer" => Some(PluginType::ContentImporter),
+        let normalized = s.trim().to_lowercase().replace('_', "-");
+        match normalized.as_str() {
+            "content-resolver"
+            | "content_resolver"
+            | "metadata-provider"
+            | "metadata_provider"
+            | "download-provider"
+            | "download_provider" => Some(PluginType::ContentResolver),
+            "chart-provider" | "chart_provider" => Some(PluginType::ChartProvider),
+            "lyrics-provider" | "lyrics_provider" => Some(PluginType::LyricsProvider),
+            "search-suggestion-provider" | "search_suggestion_provider" => {
+                Some(PluginType::SearchSuggestionProvider)
+            }
+            "content-importer" | "content_importer" => Some(PluginType::ContentImporter),
             _ => None,
         }
     }
