@@ -201,6 +201,18 @@ impl PluginManager {
         }
 
         if !std::path::Path::new(plugin_path).exists() {
+            if plugin_path.ends_with("plugin.wasm") {
+                let js_path = plugin_path.replace("plugin.wasm", "index.js");
+                let manifest_path = plugin_path.replace("plugin.wasm", "manifest.json");
+                if std::path::Path::new(&js_path).exists() || std::path::Path::new(&manifest_path).exists() {
+                    tracing::info!(
+                        plugin_id = %plugin_id,
+                        "Non-WASM extension plugin loaded (managed via script runtime)"
+                    );
+                    self.emit(PluginManagerEvent::loaded(plugin_id, plugin_type)).await;
+                    return Ok(());
+                }
+            }
             let msg = format!("Plugin file not found: {}", plugin_path);
             self.emit(PluginManagerEvent::load_failed(plugin_id, &msg))
                 .await;

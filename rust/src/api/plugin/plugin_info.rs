@@ -66,12 +66,13 @@ impl PluginInfo {
         let manifest_path_string = manifest_path.to_string_lossy().to_string();
         let manifest = Manifest::from_file(&manifest_path_string).await?;
 
-        // Look for .wasm file
+        // Look for .wasm or .js file (or valid manifest for JS/sflx plugins)
         let wasm_path = dir_path.join("plugin.wasm");
-        if !wasm_path.exists() {
+        let index_js_path = dir_path.join("index.js");
+        if !wasm_path.exists() && !index_js_path.exists() && manifest.check().is_err() {
             return Err(PluginError::WasmLoadFailed(format!(
-                "WASM file not found: {} (expected: plugin.wasm)",
-                wasm_path.display()
+                "Plugin entry file not found: {} (expected plugin.wasm or index.js)",
+                dir_path.display()
             )));
         }
 
@@ -85,7 +86,7 @@ impl PluginInfo {
             plugin_path: dir_path.to_string_lossy().to_string(),
         };
 
-        // Final validation (just check WASM and manifest validity)
+        // Final validation (just check WASM/script and manifest validity)
         plugin_info.validate()?;
 
         Ok(plugin_info)
@@ -106,10 +107,14 @@ impl PluginInfo {
             return Ok(false);
         }
 
-        // Check if WASM file still exists
+        // Check if WASM or JS file still exists
         let wasm_path = dir_path.join("plugin.wasm");
-        if !wasm_path.exists() {
-            return Ok(false);
+        let index_js_path = dir_path.join("index.js");
+        if !wasm_path.exists() && !index_js_path.exists() {
+            let manifest_path_string = manifest_path.to_string_lossy().to_string();
+            if Manifest::from_file(&manifest_path_string).await.is_err() {
+                return Ok(false);
+            }
         }
 
         // Check if manifest is still valid
@@ -156,12 +161,13 @@ impl PluginInfo {
         // Validate manifest is still valid
         self.manifest.check()?;
 
-        // Validate WASM file exists
+        // Validate WASM or JS file exists
         let wasm_path = path.join("plugin.wasm");
-        if !wasm_path.exists() {
+        let index_js_path = path.join("index.js");
+        if !wasm_path.exists() && !index_js_path.exists() && self.manifest.check().is_err() {
             return Err(PluginError::WasmLoadFailed(format!(
-                "WASM file not found: {}",
-                wasm_path.display()
+                "Plugin entry file not found: {}",
+                path.display()
             )));
         }
 
@@ -213,10 +219,15 @@ impl PluginInfo {
         &self.manifest.publisher
     }
 
-    /// Get the WASM file path
+    /// Get the WASM or JS file path
     #[flutter_rust_bridge::frb(ignore)]
     pub fn wasm_path(&self) -> String {
-        format!("{}/plugin.wasm", self.plugin_path)
+        let wasm = format!("{}/plugin.wasm", self.plugin_path);
+        if std::path::Path::new(&wasm).exists() {
+            wasm
+        } else {
+            format!("{}/index.js", self.plugin_path)
+        }
     }
 
     /// Get the manifest file path

@@ -201,15 +201,20 @@ pub async fn install_packed_plugin(
 
     if should_load {
         if let Some(plugin_mgr) = manager {
-            let plugin_type = get_plugin_type_from_string(manifest.plugin_type())
-                .ok_or_else(|| anyhow::anyhow!("Unknown type: {}", manifest.plugin_type()))?;
-
-            let plugin_path = format!("{}/{}/plugin.wasm", plugins_dir, plugin_id);
-
-            plugin_mgr
-                .load_plugin_from_path(&plugin_id, plugin_type, &plugin_path)
-                .await
-                .map_err(|e| anyhow::anyhow!("Failed to load: {}", e))?;
+            if let Some(plugin_type) = get_plugin_type_from_string(manifest.plugin_type()) {
+                let plugin_path = format!("{}/{}/plugin.wasm", plugins_dir, plugin_id);
+                if std::path::Path::new(&plugin_path).exists() {
+                    plugin_mgr
+                        .load_plugin_from_path(&plugin_id, plugin_type, &plugin_path)
+                        .await
+                        .map_err(|e| anyhow::anyhow!("Failed to load: {}", e))?;
+                } else {
+                    tracing::info!(
+                        plugin_id = %plugin_id,
+                        "Plugin directory installed (non-WASM extension / no plugin.wasm binary)"
+                    );
+                }
+            }
         }
     }
 
