@@ -1,4 +1,5 @@
 import 'package:voidmusic/core/theme/app_theme.dart';
+import 'package:voidmusic/services/audiophile_mode_service.dart';
 import 'package:voidmusic/utils/load_image.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -12,6 +13,10 @@ class SquareImgCard extends StatefulWidget {
   final String? tag;
   final bool isWide;
   final bool isList;
+  /// Optional quality label (e.g. 'FLAC', 'HD FLAC', 'DSD').
+  /// When null and in audiophile mode, a generic 'FLAC' badge is shown.
+  /// Pass empty string to suppress the badge entirely.
+  final String? qualityLabel;
 
   const SquareImgCard({
     super.key,
@@ -23,6 +28,7 @@ class SquareImgCard extends StatefulWidget {
     this.isWide = false,
     this.tag,
     this.isList = true,
+    this.qualityLabel,
   });
 
   @override
@@ -43,8 +49,44 @@ class _SquareImgCardState extends State<SquareImgCard> {
   void _onTapUp(TapUpDetails _) => _setPressed(false);
   void _onTapCancel() => _setPressed(false);
 
+  /// Determines badge label and colors for audiophile quality overlay.
+  ({String label, Color border, Color text})? _resolveQualityBadge() {
+    // qualityLabel == '' means explicitly suppressed
+    if (widget.qualityLabel == '') return null;
+
+    final label = widget.qualityLabel ??
+        (AudiophileModeService.isAudiophile ? 'FLAC' : null);
+    if (label == null) return null;
+
+    final upper = label.toUpperCase();
+    if (upper.contains('DSD')) {
+      return (
+        label: label,
+        border: const Color(0xFF9D4EDD),
+        text: const Color(0xFFE0AAFF),
+      );
+    }
+    if (upper.contains('HD') ||
+        upper.contains('HI-RES') ||
+        upper.contains('MASTER') ||
+        upper.contains('ATMOS')) {
+      return (
+        label: label,
+        border: const Color(0xFFFFB703),
+        text: const Color(0xFFFFD166),
+      );
+    }
+    return (
+      label: label,
+      border: const Color(0xFF707070),
+      text: const Color(0xFFC0C0C0),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final badge = _resolveQualityBadge();
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
@@ -77,6 +119,35 @@ class _SquareImgCardState extends State<SquareImgCard> {
                           fallbackUrl: widget.fallbackImgPath,
                         ),
                       ),
+                      // ── Audiophile quality badge (top-left) ──
+                      if (badge != null)
+                        Positioned(
+                          top: 6,
+                          left: 6,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.65),
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(
+                                color: badge.border.withValues(alpha: 0.7),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Text(
+                              badge.label,
+                              style: TextStyle(
+                                color: badge.text,
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.4,
+                                height: 1.1,
+                              ),
+                            ),
+                          ),
+                        ),
+                      // ── Tag badge (playlist count / views, top-right) ──
                       Visibility(
                         visible: widget.tag != null,
                         child: Positioned(

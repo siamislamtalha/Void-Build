@@ -68,7 +68,82 @@ Filename: "{app}\{#MyAppExeName}"; Description: "Launch {#MyAppName}"; Flags: no
 [UninstallDelete]
 ; Remove install folder even if the app created extra files there.
 Type: filesandordirs; Name: "{app}"
-; Also remove common per-user data folders created by the app.
-; NOTE: This will delete VOID Music settings/cache stored in AppData.
+
+; ------------------------------------------------------------------
+; Flutter path_provider stores data at %APPDATA%\<CompanyName>\<ProductName>
+; CompanyName = "SilentCode.CO"  (from Runner.rc)
+; ProductName = "Void Music"     (from Runner.rc)
+; ------------------------------------------------------------------
+
+; Primary data paths (Isar DB, settings, library, playlists – all live here)
+Type: filesandordirs; Name: "{userappdata}\SilentCode.CO\{#MyAppName}"
+Type: filesandordirs; Name: "{localappdata}\SilentCode.CO\{#MyAppName}"
+; Remove parent company folder if it becomes empty after the above
+Type: dirifempty;    Name: "{userappdata}\SilentCode.CO"
+Type: dirifempty;    Name: "{localappdata}\SilentCode.CO"
+
+; Legacy / fallback path variants (older builds or manual runs)
+Type: filesandordirs; Name: "{userappdata}\voidmusic"
+Type: filesandordirs; Name: "{localappdata}\voidmusic"
+Type: filesandordirs; Name: "{userappdata}\VoidMusic"
+Type: filesandordirs; Name: "{localappdata}\VoidMusic"
 Type: filesandordirs; Name: "{userappdata}\{#MyAppName}"
 Type: filesandordirs; Name: "{localappdata}\{#MyAppName}"
+
+[Code]
+
+{ Ask the user during uninstall whether to wipe all app data }
+var
+  DeleteDataPage: TInputOptionWizardPage;
+
+procedure InitializeUninstallProgressForm();
+begin
+  { nothing extra needed here }
+end;
+
+function InitializeUninstall(): Boolean;
+begin
+  Result := True;
+end;
+
+procedure InitializeWizard();
+begin
+  { This runs for the installer wizard only; skip for uninstall }
+end;
+
+function UninstallShouldDeleteAppData(): Boolean;
+begin
+  { Default: wipe data so a fresh reinstall truly starts clean }
+  Result := MsgBox(
+    'Do you want to delete ALL Void Music data?' + #13#10 +
+    '(Library, playlists, settings, download history)' + #13#10#13#10 +
+    'Choose YES for a completely fresh install next time.' + #13#10 +
+    'Choose NO to keep your library and settings.',
+    mbConfirmation, MB_YESNO) = IDYES;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+var
+  AppDataPath, LocalDataPath: String;
+begin
+  if CurUninstallStep = usPostUninstall then
+  begin
+    if UninstallShouldDeleteAppData() then
+    begin
+      { Primary Flutter path_provider paths }
+      AppDataPath   := ExpandConstant('{userappdata}\SilentCode.CO\{#MyAppName}');
+      LocalDataPath := ExpandConstant('{localappdata}\SilentCode.CO\{#MyAppName}');
+
+      if DirExists(AppDataPath)   then DelTree(AppDataPath,   True, True, True);
+      if DirExists(LocalDataPath) then DelTree(LocalDataPath, True, True, True);
+
+      { Also clean up any legacy paths }
+      if DirExists(ExpandConstant('{userappdata}\voidmusic'))  then DelTree(ExpandConstant('{userappdata}\voidmusic'),  True, True, True);
+      if DirExists(ExpandConstant('{localappdata}\voidmusic')) then DelTree(ExpandConstant('{localappdata}\voidmusic'), True, True, True);
+      if DirExists(ExpandConstant('{userappdata}\VoidMusic'))  then DelTree(ExpandConstant('{userappdata}\VoidMusic'),  True, True, True);
+      if DirExists(ExpandConstant('{localappdata}\VoidMusic')) then DelTree(ExpandConstant('{localappdata}\VoidMusic'), True, True, True);
+
+      MsgBox('All Void Music data has been removed.', mbInformation, MB_OK);
+    end;
+  end;
+end;

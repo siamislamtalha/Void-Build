@@ -88,6 +88,8 @@ class SettingKeys {
   /// Once true, the bootstrap is never run again even if the user uninstalls plugins.
   static const String repositoriesBootstrapped = "repositoriesBootstrapped";
   static const String appSetupCompleted = "appSetupCompleted";
+  static const String appQualityMode = "appQualityMode";
+
 
   // ── Plugins ────────────────────────────────────────────────────────────────
   /// JSON-encoded list of plugin IDs that should auto-load on app startup.

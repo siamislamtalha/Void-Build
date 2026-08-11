@@ -4,7 +4,9 @@ import 'dart:ui' show lerpDouble, ImageFilter;
 import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/blocs/mini_player/mini_player_cubit.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
+import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/screens/widgets/media_metadata_links.dart';
+import 'package:voidmusic/screens/widgets/quality_badge.dart';
 import 'package:voidmusic/utils/load_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -576,6 +578,7 @@ class _TrackInfo extends StatelessWidget {
                 ),
               ),
             ),
+            if (song is Track) QualityBadge(song: song as Track),
           ],
         ),
         const SizedBox(height: 2),

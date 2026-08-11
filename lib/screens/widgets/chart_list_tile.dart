@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/screens/screen/chart/chart_view.dart';
+import 'package:voidmusic/screens/widgets/quality_badge.dart';
 import 'package:voidmusic/utils/load_image.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -101,18 +102,51 @@ class ChartListTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Default_Theme.secondoryTextStyleMedium.merge(
-                          TextStyle(
-                            fontSize: isMobile ? 15 : 17,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.2,
-                            color: Colors.white.withValues(alpha: 0.95),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Default_Theme.secondoryTextStyleMedium.merge(
+                                TextStyle(
+                                  fontSize: isMobile ? 15 : 17,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.2,
+                                  color: Colors.white.withValues(alpha: 0.95),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          QualityBadge(
+                            song: chartItem.item.when(
+                              track: (t) => t,
+                              album: (_) => Track(
+                                id: '',
+                                title: title,
+                                artists: const [],
+                                thumbnail: Artwork(url: imgUrl, layout: ImageLayout.square),
+                                isExplicit: false,
+                              ),
+                              artist: (_) => Track(
+                                id: '',
+                                title: title,
+                                artists: const [],
+                                thumbnail: Artwork(url: imgUrl, layout: ImageLayout.square),
+                                isExplicit: false,
+                              ),
+                              playlist: (_) => Track(
+                                id: '',
+                                title: title,
+                                artists: const [],
+                                thumbnail: Artwork(url: imgUrl, layout: ImageLayout.square),
+                                isExplicit: false,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Text(

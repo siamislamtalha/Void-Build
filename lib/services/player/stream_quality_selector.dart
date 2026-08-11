@@ -49,6 +49,8 @@ String normalizeStoredStreamQualityLabel(
     case '128kbps':
       return AudioStreamQualityPreference.medium.label;
     case 'high':
+    case 'max':
+    case 'audiophile':
     case '320 kbps':
     case '320kbps':
     case '256 kbps':

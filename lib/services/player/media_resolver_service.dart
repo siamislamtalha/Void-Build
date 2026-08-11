@@ -6,6 +6,7 @@ import 'package:voidmusic/core/constants/setting_keys.dart';
 import 'package:voidmusic/core/models/exported.dart';
 import 'package:voidmusic/plugins/errors/plugin_exceptions.dart';
 import 'package:voidmusic/plugins/utils/media_id.dart';
+import 'package:voidmusic/services/audiophile_mode_service.dart';
 import 'package:voidmusic/services/db/dao/download_dao.dart';
 import 'package:voidmusic/services/db/dao/playlist_dao.dart';
 import 'package:voidmusic/services/db/dao/settings_dao.dart';
@@ -151,9 +152,11 @@ class MediaResolverService {
             normalizedQuality,
           );
         }
-        final preference = AudioStreamQualityPreferenceX.fromStored(
-          normalizedQuality,
-        );
+        final preference = AudiophileModeService.isAudiophile
+            ? AudioStreamQualityPreference.high
+            : AudioStreamQualityPreferenceX.fromStored(
+                normalizedQuality,
+              );
         final selectedStream = StreamQualitySelector.selectPlaybackStream(
           streams,
           preference: preference,

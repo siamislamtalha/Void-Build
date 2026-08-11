@@ -88,19 +88,60 @@ SectionEnd
 
 ; Uninstaller section
 Section "Uninstall"
-    ; Run cleanup script
-    ExecWait '"powershell.exe" -ExecutionPolicy Bypass -File "$INSTDIR\uninstall_cleanup.ps1" -InstallDir "$INSTDIR"'
-    
+    ; Ask user if they want to delete app data
+    MessageBox MB_YESNO|MB_ICONQUESTION \
+        "Do you want to delete ALL Void Music data?$\n(Library, playlists, settings, download history, and backups in Documents)$\n$\nYES = completely fresh install next time.$\nNO  = keep your library and settings." \
+        IDNO skip_data_delete
+
+    ; Execute powershell cleanup script if present
+    IfFileExists "$INSTDIR\uninstall_cleanup.ps1" 0 +2
+    ExecWait 'powershell.exe -ExecutionPolicy Bypass -NoProfile -File "$INSTDIR\uninstall_cleanup.ps1" -Silent'
+
+    ; Primary Flutter path_provider paths:
+    ;   %APPDATA%\SilentCode.CO\Void Music  (Isar DB, settings, playlists)
+    ;   %LOCALAPPDATA%\SilentCode.CO\Void Music  (cache)
+    RMDir /r "$APPDATA\SilentCode.CO\Void Music"
+    RMDir /r "$LOCALAPPDATA\SilentCode.CO\Void Music"
+    RMDir /r "$APPDATA\SilentCode.CO\VOID Music"
+    RMDir /r "$LOCALAPPDATA\SilentCode.CO\VOID Music"
+    RMDir     "$APPDATA\SilentCode.CO"          ; only if empty
+    RMDir     "$LOCALAPPDATA\SilentCode.CO"     ; only if empty
+
+    ; Documents backup files & folders (Restored automatically by DBProvider if left behind)
+    Delete "$DOCUMENTS\dbv3.isar"
+    Delete "$DOCUMENTS\voidmusic_backup_dbv3.isar"
+    RMDir /r "$DOCUMENTS\voidmusicBackup"
+    Delete "$DOCUMENTS\default.isar"
+    Delete "$DOCUMENTS\default.isar.db"
+    Delete "$DOCUMENTS\default.db"
+    Delete "$DOCUMENTS\voidmusic_migration_state.json"
+
+    ; Legacy paths
+    RMDir /r "$APPDATA\voidmusic"
+    RMDir /r "$LOCALAPPDATA\voidmusic"
+    RMDir /r "$APPDATA\VOID Music"
+    RMDir /r "$LOCALAPPDATA\VOID Music"
+    RMDir /r "$APPDATA\VoidMusic"
+    RMDir /r "$LOCALAPPDATA\VoidMusic"
+    RMDir /r "$APPDATA\com.example.voidmusic"
+    RMDir /r "$LOCALAPPDATA\com.example.voidmusic"
+
+    skip_data_delete:
+
     ; Delete files and directories
     RMDir /r "$INSTDIR"
-    
+
     ; Delete shortcuts
     Delete "$DESKTOP\${APPNAME}.lnk"
     RMDir /r "$SMPROGRAMS\${APPNAME}"
-    
+
     ; Remove registry keys
     DeleteRegKey ${INSTDIR_REG_ROOT} "${INSTDIR_REG_KEY}"
     DeleteRegKey ${INSTDIR_REG_ROOT} "${REG_UNINSTALL}"
+    DeleteRegKey HKCU "Software\SilentCode.CO"
+    DeleteRegKey HKCU "Software\Void Music"
+    DeleteRegKey HKCU "Software\VOID Music"
+    DeleteRegKey HKCU "Software\VoidMusic"
 SectionEnd
 
 ; Section descriptions

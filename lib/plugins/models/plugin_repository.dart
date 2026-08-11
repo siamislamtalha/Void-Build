@@ -84,25 +84,56 @@ class PluginRepositoryModel {
 
   factory PluginRepositoryModel.fromJson(
       String url, Map<String, dynamic> json) {
+    // Parse top-level plugins list
+    final topLevelPlugins = (json['plugins'] as List? ?? [])
+        .map((p) => RemotePluginModel.fromJson(Map<String, dynamic>.from(p)))
+        .toList();
+
+    // Also parse audiophile plugins from categories.Audiophile.plugins
+    // (used by bex-factory.json to separate hi-res plugins from standard ones)
+    final List<RemotePluginModel> audiophilePlugins = [];
+    final categories = json['categories'];
+    if (categories is Map) {
+      final audiophileCategory = categories['Audiophile'];
+      if (audiophileCategory is Map) {
+        final catPlugins = audiophileCategory['plugins'] as List?;
+        if (catPlugins != null) {
+          for (final p in catPlugins) {
+            if (p is Map) {
+              audiophilePlugins.add(
+                RemotePluginModel.fromJson(Map<String, dynamic>.from(p)),
+              );
+            }
+          }
+        }
+      }
+    }
+
+    // Merge both lists (avoid duplicates by ID)
+    final seenIds = <String>{};
+    final allPlugins = <RemotePluginModel>[];
+    for (final plugin in [...topLevelPlugins, ...audiophilePlugins]) {
+      if (seenIds.add(plugin.id)) {
+        allPlugins.add(plugin);
+      }
+    }
+
     // Handle both standard repository format and bex-factory format
     // bex-factory format has generated_at and plugins, but may not have plugin_count
-    final isBexFactoryFormat = json.containsKey('generated_at') && 
-                               json.containsKey('plugins') &&
-                               !json.containsKey('schema_version');
-    
+    final isBexFactoryFormat = json.containsKey('generated_at') &&
+        json.containsKey('plugins') &&
+        !json.containsKey('schema_version');
+
     if (isBexFactoryFormat) {
-      // bex-factory format: has generated_at, plugins
+      // bex-factory format: has generated_at, plugins, and optional categories
       return PluginRepositoryModel(
         url: url,
         schemaVersion: '1.0', // Default for bex-factory
-        name: 'Void Factory',
-        description: 'Void Music Plugin Factory',
+        name: json['name']?.toString() ?? 'Void Factory',
+        description:
+            json['description']?.toString() ?? 'Void Music Plugin Factory',
         thumbnailUrl: json['thumbnail_url']?.toString(),
-        plugins: (json['plugins'] as List?)
-                ?.map((p) =>
-                    RemotePluginModel.fromJson(Map<String, dynamic>.from(p)))
-                .toList() ??
-            [],
+        plugins: allPlugins,
         generatedAt: json['generated_at'] != null
             ? DateTime.tryParse(json['generated_at'].toString())
             : null,
@@ -115,11 +146,7 @@ class PluginRepositoryModel {
         name: json['name']?.toString() ?? 'Unknown Repository',
         description: json['description']?.toString() ?? '',
         thumbnailUrl: json['thumbnail_url']?.toString(),
-        plugins: (json['plugins'] as List?)
-                ?.map((p) =>
-                    RemotePluginModel.fromJson(Map<String, dynamic>.from(p)))
-                .toList() ??
-            [],
+        plugins: allPlugins,
         generatedAt: json['generated_at'] != null
             ? DateTime.tryParse(json['generated_at'].toString())
             : null,

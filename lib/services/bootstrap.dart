@@ -11,7 +11,9 @@ import 'package:voidmusic/services/db/dao/settings_dao.dart';
 import 'package:voidmusic/services/db/db_provider.dart';
 import 'package:voidmusic/services/local_music_service.dart';
 import 'package:voidmusic/services/network/proxy_service.dart';
+import 'package:voidmusic/services/audiophile_mode_service.dart';
 import 'package:voidmusic/services/onboarding_service.dart';
+
 import 'package:voidmusic/services/plugin_bootstrap_service.dart';
 import 'package:voidmusic/services/display/high_refresh_rate_service.dart';
 import 'package:voidmusic/services/bluetooth/bluetooth_codec_service.dart';
@@ -83,8 +85,10 @@ Future<void> bootstrapApp() async {
   try {
     final settingsDao = SettingsDAO(DBProvider.db);
     await OnboardingService.checkAndCacheDone(settingsDao);
+    await AudiophileModeService.checkAndCache(settingsDao);
     await PluginBootstrapService.checkAndCacheDone(settingsDao);
   } catch (e) {
+
     log('Could not load bootstrap flag (will re-run bootstrap)',
         error: e, name: 'Bootstrap');
   }

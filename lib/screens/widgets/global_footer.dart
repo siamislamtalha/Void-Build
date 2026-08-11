@@ -909,17 +909,36 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
 
     final activeTabIndex = items.indexWhere((i) => i.branchIndex == currentIndex).clamp(0, items.length - 1);
 
+    // ── Apple iOS 26 Liquid Glass reference settings ──────────────────────
     final glassSettings = LiquidGlassSettings(
-      thickness: 30,
-      blur: 3,
-      chromaticAberration: 0.3,
-      refractiveIndex: 1.59,
-      saturation: 0.7,
-      ambientStrength: 1,
+      thickness: 32,
+      blur: 4,
+      chromaticAberration: 0.45,
+      refractiveIndex: 1.68,
+      saturation: 0.85,
+      ambientStrength: 0.80,
       lightAngle: 0.75 * 3.141592653589793,
-      lightIntensity: 0.6,
+      lightIntensity: 0.85,
       glassColor: (isDark ? Colors.black : Colors.white)
-          .withValues(alpha: isDark ? 0.38 : 0.56),
+          .withValues(alpha: isDark ? 0.35 : 0.52),
+    );
+
+    final pillShadow = BoxDecoration(
+      borderRadius: BorderRadius.circular(29),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: isDark ? 0.38 : 0.14),
+          blurRadius: 24,
+          spreadRadius: -6,
+          offset: const Offset(0, 10),
+        ),
+        BoxShadow(
+          color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.06),
+          blurRadius: 8,
+          spreadRadius: 0,
+          offset: const Offset(0, 2),
+        ),
+      ],
     );
 
     final surface = AnimatedContainer(
@@ -927,80 +946,73 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
         curve: _kCollapseAnimCurve,
         width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
         height: _kNavBarH,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-              blurRadius: 20,
-              spreadRadius: -4,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(28),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-            child: Container(
-              decoration: BoxDecoration(
-                color: (isDark ? Colors.black : Colors.white)
-                    .withValues(alpha: isDark ? 0.20 : 0.35),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(
-                  color: Colors.white.withValues(
-                    alpha: isDark ? 0.12 : 0.20,
-                  ),
-                  width: 0.75,
-                ),
-              ),
-              child: widget.isMiniMode
-                  ? _CollapsedActiveIcon(
+        decoration: pillShadow,
+        child: widget.isMiniMode
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(29),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: (isDark ? Colors.black : Colors.white)
+                          .withValues(alpha: isDark ? 0.25 : 0.42),
+                      borderRadius: BorderRadius.circular(29),
+                      border: Border.all(
+                        color: Colors.white.withValues(
+                          alpha: isDark ? 0.15 : 0.24,
+                        ),
+                        width: 0.75,
+                      ),
+                    ),
+                    child: _CollapsedActiveIcon(
                       activeItem: items.firstWhere(
                           (item) => item.branchIndex == currentIndex,
                           orElse: () => items.first),
                       activeAccentColor: activeAccentColor,
                       onTap: widget.onTapCollapsed ?? () {},
-                    )
-                  : LiquidGlassLayer(
-                      settings: glassSettings,
-                      child: LiquidGlassBlendGroup(
-                        blend: 10,
-                        child: AdaptiveGlass.grouped(
-                          shape: const LiquidRoundedSuperellipse(borderRadius: 28),
-                          child: Container(
-                            height: _kNavBarH,
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: _TabIndicator(
-                              tabIndex: activeTabIndex,
-                              tabCount: items.length,
-                              onTabChanged: (index) {
-                                final targetBranch = items[index].branchIndex;
-                                widget.navigationShell.goBranch(targetBranch);
-                              },
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: items
-                                    .map(
-                                      (item) => _MuzoNavItem(
-                                        item: item,
-                                        selected: currentIndex == item.branchIndex,
-                                        onTap: () => widget.navigationShell
-                                            .goBranch(item.branchIndex),
-                                        onLongPress: () =>
-                                            _showSelectionChip(context, item),
-                                      ),
-                                    )
-                                    .toList(),
-                              ),
-                            ),
+                    ),
+                  ),
+                ),
+              )
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(29),
+                child: LiquidGlassLayer(
+                  settings: glassSettings,
+                  child: LiquidGlassBlendGroup(
+                    blend: 10,
+                    child: AdaptiveGlass.grouped(
+                      shape: const LiquidRoundedSuperellipse(borderRadius: 28),
+                      child: Container(
+                        height: _kNavBarH,
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: _TabIndicator(
+                          tabIndex: activeTabIndex,
+                          tabCount: items.length,
+                          onTabChanged: (index) {
+                            final targetBranch = items[index].branchIndex;
+                            widget.navigationShell.goBranch(targetBranch);
+                          },
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: items
+                                .map(
+                                  (item) => _MuzoNavItem(
+                                    item: item,
+                                    selected: currentIndex == item.branchIndex,
+                                    onTap: () => widget.navigationShell
+                                        .goBranch(item.branchIndex),
+                                    onLongPress: () =>
+                                        _showSelectionChip(context, item),
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ),
                       ),
                     ),
-            ),
-          ),
-        ),
+                  ),
+                ),
+              ),
       );
 
     return surface;
@@ -1182,7 +1194,8 @@ class _TabIndicatorState extends State<_TabIndicator>
               snapToEnd: true,
               duration: Duration(milliseconds: 300),
             ),
-            value: (_isDown || (alignment.x - targetAlignment).abs() > 0.30)
+            // Triggers dynamic appearance when dragging, swiping, or transitioning between tabs
+            value: (_isDown || _isDragging || (alignment.x - targetAlignment).abs() > 0.04)
                 ? 1.0
                 : 0.0,
             builder: (context, thickness, child) {
@@ -1198,12 +1211,12 @@ class _TabIndicatorState extends State<_TabIndicator>
                       useOwnLayer: true,
                       settings: LiquidGlassSettings(
                         glassColor: (isDark ? Colors.white : Colors.white)
-                            .withValues(alpha: isDark ? 0.12 : 0.25),
+                            .withValues(alpha: isDark ? 0.28 : 0.45),
                         saturation: 1.5,
-                        refractiveIndex: 1.15,
-                        thickness: 20,
-                        lightIntensity: 2.0,
-                        chromaticAberration: 0.5,
+                        refractiveIndex: 1.45,
+                        thickness: 24,
+                        lightIntensity: 2.2,
+                        chromaticAberration: 0.6,
                         blur: 0,
                       ),
                       shape: const LiquidRoundedSuperellipse(
@@ -1243,9 +1256,12 @@ class _IndicatorTransform extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Apple iOS 26 dynamic gesture glass pill:
+    // Lerps to a taller height (-14 top/bottom overflow) and narrower width (8 left/right padding)
+    // when swiping/tapping, creating the "short in width but big in height" liquid glass morph.
     final rect = RelativeRect.lerp(
       RelativeRect.fill,
-      const RelativeRect.fromLTRB(-14, -14, -14, -14),
+      const RelativeRect.fromLTRB(8, -14, 8, -14),
       thickness,
     );
     return Positioned.fill(
@@ -1261,23 +1277,27 @@ class _IndicatorTransform extends StatelessWidget {
           children: [
             Positioned.fromRelativeRect(
               rect: rect!,
-              child: SingleMotionBuilder(
-                motion: const Motion.bouncySpring(
-                  duration: Duration(milliseconds: 600),
+              child: Opacity(
+                // Invisible when resting at a tab (thickness = 0.0); appears dynamically when swiping/tapping
+                opacity: thickness.clamp(0.0, 1.0),
+                child: SingleMotionBuilder(
+                  motion: const Motion.bouncySpring(
+                    duration: Duration(milliseconds: 600),
+                  ),
+                  value: velocity,
+                  builder: (context, velocityVal, childWidget) {
+                    return Transform(
+                      alignment: Alignment.center,
+                      transform: _buildJellyTransform(
+                        velocity: Offset(velocityVal, 0),
+                        maxDistortion: 0.8,
+                        velocityScale: 10,
+                      ),
+                      child: childWidget,
+                    );
+                  },
+                  child: child,
                 ),
-                value: velocity,
-                builder: (context, velocityVal, childWidget) {
-                  return Transform(
-                    alignment: Alignment.center,
-                    transform: _buildJellyTransform(
-                      velocity: Offset(velocityVal, 0),
-                      maxDistortion: 0.8,
-                      velocityScale: 10,
-                    ),
-                    child: childWidget,
-                  );
-                },
-                child: child,
               ),
             ),
           ],
@@ -1305,85 +1325,73 @@ class _MuzoNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = Theme.of(context).colorScheme.onSurface;
     final activeColor = Theme.of(context).primaryColor;
 
-    final tab = GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
-      onLongPress: onLongPress,
-      child: Container(
-        height: 58,
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: selected
-            ? BoxDecoration(
-                color: (isDark ? Colors.black : Colors.white)
-                    .withValues(alpha: isDark ? 0.78 : 0.64),
-                borderRadius: BorderRadius.circular(29),
-                border: Border.all(
-                    color: Colors.white.withValues(alpha: isDark ? 0.34 : 0.62),
-                    width: 0.75),
-                boxShadow: [
-                  BoxShadow(
-                      color: activeColor.withValues(alpha: isDark ? 0.24 : 0.16),
-                      blurRadius: 16,
-                      spreadRadius: -5),
-                ],
-              )
-            : null,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              item.icon,
-              color: selected ? activeColor : textColor.withValues(alpha: 0.60),
-              size: 18,
-            ),
-            const SizedBox(height: 0.5),
-            Text(
-              item.label,
-              maxLines: 1,
-              style: TextStyle(
-                color: selected ? activeColor : textColor.withValues(alpha: 0.60),
-                fontSize: 8.5,
-                fontWeight: FontWeight.bold,
+    return Expanded(
+      child: Semantics(
+        button: true,
+        selected: selected,
+        label: item.label,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            HapticFeedback.lightImpact();
+            onTap();
+          },
+          onLongPress: onLongPress,
+          child: SizedBox(
+            height: 58,
+            child: Center(
+              child: AnimatedScale(
+                // Apple iOS 26: unselected items scale down more noticeably (~92%)
+                scale: selected ? 1.0 : 0.92,
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                child: AnimatedOpacity(
+                  // Apple iOS 26: inactive icons at ~55% opacity for clear hierarchy
+                  opacity: selected ? 1.0 : 0.55,
+                  duration: const Duration(milliseconds: 180),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        item.icon,
+                        color: selected ? activeColor : textColor,
+                        size: selected ? 22 : 20,
+                      ),
+                      // ── Apple iOS 26: label ONLY for the selected tab ─────
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOutCubic,
+                        child: selected
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Text(
+                                  item.label,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: activeColor,
+                                    fontSize: 9,
+                                    height: 1,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.3,
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
-
-    final selectedChild = selected
-        ? Container(
-            margin: const EdgeInsets.symmetric(vertical: 3, horizontal: 3),
-            decoration: BoxDecoration(
-              color: (isDark ? Colors.black : Colors.white)
-                  .withValues(alpha: isDark ? 0.78 : 0.64),
-              borderRadius: BorderRadius.circular(29),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: isDark ? 0.34 : 0.62),
-                width: 0.75,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: activeColor.withValues(alpha: isDark ? 0.24 : 0.16),
-                  blurRadius: 16,
-                  spreadRadius: -5,
-                ),
-              ],
-            ),
-            child: tab,
-          )
-        : tab;
-
-    return Expanded(child: selectedChild);
   }
 }
 

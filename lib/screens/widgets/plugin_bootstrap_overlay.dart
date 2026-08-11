@@ -7,6 +7,7 @@ import 'package:voidmusic/core/di/service_locator.dart';
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:voidmusic/plugins/services/plugin_repository_service.dart';
+import 'package:voidmusic/services/audiophile_mode_service.dart';
 import 'package:voidmusic/services/db/dao/settings_dao.dart';
 import 'package:voidmusic/services/db/db_provider.dart';
 import 'package:voidmusic/services/plugin_bootstrap_service.dart';
@@ -19,10 +20,12 @@ enum _Phase { running, success, failed, noInternet }
 class PluginBootstrapOverlay extends StatefulWidget {
   const PluginBootstrapOverlay({
     required this.onComplete,
+    this.isCleanReset = false,
     super.key,
   });
 
   final VoidCallback onComplete;
+  final bool isCleanReset;
 
   @override
   State<PluginBootstrapOverlay> createState() => _PluginBootstrapOverlayState();
@@ -86,10 +89,17 @@ class _PluginBootstrapOverlayState extends State<PluginBootstrapOverlay>
     final settingsDao = SettingsDAO(DBProvider.db);
     final repositoryService = PluginRepositoryService(settingsDao: settingsDao);
 
+    // ── CRITICAL: cache quality mode BEFORE running bootstrap so the
+    // plugin filter (audiophile vs normal) is correct on first launch.
+    // Without this, AudiophileModeService.isAudiophile always returns false
+    // even if the user selected audiophile during onboarding.
+    await AudiophileModeService.checkAndCache(settingsDao);
+
     final result = await PluginBootstrapService.run(
       pluginService: ServiceLocator.pluginService,
       repositoryService: repositoryService,
       settingsDao: settingsDao,
+      isCleanReset: widget.isCleanReset,
       onProgress: (progress) {
         if (mounted) {
           _progress.value = progress.percent.clamp(0, 100);
@@ -184,6 +194,9 @@ class _SpinnerBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: avoid_redundant_argument_values
+    final isAudiophile = _readAudiophileMode();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
       child: Column(
@@ -213,14 +226,20 @@ class _SpinnerBody extends StatelessWidget {
                         color: AppTheme.accentColor(context),
                         size: 36,
                       )
-                    : SizedBox(
-                        width: 36,
-                        height: 36,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: AppTheme.accentColor(context),
-                        ),
-                      ),
+                    : isAudiophile
+                        ? const Icon(
+                            Icons.headphones_rounded,
+                            color: Color(0xFFFFB703),
+                            size: 36,
+                          )
+                        : SizedBox(
+                            width: 36,
+                            height: 36,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: AppTheme.accentColor(context),
+                            ),
+                          ),
               ),
             ),
           ),
@@ -235,7 +254,51 @@ class _SpinnerBody extends StatelessWidget {
               letterSpacing: -0.3,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
+          // Mode badge
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            decoration: BoxDecoration(
+              color: isAudiophile
+                  ? const Color(0xFFFFB703).withValues(alpha: 0.15)
+                  : Colors.white.withValues(alpha: 0.07),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isAudiophile
+                    ? const Color(0xFFFFB703).withValues(alpha: 0.5)
+                    : Colors.white.withValues(alpha: 0.15),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isAudiophile
+                      ? Icons.headphones_rounded
+                      : Icons.music_note_rounded,
+                  size: 13,
+                  color: isAudiophile
+                      ? const Color(0xFFFFB703)
+                      : Colors.white60,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  isAudiophile
+                      ? 'Audiophile Mode  •  FLAC / HD FLAC / DSD'
+                      : 'Normal Mode  •  Standard Plugins',
+                  style: TextStyle(
+                    color: isAudiophile
+                        ? const Color(0xFFFFB703)
+                        : Colors.white60,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           ValueListenableBuilder<int>(
             valueListenable: progress,
             builder: (context, percent, _) => AnimatedSwitcher(
@@ -266,7 +329,12 @@ class _SpinnerBody extends StatelessWidget {
       ),
     );
   }
+
+  static bool _readAudiophileMode() {
+    return AudiophileModeService.isAudiophile;
+  }
 }
+
 
 class _ErrorBody extends StatelessWidget {
   const _ErrorBody({

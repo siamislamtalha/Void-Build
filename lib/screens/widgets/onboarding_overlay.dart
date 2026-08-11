@@ -3,7 +3,9 @@ import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:voidmusic/l10n/language_options.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/country_setting.dart';
+import 'package:voidmusic/services/audiophile_mode_service.dart';
 import 'package:voidmusic/services/db/dao/settings_dao.dart';
+
 import 'package:voidmusic/services/db/db_provider.dart';
 import 'package:voidmusic/services/onboarding_service.dart';
 import 'package:voidmusic/utils/country_info.dart';
@@ -31,6 +33,9 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
   bool _isResolvingCountry = false;
   bool _countryTouchedByUser = false;
   Locale? _currentLocale;
+
+  int _onboardingStep = 0;
+  String _selectedQualityMode = QualityModeValues.normal;
 
   @override
   void initState() {
@@ -137,6 +142,18 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
     }
   }
 
+  Future<void> _goToQualityStep() async {
+    await _settingsDao.putSettingBool(
+      SettingKeys.autoGetCountry,
+      _autoDetectCountry,
+    );
+    await _settingsDao.putSettingStr(SettingKeys.countryCode, _selectedCountry);
+    await _settingsDao.putSettingStr(SettingKeys.languageCode, _selectedLang);
+    setState(() {
+      _onboardingStep = 1;
+    });
+  }
+
   Future<void> _finish() async {
     await _settingsDao.putSettingBool(
       SettingKeys.autoGetCountry,
@@ -144,6 +161,7 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
     );
     await _settingsDao.putSettingStr(SettingKeys.countryCode, _selectedCountry);
     await _settingsDao.putSettingStr(SettingKeys.languageCode, _selectedLang);
+    await AudiophileModeService.setMode(_settingsDao, _selectedQualityMode);
     await OnboardingService.markDone(_settingsDao);
     widget.onComplete();
   }
@@ -230,124 +248,16 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
                           ),
                         ],
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Icon(
-                            MingCute.music_2_fill,
-                            size: 70,
-                            color: AppTheme.accentColor(context),
-                          ),
-                          const SizedBox(height: 18),
-                          Text(
-                            l10n.onboardingTitle,
-                            style: textTheme.headlineMedium?.copyWith(
-                              color: Default_Theme.primaryColor1,
-                              fontWeight: FontWeight.w800,
-                              fontFamily:
-                                  Default_Theme.secondoryTextStyle.fontFamily,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            l10n.onboardingSubtitle,
-                            style: textTheme.bodyLarge?.copyWith(
-                              color: Default_Theme.primaryColor1
-                                  .withValues(alpha: 0.75),
-                              fontFamily:
-                                  Default_Theme.secondoryTextStyle.fontFamily,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 30),
-                          _FieldLabel(label: l10n.countrySettingLanguageLabel),
-                          const SizedBox(height: 10),
-                          _DropdownField(
-                            value: _selectedLang,
-                            items: languageItems,
-                            onChanged: _updateLang,
-                          ),
-                          const SizedBox(height: 22),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: _FieldLabel(
-                                  label: l10n.countrySettingAutoDetect,
-                                ),
-                              ),
-                              if (_isResolvingCountry)
-                                SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppTheme.accentColor(context),
-                                  ),
-                                ),
-                              if (_isResolvingCountry)
-                                const SizedBox(width: 10),
-                              _AestheticSwitch(
-                                value: _autoDetectCountry,
-                                onChanged: _updateAutoDetect,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          AnimatedOpacity(
-                            opacity: _autoDetectCountry ? 0.6 : 1,
-                            duration: const Duration(milliseconds: 180),
-                            child: IgnorePointer(
-                              ignoring: _autoDetectCountry,
-                              child: _DropdownField(
-                                value: selectedCountry,
-                                items: countryItems
-                                    .map(
-                                      (e) => DropdownMenuItem(
-                                        value: e.value,
-                                        child: Text('${e.key} (${e.value})'),
-                                      ),
-                                    )
-                                    .toList(),
-                                onChanged: _updateCountry,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 28),
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: _finish,
-                              borderRadius: BorderRadius.circular(14),
-                              splashColor: Colors.white.withValues(alpha: 0.15),
-                              child: Ink(
-                                decoration: BoxDecoration(
-                                  color: AppTheme.accentColor(context),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 15),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    l10n.continueButton,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.black
-                                          : Colors.white,
-                                      fontFamily: 'Gilroy',
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      child: _onboardingStep == 0
+                          ? _buildCountryStep(
+                              context,
+                              l10n,
+                              textTheme,
+                              languageItems,
+                              countryItems,
+                              selectedCountry,
+                            )
+                          : _buildQualityStep(context, l10n, textTheme),
                     ),
                   ),
                 ),
@@ -358,6 +268,256 @@ class _OnboardingOverlayState extends State<OnboardingOverlay> {
       ),
     );
   }
+
+  Widget _buildCountryStep(
+    BuildContext context,
+    AppLocalizations l10n,
+    TextTheme textTheme,
+    List<DropdownMenuItem<String>> languageItems,
+    List<MapEntry<String, String>> countryItems,
+    String selectedCountry,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Icon(
+          MingCute.music_2_fill,
+          size: 70,
+          color: AppTheme.accentColor(context),
+        ),
+        const SizedBox(height: 18),
+        Text(
+          l10n.onboardingTitle,
+          style: textTheme.headlineMedium?.copyWith(
+            color: Default_Theme.primaryColor1,
+            fontWeight: FontWeight.w800,
+            fontFamily: Default_Theme.secondoryTextStyle.fontFamily,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          l10n.onboardingSubtitle,
+          style: textTheme.bodyLarge?.copyWith(
+            color: Default_Theme.primaryColor1.withValues(alpha: 0.75),
+            fontFamily: Default_Theme.secondoryTextStyle.fontFamily,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 30),
+        _FieldLabel(label: l10n.countrySettingLanguageLabel),
+        const SizedBox(height: 10),
+        _DropdownField(
+          value: _selectedLang,
+          items: languageItems,
+          onChanged: _updateLang,
+        ),
+        const SizedBox(height: 22),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: _FieldLabel(
+                label: l10n.countrySettingAutoDetect,
+              ),
+            ),
+            if (_isResolvingCountry)
+              SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppTheme.accentColor(context),
+                ),
+              ),
+            if (_isResolvingCountry) const SizedBox(width: 10),
+            _AestheticSwitch(
+              value: _autoDetectCountry,
+              onChanged: _updateAutoDetect,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        AnimatedOpacity(
+          opacity: _autoDetectCountry ? 0.6 : 1,
+          duration: const Duration(milliseconds: 180),
+          child: IgnorePointer(
+            ignoring: _autoDetectCountry,
+            child: _DropdownField(
+              value: selectedCountry,
+              items: countryItems
+                  .map(
+                    (e) => DropdownMenuItem(
+                      value: e.value,
+                      child: Text('${e.key} (${e.value})'),
+                    ),
+                  )
+                  .toList(),
+              onChanged: _updateCountry,
+            ),
+          ),
+        ),
+        const SizedBox(height: 28),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _goToQualityStep,
+            borderRadius: BorderRadius.circular(14),
+            splashColor: Colors.white.withValues(alpha: 0.15),
+            child: Ink(
+              decoration: BoxDecoration(
+                color: AppTheme.accentColor(context),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.continueButton,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.white,
+                        fontFamily: 'Gilroy',
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      MingCute.right_line,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black
+                          : Colors.white,
+                      size: 22,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQualityStep(
+    BuildContext context,
+    AppLocalizations l10n,
+    TextTheme textTheme,
+  ) {
+    final accentColor = AppTheme.accentColor(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  _onboardingStep = 0;
+                });
+              },
+              icon: const Icon(
+                MingCute.left_line,
+                color: Default_Theme.primaryColor1,
+              ),
+              tooltip: 'Back',
+            ),
+            const Spacer(),
+            Icon(
+              MingCute.disc_fill,
+              size: 40,
+              color: accentColor,
+            ),
+            const Spacer(),
+            const SizedBox(width: 48),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'Select Audio Quality',
+          style: textTheme.headlineMedium?.copyWith(
+            color: Default_Theme.primaryColor1,
+            fontWeight: FontWeight.w800,
+            fontFamily: Default_Theme.secondoryTextStyle.fontFamily,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Choose your preferred playback and source ecosystem mode',
+          style: textTheme.bodyLarge?.copyWith(
+            color: Default_Theme.primaryColor1.withValues(alpha: 0.75),
+            fontFamily: Default_Theme.secondoryTextStyle.fontFamily,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 24),
+        _QualityOptionCard(
+          title: 'Normal Mode',
+          subtitle: 'Downloads 14 standard .bex plugins for general music streaming and fast playback.',
+          badgeText: '14 Plugins (.bex)',
+          icon: MingCute.music_2_line,
+          isSelected: _selectedQualityMode == QualityModeValues.normal,
+          onTap: () {
+            setState(() {
+              _selectedQualityMode = QualityModeValues.normal;
+            });
+          },
+        ),
+        const SizedBox(height: 16),
+        _QualityOptionCard(
+          title: 'Audiophile Mode',
+          subtitle: 'Downloads all 11 SpotiFLAC extensions (.sflx & .spotiflac-ext) for Lossless FLAC, HD FLAC & DSD streaming & downloads. Excludes standard .bex plugins.',
+          badgeText: '11 Plugins (FLAC / DSD) 🎧',
+          badgeColor: const Color(0xFFFFB703),
+          icon: MingCute.headphone_line,
+          isSelected: _selectedQualityMode == QualityModeValues.audiophile,
+          onTap: () {
+            setState(() {
+              _selectedQualityMode = QualityModeValues.audiophile;
+            });
+          },
+        ),
+        const SizedBox(height: 28),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _finish,
+            borderRadius: BorderRadius.circular(14),
+            splashColor: Colors.white.withValues(alpha: 0.15),
+            child: Ink(
+              decoration: BoxDecoration(
+                color: accentColor,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                alignment: Alignment.center,
+                child: Text(
+                  'Get Started',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.black
+                        : Colors.white,
+                    fontFamily: 'Gilroy',
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
 }
 
 class _FieldLabel extends StatelessWidget {
@@ -487,3 +647,138 @@ class _AestheticSwitch extends StatelessWidget {
     );
   }
 }
+
+class _QualityOptionCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String badgeText;
+  final Color? badgeColor;
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _QualityOptionCard({
+    required this.title,
+    required this.subtitle,
+    required this.badgeText,
+    this.badgeColor,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = AppTheme.accentColor(context);
+    final effectiveBadgeColor = badgeColor ?? accent;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? accent.withValues(alpha: 0.12)
+                : const Color(0xFF1C1624),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isSelected
+                  ? accent
+                  : Default_Theme.primaryColor1.withValues(alpha: 0.12),
+              width: isSelected ? 2.0 : 1.0,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: accent.withValues(alpha: 0.2),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    )
+                  ]
+                : null,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? accent
+                      : Default_Theme.primaryColor1.withValues(alpha: 0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: isSelected ? Colors.black : accent,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                              color: Default_Theme.primaryColor1,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: Default_Theme
+                                  .secondoryTextStyle.fontFamily,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: effectiveBadgeColor.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: effectiveBadgeColor.withValues(alpha: 0.5),
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            badgeText,
+                            style: TextStyle(
+                              color: effectiveBadgeColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: Default_Theme.primaryColor1
+                            .withValues(alpha: 0.7),
+                        fontSize: 13,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+

@@ -13,7 +13,9 @@ import 'package:voidmusic/blocs/media_player/voidmusic_player_cubit.dart';
 import 'package:voidmusic/core/models/exported.dart' hide MediaItem;
 import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:voidmusic/screens/widgets/media_metadata_links.dart';
+import 'package:voidmusic/screens/widgets/quality_badge.dart';
 import 'package:voidmusic/screens/widgets/source_badge.dart';
+
 import 'package:voidmusic/utils/load_image.dart';
 
 class SongCardWidget extends StatelessWidget {
@@ -158,19 +160,27 @@ class SongCardWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          AnimatedDefaultTextStyle(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeOutCubic,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: -0.2,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            child: Text(song.title),
+                          Row(
+                            children: [
+                              Flexible(
+                                child: AnimatedDefaultTextStyle(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeOutCubic,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: -0.2,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  child: Text(song.title),
+                                ),
+                              ),
+                              QualityBadge(song: song),
+                            ],
                           ),
+
                           const SizedBox(height: 3),
                           if (subtitleOverride != null)
                             Text(

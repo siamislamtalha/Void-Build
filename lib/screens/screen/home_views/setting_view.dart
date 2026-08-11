@@ -2,6 +2,7 @@ import 'package:voidmusic/screens/screen/home_views/setting_views/about.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/appui_setting.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/local_music_setting.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/plugin_defaults_setting.dart';
+import 'package:voidmusic/screens/screen/home_views/setting_views/quality_mode_setting.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/storage_setting.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/country_setting.dart';
 import 'package:voidmusic/screens/screen/home_views/setting_views/download_setting.dart';
@@ -51,6 +52,15 @@ class SettingsView extends StatelessWidget {
               // ── Group 1: Core App & Plugins ──
               _SettingsSection(
                 children: [
+                  _SettingsTile(
+                    title: 'Quality Mode',
+                    subtitle: 'Normal vs Audiophile (FLAC/DSD) mode',
+                    icon: MingCute.disc_fill,
+                    iconColor: const Color(0xFFFFB703),
+                    isHighlightIcon: true,
+                    onTap: () =>
+                        _navigate(context, const QualityModeSetting()),
+                  ),
                   _SettingsTile(
                     title: AppLocalizations.of(context)!.settingsPlugins,
                     subtitle:

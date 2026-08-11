@@ -8,7 +8,9 @@ import 'package:voidmusic/core/constants/setting_keys.dart';
 import 'package:voidmusic/plugins/models/plugin_repository.dart';
 import 'package:voidmusic/plugins/utils/plugin_constants.dart';
 import 'package:voidmusic/plugins/services/plugin_repository_service.dart';
+import 'package:voidmusic/services/audiophile_mode_service.dart';
 import 'package:voidmusic/services/db/dao/settings_dao.dart';
+
 import 'package:voidmusic/services/plugin/plugin_load_state_service.dart';
 import 'package:voidmusic/services/plugin/plugin_service.dart';
 import 'package:voidmusic/src/rust/api/plugin/plugin_info.dart';
@@ -96,15 +98,84 @@ class PluginBootstrapService {
     }
   }
 
+  /// Completely uninstalls all existing plugins, clears stored auto-load keys,
+  /// deletes leftover temporary plugin files/residue from storage, and resets bootstrap flags.
+  static Future<void> purgeAllPluginsAndResidue({
+    required PluginService pluginService,
+    required SettingsDAO settingsDao,
+  }) async {
+    try {
+      log('Starting clean purge of all installed plugins and residue...',
+          name: 'PluginBootstrap');
+      final available = await _safeGetAvailable(pluginService);
+      for (final plugin in available) {
+        try {
+          await pluginService.deletePlugin(
+            pluginId: plugin.manifest.id,
+            pluginType: plugin.pluginType,
+          );
+          log('Deleted plugin: ${plugin.manifest.id}', name: 'PluginBootstrap');
+        } catch (e) {
+          log('Failed to delete plugin ${plugin.manifest.id}: $e',
+              name: 'PluginBootstrap');
+        }
+      }
+
+      // Reset auto-load keys & defaults in DB
+      final loadStateService = PluginLoadStateService(settingsDao);
+      await loadStateService.writeAutoLoadPluginIds({});
+      await settingsDao.putSettingStr(SettingKeys.homePluginIds, '[]');
+      await settingsDao.putSettingStr(SettingKeys.searchPluginIds, '[]');
+      await settingsDao.putSettingStr(SettingKeys.suggestionPluginIds, '[]');
+      await settingsDao.putSettingBool(SettingKeys.repositoriesBootstrapped, false);
+      _bootstrapDone = false;
+
+      // Clean temporary directory residue (.bex, .sflx, .spotiflac-ext files)
+      try {
+        final tmpDir = await getTemporaryDirectory();
+        if (await tmpDir.exists()) {
+          final entities = tmpDir.listSync();
+          for (final entity in entities) {
+            if (entity is File) {
+              final lower = entity.path.toLowerCase();
+              if (lower.endsWith('.bex') ||
+                  lower.endsWith('.sflx') ||
+                  lower.endsWith('.spotiflac-ext')) {
+                await entity.delete();
+              }
+            }
+          }
+        }
+      } catch (e) {
+        log('Temp directory residue cleanup warning: $e', name: 'PluginBootstrap');
+      }
+
+      await pluginService.refreshPlugins();
+      log('Purge completed successfully.', name: 'PluginBootstrap');
+    } catch (e) {
+      log('Error during plugin purge: $e', name: 'PluginBootstrap');
+    }
+  }
+
   static Future<PluginBootstrapResult> run({
     required PluginService pluginService,
     required PluginRepositoryService repositoryService,
     required SettingsDAO settingsDao,
     required void Function(PluginBootstrapProgress progress) onProgress,
+    bool isCleanReset = false,
   }) async {
     final errors = <String>[];
 
     onProgress(const PluginBootstrapProgress(8));
+
+    if (isCleanReset) {
+      log('Clean reset enabled: purging old plugins and residue before setup...',
+          name: 'PluginBootstrap');
+      await purgeAllPluginsAndResidue(
+        pluginService: pluginService,
+        settingsDao: settingsDao,
+      );
+    }
 
     // Country restrictions removed - all plugins available to all countries
     log('Bootstrap policy country: <all countries allowed>',
@@ -180,11 +251,41 @@ class PluginBootstrapService {
     final available = await _safeGetAvailable(pluginService);
     final installedIds = available.map((p) => p.manifest.id).toSet();
     final bootstrapTargetIds = <String>{};
-    final totalPlugins =
-        installRepos.fold<int>(0, (sum, repo) => sum + repo.plugins.length);
+
+    final isAudiophile = AudiophileModeService.isAudiophile;
+    log('Bootstrap Quality Mode: ${isAudiophile ? "Audiophile (.sflx / .spotiflac-ext)" : "Normal (.bex)"}',
+        name: 'PluginBootstrap');
+
+    // Filter plugins according to mode
+    final filteredInstallRepos = installRepos.map((repo) {
+      final modePlugins = repo.plugins.where((plugin) {
+        final assetName = plugin.assetName.toLowerCase();
+        final id = plugin.id.toLowerCase();
+        if (isAudiophile) {
+          return assetName.endsWith('.sflx') ||
+              assetName.endsWith('.spotiflac-ext') ||
+              id.startsWith('audiophile.');
+        } else {
+          return assetName.endsWith('.bex') && !id.startsWith('audiophile.');
+        }
+      }).toList();
+      return PluginRepositoryModel(
+        url: repo.url,
+        schemaVersion: repo.schemaVersion,
+        name: repo.name,
+        description: repo.description,
+        thumbnailUrl: repo.thumbnailUrl,
+        plugins: modePlugins,
+        generatedAt: repo.generatedAt,
+      );
+
+    }).toList();
+
+    final totalPlugins = filteredInstallRepos.fold<int>(
+        0, (sum, repo) => sum + repo.plugins.length);
     var processedPlugins = 0;
 
-    for (final repo in installRepos) {
+    for (final repo in filteredInstallRepos) {
       for (final plugin in repo.plugins) {
         onProgress(PluginBootstrapProgress(40 +
             ((processedPlugins * 55) ~/
@@ -301,13 +402,25 @@ class PluginBootstrapService {
   ) async {
     try {
       final available = await _safeGetAvailable(pluginService);
+      final isAudiophile = AudiophileModeService.isAudiophile;
+
+      if (isAudiophile) {
+        // Enforce highest quality audio setting
+        await settingsDao.putSettingStr(SettingKeys.strmQuality, "Max");
+        await settingsDao.putSettingStr(SettingKeys.downQuality, "Max");
+        log('Auto-set stream and download quality to Max for Audiophile mode',
+            name: 'PluginBootstrap');
+      }
 
       final currentSuggestion =
           await settingsDao.getSettingStr(SettingKeys.suggestionPluginIds);
       if (currentSuggestion == null || currentSuggestion.isEmpty) {
         final suggestionPlugin = available.firstWhere(
           (p) => p.pluginType == PluginType.searchSuggestionProvider,
-          orElse: () => throw StateError('none'),
+          orElse: () => available.firstWhere(
+            (p) => true,
+            orElse: () => throw StateError('none'),
+          ),
         );
         await settingsDao.putSettingStr(
             SettingKeys.suggestionPluginIds, jsonEncode([suggestionPlugin.manifest.id]));
@@ -318,14 +431,9 @@ class PluginBootstrapService {
       final currentHome =
           await settingsDao.getSettingStr(SettingKeys.homePluginIds);
       if (currentHome == null || currentHome.isEmpty || currentHome == '[]') {
-        // Prefer multi-source plugin for home if available
         final homePlugin = available.firstWhere(
-          (p) => p.pluginType == PluginType.contentResolver &&
-                  p.manifest.id == 'content-resolver.bloomfactory.multisource',
-          orElse: () => available.firstWhere(
-            (p) => p.pluginType == PluginType.contentResolver,
-            orElse: () => throw StateError('none'),
-          ),
+          (p) => p.pluginType == PluginType.contentResolver || p.manifest.id.contains('audiophile') || p.manifest.id.contains('spotify') || p.manifest.id.contains('ytmusic'),
+          orElse: () => available.isNotEmpty ? available.first : throw StateError('none'),
         );
         await settingsDao.putSettingStr(
             SettingKeys.homePluginIds, jsonEncode([homePlugin.manifest.id]));
@@ -336,14 +444,9 @@ class PluginBootstrapService {
       final currentSearch =
           await settingsDao.getSettingStr(SettingKeys.searchPluginIds);
       if (currentSearch == null || currentSearch.isEmpty || currentSearch == '[]') {
-        // Prefer multi-source plugin for search if available
         final searchPlugin = available.firstWhere(
-          (p) => p.pluginType == PluginType.contentResolver &&
-                  p.manifest.id == 'content-resolver.bloomfactory.multisource',
-          orElse: () => available.firstWhere(
-            (p) => p.pluginType == PluginType.contentResolver,
-            orElse: () => throw StateError('none'),
-          ),
+          (p) => p.pluginType == PluginType.contentResolver || p.manifest.id.contains('audiophile') || p.manifest.id.contains('spotify') || p.manifest.id.contains('ytmusic'),
+          orElse: () => available.isNotEmpty ? available.first : throw StateError('none'),
         );
         await settingsDao.putSettingStr(
             SettingKeys.searchPluginIds, jsonEncode([searchPlugin.manifest.id]));
@@ -352,6 +455,7 @@ class PluginBootstrapService {
       }
     } catch (_) {}
   }
+
 
   static Future<void> syncOnAppOpenIfDue({
     required PluginService pluginService,
@@ -410,13 +514,22 @@ class PluginBootstrapService {
         for (final plugin in available) plugin.manifest.id: plugin,
       };
 
+      final isAudiophile = AudiophileModeService.isAudiophile;
       final remoteLatestById = <String, RemotePluginModel>{};
       for (final repo in repos) {
         for (final remote in repo.plugins) {
           if (!_isRemoteManifestCompatible(remote)) {
             continue;
           }
-          // Country restrictions removed - all plugins available to all countries
+          final isAudiophilePlugin = remote.assetName.endsWith('.sflx') ||
+              remote.assetName.endsWith('.spotiflac-ext') ||
+              remote.id.startsWith('audiophile.');
+          if (isAudiophile && !isAudiophilePlugin) {
+            continue;
+          }
+          if (!isAudiophile && isAudiophilePlugin) {
+            continue;
+          }
           final existing = remoteLatestById[remote.id];
           if (existing == null ||
               _compareVersions(remote.version, existing.version) > 0) {

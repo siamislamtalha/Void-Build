@@ -16,9 +16,12 @@ import 'package:voidmusic/core/models/exported.dart';
 
 import 'package:voidmusic/l10n/app_localizations.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
+import 'package:voidmusic/screens/widgets/audiophile_download_sheet.dart';
 import 'package:voidmusic/screens/widgets/smart_replace_dialog.dart';
 import 'package:voidmusic/screens/widgets/song_tile.dart';
+import 'package:voidmusic/services/audiophile_mode_service.dart';
 import 'package:voidmusic/services/song_metadata_refresh_service.dart';
+
 
 void showMoreBottomSheet(
   BuildContext context,
@@ -310,12 +313,16 @@ class _TrackOptionsBottomSheet extends StatelessWidget {
                                     : l10n.menuDownload,
                                 iconColor: isDownloaded ? Colors.green : null,
                                 onTap: (sheetCtx) {
-                                  if (!isDownloaded) {
-                                    sheetCtx
-                                        .read<DownloaderCubit>()
-                                        .downloadSong(song);
-                                  }
                                   Navigator.pop(sheetCtx);
+                                  if (!isDownloaded) {
+                                    if (AudiophileModeService.isAudiophile) {
+                                      showAudiophileDownloadSheet(parentContext, song);
+                                    } else {
+                                      sheetCtx
+                                          .read<DownloaderCubit>()
+                                          .downloadSong(song);
+                                    }
+                                  }
                                 },
                               );
                             },

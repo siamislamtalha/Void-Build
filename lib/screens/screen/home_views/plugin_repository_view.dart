@@ -10,6 +10,7 @@ import 'package:voidmusic/screens/widgets/sign_board_widget.dart';
 import 'package:voidmusic/screens/widgets/bottom_safe_area_spacer.dart';
 import 'package:voidmusic/screens/widgets/snackbar.dart';
 import 'package:voidmusic/screens/screen/home_views/repository_detail_screen.dart';
+import 'package:voidmusic/services/audiophile_mode_service.dart';
 
 class PluginRepositoryView extends StatefulWidget {
   const PluginRepositoryView({super.key});
@@ -179,6 +180,52 @@ class _PluginRepositoryViewState extends State<PluginRepositoryView> {
                 ],
               ),
             ),
+            // ── Audiophile mode active banner ──
+            if (AudiophileModeService.isAudiophile)
+              Container(
+                margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFB703).withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFFFB703).withValues(alpha: 0.40),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(MingCute.headphone_line,
+                        color: Color(0xFFFFB703), size: 16),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'Audiophile Mode active — only .sflx / .spotiflac-ext plugins load',
+                        style: TextStyle(
+                          color: Color(0xFFFFD166),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFB703).withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: const Text(
+                        'HI-RES',
+                        style: TextStyle(
+                          color: Color(0xFFFFB703),
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             Expanded(
               child: BlocConsumer<PluginRepositoryCubit, PluginRepositoryState>(
                 listener: (context, state) {
@@ -419,6 +466,30 @@ class _RepoCard extends StatelessWidget {
                             _Badge(
                                 icon: MingCute.clock_2_line,
                                 label: generatedDate),
+                            // ── Plugin-type composition badge ──
+                            Builder(builder: (ctx) {
+                              final audiophileCount = repo.plugins.where((p) {
+                                final a = p.assetName.toLowerCase();
+                                return a.endsWith('.sflx') ||
+                                    a.endsWith('.spotiflac-ext') ||
+                                    p.id.startsWith('audiophile.');
+                              }).length;
+                              final standardCount =
+                                  repo.plugins.length - audiophileCount;
+                              if (audiophileCount > 0 && standardCount > 0) {
+                                return _Badge(
+                                    icon: MingCute.headphone_line,
+                                    label:
+                                        '$audiophileCount audiophile · $standardCount standard',
+                                    color: const Color(0xFFFFB703));
+                              } else if (audiophileCount > 0) {
+                                return const _Badge(
+                                    icon: MingCute.headphone_line,
+                                    label: 'Audiophile (.sflx / .spotiflac-ext)',
+                                    color: Color(0xFFFFB703));
+                              }
+                              return const SizedBox.shrink();
+                            }),
                           ],
                         ),
                       ),
@@ -472,28 +543,38 @@ String _localizedRepositoryError(BuildContext context, String rawMessage) {
 class _Badge extends StatelessWidget {
   final IconData icon;
   final String label;
-  const _Badge({required this.icon, required this.label});
+  /// Optional tint color for audiophile/special badges. Null = default muted.
+  final Color? color;
+  const _Badge({required this.icon, required this.label, this.color});
 
   @override
   Widget build(BuildContext context) {
+    final effectiveColor = color ??
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45);
+    final bgColor = color != null
+        ? color!.withValues(alpha: 0.10)
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05);
+    final borderColor = color != null
+        ? color!.withValues(alpha: 0.30)
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06);
+    final textColor = color ??
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+        color: bgColor,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
-              size: 11),
+          Icon(icon, color: effectiveColor, size: 11),
           const SizedBox(width: 4),
           Text(label,
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
+                  color: textColor,
                   fontSize: 11,
                   fontWeight: FontWeight.w600)),
         ],
@@ -501,6 +582,7 @@ class _Badge extends StatelessWidget {
     );
   }
 }
+
 
 class _AestheticButton extends StatelessWidget {
   final String text;

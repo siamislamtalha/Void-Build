@@ -27,6 +27,7 @@ import 'package:voidmusic/utils/load_image.dart';
 import 'package:voidmusic/utils/pallete_generator.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:voidmusic/screens/widgets/quality_badge.dart';
 import 'package:voidmusic/services/cast/google_cast_service.dart' as cast_service;
 import 'package:voidmusic/widgets/chromecast_icon.dart';
 import '../../blocs/media_player/voidmusic_player_cubit.dart';
@@ -342,16 +343,24 @@ class _SongInfoRow extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    currentTrack.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style:
-                        Default_Theme.secondoryTextStyle.merge(TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: primaryTextColor,
-                    )),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          currentTrack.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              Default_Theme.secondoryTextStyle.merge(TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: primaryTextColor,
+                          )),
+                        ),
+                      ),
+                      QualityBadge(song: currentTrack),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   TrackMetadataLinks(
