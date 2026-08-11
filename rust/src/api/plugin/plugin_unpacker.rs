@@ -8,12 +8,27 @@ use std::io::{BufReader, Read};
 use tar::Archive;
 use zstd::stream::read::Decoder;
 
+/// Parse a version string into a comparable u64 for version comparison.
+/// Accepts integer strings ("1", "42") and semver ("1.2.0", "v2.3.1").
+/// Returns the major version number so older/newer comparisons still work.
 fn parse_version_int(version: &str) -> Option<u64> {
-    let trimmed = version.trim();
-    if trimmed.is_empty() || !trimmed.chars().all(|c| c.is_ascii_digit()) {
+    let trimmed = version.trim().trim_start_matches('v');
+    if trimmed.is_empty() {
         return None;
     }
-    trimmed.parse::<u64>().ok()
+    // Try plain integer first
+    if let Ok(num) = trimmed.parse::<u64>() {
+        return Some(num);
+    }
+    // Accept semver: extract major.minor.patch and form a comparable u64
+    let parts: Vec<&str> = trimmed.splitn(3, '.').collect();
+    let major = parts.first().and_then(|s| s.parse::<u64>().ok()).unwrap_or(0);
+    let minor = parts.get(1).and_then(|s| s.parse::<u64>().ok()).unwrap_or(0);
+    let patch = parts.get(2)
+        .and_then(|s| s.split('-').next()) // strip pre-release e.g. "0-beta"
+        .and_then(|s| s.parse::<u64>().ok())
+        .unwrap_or(0);
+    Some(major * 1_000_000 + minor * 1_000 + patch)
 }
 
 pub async fn unpack_and_read_manifest(
@@ -93,17 +108,48 @@ pub async fn install_plugin(
         .await
         .with_context(|| format!("Failed to create directory '{}'", plugin_install_dir))?;
 
-    for file in ["manifest.json", "plugin.wasm", "plugin.wit"] {
-        let source = format!("{}/{}", temp_plugin_dir, file);
-        let dest = format!("{}/{}", plugin_install_dir, file);
-        if std::path::Path::new(&source).exists() {
-            tokio::fs::copy(&source, &dest)
-                .await
-                .with_context(|| format!("Failed to copy {}", file))?;
-        }
-    }
+    // Recursively copy every file from temp_plugin_dir to plugin_install_dir.
+    // SpotiFLAC .sflx archives contain index.js, assets, config files, etc.
+    // in addition to the standard manifest.json / plugin.wasm / plugin.wit.
+    copy_dir_all(temp_plugin_dir, &plugin_install_dir).with_context(|| {
+        format!(
+            "Failed to copy plugin files from '{}' to '{}'",
+            temp_plugin_dir, plugin_install_dir
+        )
+    })?;
 
     Ok((manifest.id.clone(), status))
+}
+
+/// Recursively copy all contents of `src` into `dst`.
+fn copy_dir_all(src: &str, dst: &str) -> Result<()> {
+    let src_path = std::path::Path::new(src);
+    let dst_path = std::path::Path::new(dst);
+    std::fs::create_dir_all(dst_path)
+        .with_context(|| format!("Failed to create directory '{}'", dst))?;
+    for entry in std::fs::read_dir(src_path)
+        .with_context(|| format!("Failed to read directory '{}'", src))?
+    {
+        let entry = entry.with_context(|| format!("Failed to read entry in '{}'", src))?;
+        let entry_type = entry.file_type()
+            .with_context(|| format!("Failed to get file type for '{:?}'", entry.path()))?;
+        let target = dst_path.join(entry.file_name());
+        if entry_type.is_dir() {
+            copy_dir_all(
+                &entry.path().to_string_lossy().to_string(),
+                &target.to_string_lossy().to_string(),
+            )?;
+        } else {
+            std::fs::copy(entry.path(), &target).with_context(|| {
+                format!(
+                    "Failed to copy '{:?}' to '{:?}'",
+                    entry.path(),
+                    target
+                )
+            })?;
+        }
+    }
+    Ok(())
 }
 
 pub async fn install_packed_plugin(

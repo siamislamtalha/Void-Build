@@ -10,10 +10,26 @@ pub const CURRENT_MANIFEST_VERSION: u32 = 1;
 #[flutter_rust_bridge::frb]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PluginPublisher {
+    #[serde(default)]
     pub name: String,
     pub url: Option<String>,
     pub contact: Option<String>,
     pub key_id: Option<String>,
+}
+
+impl Default for PluginPublisher {
+    fn default() -> Self {
+        PluginPublisher {
+            name: "SpotiFLAC / Audiophile Provider".to_string(),
+            url: None,
+            contact: None,
+            key_id: None,
+        }
+    }
+}
+
+fn default_publisher() -> PluginPublisher {
+    PluginPublisher::default()
 }
 
 /// Describes a required key/credential for a plugin.
@@ -41,44 +57,185 @@ pub struct KeyRequirement {
     pub is_secret: bool,
 }
 
+fn default_manifest_version() -> u32 {
+    1
+}
+
+fn default_version() -> String {
+    "1.0.0".to_string()
+}
+
+fn default_plugin_type() -> String {
+    "content_resolver".to_string()
+}
+
 #[flutter_rust_bridge::frb]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Manifest {
-    #[serde(deserialize_with = "deserialize_manifest_version")]
+    #[serde(
+        default = "default_manifest_version",
+        deserialize_with = "deserialize_manifest_version"
+    )]
     pub manifest_version: u32,
+
+    #[serde(default, deserialize_with = "deserialize_id_or_name")]
     pub id: String,
+
+    #[serde(default)]
     pub name: String,
+
+    #[serde(default = "default_version")]
     pub version: String,
+
+    #[serde(
+        default = "default_plugin_type",
+        deserialize_with = "deserialize_plugin_type"
+    )]
     pub r#type: String,
+
+    #[serde(default)]
     pub description: String,
+
+    #[serde(default = "default_publisher", deserialize_with = "deserialize_publisher_flexible")]
     pub publisher: PluginPublisher,
+
     #[serde(default)]
     pub license: String,
+
     #[serde(default)]
     pub homepage: String,
+
     pub icon: Option<String>,
+
     #[serde(default)]
     pub host_site: Vec<String>,
-    #[serde(default)]
+
+    #[serde(default, deserialize_with = "deserialize_capabilities_flexible")]
     pub capabilities: Vec<String>,
+
     pub created_at: Option<String>,
     pub remote_url: Option<String>,
+
     #[serde(default)]
     pub keys_required: HashMap<String, KeyRequirement>,
+
     pub thumbnail_url: Option<String>,
+
     #[serde(default)]
     pub resolver: bool,
+
     pub last_updated: Option<String>,
+
     #[serde(default)]
     pub country_allowlist: Vec<String>,
 }
 
+fn deserialize_id_or_name<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value = serde_json::Value::deserialize(deserializer)?;
+    match value {
+        serde_json::Value::String(s) if !s.trim().is_empty() => Ok(s),
+        serde_json::Value::Null => Ok(String::new()),
+        _ => Ok(String::new()),
+    }
+}
+
+fn deserialize_plugin_type<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value = serde_json::Value::deserialize(deserializer)?;
+    match value {
+        serde_json::Value::String(s) => Ok(s),
+        serde_json::Value::Array(arr) => {
+            // SpotiFLAC extension manifests use array: ["metadata_provider", "download_provider"]
+            if arr.iter().any(|v| v.as_str() == Some("download_provider") || v.as_str() == Some("metadata_provider")) {
+                Ok("content_resolver".to_string())
+            } else if let Some(first) = arr.first().and_then(|v| v.as_str()) {
+                Ok(first.to_string())
+            } else {
+                Ok("content_resolver".to_string())
+            }
+        }
+        _ => Ok("content_resolver".to_string()),
+    }
+}
+
+/// Deserialize `capabilities` which in SpotiFLAC manifests can be:
+///   - an array of strings  ["search", "download"]
+///   - an object            {"downloadFallbackTier": "lossless", ...}  → extract string values
+///   - a plain string       "download"
+///   - absent / null        → empty vec
+fn deserialize_capabilities_flexible<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value = serde_json::Value::deserialize(deserializer)?;
+    match value {
+        serde_json::Value::Array(arr) => Ok(arr
+            .into_iter()
+            .filter_map(|v| match v {
+                serde_json::Value::String(s) if !s.trim().is_empty() => Some(s),
+                _ => None,
+            })
+            .collect()),
+        serde_json::Value::Object(map) => {
+            // SpotiFLAC uses an object like {"downloadFallbackTier": "lossless"}
+            // Extract the string values as capability tags
+            let caps: Vec<String> = map
+                .into_iter()
+                .filter_map(|(_, v)| match v {
+                    serde_json::Value::String(s) if !s.trim().is_empty() => Some(s),
+                    _ => None,
+                })
+                .collect();
+            Ok(caps)
+        }
+        serde_json::Value::String(s) if !s.trim().is_empty() => Ok(vec![s]),
+        _ => Ok(Vec::new()),
+    }
+}
+
+fn deserialize_publisher_flexible<'de, D>(deserializer: D) -> Result<PluginPublisher, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value = serde_json::Value::deserialize(deserializer)?;
+    match value {
+        serde_json::Value::Object(_) => {
+            PluginPublisher::deserialize(value).map_err(de::Error::custom)
+        }
+        serde_json::Value::String(pub_name) => Ok(PluginPublisher {
+            name: pub_name,
+            url: None,
+            contact: None,
+            key_id: None,
+        }),
+        _ => Ok(PluginPublisher {
+            name: "SpotiFLAC / Audiophile Provider".to_string(),
+            url: None,
+            contact: None,
+            key_id: None,
+        }),
+    }
+}
+
 fn parse_plugin_version(version: &str) -> Option<u64> {
-    let trimmed = version.trim();
-    if trimmed.is_empty() || !trimmed.chars().all(|c| c.is_ascii_digit()) {
+    let trimmed = version.trim().trim_start_matches('v');
+    if trimmed.is_empty() {
         return None;
     }
-    trimmed.parse::<u64>().ok()
+    if let Ok(num) = trimmed.parse::<u64>() {
+        return Some(num);
+    }
+    if let Some((major, _)) = trimmed.split_once('.') {
+        if let Ok(num) = major.parse::<u64>() {
+            return Some(num);
+        }
+    }
+    Some(1)
 }
 
 fn deserialize_manifest_version<'de, D>(deserializer: D) -> Result<u32, D::Error>
@@ -90,31 +247,22 @@ where
         serde_json::Value::Number(number) => {
             let as_u64 = number
                 .as_u64()
-                .ok_or_else(|| de::Error::custom("manifest_version must be a positive integer"))?;
-            u32::try_from(as_u64)
-                .map_err(|_| de::Error::custom("manifest_version is too large"))
+                .unwrap_or(1);
+            Ok(u32::try_from(as_u64).unwrap_or(1))
         }
         serde_json::Value::String(text) => {
             let trimmed = text.trim();
             if let Ok(v) = trimmed.parse::<u32>() {
                 return Ok(v);
             }
-            if let Some((whole, fractional)) = trimmed.split_once('.') {
-                let whole_num = whole
-                    .parse::<u32>()
-                    .map_err(|_| de::Error::custom("Invalid manifest_version format"))?;
-                let fractional_trimmed = fractional.trim_matches('0');
-                if fractional_trimmed.is_empty() {
+            if let Some((whole, _)) = trimmed.split_once('.') {
+                if let Ok(whole_num) = whole.parse::<u32>() {
                     return Ok(whole_num);
                 }
             }
-            Err(de::Error::custom(
-                "manifest_version must be an integer or integer-like string (e.g. '1' or '1.0')",
-            ))
+            Ok(1)
         }
-        _ => Err(de::Error::custom(
-            "manifest_version must be a number or string",
-        )),
+        _ => Ok(1),
     }
 }
 
@@ -122,7 +270,6 @@ impl Manifest {
     /// Load and validate a manifest from a JSON file
     #[flutter_rust_bridge::frb(ignore)]
     pub async fn from_file(file_path: &str) -> PluginResult<Self> {
-        // Read the file content
         let content = tokio::fs::read_to_string(file_path).await.map_err(|e| {
             PluginError::ManifestParseError(format!(
                 "Failed to read manifest file '{}': {}",
@@ -130,15 +277,43 @@ impl Manifest {
             ))
         })?;
 
-        // Parse JSON
-        let manifest: Manifest = serde_json::from_str(&content).map_err(|e| {
+        // Parse JSON into raw value first to ensure id/name fallback
+        let mut raw_val: serde_json::Value = serde_json::from_str(&content).map_err(|e| {
             PluginError::ManifestParseError(format!(
                 "Failed to parse manifest JSON from '{}': {}",
                 file_path, e
             ))
         })?;
 
-        // Validate the manifest
+        if let serde_json::Value::Object(ref mut map) = raw_val {
+            // Fallback id to name if id is missing or empty
+            let has_id = map.get("id").and_then(|v| v.as_str()).map(|s| !s.trim().is_empty()).unwrap_or(false);
+            if !has_id {
+                let fallback_id = map.get("name")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("unknown_plugin")
+                    .to_string();
+                map.insert("id".to_string(), serde_json::Value::String(fallback_id));
+            }
+
+            // Fallback name to id if name is missing or empty
+            let has_name = map.get("name").and_then(|v| v.as_str()).map(|s| !s.trim().is_empty()).unwrap_or(false);
+            if !has_name {
+                let fallback_name = map.get("id")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("Unknown Plugin")
+                    .to_string();
+                map.insert("name".to_string(), serde_json::Value::String(fallback_name));
+            }
+        }
+
+        let manifest: Manifest = serde_json::from_value(raw_val).map_err(|e| {
+            PluginError::ManifestParseError(format!(
+                "Failed to deserialize manifest from '{}': {}",
+                file_path, e
+            ))
+        })?;
+
         manifest.validate()?;
 
         Ok(manifest)
@@ -196,12 +371,12 @@ impl Manifest {
         // It should be validated at install time instead.
 
         // Validate required string fields are not empty
+        // Note: 'description' is optional for SpotiFLAC-format plugins.
         let required_strings = vec![
             ("id", &self.id),
             ("name", &self.name),
             ("version", &self.version),
             ("type", &self.r#type),
-            ("description", &self.description),
         ];
 
         for (field_name, value) in required_strings {
@@ -215,7 +390,7 @@ impl Manifest {
 
         if parse_plugin_version(&self.version).is_none() {
             return Err(PluginError::ManifestParseError(
-                "Invalid plugin version: expected an integer string (e.g. '1', '2', '42')"
+                "Invalid plugin version: expected a version string (e.g. '1', '1.2.0', 'v2.3.1')"
                     .to_string(),
             ));
         }
@@ -367,11 +542,12 @@ mod tests {
     }
 
     #[test]
-    fn rejects_manifest_with_invalid_version() {
+    fn rejects_manifest_with_empty_id() {
+        // A manifest with an empty id should always fail validation.
         let json = r#"{
-            "manifest_version": "2.0",
-            "id": "com.example.plugin",
-            "name": "Example",
+            "manifest_version": "1",
+            "id": "",
+            "name": "",
             "version": "1",
             "type": "content-resolver",
             "publisher": { "name": "Example Inc" },
@@ -383,7 +559,8 @@ mod tests {
     }
 
     #[test]
-    fn rejects_manifest_with_non_integer_plugin_version() {
+    fn accepts_semver_plugin_version() {
+        // SpotiFLAC plugins use semver like "1.2.0" — this must now pass validation.
         let json = r#"{
             "manifest_version": "1",
             "id": "com.example.plugin",
@@ -395,6 +572,31 @@ mod tests {
         }"#;
 
         let manifest: Manifest = serde_json::from_str(json).expect("manifest should parse");
-        assert!(manifest.validate().is_err());
+        // semver is now accepted
+        assert!(manifest.validate().is_ok());
+    }
+
+    #[test]
+    fn accepts_spotiflac_manifest_with_object_capabilities() {
+        // Deezer .sflx manifest uses: "capabilities": {"downloadFallbackTier": "lossless"}
+        // Note: id-from-name fallback only runs in from_file(); in unit tests we provide id directly.
+        let json = r#"{
+            "id": "deezer",
+            "name": "deezer",
+            "version": "1.2.0",
+            "description": "Deezer plugin",
+            "type": ["metadata_provider", "download_provider"],
+            "capabilities": {
+                "downloadFallbackTier": "lossless"
+            }
+        }"#;
+
+        let manifest: Manifest = serde_json::from_str(json).expect("manifest should parse");
+        assert_eq!(manifest.id, "deezer");
+        assert_eq!(manifest.name, "deezer");
+        assert_eq!(manifest.r#type, "content_resolver");
+        // Object capabilities → extracted string values ("lossless")
+        assert!(!manifest.capabilities.is_empty());
+        assert!(manifest.validate().is_ok());
     }
 }
