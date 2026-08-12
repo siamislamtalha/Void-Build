@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:voidmusic/services/db/dao/settings_dao.dart';
 import 'package:voidmusic/plugins/models/plugin_repository.dart';
@@ -24,21 +25,54 @@ class PluginRepositoryService {
     return completer.future;
   }
 
-  /// Fetch and parse a repository from a URL
+  /// Fetch and parse a repository from [url].
+  ///
+  /// Retries up to [_fetchRetries] times on transient network errors
+  /// (e.g. GitHub releases CDN dropping the connection mid-redirect).
+  /// Network errors and JSON parse errors are surfaced with distinct
+  /// prefixes so callers can classify them correctly.
+  static const int _fetchRetries = 3;
+
   Future<PluginRepositoryModel> fetchRepository(String url) async {
-    try {
-      final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        final jsonMap = jsonDecode(response.body);
-        return PluginRepositoryModel.fromJson(url, jsonMap);
-      } else {
-        throw Exception(
-            'Failed to fetch repository: HTTP ${response.statusCode}');
+    Object? lastError;
+    for (int attempt = 1; attempt <= _fetchRetries; attempt++) {
+      try {
+        final response = await http
+            .get(Uri.parse(url))
+            .timeout(const Duration(seconds: 30));
+        if (response.statusCode != 200) {
+          throw Exception('HTTP ${response.statusCode}');
+        }
+        try {
+          final jsonMap = jsonDecode(response.body);
+          return PluginRepositoryModel.fromJson(url, jsonMap);
+        } on FormatException catch (e) {
+          // Real JSON parse failure — do not retry.
+          throw Exception('JSON parse error at $url: $e');
+        }
+      } catch (e) {
+        lastError = e;
+        final msg = e.toString();
+        // Only retry on transient network-level errors.
+        final isTransient = msg.contains('ClientException') ||
+            msg.contains('Connection closed') ||
+            msg.contains('SocketException') ||
+            msg.contains('TimeoutException') ||
+            msg.contains('Connection reset');
+        if (!isTransient || attempt == _fetchRetries) {
+          break;
+        }
+        log('Fetch attempt $attempt failed for $url ($e), retrying...',
+            name: 'PluginRepositoryService');
+        await Future<void>.delayed(Duration(seconds: attempt * 2));
       }
-    } catch (e) {
-      throw Exception('Failed to parse repository at $url: $e');
     }
+    // Distinguish network errors from parse errors for upstream classifiers.
+    final errStr = lastError.toString();
+    if (errStr.contains('JSON parse error')) {
+      throw Exception('Failed to parse repository at $url: $lastError');
+    }
+    throw Exception('Failed to fetch repository at $url: $lastError');
   }
 
   /// Get the list of saved repository URLs
