@@ -16,6 +16,7 @@ import 'package:voidmusic/core/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+import 'package:cupertino_native/cupertino_native.dart';
 import 'package:motor/motor.dart';
 
 // ─── Collapse animation ──────────────────────────────────────────────────────
@@ -41,11 +42,15 @@ const double _kOuterBottomPadding = 6.0;
 const double _kDesktopSidebarWidth = 80.0;
 
 // Mobile footer element sizes
-// Preserve Void Music's established geometry while using Muzo's glass surface.
-const double _kNavBarH = 58.0;
-const double _kSearchCircleW = 58.0;
-const double _kPillGap = 10.0; // gap between left pill and search circle
-const double _kFooterHPad = 12.0; // horizontal padding for the whole footer
+// cupertino_native CNTabBar style:
+//   LEFT  = small standalone search pill  (_kSearchPillW)
+//   RIGHT = large nav pill (Home / Library / Offline / Local)
+// This matches the pub.dev screenshot where the search pill sits on the
+// left edge and the wider nav capsule fills the remaining width on the right.
+const double _kNavBarH      = 58.0;
+const double _kSearchPillW  = 58.0; // compact square-ish pill (matches screenshot)
+const double _kPillGap      = 10.0; // horizontal gap between the two pills
+const double _kFooterHPad   = 12.0; // outer horizontal padding
 
 class GlobalFooter extends StatefulWidget {
   const GlobalFooter({super.key, required this.navigationShell});
@@ -695,12 +700,15 @@ class _GlassFooterOverlay extends StatelessWidget {
 
         final double miniBottom = isCollapsed ? navBottomAbs : miniNormalBottom;
 
-        // In collapsed mode the mini player is sandwiched between the two circles.
+        // In collapsed mode the mini player is sandwiched between the two pills.
+        // LEFT boundary = search pill (left edge) + search pill width + gap.
+        // RIGHT boundary = collapsed nav circle (right edge) + circle width + gap.
+        // Both pills are _kSearchPillW wide when collapsed, so geometry is symmetric.
         final double miniLeft = isCollapsed
-            ? _kFooterHPad + _kSearchCircleW + _kPillGap
+            ? _kFooterHPad + _kSearchPillW + _kPillGap
             : _kFooterHPad;
         final double miniRight = isCollapsed
-            ? _kFooterHPad + _kSearchCircleW + _kPillGap
+            ? _kFooterHPad + _kSearchPillW + _kPillGap
             : _kFooterHPad;
 
         // Height matches nav bar when collapsed; full card+padding otherwise.
@@ -714,36 +722,45 @@ class _GlassFooterOverlay extends StatelessWidget {
             _kNavBarH +
             (hasMiniPlayer ? _kMiniPlayerGap + _kMiniPlayerHeight : 0.0);
 
-        // The live Muzo footer is one four-item capsule. Keep Void's legacy
-        // outer inset and height, but do not reserve room for the old,
-        // separately rendered search circle.
+        // ── cupertino_native CNTabBar layout ─────────────────────────────
+        // LEFT  = standalone search pill (_kSearchPillW), anchored to left edge.
+        // RIGHT = large nav pill (Home / Library / Offline / Local), fills
+        //         remaining width up to the right edge.
+        // This matches the pub.dev CNTabBar screenshot exactly.
         final double screenW = MediaQuery.of(context).size.width;
-        final double leftCapsuleFullW =
-            screenW - _kFooterHPad * 2;
+        // Nav pill width = full width minus both outer pads, gap, and search pill.
+        final double rightCapsuleFullW =
+            screenW - _kFooterHPad * 2 - _kPillGap - _kSearchPillW;
 
-        // Muzo's mobile footer is a single native Flutter composition. There
-        // is deliberately no LiquidGlassLayer or blend group here: the
-        // surface is just BackdropFilter + translucent fill + border + shadow.
         return SizedBox(
           height: sizedBoxH,
           child: Stack(
-            // Clip.none lets the AnimatedPositioned animate out of the
-            // SizedBox bounds without visual clipping during the transition.
             clipBehavior: Clip.none,
             children: [
-                // ── Left nav capsule ──────────────────────────────────────
-                // Left-edge is anchored at _kFooterHPad.
-                // Width shrinks from fullWidth → _kSearchCircleW (right side moves in).
-                // Uses plain LiquidGlass() — shares the parent LiquidGlassLayer,
-                // matching reference LiquidGlass.inLayer pattern exactly.
+                // ── LEFT: standalone search pill ─────────────────────────
+                // Anchored to the left edge; always visible, never animates.
+                // Matches the single-icon search pill in the CNTabBar screenshot.
                 Positioned(
                   left: _kFooterHPad,
+                  bottom: navBottomAbs,
+                  width: _kSearchPillW,
+                  height: _kNavBarH,
+                  child: _SearchPill(
+                    navigationShell: navigationShell,
+                  ),
+                ),
+
+                // ── RIGHT: collapsible nav capsule (Home|Library|Offline|Local)
+                // Right-edge anchored at _kFooterHPad.
+                // In mini-mode the capsule collapses to a single icon circle.
+                Positioned(
+                  right: _kFooterHPad,
                   bottom: navBottomAbs,
                   height: _kNavBarH,
                   child: _CollapsibleNavCapsule(
                     isMiniMode: isCollapsed,
                     navigationShell: navigationShell,
-                    fullWidth: leftCapsuleFullW,
+                    fullWidth: rightCapsuleFullW,
                     onTapCollapsed: () {
                       HapticFeedback.selectionClick();
                       onExpandFooter?.call();
@@ -751,14 +768,10 @@ class _GlassFooterOverlay extends StatelessWidget {
                   ),
                 ),
 
-                // ── Search circle ──────────────────────────────────────────
-                // Right-edge is anchored at _kFooterHPad. Never moves.
-                // Uses plain LiquidGlass() — shares the parent LiquidGlassLayer,
-                // matching reference LiquidGlass.inLayer profile button exactly.
                 // ── Mini player ────────────────────────────────────────────
-                // AnimatedPositioned smoothly moves between its two positions:
-                //   • Normal: full-width pill floating above the nav bar.
-                //   • Collapsed: narrow pill inline with the two nav circles.
+                // Normal:    full-width pill floating above the nav bar.
+                // Collapsed: narrow pill sandwiched between the two pills,
+                //            left=searchPill+gap, right=collapsedNavCircle+gap.
                 if (hasMiniPlayer)
                   AnimatedPositioned(
                     duration: _kCollapseAnimDuration,
@@ -896,15 +909,33 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final activeAccentColor = AppTheme.accentColor(context);
 
+    // cupertino_native CNTabBar: 4-item nav pill — Search lives in its own
+    // separate pill on the right, so it is intentionally excluded here.
     final items = [
       _NavItemData(
-          branchIndex: 0, icon: FluentIcons.home_24_filled, label: l10n.navHome),
+        branchIndex: 0,
+        icon: FluentIcons.home_24_filled,
+        label: l10n.navHome,
+        symbol: const CNSymbol('house.fill'),
+      ),
       _NavItemData(
-          branchIndex: 2, icon: FluentIcons.search_24_regular, label: l10n.navSearch),
+        branchIndex: 1,
+        icon: FluentIcons.library_24_filled,
+        label: l10n.navLibrary,
+        symbol: const CNSymbol('music.note.list'),
+      ),
       _NavItemData(
-          branchIndex: 1, icon: FluentIcons.library_24_filled, label: l10n.navLibrary),
+        branchIndex: 4,
+        icon: FluentIcons.arrow_download_24_filled,
+        label: l10n.navOffline,
+        symbol: const CNSymbol('arrow.down.circle.fill'),
+      ),
       _NavItemData(
-          branchIndex: 4, icon: FluentIcons.arrow_download_24_filled, label: l10n.navOffline),
+        branchIndex: 3,
+        icon: MingCute.music_2_fill,
+        label: l10n.navLocal,
+        symbol: const CNSymbol('folder.fill'),
+      ),
     ];
 
     final activeTabIndex = items.indexWhere((i) => i.branchIndex == currentIndex).clamp(0, items.length - 1);
@@ -944,7 +975,9 @@ class _CollapsibleNavCapsuleState extends State<_CollapsibleNavCapsule>
     final surface = AnimatedContainer(
         duration: _kCollapseAnimDuration,
         curve: _kCollapseAnimCurve,
-        width: widget.isMiniMode ? _kSearchCircleW : widget.fullWidth,
+        // Collapses to a small circle (_kSearchPillW) matching the search pill width;
+        // expands back to the full right-side capsule width.
+        width: widget.isMiniMode ? _kSearchPillW : widget.fullWidth,
         height: _kNavBarH,
         decoration: pillShadow,
         child: widget.isMiniMode
@@ -1537,23 +1570,23 @@ class _CollapsedActiveIconState extends State<_CollapsedActiveIcon>
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SEARCH CIRCLE BUTTON
+// SEARCH PILL  (cupertino_native CNTabBar — right standalone pill)
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Standalone search circle pill — liquid glass translucent circle.
-/// Uses AdaptiveGlass with LiquidOval shape for the true circular glass effect.
-class _SearchCircleButton extends StatefulWidget {
-  const _SearchCircleButton({required this.navigationShell});
+/// Standalone search pill matching the single-icon pill in the cupertino_native
+/// CNTabBar screenshot.  Uses the same liquid-glass blur treatment as the main
+/// nav capsule so both pills feel visually unified.
+class _SearchPill extends StatefulWidget {
+  const _SearchPill({required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
   @override
-  State<_SearchCircleButton> createState() => _SearchCircleButtonState();
+  State<_SearchPill> createState() => _SearchPillState();
 }
 
-class _SearchCircleButtonState extends State<_SearchCircleButton>
-    with TickerProviderStateMixin {
-  late final AnimationController _liquidController;
+class _SearchPillState extends State<_SearchPill>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _bounceController;
   late final Animation<double> _bounceAnimation;
 
@@ -1563,11 +1596,6 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
   @override
   void initState() {
     super.initState();
-    _liquidController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -1584,7 +1612,6 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
   void dispose() {
     _chipDismissTimer?.cancel();
     _removeChipOverlay();
-    _liquidController.dispose();
     _bounceController.dispose();
     super.dispose();
   }
@@ -1661,25 +1688,20 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final currentIndex = widget.navigationShell.currentIndex;
     final isSearchSelected = currentIndex == 2;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeAccentColor = AppTheme.accentColor(context);
 
-    final iconColor =
-        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
+    final iconColor = isSearchSelected
+        ? activeAccentColor
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60);
 
-    // 1:1 reference: profile circle from liquid_glass_demo dashboard_page.dart
-    // lines 502-521 (LiquidGlass.inLayer for the profile button).
-    //
-    // Reference uses LiquidGlass.inLayer inside a LiquidGlassLayer — the shape
-    // inherits the layer's settings (blur:3, white12, ambientStrength:0.5).
-    // In the local package, LiquidGlass.inLayer = plain LiquidGlass() inside a
-    // parent LiquidGlassLayer (which is provided by _GlassFooterOverlay above).
-    //
-    // lightAngle: -0.2π matches the reference notification button (right-side icon)
-    // which is the closest analog to our right-side search circle.
-    // This negative angle creates the raised-corner from the upper-right,
-    // producing the light-bending distortion illusion shown in the reference icon.
+    // Standalone search pill — LEFT side of the footer, matching the
+    // cupertino_native CNTabBar screenshot (single-icon compact pill on left).
+    // Uses identical glass recipe (BackdropFilter + translucent fill + border
+    // + drop shadow) as the nav capsule so both pills feel visually unified.
     return GestureDetector(
       onTap: () {
         _removeChipOverlay();
@@ -1689,60 +1711,86 @@ class _SearchCircleButtonState extends State<_SearchCircleButton>
       onLongPress: () => _showGlassChip(context),
       behavior: HitTestBehavior.opaque,
       child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
-                blurRadius: 20,
-                spreadRadius: -4,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: ClipOval(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: (isDark ? Colors.black : Colors.white)
-                      .withValues(alpha: isDark ? 0.20 : 0.35),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(
-                      alpha: isDark ? 0.12 : 0.20,
-                    ),
-                    width: 0.75,
+        width: _kSearchPillW,
+        height: _kNavBarH,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(29),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.38 : 0.14),
+              blurRadius: 24,
+              spreadRadius: -6,
+              offset: const Offset(0, 10),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.06),
+              blurRadius: 8,
+              spreadRadius: 0,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(29),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+            child: Container(
+              decoration: BoxDecoration(
+                color: (isDark ? Colors.black : Colors.white)
+                    .withValues(alpha: isDark ? 0.25 : 0.42),
+                borderRadius: BorderRadius.circular(29),
+                border: Border.all(
+                  color: Colors.white.withValues(
+                    alpha: isDark ? 0.15 : 0.24,
                   ),
+                  width: 0.75,
                 ),
-                child: SizedBox(
-                  width: _kSearchCircleW,
-                  height: _kNavBarH,
-                  child: Center(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      transitionBuilder: (child, animation) => ScaleTransition(
-                        scale: animation,
-                        child: FadeTransition(opacity: animation, child: child),
-                      ),
-                      child: Icon(
+              ),
+              child: Center(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  transitionBuilder: (child, animation) => ScaleTransition(
+                    scale: animation,
+                    child: FadeTransition(opacity: animation, child: child),
+                  ),
+                  child: Column(
+                    key: ValueKey<bool>(isSearchSelected),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
                         isSearchSelected
-                            ? FluentIcons.home_24_regular
+                            ? FluentIcons.search_24_filled
                             : FluentIcons.search_24_regular,
-                        key: ValueKey<bool>(isSearchSelected),
-                        size: 18,
+                        size: isSearchSelected ? 22 : 20,
                         color: iconColor,
                       ),
-                    ),
+                      if (isSearchSelected) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          l10n.navSearch,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: iconColor,
+                            fontSize: 9,
+                            height: 1,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ),
             ),
           ),
+        ),
       ),
     );
   }
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ANIMATED PAGE VIEW
@@ -1896,14 +1944,12 @@ class VerticalNavBar extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HORIZONTAL NAV BAR (preserved for backward-compat / external references)
+// HORIZONTAL NAV BAR (legacy stub — not rendered on mobile)
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Original horizontal nav bar widget.
-/// No longer used in the mobile footer path — the mobile footer now uses the
-/// animated [_CollapsibleNavCapsule] + [_SearchCircleButton] Stack layout.
-/// Preserved here so any external code that references [HorizontalNavBar]
-/// continues to compile unchanged.
+/// Legacy stub kept so any external import of [HorizontalNavBar] still
+/// compiles.  The real mobile footer uses [_CollapsibleNavCapsule] (right
+/// large pill) + [_SearchPill] (left compact pill) via [_GlassFooterOverlay].
 class HorizontalNavBar extends StatelessWidget {
   const HorizontalNavBar({super.key, required this.navigationShell});
   final StatefulNavigationShell navigationShell;
@@ -2288,10 +2334,12 @@ class _NavItemData {
   final int branchIndex;
   final IconData icon;
   final String label;
+  final CNSymbol? symbol;
 
   const _NavItemData({
     required this.branchIndex,
     required this.icon,
     required this.label,
+    this.symbol,
   });
 }
