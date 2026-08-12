@@ -230,13 +230,17 @@ class PluginBootstrapService {
         if (errorStr.contains('HTTP')) {
           errorType = 'Failed to fetch';
           reason = 'HTTP error';
-        } else if (errorStr.contains('SocketException')) {
+        } else if (errorStr.contains('SocketException') ||
+            errorStr.contains('ClientException') ||
+            errorStr.contains('Connection closed') ||
+            errorStr.contains('Connection reset')) {
           errorType = 'Failed to fetch';
           reason = 'Network connection failed';
         } else if (errorStr.contains('TimeoutException')) {
           errorType = 'Failed to fetch';
           reason = 'Request timed out';
-        } else if (errorStr.contains('FormatException') || errorStr.contains('json')) {
+        } else if (errorStr.contains('JSON parse error') ||
+            errorStr.contains('FormatException')) {
           errorType = 'Failed to parse';
           reason = 'Invalid JSON format';
         } else {
