@@ -256,17 +256,27 @@ class PluginBootstrapService {
     log('Bootstrap Quality Mode: ${isAudiophile ? "Audiophile (.sflx / .spotiflac-ext)" : "Normal (.bex)"}',
         name: 'PluginBootstrap');
 
-    // Filter plugins according to mode
+    // Filter plugins according to mode.
+    // A .bex whose asset_name contains "audiophile" is ONLY for Audiophile mode.
+    // Normal mode must NEVER download any .bex containing "audiophile" in its name.
     final filteredInstallRepos = installRepos.map((repo) {
       final modePlugins = repo.plugins.where((plugin) {
         final assetName = plugin.assetName.toLowerCase();
         final id = plugin.id.toLowerCase();
+        // Audiophile-specific .bex files are identified by their asset name
+        // containing the word "audiophile" OR by the id prefix "audiophile."
+        final isAudiophileBex =
+            (assetName.endsWith('.bex') && assetName.contains('audiophile')) ||
+            id.startsWith('audiophile.');
         if (isAudiophile) {
+          // Audiophile mode: download .sflx / .spotiflac-ext formats AND
+          // all audiophile-prefixed .bex plugins from the Audiophile category.
           return assetName.endsWith('.sflx') ||
               assetName.endsWith('.spotiflac-ext') ||
-              id.startsWith('audiophile.');
+              isAudiophileBex;
         } else {
-          return assetName.endsWith('.bex') && !id.startsWith('audiophile.');
+          // Normal mode: ONLY plain .bex files that do NOT contain "audiophile".
+          return assetName.endsWith('.bex') && !isAudiophileBex;
         }
       }).toList();
       return PluginRepositoryModel(
@@ -521,8 +531,15 @@ class PluginBootstrapService {
           if (!_isRemoteManifestCompatible(remote)) {
             continue;
           }
-          final isAudiophilePlugin = remote.assetName.endsWith('.sflx') ||
-              remote.assetName.endsWith('.spotiflac-ext') ||
+          final remoteAsset = remote.assetName.toLowerCase();
+          // A plugin is audiophile-only if its asset name is a .bex containing
+          // "audiophile", it uses the lossless formats, or its id starts with
+          // "audiophile." — any of these means it must NEVER be synced in
+          // normal mode.
+          final isAudiophilePlugin =
+              remoteAsset.endsWith('.sflx') ||
+              remoteAsset.endsWith('.spotiflac-ext') ||
+              (remoteAsset.endsWith('.bex') && remoteAsset.contains('audiophile')) ||
               remote.id.startsWith('audiophile.');
           if (isAudiophile && !isAudiophilePlugin) {
             continue;
