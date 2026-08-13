@@ -53,13 +53,26 @@ impl PluginInfo {
             )));
         }
 
-        // Look for manifest.json file
+        // Look for manifest.json file (case-insensitive check for cross-platform compatibility)
         let manifest_path = dir_path.join("manifest.json");
         if !manifest_path.exists() {
-            return Err(PluginError::ManifestParseError(format!(
-                "manifest.json not found in: {}",
-                dir_path.display()
-            )));
+            let mut found_manifest = None;
+            if let Ok(entries) = std::fs::read_dir(dir_path) {
+                for entry in entries.flatten() {
+                    if entry.file_name().to_string_lossy().to_lowercase() == "manifest.json" {
+                        found_manifest = Some(entry.path());
+                        break;
+                    }
+                }
+            }
+            if let Some(actual) = found_manifest {
+                let _ = std::fs::rename(&actual, &manifest_path);
+            } else {
+                return Err(PluginError::ManifestParseError(format!(
+                    "manifest.json not found in: {}",
+                    dir_path.display()
+                )));
+            }
         }
 
         // Load manifest (this already validates it)

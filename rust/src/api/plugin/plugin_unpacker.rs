@@ -31,6 +31,80 @@ fn parse_version_int(version: &str) -> Option<u64> {
     Some(major * 1_000_000 + minor * 1_000 + patch)
 }
 
+fn copy_dir_or_file(src: &std::path::Path, dst: &std::path::Path) -> Result<()> {
+    if src.is_dir() {
+        std::fs::create_dir_all(dst)?;
+        for entry in std::fs::read_dir(src)? {
+            let entry = entry?;
+            let target = dst.join(entry.file_name());
+            copy_dir_or_file(&entry.path(), &target)?;
+        }
+    } else {
+        if let Some(p) = dst.parent() {
+            std::fs::create_dir_all(p)?;
+        }
+        std::fs::copy(src, dst)?;
+    }
+    Ok(())
+}
+
+fn find_manifest_dir(dir: &std::path::Path) -> Option<(std::path::PathBuf, std::path::PathBuf)> {
+    if let Ok(entries) = std::fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_file() {
+                if entry.file_name().to_string_lossy().to_lowercase() == "manifest.json" {
+                    return Some((dir.to_path_buf(), path));
+                }
+            }
+        }
+    }
+    if let Ok(entries) = std::fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() && entry.file_name() != "__MACOSX" {
+                if let Some(found) = find_manifest_dir(&path) {
+                    return Some(found);
+                }
+            }
+        }
+    }
+    None
+}
+
+fn flatten_plugin_dir(temp_plugin_dir: &str) -> Result<()> {
+    let root = std::path::Path::new(temp_plugin_dir);
+
+    if let Some((manifest_dir, manifest_file)) = find_manifest_dir(root) {
+        let root_manifest = root.join("manifest.json");
+
+        if manifest_dir != root {
+            let entries: Vec<_> = std::fs::read_dir(&manifest_dir)?
+                .flatten()
+                .collect();
+            for entry in entries {
+                let is_manifest = entry.file_name().to_string_lossy().to_lowercase() == "manifest.json";
+                let dest = if is_manifest {
+                    root_manifest.clone()
+                } else {
+                    root.join(entry.file_name())
+                };
+
+                if entry.path() != dest {
+                    if let Err(_) = std::fs::rename(entry.path(), &dest) {
+                        copy_dir_or_file(&entry.path(), &dest)?;
+                    }
+                }
+            }
+            let _ = std::fs::remove_dir_all(&manifest_dir);
+        } else if manifest_file != root_manifest {
+            // Renaming uppercase/mixed case Manifest.json to lowercase manifest.json for case-sensitive filesystems (Android/Linux)
+            let _ = std::fs::rename(&manifest_file, &root_manifest);
+        }
+    }
+    Ok(())
+}
+
 pub async fn unpack_and_read_manifest(
     archive_path: &str,
     temp_dir: &str,
@@ -47,6 +121,8 @@ pub async fn unpack_and_read_manifest(
     );
 
     unpack_plugin(archive_path, &temp_plugin_dir, None).await?;
+
+    flatten_plugin_dir(&temp_plugin_dir)?;
 
     let manifest_path = format!("{}/manifest.json", temp_plugin_dir);
     let manifest = Manifest::from_file(&manifest_path)
