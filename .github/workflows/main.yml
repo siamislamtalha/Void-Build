@@ -479,8 +479,15 @@ jobs:
 
 
             - name: Build Android APK
-
-              run: flutter build apk --release --target-platform android-arm64 --build-number ${{github.run_number}}
+              run: |
+                for i in 1 2 3; do
+                  echo "Attempt $i to build Android APK..."
+                  flutter build apk --release --target-platform android-arm64 --build-number ${{github.run_number}} && break || {
+                    if [ $i -eq 3 ]; then exit 1; fi
+                    echo "Build failed on attempt $i (transient network/CDN drop), retrying in 10s..."
+                    sleep 10
+                  }
+                done
 
 
 
