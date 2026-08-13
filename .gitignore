@@ -163,3 +163,9 @@ analyze_*.txt
 
 # Screenshots
 /screenshot/
+
+# Resonada
+Resonada/
+
+# Desktop Plugins
+desktop_plugins/
