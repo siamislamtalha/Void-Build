@@ -15,6 +15,7 @@ import 'package:voidmusic/blocs/explore/cubit/recently_cubit.dart';
 import 'package:voidmusic/blocs/player_overlay/player_overlay_cubit.dart';
 import 'package:voidmusic/blocs/search_suggestions/search_suggestion_bloc.dart';
 import 'package:voidmusic/blocs/settings_cubit/cubit/settings_cubit.dart';
+import 'package:voidmusic/blocs/audiophile/audiophile_cubit.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:voidmusic/plugins/blocs/plugin/plugin_event.dart';
 import 'package:voidmusic/repository/voidmusic/voidmusic_download_repository.dart';
@@ -377,6 +378,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 ticker: const Ticker(), voidMusicPlayer: voidMusicPlayerCubit)),
         BlocProvider(
           create: (context) => ConnectivityCubit(),
+          lazy: false,
+        ),
+        BlocProvider(
+          create: (context) => AudiophileCubit(),
           lazy: false,
         ),
         BlocProvider(

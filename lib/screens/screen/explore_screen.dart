@@ -38,6 +38,7 @@ import 'chart/carousal_widget.dart';
 import '../widgets/horizontal_card_view.dart';
 import '../widgets/tab_list_widget.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:voidmusic/screens/screen/audiophile/audiophile_shell.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -1392,6 +1393,23 @@ class _DiscoverBarDelegate extends SliverPersistentHeaderDelegate {
                     ),
                   ),
                   const Spacer(),
+                  IconButton(
+                    tooltip: 'Audiophile Mode (FLAC / Hi-Res)',
+                    icon: Icon(
+                      MingCute.disc_fill,
+                      color: AppTheme.accentColor(context),
+                      size: 24,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AudiophileShell(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 4),
                   const NotificationIcon(),
                   const SizedBox(width: 8),
                   const TimerIcon(),

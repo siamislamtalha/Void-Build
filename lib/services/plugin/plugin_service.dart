@@ -14,6 +14,8 @@ import 'package:voidmusic/utils/country_info.dart';
 import 'package:archive/archive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:voidmusic/src/rust/api/plugin/models.dart';
+import 'package:voidmusic/services/plugin/spotiflac_extension_bridge.dart';
 
 /// The main Dart-side interface to the Rust plugin system.
 ///
@@ -122,13 +124,54 @@ class PluginService {
     required String pluginId,
     required PluginRequest request,
   }) async {
+    final bridgeExt = SpotiFLACExtensionBridge();
+    if (bridgeExt.isSpotiFLACExtension(pluginId)) {
+      try {
+        if (request is PluginRequest_ContentResolver) {
+          final cmd = request.field0;
+          if (cmd is ContentResolverCommand_Search) {
+            final res = await bridgeExt.search(
+              pluginId: pluginId,
+              query: cmd.query,
+              filter: cmd.filter,
+              limit: 20,
+              page: 1,
+            );
+            return PluginResponse.search(
+              PagedMediaItems(
+                items: res.tracks.items.map((t) => MediaItem.track(t)).toList(),
+              ),
+            );
+          } else if (cmd is ContentResolverCommand_GetHomeSections) {
+            final sections = await bridgeExt.getHomeFeed(pluginId);
+            return PluginResponse.homeSections(sections);
+          } else if (cmd is ContentResolverCommand_GetStreams) {
+            final source = await bridgeExt.getHighQualityStreamSource(cmd.id, pluginId);
+            if (source != null) {
+              return PluginResponse.streams([source]);
+            }
+          }
+        } else if (request is PluginRequest_SearchSuggestionProvider) {
+          final cmd = request.field0;
+          if (cmd is SearchSuggestionCommand_GetSuggestions) {
+            final suggestions = await bridgeExt.getSearchSuggestions(pluginId, cmd.query);
+            return PluginResponse.suggestions(suggestions);
+          } else if (cmd is SearchSuggestionCommand_GetDefaultSuggestions) {
+            final suggestions = await bridgeExt.getSearchSuggestions(pluginId, 'audiophile flac');
+            return PluginResponse.suggestions(suggestions);
+          }
+        }
+      } catch (e) {
+        log('SpotiFLAC extension execution fallback: $e', name: 'PluginService');
+      }
+    }
+
     try {
       final response = await bridge.handlePluginRequest(
         manager: manager,
         pluginId: pluginId,
         request: request,
       );
-      // IDs are stamped on the Rust side before crossing the FRB boundary.
       return response;
     } catch (e) {
       throw _mapError(pluginId, e);
