@@ -277,8 +277,11 @@ impl Manifest {
             ))
         })?;
 
+        // Strip UTF-8 Byte Order Mark (BOM) if present (\u{feff})
+        let clean_content = content.trim_start_matches('\u{feff}');
+
         // Parse JSON into raw value first to ensure id/name fallback
-        let mut raw_val: serde_json::Value = serde_json::from_str(&content).map_err(|e| {
+        let mut raw_val: serde_json::Value = serde_json::from_str(clean_content).map_err(|e| {
             PluginError::ManifestParseError(format!(
                 "Failed to parse manifest JSON from '{}': {}",
                 file_path, e

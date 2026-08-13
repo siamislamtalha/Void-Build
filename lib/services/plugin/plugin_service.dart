@@ -423,7 +423,11 @@ Future<_PackedPluginManifest> _readPackedManifest(String packedFilePath) async {
     if (manifestFile != null) {
       final manifestBytes = manifestFile.content as List<int>;
       if (manifestBytes.isNotEmpty) {
-        final decoded = jsonDecode(utf8.decode(manifestBytes));
+        var rawText = utf8.decode(manifestBytes);
+        if (rawText.startsWith('\uFEFF')) {
+          rawText = rawText.substring(1);
+        }
+        final decoded = jsonDecode(rawText);
         if (decoded is Map) {
           final json = Map<String, dynamic>.from(decoded);
           final pluginId = json['id']?.toString() ?? 'unknown';
